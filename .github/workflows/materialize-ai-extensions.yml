@@ -8,13 +8,17 @@ on:
       - .github/workflows/materialize-ai-extensions.yml
       - scripts/restore_extensions.py
       - transport/dataset-manifest.json
+  pull_request:
+    branches:
+      - main
+    types: [opened, synchronize, reopened]
   workflow_dispatch:
 
 permissions:
   contents: write
 
 concurrency:
-  group: materialize-ai-extensions-${{ github.ref }}
+  group: materialize-ai-extensions-${{ github.head_ref || github.ref_name }}
   cancel-in-progress: false
 
 jobs:
@@ -26,6 +30,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: ${{ github.head_ref || github.ref_name }}
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -55,5 +60,5 @@ jobs:
             echo "No source changes to commit"
           else
             git commit -m "Materialize 78 AI extensions"
-            git push
+            git push origin HEAD:${{ github.head_ref || github.ref_name }}
           fi
