@@ -1,0 +1,78 @@
+{
+  "name": "Titan Go",
+  "slug": "titan-go",
+  "type": "technician-work",
+  "description": "Field technician work app",
+  "icon": "🚀",
+  "color": "#00d4ff",
+  "theme": {
+    "primary": "#00d4ff",
+    "gradient": "linear-gradient(135deg, #00d4ff, #0ea5e9)"
+  },
+  "wizard_steps": [
+    "Configure",
+    "Customize",
+    "Train",
+    "Deploy",
+    "Launch"
+  ],
+  "features": [
+    "job-assignment",
+    "gps-navigation",
+    "photo-capture",
+    "signature-pad",
+    "work-checklist",
+    "time-tracking",
+    "location-tracking",
+    "offline-sync",
+    "chatbot"
+  ],
+  "chatbot": {
+    "name": "Titan Go Assistant",
+    "role": "Field technician support",
+    "system_prompt": "You are a field technician assistant helping with:\n- Job-specific troubleshooting\n- Customer communication\n- Safety procedures\n- Equipment questions\n- Time management\n\nAlways prioritize customer satisfaction and safety.",
+    "suggested_prompts": [
+      "How do I handle this issue?",
+      "What should I tell the customer?",
+      "Need extra time, how do I request?",
+      "Safety question",
+      "Equipment troubleshooting"
+    ],
+    "context_fields": [
+      "current_job_id",
+      "customer_name",
+      "service_type",
+      "location"
+    ]
+  },
+  "ui_components": {
+    "dashboard": "JobList.vue",
+    "detail_view": "JobDetail.vue",
+    "actions": [
+      "navigate",
+      "capture_photo",
+      "get_signature",
+      "mark_complete"
+    ]
+  },
+  "api_routes": [
+    "GET /api/v2/titan-go/jobs/today",
+    "POST /api/v2/titan-go/job/{id}/complete",
+    "POST /api/v2/titan-go/location/update",
+    "POST /api/v2/titan-go/photo/upload",
+    "POST /api/v2/titan-go/signature/capture"
+  ],
+  "permissions": {
+    "geolocation": true,
+    "camera": true,
+    "background_sync": true,
+    "notification": true
+  },
+  "storage": {
+    "local_tables": [
+      "titan_go_jobs",
+      "titan_go_photos",
+      "titan_go_sync_queue"
+    ]
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "name": "Custom Agent Factory",
+  "type": "extension",
+  "version": "1.0.0",
+  "description": "Custom Agent Factory: Controlled system for creating, testing, approving and managing custom Titan Trio agents when capability gaps are detected.",
+  "tier": "trio_factory",
+  "purpose": "Autonomous Agent Creation",
+  "support_telegram": "heew_support",
+  "requires": [
+    "titan-duo-assistants",
+    "titan-trio-agents",
+    "titan-quattro-tools"
+  ]
+}

@@ -1,0 +1,355 @@
+@php
+    $apsMaxUploadMb = \App\Extensions\AIPhotoshoot\System\Services\AIPhotoshootImageModelRegistry::getMaxUploadSizeMb();
+@endphp
+@extends('panel.layout.app', ['disable_tblr' => true])
+@section('title', __('Custom Photoshoot'))
+@section('titlebar_pretitle', '')
+@section('titlebar_actions')
+    <x-button
+        href="{{ route('dashboard.user.ai-photoshoot.photo_shoots.my') }}"
+        variant="ghost-shadow"
+    >
+        {{ __('My Photoshoots') }}
+    </x-button>
+
+    <x-button
+        href="{{ route('dashboard.user.ai-photoshoot.custom.index') }}"
+        variant="primary"
+    >
+        <x-tabler-plus class="size-4" />
+        {{ __('New Photoshoot') }}
+    </x-button>
+@endsection
+@section('titlebar_subtitle', __('Describe the setting, lighting, and other details to create the perfect photoshoot.'))
+
+@section('content')
+    <div
+        class="py-10"
+        x-data="customPhotoApp"
+    >
+        <div class="flex flex-col gap-4 lg:flex-row lg:gap-9">
+            <div class="w-full lg:basis-1/3">
+                <p class="mb-5 border-b py-2.5 text-[12px] font-semibold transition-border">
+                    {{ __('Set Up Photoshoot') }}
+                </p>
+
+                <form
+                    class="space-y-4 sm:space-y-6"
+                    id="aps-custom-form"
+                    @submit.prevent="submit"
+                >
+                    @csrf
+
+                    {{-- Product Image Upload --}}
+                    <div>
+                        <label class="mb-4 flex items-center gap-1 text-2xs font-medium">
+                            {{ __('Product / Reference Images (Optional)') }}
+                            <x-info-tooltip
+                                class:content="-start-4 translate-x-0 text-2xs"
+                                text="{{ __('Upload a product or reference image to guide the generation.') }}"
+                            />
+                        </label>
+
+                        <input
+                            class="hidden"
+                            type="file"
+                            x-ref="productInput"
+                            accept="image/*"
+                            @change="handleFileSelect($event)"
+                        >
+
+                        <div
+                            class="cursor-pointer rounded-[10px] border border-dashed border-foreground/10 p-6 text-center transition hover:border-primary hover:bg-primary/5 sm:p-8"
+                                @click="$refs.productInput.click()"
+                                @dragover.prevent="dragOver = true"
+                                @dragleave.prevent="dragOver = false"
+                                @drop.prevent="handleFileDrop($event)"
+                                :class="{ 'border-primary bg-primary/5': dragOver }"
+                            >
+                                <div x-show="!productPreview">
+                                    <svg
+                                        class="mx-auto mb-2.5 opacity-25"
+                                        width="38"
+                                        height="38"
+                                        viewBox="0 0 38 38"
+                                        fill="currentColor"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                        <path
+                                            d="M32.4073 32.4839C28.7298 36.1613 24.2608 38 19 38C13.7392 38 9.24462 36.1613 5.51613 32.4839C1.83871 28.7554 0 24.2608 0 19C0 13.7392 1.83871 9.27016 5.51613 5.59274C9.24462 1.86425 13.7392 0 19 0C24.2608 0 28.7298 1.86425 32.4073 5.59274C36.1358 9.27016 38 13.7392 38 19C38 24.2608 36.1358 28.7554 32.4073 32.4839ZM29.8024 8.19758C26.8401 5.18414 23.2392 3.67742 19 3.67742C14.7608 3.67742 11.1344 5.18414 8.12097 8.19758C5.1586 11.1599 3.67742 14.7608 3.67742 19C3.67742 23.2392 5.1586 26.8656 8.12097 29.879C11.1344 32.8414 14.7608 34.3226 19 34.3226C23.2392 34.3226 26.8401 32.8414 29.8024 29.879C32.8159 26.8656 34.3226 23.2392 34.3226 19C34.3226 14.7608 32.8159 11.1599 29.8024 8.19758ZM20.5323 28.8065H17.4677C16.8548 28.8065 16.5484 28.5 16.5484 27.8871V22C16.5484 20.3431 15.2052 19 13.5484 19H11.4153C11.0067 19 10.7258 18.8212 10.5726 18.4637C10.4194 18.0551 10.4704 17.7231 10.7258 17.4677L18.3871 9.80645C18.7957 9.39785 19.2043 9.39785 19.6129 9.80645L27.2742 17.4677C27.5296 17.7231 27.5806 18.0551 27.4274 18.4637C27.2742 18.8212 26.9933 19 26.5847 19H24.4516C22.7948 19 21.4516 20.3431 21.4516 22V27.8871C21.4516 28.5 21.1452 28.8065 20.5323 28.8065Z"
+                                        />
+                                    </svg>
+                                    <p class="mb-2 text-sm font-medium">
+                                        {{ __('Drag and drop or click to browse') }}
+                                    </p>
+                                    <p class="m-0 text-4xs font-medium opacity-50">
+                                        {{ __('Max File Size: :size MB', ['size' => $apsMaxUploadMb]) }}
+                                    </p>
+                                </div>
+
+                                <div
+                                    x-show="productPreview"
+                                    x-cloak
+                                >
+                                    <div class="relative mx-auto mb-2 inline-block w-32">
+                                        <img
+                                            class="max-h-40 w-full rounded-lg border object-cover"
+                                            :src="productPreview"
+                                        >
+                                        <button
+                                            class="absolute -end-3 -top-3 inline-grid size-7 place-items-center rounded-full bg-background text-foreground shadow-lg transition hover:scale-110 hover:bg-red-500 hover:text-white"
+                                            type="button"
+                                            @click.stop="removeProduct()"
+                                            title="{{ __('Remove') }}"
+                                        >
+                                            <x-tabler-x class="size-4" />
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- Photoshoot Details --}}
+                        <x-forms.input
+                            class:label="text-heading-foreground text-2xs font-medium"
+                            label="{{ __('Photoshoot Details') }}"
+                            type="textarea"
+                            x-model="prompt"
+                            rows="4"
+                            placeholder="{{ __('Explain your idea about the product, scene and more') }}"
+                        />
+
+                        {{-- Ratio + Number of Images --}}
+                        <div class="grid grid-cols-2 gap-3">
+                            <x-forms.input
+                                class:label="text-heading-foreground text-2xs font-medium"
+                                label="{{ __('Ratio') }}"
+                                type="select"
+                                x-model="ratio"
+                            >
+                                @foreach (\App\Extensions\AIPhotoshoot\System\Services\AIPhotoshootImageModelRegistry::getRatioOptionsForActiveModel() as $rValue => $rLabel)
+                                    <option value="{{ $rValue }}">{{ $rLabel }}</option>
+                                @endforeach
+                            </x-forms.input>
+
+                            <x-forms.input
+                                class:label="text-heading-foreground text-2xs font-medium"
+                                label="{{ __('Number of Images') }}"
+                                type="select"
+                                x-model.number="numImages"
+                            >
+                                @for ($i = 1; $i <= (int) config('ai-photoshoot.max_images', 4); $i++)
+                                    <option value="{{ $i }}">{{ $i }}</option>
+                                @endfor
+                            </x-forms.input>
+                        </div>
+
+                        <div
+                            x-init="
+                                $nextTick(() => $dispatch('generator-changed', { generator: '{{ \App\Extensions\AIPhotoshoot\System\Services\AIPhotoshootImageModelRegistry::getDefaultModel()->value }}', quantity: numImages }));
+                                $watch('numImages', val => $dispatch('generator-changed', { generator: '{{ \App\Extensions\AIPhotoshoot\System\Services\AIPhotoshootImageModelRegistry::getDefaultModel()->value }}', quantity: val, _force: Date.now() }));
+                            "
+                        >
+                            <x-cost-preview class="w-full justify-end" />
+                        </div>
+
+                        <x-button
+                            class="w-full"
+                            size="xl"
+                            type="submit"
+                            variant="primary"
+                            ::disabled="generating || !prompt.trim()"
+                        >
+                            <span x-show="!generating">{{ __('Generate') }}</span>
+                            <span
+                                class="flex items-center gap-2"
+                                x-show="generating"
+                                x-cloak
+                            >
+                                <x-tabler-loader-2 class="size-4 animate-spin" />
+                                {{ __('Generating...') }}
+                            </span>
+                        </x-button>
+                </form>
+            </div>
+
+            {{-- Right: Generated Results --}}
+            <div class="flex w-full flex-col lg:basis-2/3">
+                <div class="mb-5 flex flex-wrap justify-between gap-3 border-b py-2.5 transition-border">
+                    <p class="m-0 text-[12px] font-semibold">
+                        {{ __('Generated Results') }}
+                    </p>
+                </div>
+
+                {{-- Empty State --}}
+                <div
+                    class="grid min-h-[400px] grow place-items-center rounded-[10px] border border-dashed border-foreground/10 p-8 text-center"
+                    x-show="!results.length && !generating"
+                    x-cloak
+                >
+                    <div>
+                        <svg
+                            class="mx-auto mb-5"
+                            width="28"
+                            height="26"
+                            viewBox="0 0 28 26"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+                            <path
+                                d="M9.15053 21.5418L9.76695 21.4163C9.94061 21.3827 10.0972 21.2897 10.2097 21.1533C10.3223 21.0168 10.3839 20.8455 10.3839 20.6686C10.3839 20.4918 10.3223 20.3204 10.2097 20.184C10.0972 20.0475 9.94061 19.9546 9.76695 19.921L9.15053 19.7954C8.38982 19.641 7.69147 19.2659 7.14274 18.7169C6.594 18.1679 6.21921 17.4694 6.06519 16.7086L5.93962 16.0922C5.90603 15.9186 5.81303 15.762 5.6766 15.6495C5.54017 15.5369 5.36881 15.4754 5.19193 15.4754C5.01505 15.4754 4.84369 15.5369 4.70726 15.6495C4.57083 15.762 4.47783 15.9186 4.44424 16.0922L4.31867 16.7086C4.16456 17.4692 3.78971 18.1674 3.24096 18.7161C2.69222 19.2648 1.99392 19.6397 1.23333 19.7938L0.616915 19.9193C0.443257 19.9529 0.286707 20.0459 0.174137 20.1823C0.0615681 20.3188 0 20.4901 0 20.667C0 20.8439 0.0615681 21.0152 0.174137 21.1516C0.286707 21.2881 0.443257 21.381 0.616915 21.4146L1.23333 21.5402C1.9937 21.6942 2.69185 22.0688 3.24057 22.6172C3.78929 23.1656 4.16427 23.8635 4.31867 24.6237L4.44424 25.2401C4.47783 25.4138 4.57083 25.5703 4.70726 25.6829C4.84369 25.7954 5.01505 25.857 5.19193 25.857C5.36881 25.857 5.54017 25.7954 5.6766 25.6829C5.81303 25.5703 5.90603 25.4138 5.93962 25.2401L6.06519 24.6237C6.21979 23.8636 6.59483 23.1658 7.14352 22.6174C7.69221 22.069 8.39025 21.696 9.15053 21.5418Z"
+                                fill="url(#aps_sparkles_a)"
+                            />
+                            <path
+                                d="M24.0928 10.3752L26.3628 9.91531C26.5891 9.86897 26.7926 9.74588 26.9386 9.56687C27.0847 9.38786 27.1645 9.1639 27.1645 8.93285C27.1645 8.70181 27.0847 8.47785 26.9386 8.29884C26.7926 8.11982 26.5891 7.99674 26.3628 7.95039L24.0928 7.49382C22.9995 7.27197 21.9957 6.73301 21.2069 5.94421C20.4181 5.15541 19.8791 4.15173 19.6572 3.05848L19.1973 0.788628C19.1488 0.56523 19.0253 0.36517 18.8473 0.221703C18.6693 0.0782349 18.4475 0 18.2189 0C17.9903 0 17.7685 0.0782349 17.5905 0.221703C17.4125 0.36517 17.289 0.56523 17.2405 0.788628L16.7806 3.05848C16.5589 4.15182 16.02 5.15561 15.2311 5.94444C14.4423 6.73327 13.4384 7.27217 12.345 7.49382L10.075 7.95366C9.84867 8 9.64525 8.12308 9.49917 8.3021C9.35309 8.48111 9.27331 8.70507 9.27331 8.93612C9.27331 9.16716 9.35309 9.39112 9.49917 9.57013C9.64525 9.74915 9.84867 9.87223 10.075 9.91858L12.345 10.3784C13.4385 10.5999 14.4425 11.1387 15.2314 11.9276C16.0203 12.7164 16.5591 13.7203 16.7806 14.8138L17.2405 17.0836C17.289 17.307 17.4125 17.5071 17.5905 17.6505C17.7685 17.794 17.9903 17.8722 18.2189 17.8722C18.4475 17.8722 18.6693 17.794 18.8473 17.6505C19.0253 17.5071 19.1488 17.307 19.1973 17.0836L19.6572 14.8138C19.8791 13.7205 20.4181 12.7168 21.2069 11.928C21.9957 11.1392 22.9995 10.6003 24.0928 10.3784V10.3752Z"
+                                fill="url(#aps_sparkles_b)"
+                            />
+                            <defs>
+                                <linearGradient
+                                    id="aps_sparkles_a"
+                                    x1="6.43368e-08"
+                                    y1="17.5932"
+                                    x2="8.71043"
+                                    y2="25.2775"
+                                    gradientUnits="userSpaceOnUse"
+                                >
+                                    <stop stop-color="#82E2F4" />
+                                    <stop offset="0.502" stop-color="#8A8AED" />
+                                    <stop offset="1" stop-color="#6977DE" />
+                                </linearGradient>
+                                <linearGradient
+                                    id="aps_sparkles_b"
+                                    x1="9.27331"
+                                    y1="3.64594"
+                                    x2="24.2701"
+                                    y2="16.8872"
+                                    gradientUnits="userSpaceOnUse"
+                                >
+                                    <stop stop-color="#82E2F4" />
+                                    <stop offset="0.502" stop-color="#8A8AED" />
+                                    <stop offset="1" stop-color="#6977DE" />
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                        <p class="text-sm font-medium">
+                            {{ __('Your images will appear here.') }}
+                        </p>
+                    </div>
+                </div>
+
+                {{-- Loading Skeleton --}}
+                <div
+                    class="lqd-loading-skeleton lqd-is-loading grid grid-cols-1 gap-4 sm:grid-cols-2"
+                    x-cloak
+                    x-show="generating"
+                >
+                    <template x-for="n in numImages" :key="`skeleton-${n}`">
+                        <div
+                            class="aspect-[3/4] w-full rounded"
+                            data-lqd-skeleton-el
+                        ></div>
+                    </template>
+                </div>
+
+                {{-- Results Grid --}}
+                <div
+                    class="grid grid-cols-1 items-start gap-4 sm:grid-cols-2"
+                    x-show="results.length && !generating"
+                    x-cloak
+                >
+                    <template
+                        x-for="(result, index) in results"
+                        :key="result.id || index"
+                    >
+                        <div class="group relative overflow-hidden rounded-lg">
+                            <img
+                                class="w-full rounded-lg"
+                                :src="result.thumbnail || result.image_url"
+                                :alt="'Generated ' + (index + 1)"
+                                loading="lazy"
+                            >
+
+                            {{-- Hover Overlay --}}
+                            <div class="absolute inset-0 flex items-center justify-center rounded-lg bg-black/10 opacity-0 transition-opacity group-hover:opacity-100">
+                                <div class="flex gap-2">
+                                    <x-button
+                                        class="inline-grid size-9 place-items-center bg-white p-0 text-black hover:bg-white hover:text-black"
+                                        data-fslightbox="aps-results"
+                                        size="none"
+                                        ::href="result.image_url"
+                                        title="{{ __('View') }}"
+                                    >
+                                        <x-tabler-eye class="size-4" />
+                                    </x-button>
+                                    <x-button
+                                        class="inline-grid size-9 place-items-center bg-white p-0 text-black hover:bg-white hover:text-black"
+                                        size="none"
+                                        ::href="result.image_url"
+                                        ::download="`image_${result.id}.jpg`"
+                                        title="{{ __('Download') }}"
+                                    >
+                                        <x-tabler-download class="size-4" />
+                                    </x-button>
+                                </div>
+                            </div>
+
+                            <div class="absolute right-0 top-0 px-3 py-3 opacity-0 transition-all duration-300 group-hover:opacity-100">
+                                <x-dropdown.dropdown
+                                    class:dropdown-dropdown="max-lg:end-0 max-lg:start-auto"
+                                    anchor="end"
+                                    :teleport="false"
+                                >
+                                    <x-slot:trigger
+                                        class="size-8"
+                                    >
+                                        <x-tabler-dots-vertical class="size-7 rounded-full bg-white/90 p-1 text-black/70 shadow-sm hover:text-foreground" />
+                                        <span class="sr-only">{{ __('Options') }}</span>
+                                    </x-slot:trigger>
+                                    <x-slot:dropdown
+                                        class="min-w-[170px]"
+                                    >
+                                        <ul class="py-1 text-xs font-medium">
+                                            <li>
+                                                <a
+                                                    class="text-heading-foreground/2 flex px-5 py-2 transition-colors hover:bg-heading-foreground/[3%]"
+                                                    :href="result.image_url"
+                                                    :download="`image_${result.id}.jpg`"
+                                                    @click="toggle('collapse')"
+                                                >
+                                                    <x-tabler-download class="me-2 size-5" />
+                                                    {{ __('Download') }}
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a
+                                                    class="text-heading-foreground/2 flex px-5 py-2 transition-colors hover:bg-heading-foreground/[3%]"
+                                                    href="javascript:void(0);"
+                                                    @click.prevent="editResult(result); toggle('collapse')"
+                                                >
+                                                    <x-tabler-scissors class="me-2 size-5" />
+                                                    {{ __('Edit') }}
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a
+                                                    class="text-heading-foreground/2 flex px-5 py-2 transition-colors hover:bg-heading-foreground/[3%]"
+                                                    href="javascript:void(0);"
+                                                    @click.prevent="videoResult(result); toggle('collapse')"
+                                                >
+                                                    <x-tabler-video class="me-2 size-5" />
+                                                    {{ __('Create Video') }}
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </x-slot:dropdown>
+                                </x-dropdown.dropdown>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </div>
+    </div>
+@endsection
+
+@include('ai-photoshoot::custom.scripts')

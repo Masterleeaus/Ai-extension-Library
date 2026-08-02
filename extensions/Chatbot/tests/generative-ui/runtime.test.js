@@ -1,0 +1,13 @@
+const assert = require('assert');
+const ui = require('../../resources/assets/js/titan-generative-ui.js');
+assert.strictEqual(Object.keys(ui.components).length, 71, 'runtime must expose all 71 components');
+const spec = ui.normaliseSpec({ root: 'root', elements: { root: { type: 'stack', props: {}, children: [] } } }, { surface: 'chat' });
+assert.strictEqual(spec.authority, 'presentation-only');
+assert.strictEqual(spec.version, '1.1');
+const store = ui.createPersistentStateStore({ count: 1 }, { key: 'test', storage: { data: {}, getItem(k){return this.data[k]||null}, setItem(k,v){this.data[k]=v}, removeItem(k){delete this.data[k]} } });
+store.set('/count', 2); assert.strictEqual(store.get('/count'), 2); assert.strictEqual(store.undo(), true); assert.strictEqual(store.get('/count'), 1); assert.strictEqual(store.redo(), true); assert.strictEqual(store.get('/count'), 2); store.destroy();
+const patched = ui.applyJsonPatch({ a: 1 }, [{ op: 'replace', path: '/a', value: 2 }, { op: 'add', path: '/b', value: 3 }]);
+assert.deepStrictEqual(patched, { a: 2, b: 3 });
+const invalid = ui.validateSpecClient({ root: 'root', elements: { root: { type: 'not-registered', props: {} } } });
+assert.strictEqual(invalid.valid, false);
+console.log(JSON.stringify({ passed: 9, components: Object.keys(ui.components).length }));

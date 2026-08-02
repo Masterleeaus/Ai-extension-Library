@@ -1,0 +1,137 @@
+{
+  "app_slug": "titan-go",
+  "app_name": "Titan Go",
+  "workcore_enabled": true,
+  "workcore_authority": true,
+  "offline_first": true,
+  "domain": "field-operations",
+  "workcore": {
+    "read_tools": [
+      "workcore.jobs.assigned",
+      "workcore.jobs.show",
+      "workcore.customers.show",
+      "workcore.properties.show",
+      "workcore.checklists.show",
+      "workcore.inventory.available"
+    ],
+    "action_tools": [
+      "workcore.job.start",
+      "workcore.job.pause",
+      "workcore.job.complete",
+      "workcore.checklist.update",
+      "workcore.time.record",
+      "workcore.incident.create",
+      "workcore.material.consume",
+      "workcore.attachment.register"
+    ],
+    "requires_tenant_context": true,
+    "requires_actor_context": true,
+    "idempotent_actions": true,
+    "confirmation_for_high_risk": true
+  },
+  "offline_projection": {
+    "stores": [
+      "assigned_jobs",
+      "customers",
+      "properties",
+      "checklists",
+      "time_entries",
+      "attachments",
+      "incidents",
+      "materials"
+    ],
+    "writes_are_provisional": true,
+    "sync_via": "chatbot_outbox",
+    "conflicts_via": "chatbot_conflict_centre"
+  },
+  "governance": {
+    "executor": "GovernedToolExecutor",
+    "fact_verification": "WorkCoreFactVerifier",
+    "risk_classification": true
+  },
+  "capabilities": {
+    "required": [
+      "geolocation",
+      "camera",
+      "storage",
+      "network",
+      "battery"
+    ],
+    "optional": [
+      "accelerometer",
+      "microphone",
+      "notification"
+    ],
+    "offline_critical": [
+      "geolocation",
+      "camera",
+      "storage"
+    ],
+    "sync_priority": "high"
+  },
+  "device_requirements": {
+    "recommended_device": "mobile",
+    "minimum_android_version": "9.0",
+    "minimum_ios_version": "13.0",
+    "required_capabilities": [
+      "gps",
+      "camera",
+      "touch_screen"
+    ],
+    "storage_required": "500MB"
+  },
+  "realtime_sync": {
+    "enabled": true,
+    "channels": [
+      "job_updates",
+      "location_updates",
+      "customer_updates"
+    ],
+    "websocket_heartbeat": 30
+  },
+  "offline_features": {
+    "job_assignment": {
+      "offline": true,
+      "queue_operations": true,
+      "conflict_resolution": "last_write_wins"
+    },
+    "location_tracking": {
+      "offline": true,
+      "batching": true,
+      "batch_interval": 10,
+      "accuracy": "best"
+    },
+    "photo_capture": {
+      "offline": true,
+      "compression": "auto",
+      "sync_on_wifi": true
+    },
+    "form_completion": {
+      "offline": true,
+      "validation": "offline",
+      "sync_on_complete": true
+    }
+  },
+  "chatbot": {
+    "enabled": true,
+    "assistant_name": "Titan Go Assistant",
+    "system_prompt": "You are a field technician assistant. Help the technician with job information, customer details, and task completion. You have access to offline job data."
+  },
+  "analytics": {
+    "track_location_distance": true,
+    "track_jobs_per_day": true,
+    "track_photos_per_job": true,
+    "track_offline_time": true,
+    "track_sync_duration": true
+  },
+  "permissions": {
+    "data:read": true,
+    "data:write": true,
+    "data:delete": false,
+    "network:access": true,
+    "storage:access": true,
+    "device:access": true,
+    "location:access": true,
+    "camera:access": true
+  }
+}

@@ -1,0 +1,463 @@
+{
+  "package": "WorkCore Native AI Runtime",
+  "version": "0.51.0",
+  "scope": "AI runtime only",
+  "file_count": 91,
+  "files": [
+    {
+      "path": "README_AI_RUNTIME.md",
+      "bytes": 1689,
+      "sha256": "47be0d2b882cf55f2f797e58033f3d4b9b0c5c23836333f33b488112e80510af"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/AI/Contracts/AiRunRecorderContract.php",
+      "bytes": 638,
+      "sha256": "2c4c945a82fd6d427663c1c8e50470524b14a62a00f7f7063bf03e6ab2966d01"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/AI/Contracts/AiToolRunRecorderContract.php",
+      "bytes": 630,
+      "sha256": "a995525bcf492ab19717adfc39a5c1b83fb2b06c81aa29dcf504f3e334bb4489"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/AI/Contracts/CredentialResolverContract.php",
+      "bytes": 200,
+      "sha256": "93dda0614fe8233b96c2f681e07aa0da1978e5d7d3da01dabf1b6bae53298321"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/AI/Contracts/ModelProfileResolverContract.php",
+      "bytes": 349,
+      "sha256": "ad0d9c4b24f74d30561a9616f744a9596f6cc2c6a18112debe8d4fab18bbdd58"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/AI/Contracts/ModelProviderContract.php",
+      "bytes": 437,
+      "sha256": "a95364551f6654e25f1ac2317231aa2e7c593f0125adfe744adcbbd73842ba60"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/AI/DTO/AiToolExecutionContext.php",
+      "bytes": 865,
+      "sha256": "8703798104e95de272412adc59754d71f8b4589833ada2a8ef6a97c95052a267"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/AI/DTO/AiToolResult.php",
+      "bytes": 934,
+      "sha256": "c07f4ee4cf9eff4fb823743413ff12548f6672f4558b8f12989ab1e11f617e8b"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/AI/DTO/ModelMessage.php",
+      "bytes": 1191,
+      "sha256": "195488447712cde665611eb3b918d34a188353a346ade55f0934d527a8473c8e"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/AI/DTO/ModelRequest.php",
+      "bytes": 2886,
+      "sha256": "4883e66dc2841e8801d2f15fd577d20e974a44c408f2853eb4cac259d7422f52"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/AI/DTO/ModelResponse.php",
+      "bytes": 1141,
+      "sha256": "93780b35075c700fd23e464ec4b6e4e1d2089b9837c7f3eede7a1bede21aee16"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/AI/DTO/ResolvedModelProfile.php",
+      "bytes": 737,
+      "sha256": "2e1ba7933bef9755c22d1d8bdd380762941245c9ddad10e6596fcac5be01d224"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/AI/DTO/TokenUsage.php",
+      "bytes": 844,
+      "sha256": "dd9f2bb6aacc4d431fa752be5a17ee9b5917d3d5f51a75d6eca035262f07ef69"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/AI/Exceptions/AiConfigurationException.php",
+      "bytes": 175,
+      "sha256": "1ddbc952cc1f3cafcc32f125f02c46449bffad12e5e083851e0c5f90c41737f4"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/AI/Exceptions/AiPolicyException.php",
+      "bytes": 313,
+      "sha256": "5c207b6bf63deff30cd77e3a82a5e874ae34f5acda9e659e2af968566a5ced48"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/AI/Exceptions/AiProviderException.php",
+      "bytes": 485,
+      "sha256": "0bcb5ed63e7337fbae036c0a478a16c0a77eaeb65ad9f8290230f043dc6efa27"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/AI/Exceptions/AiToolException.php",
+      "bytes": 406,
+      "sha256": "eee5a3a585950ea507984c71bab1fee206e08496848ad5c0e7aed7752afc6905"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/AI/Models/AiAgent.php",
+      "bytes": 439,
+      "sha256": "e5587099512e50aec626a70a712e4bebabc7bdf74b58daef8f5ad8145eef01bf"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/AI/Models/AiAgentVersion.php",
+      "bytes": 563,
+      "sha256": "8dd8262b8fff5919506eb649c7fb2030800d9bb01f59d5162e058bef4a665eb8"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/AI/Models/AiPolicyVersion.php",
+      "bytes": 524,
+      "sha256": "9f118f298a38dee7291d2ef60efc7541d5397796bb02ce43326d8644aa55e74b"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/AI/Models/AiRun.php",
+      "bytes": 722,
+      "sha256": "1d0d7bb54d302d560e993d9f7880dccdd45b2690bab62703b0421ec3fb9910d6"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/AI/Models/AiToolRun.php",
+      "bytes": 562,
+      "sha256": "716e49bc93ffe51c48f3a85d357ca1d532e1ae829c08d4950ad1ca572295e7cd"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/AI/Models/AiUsageLedger.php",
+      "bytes": 587,
+      "sha256": "c6a5e28c900d73d8c2565fe9e57298a6dd9be9d0eae7682576a2afcf3ed8cad8"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/AI/Models/ModelProfile.php",
+      "bytes": 738,
+      "sha256": "510fecb68cf78e7e77e3c20adf4bd840353470089c9cd66481cb886740b36110"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/AI/Models/ProviderProfile.php",
+      "bytes": 571,
+      "sha256": "cfb14851e35f70cd26dd59667ce8176934d8dece66fcffa646383e473566a8db"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/AI/Persistence/DatabaseAiRunRecorder.php",
+      "bytes": 5943,
+      "sha256": "943291e7aea6a0dbbd3d07ebb304b18960ca8a2c76e08a23f1e257291d113cdd"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/AI/Persistence/DatabaseAiToolRunRecorder.php",
+      "bytes": 2765,
+      "sha256": "6c8443334a65455bf5cb279048971ebc2865042b3cdb8cee379067f1e14fdb0b"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/AI/Persistence/DatabaseModelProfileResolver.php",
+      "bytes": 4828,
+      "sha256": "bd12aacb57ca71c3cfc3cf513c594938873e64ce9c11751e56f4c7fe3954260d"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/AI/Policies/AiBudgetGuard.php",
+      "bytes": 1293,
+      "sha256": "f921978272a2e3deb5a58624d34c57026b869740028ad78c537120e60948e450"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/AI/Policies/AiRateLimiter.php",
+      "bytes": 789,
+      "sha256": "1627ad2d564440cd09a0479a26e6220ba4771e85281cb3ddb6b3204c8d06894b"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/AI/Policies/ProviderCircuitBreaker.php",
+      "bytes": 1576,
+      "sha256": "17e5e8526bcf2a27b0c9d6ced02144384cc3c1c07de4cbd48ac305fd91b1291f"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/AI/Providers/ModelProviderFactory.php",
+      "bytes": 1576,
+      "sha256": "d50b47cbb7ebe54fcc5517a1e8b46ada769abe88746232c4df9758fdfa725eed"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/AI/Providers/NativeModelGateway.php",
+      "bytes": 2636,
+      "sha256": "071808764233157683dfdf8807c3fc98f05f506e166d8bb68a966c118687af95"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/AI/Providers/NullModelProvider.php",
+      "bytes": 920,
+      "sha256": "0fe83111d3e1b02ff3b8dbb611adc704abf7faf773b39277ab33ce33170c5384"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/AI/Providers/OpenAICompatibleProvider.php",
+      "bytes": 5204,
+      "sha256": "89932346068520bb50fa3b711689bcdb0faa9bcb1fe786cc49ea22af6dc933de"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/AI/Providers/ProviderFailoverChain.php",
+      "bytes": 2808,
+      "sha256": "28f1c8e33333fcc8657ab2db6296dfbe1306ae7e5922d86bf8a94dafa053f4fc"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/AI/Providers/WorkCoreAIServiceProvider.php",
+      "bytes": 3932,
+      "sha256": "8b264b6dcc0665789424a9f3f5e37a280135bac7ca7939bf4d35a5a06c9a7bab"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/AI/Security/EnvironmentCredentialResolver.php",
+      "bytes": 1457,
+      "sha256": "b46c4ad81f70fdecec91f4c2825792e893eb7c00cdf7cea23514c0bd55f3f308"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/AI/Security/NativeAiAccessGate.php",
+      "bytes": 2723,
+      "sha256": "bea08d99f7cfb5cb34f7af70f9f56b1c363a717cba93d56e099aa3b68b40228e"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/AI/Security/SensitiveDataRedactor.php",
+      "bytes": 1133,
+      "sha256": "9a49317b9b37dda477bf776d51cb4489742ee166f893b34a541d186c6dc8db1c"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/AI/Tools/AiToolDefinition.php",
+      "bytes": 3361,
+      "sha256": "afccfb91ba156278cadf3371fb525d2d1d5f476e8a1fbf8ac59b574cc07b10c3"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/AI/Tools/AiToolRegistry.php",
+      "bytes": 1177,
+      "sha256": "176a638c0d7ed46d627cbe983586d523fdb6409b4946dce36fe17acb8f75eb9b"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/AI/Tools/AiToolRouter.php",
+      "bytes": 1770,
+      "sha256": "14f9a8c282f5ce312dedec77e0ee6df9c3f8efaef75d1efb11c35db5a0dc670c"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/AI/Tools/DomainToolRegistryContract.php",
+      "bytes": 209,
+      "sha256": "895b504b5345cf817f77a1069c7e04968539db37555ca9710d4ffde3bae0175f"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/AI/Tools/JsonSchemaValidator.php",
+      "bytes": 4233,
+      "sha256": "de25c11052878143b364a567b55f6c3044d0ddca1e80253f1120bfacb3dd23f1"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/AI/Tools/NativeToolCatalogue.php",
+      "bytes": 4336,
+      "sha256": "a31ea720ef4af7449b94329b4d9ac35783644012f05eaf025875d2b39be26962"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/AI/Tools/ToolDefinitionFactory.php",
+      "bytes": 3259,
+      "sha256": "6a8742e260dc0a8588f291065a8f8b9006abdd256bce613500085111e27d9f2b"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/AI/Tools/WorkCoreActionToolExecutor.php",
+      "bytes": 2357,
+      "sha256": "c67fa8466d647b9dc2f0b32cacb1b2adbcfb31050080025a9e9d4b8220c65ca4"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/AI/Tools/WorkCoreReadToolExecutor.php",
+      "bytes": 4717,
+      "sha256": "f1a910ebfa3f9c3dcb114ee95e92df8bea345e68e71a37aecd2908c2d275b628"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/Actions/ActionDefinition.php",
+      "bytes": 863,
+      "sha256": "d8aba52d9ae971f881099336a4d9a7cdbfd26574fc1e7b0823e19b608100b4f5"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/Actions/ActionHandlerResult.php",
+      "bytes": 430,
+      "sha256": "0aa6a25efd948d89fdc7a8d3d84e6a4b08b6a0e54e72eed1a05f727cd7184412"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/Actions/ActionRequest.php",
+      "bytes": 900,
+      "sha256": "a5668c35eb62efc42838126a845e2554cd70b41238a629a9139d07112d7cc667"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/Actions/ActionResult.php",
+      "bytes": 825,
+      "sha256": "888dde7fe4264a33d28480551215e2a2a11f3bcefbf315c812b9c45795f4531b"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/Actions/BusinessActionDispatcher.php",
+      "bytes": 5518,
+      "sha256": "c9d73731b17f044bb74ac501bde82f2154c30c6401f241545dce16dd8e274086"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/Actions/BusinessActionRegistry.php",
+      "bytes": 954,
+      "sha256": "8cea966fb456f8897aa438426e87888a6b5bc76e06674552a61ff3489901ca66"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/Actions/Contracts/ActionAuditRecorderContract.php",
+      "bytes": 595,
+      "sha256": "1bfb9c73bf2585be0c06a9f16074bc24bef6a2b4262f1491a4a165d07d5a54b1"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/Actions/Contracts/ActionIdempotencyStoreContract.php",
+      "bytes": 527,
+      "sha256": "7a54f3997a1da42b8e526ac41e1deb74b5b614fe6bb42c679dffa165ea54e9d9"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/Actions/Contracts/BusinessActionHandlerContract.php",
+      "bytes": 325,
+      "sha256": "3cff950097d2ac1605bce9d294fb5c04d6ed2682cc0eabbc6c33f0bd97b20c78"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/Actions/Contracts/ConfirmationVerifierContract.php",
+      "bytes": 336,
+      "sha256": "04bd74f2aed18ea02d1f1af0fd5daa875e038caf5ba169016f3a80d3fe5eb9b2"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/Actions/Contracts/DomainEventRecorderContract.php",
+      "bytes": 420,
+      "sha256": "ff2a6dd3ba7fe1fcb55c5db1c23e2ae5d6a9009f7fcc10cbeb275d72ce95a0a1"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/Actions/Contracts/EntitlementResolverContract.php",
+      "bytes": 204,
+      "sha256": "4f85f481d8a786fd40d5d7a248475dead8f2889110f32758e459d2115cad1ba3"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/Actions/Exceptions/ActionConflictException.php",
+      "bytes": 325,
+      "sha256": "368e2ea67e09535e76ffe79d709123d29e7ef1bb79c044917534d206d88a9825"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/Actions/Exceptions/ActionDispatchException.php",
+      "bytes": 398,
+      "sha256": "52964a7aa587f1b5c92f6e5e8fcd688f8f8e54eccaff442a4e2a547c1492d349"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/Actions/Infrastructure/DatabaseActionAuditRecorder.php",
+      "bytes": 2512,
+      "sha256": "c4c42fa96730b465b96f008fc8aa68b1cee1869a0dc73d2293842d1b9bc2b09d"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/Actions/Infrastructure/DatabaseActionIdempotencyStore.php",
+      "bytes": 3789,
+      "sha256": "c2f95816c8ec0c2463c0e992e584dbadd5a2c1e15500e752fdca0a59382cca30"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/Actions/Infrastructure/DatabaseDomainEventRecorder.php",
+      "bytes": 3319,
+      "sha256": "b121a0021c6248e76d75d9b9b313f9f1fdc8d72ccd544bec3776d336a48c9b8b"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/Actions/PendingDomainEvent.php",
+      "bytes": 312,
+      "sha256": "6509f0bce2d14b4cfeda3651f692bbf10a61f20ce639a5d0ad59dc605119d463"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/Actions/Policies/ExplicitConfirmationVerifier.php",
+      "bytes": 691,
+      "sha256": "a0fe7cb63f65b2ad6e8decc50678fefb220fd814b3c465e80d7e9ab4837c6213"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/Actions/Policies/MagicAIPlanEntitlementResolver.php",
+      "bytes": 1263,
+      "sha256": "109fd03b9a88754120038a6e049f10067d708142b29f97aa5a0c72d37103abd8"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/Actions/Policies/RegisteredCapabilityEntitlementResolver.php",
+      "bytes": 568,
+      "sha256": "61bda562fc22341ae87e5997a613cefb2987e5cf11ab2d855376fe46fcbee10b"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/Actions/Policies/VerticalAwareEntitlementResolver.php",
+      "bytes": 1477,
+      "sha256": "9a52a4f67b374ea1d2b480b0e3901f3376fc2806d014eef34809d955eb2ffbde"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/Authorization/WorkCoreAccessLevel.php",
+      "bytes": 432,
+      "sha256": "aee5ef727b1fba07227a819dcbab57eb46e87f7b656bae2f67572b16bf263e0f"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/Context/CompanyOperatingContext.php",
+      "bytes": 314,
+      "sha256": "3b3a6b5a9681525e4f252e22127394f8945fdee9e77a10d1f25d51eaa4567509"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/Context/CompanyOperatingContextResolver.php",
+      "bytes": 1201,
+      "sha256": "dbb4a57ddfba3d18f737309095725639c993befdb867f53bcc6cbbefc82a313d"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/Context/ContextIdNormalizer.php",
+      "bytes": 912,
+      "sha256": "fc9e9b56c06c4a0de8e769bf838deb57013ffb423373d3182c9af8fd54ddf557"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/Context/OperationContext.php",
+      "bytes": 1794,
+      "sha256": "aa65a82bd4400acad2c6f1d48ab021b5c3bf0a405d0eb7d28350c8742fb861db"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/Context/OperationContextSnapshot.php",
+      "bytes": 2101,
+      "sha256": "ccbb5c38df2b505f04073397878d595b1d4cfa5abc4ecb1288d4b28340abe15e"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/Context/TenantContextSnapshot.php",
+      "bytes": 958,
+      "sha256": "09c0477a52c7825e25429ea86438ac04c723c8b1007ae84e0af40bf0d5d0ab46"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/Contracts/OperationContextContract.php",
+      "bytes": 814,
+      "sha256": "007bf510ccd4aab5569f893675b96889efa6756fb483a2b96c9c6bf5188124a5"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/Contracts/PermissionResolverContract.php",
+      "bytes": 393,
+      "sha256": "f62c8c49c67411f98511fbec0d2c95e460808feffe872e8f4809d4065a2adbac"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/Contracts/TenantContextContract.php",
+      "bytes": 522,
+      "sha256": "7fc31563c2fc1e247651a474a7fac5d9d4d4633f938ec6d5b8cae35d7efac325"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/ReadModels/ReadModelDefinition.php",
+      "bytes": 615,
+      "sha256": "912515db01891ff21fc346c01043d58d140d6c184b6ec77efb61167a16efab76"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/ReadModels/ReadModelRegistry.php",
+      "bytes": 959,
+      "sha256": "6e41811a058b2a85cf8a3bb5807396e227c0455cc17b1670f3f97821c572819f"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/References/TypedReference.php",
+      "bytes": 792,
+      "sha256": "0fa03068ce9281037ea04e12700c699fbca1dd465bca84743906cbcabe721af2"
+    },
+    {
+      "path": "app/Domains/WorkCore/System/Support/HasPublicId.php",
+      "bytes": 384,
+      "sha256": "bd38e96c7f40866b19ba1349e1b060a08254554ccf45a603106bf6640d346cde"
+    },
+    {
+      "path": "app/Domains/WorkCore/config/workcore_ai.php",
+      "bytes": 2348,
+      "sha256": "172145bc2de9f86cb9bd11f42ae88a25c51e696df5aabb0ac84979ae2ccb1033"
+    },
+    {
+      "path": "app/Domains/WorkCore/database/migrations/2026_07_19_000008_create_tz_action_governance_tables.php",
+      "bytes": 3406,
+      "sha256": "095f341fc4a54889942b4acfb792d850086aea7c18ee28215f122074fde1f61b"
+    },
+    {
+      "path": "app/Domains/WorkCore/database/migrations/2026_07_28_000100_create_tz_native_ai_kernel_tables.php",
+      "bytes": 11982,
+      "sha256": "7eb8a364f34da7ba4d84e5d23768c82842fad24e7f0a58c71e92055e79b0b74a"
+    },
+    {
+      "path": "app/Domains/WorkCore/database/migrations/2026_07_28_000110_register_workcore_native_ai_permissions.php",
+      "bytes": 1620,
+      "sha256": "c5fa54cc23bea1981af9dcca5023e45f7e9d447eb38aa821c2e56b0750b55254"
+    },
+    {
+      "path": "app/Domains/WorkCore/tests/AI/run_native_ai_kernel.php",
+      "bytes": 9145,
+      "sha256": "e23d5853ef37385c40ede91c4ab31ca5d672348bbdbd30a7aad26135f79049d2"
+    },
+    {
+      "path": "app/Domains/WorkCore/tests/AI/validate_runtime_package.php",
+      "bytes": 2234,
+      "sha256": "4a1d3650188ad8d770c90f601a60a6e58268e6986d91e542f6fcd8d76079cbdc"
+    }
+  ]
+}

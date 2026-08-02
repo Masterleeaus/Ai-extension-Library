@@ -1,0 +1,7 @@
+{
+    "name": "Chatbot",
+    "type": "extension",
+    "version": "6.9.0-unified-ai-shell",
+    "description": "Unified Titan Zero chatbot with template-aware 14-app shell, offline WorkCore PWA, shared five-tier AI convergence, 28 Tier-2 assistants, expanded Tier-3 agents, governance, generative UI, staff inbox, team chat and business channels.",
+    "support_telegram": "heew_support"
+}

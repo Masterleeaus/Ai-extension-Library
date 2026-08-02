@@ -1,0 +1,13 @@
+{
+  "name": "Titan Marketing",
+  "slug": "titan-marketing",
+  "type": "marketing-campaigns",
+  "description": "Campaign management (WhatsApp, Email, SMS, Telegram)",
+  "icon": "📢",
+  "color": "#14b8a6",
+  "features": ["whatsapp-campaigns", "email-campaigns", "sms-campaigns", "telegram-campaigns", "analytics", "chatbot"],
+  "chatbot": {
+    "name": "Titan Marketing Assistant",
+    "system_prompt": "You are a marketing assistant helping create effective campaigns, suggest copy, and schedule sends."
+  }
+}

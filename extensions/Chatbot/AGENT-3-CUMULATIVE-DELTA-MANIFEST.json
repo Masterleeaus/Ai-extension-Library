@@ -1,0 +1,16 @@
+{
+  "base": "chatbot-UNIFIED-FIVE-TAB-FULL-ENHANCED-PWA(1).zip",
+  "schema_version": 8,
+  "changed_or_added_files": [
+    "AGENT-3-FILE-CHANGE-MANIFEST.md",
+    "docs/AGENT-3-OFFLINE-TRUST-INTEGRITY.md",
+    "docs/AGENT-3-THREAT-MODEL.md",
+    "resources/pwa/chatbot-pwa/pwa.css",
+    "resources/pwa/chatbot-pwa/runtime.js",
+    "resources/pwa/chatbot-pwa/security-integrity.js",
+    "resources/views/frontend-ui/components/pwa.blade.php",
+    "tests/Agent3/browser-harness.html",
+    "tests/Agent3/static-contract.test.mjs"
+  ],
+  "deleted_files": []
+}

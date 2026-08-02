@@ -1,0 +1,688 @@
+{
+  "agents": {
+    "ApplyCustomerTagAgent": {
+      "capabilities": [
+        "Apply one approved tag to a customer",
+        "Auto-apply tags based on customer behavior patterns",
+        "Remove tags based on expiration or conditions",
+        "Apply multiple tags in batch operation",
+        "Trigger marketing workflows based on tag additions",
+        "Maintain tag usage analytics"
+      ],
+      "permissions": [
+        "customers.read",
+        "customer_tags.apply",
+        "customer_tags.remove",
+        "analytics.read"
+      ]
+    },
+    "CreateQuoteAgent": {
+      "capabilities": [
+        "Create one governed cleaning quote",
+        "Calculate pricing based on property size and service type",
+        "Apply discounts and promotions",
+        "Generate itemized quote breakdown",
+        "Validate quote against pricing rules",
+        "Check property and customer eligibility",
+        "Store quote with idempotency protection",
+        "Support multiple service line items",
+        "Calculate tax and fees",
+        "Set quote expiration date"
+      ],
+      "permissions": [
+        "quotes.create",
+        "quotes.read",
+        "pricing.read",
+        "discounts.read",
+        "customers.read"
+      ]
+    },
+    "SendQuoteAgent": {
+      "capabilities": [
+        "Send one existing quote through approved channels",
+        "Support multiple delivery channels (email, SMS, portal)",
+        "Generate PDF quote document",
+        "Track quote open and view events",
+        "Send follow-up reminders for pending quotes",
+        "Include payment links or acceptance buttons",
+        "Record delivery confirmation",
+        "Personalize quote presentation"
+      ],
+      "permissions": [
+        "quotes.read",
+        "communications.send",
+        "documents.generate",
+        "quotes.view_tracking"
+      ]
+    },
+    "AcceptQuoteAgent": {
+      "capabilities": [
+        "Record acceptance of one quote",
+        "Validate quote acceptance conditions",
+        "Create job from accepted quote",
+        "Generate acceptance confirmation",
+        "Trigger job creation workflow",
+        "Update quote status to accepted",
+        "Send acceptance confirmation to customer",
+        "Calculate and apply deposit if required",
+        "Schedule service date based on quote"
+      ],
+      "permissions": [
+        "quotes.read",
+        "quotes.accept",
+        "jobs.create",
+        "payments.create",
+        "communications.send"
+      ]
+    },
+    "CreateLeadAgent": {
+      "capabilities": [
+        "Create one sales lead with validation",
+        "Score leads based on qualification criteria",
+        "Assign leads to appropriate sales representatives",
+        "Capture lead source and campaign attribution",
+        "Trigger lead follow-up workflows",
+        "Convert leads to customers",
+        "Enrich lead data from external sources",
+        "Track lead engagement metrics"
+      ],
+      "permissions": [
+        "leads.create",
+        "leads.update",
+        "leads.score",
+        "customers.read",
+        "analytics.write"
+      ]
+    },
+    "BookJobAgent": {
+      "capabilities": [
+        "Create one confirmed cleaning job",
+        "Validate customer, property, and service availability",
+        "Check resource availability (cleaners, equipment)",
+        "Calculate job duration and cost",
+        "Handle recurring job creation",
+        "Apply customer preferences and special instructions",
+        "Prevent double-booking conflicts",
+        "Generate job reference number",
+        "Store with idempotency protection",
+        "Handle deposit or payment requirements"
+      ],
+      "permissions": [
+        "jobs.create",
+        "jobs.read",
+        "customers.read",
+        "availability.read",
+        "pricing.read"
+      ]
+    },
+    "CreateRecurringJobAgent": {
+      "capabilities": [
+        "Create one recurring cleaning schedule",
+        "Support weekly, bi-weekly, monthly frequencies",
+        "Set start and end dates for recurrence",
+        "Handle skipped dates and holidays",
+        "Calculate next occurrence dates",
+        "Apply customer preference patterns",
+        "Handle recurrence modifications",
+        "Track recurring job history",
+        "Auto-generate jobs from recurrence rules"
+      ],
+      "permissions": [
+        "customers.read",
+        "jobs.create",
+        "recurrence.create",
+        "recurrence.update",
+        "schedule.read"
+      ]
+    },
+    "CancelJobAgent": {
+      "capabilities": [
+        "Cancel one job using approved reason",
+        "Apply cancellation policies and fees",
+        "Notify affected customers and cleaners",
+        "Process refunds if applicable",
+        "Update availability of resources",
+        "Handle recurring job cancellation",
+        "Record cancellation reason for analytics",
+        "Trigger customer retention workflow"
+      ],
+      "permissions": [
+        "jobs.read",
+        "jobs.cancel",
+        "communications.send",
+        "payments.refund",
+        "schedule.update"
+      ]
+    },
+    "RescheduleJobAgent": {
+      "capabilities": [
+        "Change one existing job appointment",
+        "Check availability for new time slot",
+        "Notify affected parties of change",
+        "Handle resource reassignment",
+        "Apply rescheduling fees if applicable",
+        "Maintain reschedule history",
+        "Update related jobs or dependencies",
+        "Trigger customer notification workflow"
+      ],
+      "permissions": [
+        "jobs.read",
+        "jobs.reschedule",
+        "schedule.read",
+        "communications.send",
+        "jobs.update"
+      ]
+    },
+    "MarkJobCompleteAgent": {
+      "capabilities": [
+        "Mark one job complete with required evidence",
+        "Validate evidence requirements (photos, signatures)",
+        "Record completion time and duration",
+        "Capture job notes and observations",
+        "Trigger invoice generation workflow",
+        "Update cleaner availability",
+        "Send completion confirmation to customer",
+        "Request customer review",
+        "Generate completion certificate"
+      ],
+      "permissions": [
+        "jobs.read",
+        "jobs.complete",
+        "evidence.create",
+        "evidence.read",
+        "invoices.create",
+        "communications.send"
+      ]
+    },
+    "UploadJobEvidenceAgent": {
+      "capabilities": [
+        "Attach one evidence item to a job",
+        "Support multiple file types (images, PDFs, videos)",
+        "Validate evidence quality and completeness",
+        "Store evidence with proper metadata",
+        "Track evidence submission timestamps",
+        "Verify evidence against job requirements",
+        "Generate evidence audit trail",
+        "Support before/after photo comparisons"
+      ],
+      "permissions": [
+        "jobs.read",
+        "evidence.create",
+        "evidence.read",
+        "evidence.delete"
+      ]
+    },
+    "RecordInspectionAgent": {
+      "capabilities": [
+        "Record one quality inspection result",
+        "Score inspection on multiple criteria",
+        "Record inspector comments and observations",
+        "Attach inspection photos",
+        "Generate inspection report",
+        "Trigger rework workflow if needed",
+        "Update job quality metrics",
+        "Maintain inspection history",
+        "Flag recurring quality issues"
+      ],
+      "permissions": [
+        "jobs.read",
+        "inspections.create",
+        "inspections.update",
+        "analytics.write"
+      ]
+    },
+    "AssignCleanerAgent": {
+      "capabilities": [
+        "Assign one cleaner to one existing job",
+        "Validate cleaner availability and skills",
+        "Check certification and compliance requirements",
+        "Calculate travel time and distance",
+        "Respect cleaner preferences and restrictions",
+        "Send assignment notification",
+        "Update schedule with assignment details",
+        "Handle time-off conflicts",
+        "Support multi-cleaner assignments",
+        "Maintain assignment history"
+      ],
+      "permissions": [
+        "jobs.read",
+        "workers.read",
+        "assignments.create",
+        "communications.send",
+        "schedule.read"
+      ]
+    },
+    "ReassignCleanerAgent": {
+      "capabilities": [
+        "Replace the cleaner assigned to one job",
+        "Find suitable replacement based on skills",
+        "Notify original and replacement cleaners",
+        "Handle schedule conflicts",
+        "Maintain reassignment audit trail",
+        "Calculate any schedule impact",
+        "Update dispatcher dashboard",
+        "Support emergency reassignments",
+        "Track reassignment reasons"
+      ],
+      "permissions": [
+        "jobs.read",
+        "workers.read",
+        "assignments.update",
+        "communications.send",
+        "schedule.update"
+      ]
+    },
+    "NotifyCleanerAgent": {
+      "capabilities": [
+        "Send one operational notification to a cleaner",
+        "Support SMS, email, and app push notifications",
+        "Include job details and access information",
+        "Handle urgent and non-urgent notifications",
+        "Track notification delivery and read status",
+        "Support two-way communication",
+        "Send schedule change notifications",
+        "Include directions or entry instructions",
+        "Send payroll and payment notifications"
+      ],
+      "permissions": [
+        "workers.read",
+        "communications.send",
+        "communications.read",
+        "schedule.read"
+      ]
+    },
+    "RecordIncidentAgent": {
+      "capabilities": [
+        "Record one safety or service incident",
+        "Categorize incidents by type and severity",
+        "Capture incident details and witnesses",
+        "Attach supporting evidence",
+        "Trigger escalation workflows for serious incidents",
+        "Generate incident reports",
+        "Track incident resolution",
+        "Analyze incident patterns for prevention",
+        "Comply with regulatory reporting requirements"
+      ],
+      "permissions": [
+        "jobs.read",
+        "incidents.create",
+        "incidents.update",
+        "incidents.read",
+        "reports.create"
+      ]
+    },
+    "CreateInvoiceAgent": {
+      "capabilities": [
+        "Create one invoice from approved job charges",
+        "Calculate taxes and discounts accurately",
+        "Support multiple line items and services",
+        "Apply customer-specific pricing rules",
+        "Generate invoice number and reference",
+        "Handle partial invoicing",
+        "Apply payment terms and due dates",
+        "Validate invoice against business rules",
+        "Support multiple currencies"
+      ],
+      "permissions": [
+        "jobs.read",
+        "invoices.create",
+        "invoices.read",
+        "pricing.read",
+        "customers.read"
+      ]
+    },
+    "SendInvoiceAgent": {
+      "capabilities": [
+        "Send one existing invoice through approved channel",
+        "Generate PDF invoice with professional formatting",
+        "Include payment links for online payment",
+        "Track invoice open and view events",
+        "Send payment reminders for overdue invoices",
+        "Support multiple delivery channels",
+        "Personalize invoice presentation",
+        "Record delivery confirmation",
+        "Include dispute resolution information"
+      ],
+      "permissions": [
+        "invoices.read",
+        "communications.send",
+        "documents.generate",
+        "payments.read"
+      ]
+    },
+    "RecordPaymentAgent": {
+      "capabilities": [
+        "Record one verified payment",
+        "Support multiple payment methods (card, bank, cash)",
+        "Apply payment to specific invoices",
+        "Handle partial payments and overpayments",
+        "Validate payment authorization",
+        "Update invoice status accordingly",
+        "Generate payment receipt",
+        "Sync with payment gateway",
+        "Handle payment disputes and chargebacks",
+        "Maintain payment audit trail"
+      ],
+      "permissions": [
+        "invoices.read",
+        "payments.create",
+        "payments.update",
+        "payments.read",
+        "communications.send"
+      ]
+    },
+    "SendPaymentReminderAgent": {
+      "capabilities": [
+        "Send one approved overdue payment reminder",
+        "Escalate reminder severity over time",
+        "Include invoice details and payment link",
+        "Calculate late fees if applicable",
+        "Track reminder delivery and open rates",
+        "Handle payment plan offers",
+        "Trigger collections workflow for severe overdue",
+        "Personalize reminder tone and content"
+      ],
+      "permissions": [
+        "invoices.read",
+        "communications.send",
+        "payments.read",
+        "invoices.update"
+      ]
+    },
+    "UpdateStockAgent": {
+      "capabilities": [
+        "Apply one approved stock adjustment",
+        "Support quantity additions and deductions",
+        "Track adjustment reason and approval",
+        "Update product availability in real-time",
+        "Handle batch and serial tracking",
+        "Maintain stock movement history",
+        "Trigger reorder alerts for low stock",
+        "Adjust pricing based on stock levels"
+      ],
+      "permissions": [
+        "inventory.read",
+        "inventory.update",
+        "inventory.write",
+        "inventory.adjust",
+        "analytics.read"
+      ]
+    },
+    "CreatePurchaseOrderAgent": {
+      "capabilities": [
+        "Create one approved supplier purchase order",
+        "Validate stock levels and reorder points",
+        "Calculate optimal order quantities",
+        "Apply supplier pricing and discounts",
+        "Generate purchase order number",
+        "Send purchase order to supplier",
+        "Track order fulfillment status",
+        "Handle partial deliveries",
+        "Match receipts to purchase orders"
+      ],
+      "permissions": [
+        "inventory.read",
+        "suppliers.read",
+        "purchase_orders.create",
+        "purchase_orders.update",
+        "communications.send"
+      ]
+    },
+    "AllocateEquipmentAgent": {
+      "capabilities": [
+        "Allocate one equipment item to a cleaner or job",
+        "Check equipment availability and condition",
+        "Validate equipment certification and maintenance status",
+        "Schedule equipment return or pickup",
+        "Track equipment usage and performance",
+        "Handle equipment reservations",
+        "Maintain equipment allocation history",
+        "Generate equipment usage reports"
+      ],
+      "permissions": [
+        "equipment.read",
+        "equipment.allocate",
+        "equipment.update",
+        "equipment.reserve",
+        "analytics.read"
+      ]
+    },
+    "OptimiseRouteAgent": {
+      "capabilities": [
+        "Generate one route sequence for selected jobs",
+        "Optimize for shortest distance and time",
+        "Consider traffic patterns and time windows",
+        "Account for cleaner skills and equipment",
+        "Support dynamic route re-optimization",
+        "Generate route maps and directions",
+        "Calculate estimated travel times",
+        "Handle emergency route changes",
+        "Optimize fuel efficiency"
+      ],
+      "permissions": [
+        "jobs.read",
+        "routes.optimise",
+        "routes.create",
+        "maps.read",
+        "analytics.read"
+      ]
+    },
+    "SendCustomerMessageAgent": {
+      "capabilities": [
+        "Send one approved customer message",
+        "Support multiple channels (email, SMS, app)",
+        "Personalize content with customer data",
+        "Track delivery and open rates",
+        "Support transactional and marketing messages",
+        "Handle opt-out preferences",
+        "Send bulk messages with personalization",
+        "Schedule messages for optimal delivery",
+        "Include call-to-action buttons"
+      ],
+      "permissions": [
+        "customers.read",
+        "communications.send",
+        "communications.schedule",
+        "communications.read"
+      ]
+    },
+    "RequestReviewAgent": {
+      "capabilities": [
+        "Send one review request after eligible job",
+        "Support multiple review platforms (Google, Yelp, Facebook)",
+        "Customize request timing and content",
+        "Track review submission and rating",
+        "Handle negative review escalation",
+        "Incentivize review completion",
+        "Analyze review sentiment",
+        "Respond to reviews automatically"
+      ],
+      "permissions": [
+        "jobs.read",
+        "customers.read",
+        "communications.send",
+        "reviews.read",
+        "reviews.create"
+      ]
+    },
+    "ArchiveConversationAgent": {
+      "capabilities": [
+        "Archive one conversation with metadata",
+        "Preserve conversation context and history",
+        "Search archived conversations",
+        "Retrieve specific conversation segments",
+        "Archive based on retention policies",
+        "Handle GDPR and compliance requirements"
+      ],
+      "permissions": [
+        "conversations.read",
+        "conversations.archive",
+        "conversations.delete",
+        "compliance.read"
+      ]
+    },
+    "PauseRecurringServiceAgent": {
+      "capabilities": [
+        "Pause one recurring service temporarily",
+        "Specify pause duration and reason",
+        "Handle skipped jobs during pause",
+        "Notify affected customers",
+        "Auto-resume after specified date",
+        "Maintain recurring service history",
+        "Update customer billing during pause",
+        "Send pause confirmation"
+      ],
+      "permissions": [
+        "recurrence.read",
+        "recurrence.update",
+        "recurrence.pause",
+        "customers.read",
+        "communications.send"
+      ]
+    },
+    "GenerateBlogDraftAgent": {
+      "capabilities": [
+        "Generates one cleaning-business blog draft",
+        "Support multiple topics and SEO keywords",
+        "Generate meta descriptions and tags",
+        "Suggest internal and external links",
+        "Maintain brand voice and tone",
+        "Generate content outlines",
+        "Support A/B content variations"
+      ],
+      "permissions": [
+        "content.generate",
+        "blog.write",
+        "seo.read",
+        "content.review"
+      ]
+    },
+    "PublishBlogPostAgent": {
+      "capabilities": [
+        "Publishes one approved blog post",
+        "Schedule publication date and time",
+        "Push to CMS and social channels",
+        "Support multiple publication platforms",
+        "Track post performance and engagement"
+      ],
+      "permissions": [
+        "blog.publish",
+        "content.read",
+        "social.publish",
+        "analytics.read"
+      ]
+    },
+    "ScheduleSocialPostAgent": {
+      "capabilities": [
+        "Schedules one approved social post",
+        "Support multiple social platforms (Facebook, Instagram, LinkedIn, Twitter)",
+        "Set optimal posting times",
+        "Include images and hashtags",
+        "Support post variations per platform",
+        "Preview posts before scheduling"
+      ],
+      "permissions": [
+        "social.schedule",
+        "social.publish",
+        "content.read",
+        "social.analytics"
+      ]
+    },
+    "PublishSocialPostAgent": {
+      "capabilities": [
+        "Publishes one approved social post immediately",
+        "Support multiple social platforms",
+        "Include media attachments and links",
+        "Track engagement in real-time",
+        "Support reposting and sharing"
+      ],
+      "permissions": [
+        "social.publish",
+        "content.read",
+        "social.analytics",
+        "media.upload"
+      ]
+    },
+    "EditImageAgent": {
+      "capabilities": [
+        "Performs one governed image edit operation",
+        "Resize, crop, and rotate images",
+        "Adjust colors and lighting",
+        "Remove backgrounds and blemishes",
+        "Add watermarks and text overlays",
+        "Optimize for different platforms",
+        "Convert between formats"
+      ],
+      "permissions": [
+        "image.edit",
+        "media.update",
+        "marketing.write",
+        "content.write"
+      ]
+    },
+    "GeneratePhotoShootAgent": {
+      "capabilities": [
+        "Generates one staged cleaning-business photoshoot set",
+        "Create AI-generated before/after images",
+        "Generate training and marketing images",
+        "Support multiple image styles and formats"
+      ],
+      "permissions": [
+        "image.generate",
+        "media.create",
+        "marketing.write",
+        "training.write"
+      ]
+    },
+    "GenerateProductShotAgent": {
+      "capabilities": [
+        "Generates one product or equipment image",
+        "Create 360-degree product views",
+        "Generate lifestyle product shots",
+        "Support multiple angles and lighting",
+        "Generate white-background catalog images"
+      ],
+      "permissions": [
+        "image.generate",
+        "media.create",
+        "catalog.write",
+        "marketing.write"
+      ]
+    },
+    "GenerateMarketingImageAgent": {
+      "capabilities": [
+        "Generates one cleaning-business marketing image draft",
+        "Support multiple campaign types",
+        "Incorporate branding guidelines",
+        "Generate A/B test variations",
+        "Create social media templates",
+        "Support seasonal and themed campaigns"
+      ],
+      "permissions": [
+        "image.generate",
+        "media.create",
+        "marketing.write",
+        "branding.read"
+      ]
+    },
+    "CreateFollowUpAgent": {
+      "capabilities": [
+        "Create one customer or sales follow-up task",
+        "Set follow-up priority and due date",
+        "Assign to appropriate team member",
+        "Link to customer or lead record",
+        "Add follow-up notes and instructions",
+        "Set reminders and notifications",
+        "Track follow-up completion status",
+        "Trigger based on customer activity or inactivity"
+      ],
+      "permissions": [
+        "customers.read",
+        "followups.create",
+        "followups.update",
+        "followups.assign",
+        "communications.send"
+      ]
+    }
+  }
+}

@@ -1,0 +1,7 @@
+﻿{
+    "name":  "Video Dubbing",
+    "type":  "extension",
+    "version":  "1.2",
+    "description":  "AI Video Dubbing extension for translating and dubbing videos into multiple languages using HeyGen and ElevenLabs. — TG: @heew_support",
+    "support_telegram":  "heew_support"
+}

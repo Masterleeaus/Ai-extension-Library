@@ -1,0 +1,22 @@
+Titan Zero Chatbot PWA — WorkCore Edge Runtime Merge
+
+Modified:
+- resources/views/frontend-ui/components/pwa.blade.php
+- resources/pwa/chatbot-pwa/runtime.js
+- resources/pwa/chatbot-pwa/pwa.css
+- resources/pwa/chatbot-sw.js
+- resources/pwa/chatbot.webmanifest
+
+Added:
+- resources/pwa/chatbot-pwa/workcore/contracts.js
+- resources/pwa/chatbot-pwa/workcore/database.js
+- resources/pwa/chatbot-pwa/workcore/attachments.js
+- resources/pwa/chatbot-pwa/workcore/client.js
+- resources/pwa/chatbot-pwa/workcore/ui.js
+- WORKCORE-PWA-INTEGRATION.md
+- WORKCORE-PWA-MERGE-MANIFEST.txt
+
+Validation:
+- JavaScript syntax checked with node --check
+- PHP/Blade PHP syntax checked with php -l
+- Original System PHP classes, database migrations and builder views retained

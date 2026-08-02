@@ -1,0 +1,107 @@
+{
+  "name": "Titan Sprout",
+  "slug": "titan-sprout",
+  "type": "lead-management",
+  "version": "1.0.0",
+  "description": "Lead generation, scoring, qualification, and conversion management",
+  "icon": "🌱",
+  "color": "#10b981",
+  "theme": {
+    "primary": "#10b981",
+    "gradient": "linear-gradient(135deg, #10b981, #059669)"
+  },
+  "wizard_steps": [
+    "Configure",
+    "Customize",
+    "Train",
+    "Deploy",
+    "Launch"
+  ],
+  "features": [
+    "lead-creation",
+    "lead-scoring",
+    "lead-qualification",
+    "lead-tracking",
+    "lead-assignment",
+    "lead-conversion",
+    "source-tracking",
+    "pipeline-management",
+    "lead-tagging",
+    "bulk-import",
+    "export",
+    "chatbot"
+  ],
+  "chatbot": {
+    "name": "Titan Sprout Assistant",
+    "role": "Lead management and sales pipeline",
+    "system_prompt": "You are a lead management assistant helping sales teams:\n- Create and track new leads\n- Score leads based on quality indicators\n- Qualify leads for sales team handoff\n- Track lead sources and conversion rates\n- Suggest next steps in the pipeline\n- Manage lead assignments\n\nAlways prioritize lead quality and conversion potential. Help the team focus on hot leads.",
+    "suggested_prompts": [
+      "Create new lead",
+      "Score this lead",
+      "Qualify for sales",
+      "Convert to customer",
+      "Show pipeline",
+      "Assign leads",
+      "Track source performance"
+    ]
+  },
+  "tier1_manager": "SalesManager",
+  "tier2_specialists": [
+    "LeadGenerationSpecialist",
+    "LeadQualificationSpecialist"
+  ],
+  "tier3_actions": [
+    "CreateLeadAgent",
+    "UpdateLeadAgent",
+    "ScoreLeadAgent",
+    "QualifyLeadAgent",
+    "AssignLeadAgent",
+    "ConvertLeadToCustomerAgent",
+    "TrackLeadSourceAgent",
+    "BulkImportLeadsAgent"
+  ],
+  "database": {
+    "tables": [
+      "leads",
+      "lead_sources",
+      "lead_scores",
+      "lead_qualifications",
+      "lead_conversions",
+      "lead_assignments"
+    ]
+  },
+  "permissions": [
+    "lead:create",
+    "lead:read",
+    "lead:update",
+    "lead:delete",
+    "lead:score",
+    "lead:qualify",
+    "lead:assign",
+    "lead:convert",
+    "lead:export"
+  ],
+  "models": [
+    "Lead",
+    "LeadSource",
+    "LeadScore",
+    "LeadQualification",
+    "LeadConversion"
+  ],
+  "settings": {
+    "scoring_weights": {
+      "engagement": 0.4,
+      "fit": 0.35,
+      "readiness": 0.25
+    },
+    "quality_tiers": [
+      { "name": "hot", "min_score": 80 },
+      { "name": "warm", "min_score": 60 },
+      { "name": "cool", "min_score": 40 },
+      { "name": "cold", "min_score": 0 }
+    ],
+    "auto_assignment": true,
+    "auto_scoring": true,
+    "notification_on_hot_lead": true
+  }
+}

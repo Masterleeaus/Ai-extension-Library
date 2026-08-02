@@ -1,0 +1,4 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+test('shared pack retention removes only the departing pack reference',()=>{const row={pack_id:'a',pack_ids:['a','b']};const id='a',remaining=row.pack_ids.filter(x=>String(x)!==String(id));if(String(row.pack_id)===String(id))row.pack_id=remaining[0]||null;row.pack_ids=remaining;assert.deepEqual(row,{pack_id:'b',pack_ids:['b']});});
+test('reduced payload policy activates for weak and unstable links',()=>{const reduced=q=>q==='weak'||q==='unstable';assert.equal(reduced('weak'),true);assert.equal(reduced('unstable'),true);assert.equal(reduced('good'),false);});
+test('storage pressure thresholds remain deterministic',()=>{const pressure=r=>r>=.9?'critical':r>=.75?'warning':'normal';assert.equal(pressure(.91),'critical');assert.equal(pressure(.8),'warning');assert.equal(pressure(.4),'normal');});

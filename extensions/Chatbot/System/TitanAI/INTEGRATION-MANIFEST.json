@@ -1,0 +1,7 @@
+{
+  "integration": "chatbot-five-tier-ai-pruned",
+  "authority": {"chatbot": "conversation and device runtime", "workcore": "operational records", "server": "cross-tenant and provider execution"},
+  "retained": ["tier0 contracts", "WorkCore runtime bridge", "worker registry", "agent factory", "memory", "skills", "personas", "model routing", "tier1 managers", "tier2 assistants and cleaning specialists", "tier3 atomic agents", "booking agent", "chatbot tools", "human-agent inbox", "provider-neutral messaging", "internal/web chat", "push contracts", "customer tags", "reviews", "file chat", "temporary chat", "shared chat", "voice isolation", "Quattro tool contracts", "PWA device agent runtime"],
+  "removed": ["pass reports and generated documentation", "tests and package verification tools", "deep research", "Google/Microsoft/Slack OAuth connectors", "duplicate WhatsApp agent package", "marketing and social automation", "ecommerce authority", "canvas", "blog pilot", "content manager", "highlight tools", "visual inspector", "image generation and photoshoot studios", "live customizer", "onboarding", "focus mode", "announcements", "provider-specific phone and voice runtimes"],
+  "reason": "Keep autonomous chatbot and offline execution capabilities while avoiding duplicated business domains, external credential surfaces, heavy online-only features, and unrelated manager content tooling."
+}

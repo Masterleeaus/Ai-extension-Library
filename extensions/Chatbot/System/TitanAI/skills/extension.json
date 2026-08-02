@@ -1,0 +1,58 @@
+{
+  "name": "AI Chat Pro Skills",
+  "key": "system-ai-chat-skills",
+  "type": "extension",
+  "version": "1.9.0",
+  "contract_version": "1.0",
+  "description": "Reusable SystemAIChat skill packages with immutable releases, governed tools, canonical integrity, hardened transactional imports, provenance, company tenancy, and version-pinned activation — TG: @heew_support",
+  "entry_provider": "System/SystemAIChatSkillsServiceProvider.php",
+  "requires": [
+    "system-ai-chat"
+  ],
+  "capabilities": [
+    "system-ai-chat.skills",
+    "skills.authorization",
+    "skills.company-tenancy",
+    "skills.import",
+    "skills.export",
+    "skills.activate",
+    "skills.versioning",
+    "skills.provider-tools",
+    "skills.release-lifecycle",
+    "skills.version-pinning",
+    "skills.rollback",
+    "skills.structured-tools",
+    "skills.tool-registry",
+    "skills.tool-approval",
+    "skills.tool-execution",
+    "skills.connector-tool-bridge",
+    "skills.ai-agent-tool-catalog",
+    "skills.core-tool-bridge",
+    "skills.tool-catalog-ui",
+    "skills.package-hashing",
+    "skills.resource-integrity",
+    "skills.provenance",
+    "skills.package-verification",
+    "skills.transactional-imports",
+    "skills.archive-hardening",
+    "skills.import-staging",
+    "skills.import-cleanup"
+  ],
+  "compatibility": {
+    "php": ">=8.2",
+    "ai_chat_pro": ">=3.8.0",
+    "upgrade_from": [
+      "1.1",
+      "1.2.0",
+      "1.3.0",
+      "1.4.0",
+      "1.5.0",
+      "1.6.0",
+      "1.7.0",
+      "1.8.0"
+    ],
+    "preserves_existing_data": true
+  },
+  "support_telegram": "heew_support",
+  "permission_contract": "1.0"
+}

@@ -1,0 +1,76 @@
+{
+  "name": "Titan Hub",
+  "slug": "titan-hub",
+  "type": "customer",
+  "description": "Customer service and booking",
+  "icon": "🏠",
+  "color": "#10b981",
+  "theme": {
+    "primary": "#10b981",
+    "gradient": "linear-gradient(135deg, #10b981, #059669)"
+  },
+  "wizard_steps": [
+    "Configure",
+    "Customize",
+    "Train",
+    "Deploy",
+    "Launch"
+  ],
+  "features": [
+    "chat",
+    "booking",
+    "quote-calculator",
+    "payment-processing",
+    "invoice-viewing",
+    "service-history",
+    "reviews",
+    "offline-sync",
+    "chatbot"
+  ],
+  "chatbot": {
+    "name": "Titan Hub Assistant",
+    "role": "Customer service and booking",
+    "system_prompt": "You are a customer service assistant helping:\n- Book or reschedule appointments\n- Answer questions about services\n- Check job status\n- Process payments\n- Handle feedback\n\nAlways be friendly, helpful, and professional.",
+    "suggested_prompts": [
+      "Book a service",
+      "Check my appointment",
+      "Get a quote",
+      "Pay invoice",
+      "How does this work?"
+    ],
+    "context_fields": [
+      "customer_id",
+      "booking_id",
+      "invoice_id"
+    ]
+  },
+  "ui_components": {
+    "dashboard": "CustomerDashboard.vue",
+    "booking_flow": "BookingWizard.vue",
+    "actions": [
+      "chat",
+      "book_service",
+      "view_invoice",
+      "pay_online",
+      "leave_review"
+    ]
+  },
+  "api_routes": [
+    "GET /api/v2/titan-hub/services/upcoming",
+    "POST /api/v2/titan-hub/service/book",
+    "GET /api/v2/titan-hub/invoices",
+    "POST /api/v2/titan-hub/payment/process",
+    "POST /api/v2/titan-hub/review/submit"
+  ],
+  "permissions": {
+    "notification": true,
+    "payment_processing": true
+  },
+  "storage": {
+    "local_tables": [
+      "titan_hub_bookings",
+      "titan_hub_invoices",
+      "titan_hub_conversations"
+    ]
+  }
+}

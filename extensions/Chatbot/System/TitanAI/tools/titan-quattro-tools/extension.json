@@ -1,0 +1,11 @@
+{
+  "name": "Titan Quattro Tools",
+  "type": "extension",
+  "version": "1.0.0",
+  "description": "Titan Quattro Tools and Connections: 165+ reusable tools providing actual functions, APIs, channels, data access and integrations used by Trio agents.",
+  "tier": "quattro",
+  "purpose": "Tool & Integration Layer",
+  "tool_categories": 16,
+  "total_tools": 165,
+  "support_telegram": "heew_support"
+}

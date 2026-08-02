@@ -1,0 +1,215 @@
+{
+  "schema_version": "1.0.0",
+  "identity": {
+    "name": "Titan Locker",
+    "slug": "titan-locker",
+    "icon": "locker",
+    "accent": "var(--lqd-ext-chat-primary)"
+  },
+  "navigation": {
+    "default_view": "stock",
+    "primary": [
+      {
+        "id": "stock",
+        "label": "Stock",
+        "icon": "stock",
+        "offline": true
+      },
+      {
+        "id": "equipment",
+        "label": "Equipment",
+        "icon": "equipment",
+        "offline": true
+      },
+      {
+        "id": "scan",
+        "label": "Scan",
+        "icon": "scan",
+        "offline": true
+      },
+      {
+        "id": "maintenance",
+        "label": "Maintenance",
+        "icon": "maintenance",
+        "offline": true
+      }
+    ],
+    "drawer": [
+      {
+        "id": "fleet",
+        "label": "Fleet",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "assignments",
+        "label": "Assignments",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "locations",
+        "label": "Locations",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "suppliers",
+        "label": "Suppliers",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "stock-movements",
+        "label": "Stock movements",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "reorder-queue",
+        "label": "Reorder queue",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "downtime",
+        "label": "Downtime",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "service-history",
+        "label": "Service history",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "warranties",
+        "label": "Warranties",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "reports",
+        "label": "Reports",
+        "icon": "chevron-right",
+        "offline": false
+      }
+    ],
+    "header_actions": [
+      "sync",
+      "notifications",
+      "settings"
+    ]
+  },
+  "home": {
+    "widgets": [
+      "low_stock",
+      "maintenance_due",
+      "equipment_status",
+      "reorder_queue"
+    ],
+    "quick_actions": [
+      "equipment",
+      "scan"
+    ]
+  },
+  "chat": {
+    "persistent": true,
+    "role": "Titan Locker",
+    "suggested_prompts": [
+      "Find this equipment",
+      "Check stock",
+      "Schedule maintenance"
+    ],
+    "context_policy": {
+      "minimum_scope": true,
+      "send_full_record": false,
+      "requires_permission": true
+    }
+  },
+  "workcore": {
+    "domains": [
+      "Inventory",
+      "Assets",
+      "Fleet",
+      "Supply",
+      "Maintenance"
+    ],
+    "commands": [
+      "scan_asset",
+      "move_stock",
+      "assign_equipment",
+      "schedule_maintenance"
+    ],
+    "read_models": [
+      "assigned_equipment",
+      "asset_records",
+      "location_stock",
+      "maintenance_checklists",
+      "scan_queue"
+    ]
+  },
+  "offline": {
+    "records": [
+      "assigned_equipment",
+      "asset_records",
+      "location_stock",
+      "maintenance_checklists",
+      "scan_queue"
+    ],
+    "packs": [
+      "titan-locker-default"
+    ],
+    "retention": {
+      "completed_days": 30
+    },
+    "conflict_rules": {
+      "server_authoritative": true,
+      "preserve_local_copy": true
+    }
+  },
+  "permissions": [
+    "scan_asset",
+    "move_stock",
+    "assign_equipment",
+    "schedule_maintenance"
+  ],
+  "privacy": {
+    "default_mode": "device-first",
+    "redact_before_cloud": true,
+    "attachment_confirmation": true,
+    "provider_allowlist": []
+  },
+  "notifications": [
+    "assignment",
+    "approval",
+    "sync_failure",
+    "conflict"
+  ],
+  "settings_sections": [
+    "ai-providers",
+    "privacy",
+    "device-security",
+    "offline-sync",
+    "workcore",
+    "permissions",
+    "notifications",
+    "channels",
+    "appearance",
+    "accessibility",
+    "diagnostics"
+  ],
+  "preview_states": [
+    "mobile",
+    "tablet",
+    "desktop",
+    "drawer-open",
+    "settings-open",
+    "offline",
+    "syncing",
+    "conflict",
+    "empty",
+    "populated"
+  ]
+}

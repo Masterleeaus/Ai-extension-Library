@@ -1,0 +1,34 @@
+{
+  "id": "/chatbot",
+  "name": "Titan Zero Chatbot",
+  "short_name": "Titan Chat",
+  "description": "Installable customer chat, support, knowledge and service workspace.",
+  "start_url": "/chatbot?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
+  "orientation": "any",
+  "background_color": "#111318",
+  "theme_color": "#111318",
+  "lang": "en-AU",
+  "dir": "ltr",
+  "categories": ["business", "productivity", "utilities"],
+  "prefer_related_applications": false,
+  "launch_handler": { "client_mode": ["navigate-existing", "auto"] },
+  "handle_links": "preferred",
+  "icons": [
+    {"src":"/chatbot-pwa/icons/icon-192.png","sizes":"192x192","type":"image/png","purpose":"any"},
+    {"src":"/chatbot-pwa/icons/icon-192-maskable.png","sizes":"192x192","type":"image/png","purpose":"maskable"},
+    {"src":"/chatbot-pwa/icons/icon-512.png","sizes":"512x512","type":"image/png","purpose":"any"},
+    {"src":"/chatbot-pwa/icons/icon-512-maskable.png","sizes":"512x512","type":"image/png","purpose":"maskable"}
+  ],
+  "screenshots": [
+    {"src":"/chatbot-pwa/screenshots/chatbot-wide.png","sizes":"1280x720","type":"image/png","form_factor":"wide","label":"Titan Zero chatbot workspace"},
+    {"src":"/chatbot-pwa/screenshots/chatbot-mobile.png","sizes":"720x1280","type":"image/png","form_factor":"narrow","label":"Titan Zero chatbot mobile experience"}
+  ],
+  "shortcuts": [
+    {"name":"Open Chat","short_name":"Chat","description":"Open the chatbot conversation view","url":"/chatbot?source=pwa&view=chat","icons":[{"src":"/chatbot-pwa/icons/icon-192.png","sizes":"192x192","type":"image/png"}]},
+    {"name":"Help Centre","short_name":"Help","description":"Search support articles and help","url":"/chatbot?source=pwa&view=help","icons":[{"src":"/chatbot-pwa/icons/icon-192.png","sizes":"192x192","type":"image/png"}]},
+    {"name":"New Conversation","short_name":"New chat","description":"Start a new conversation","url":"/chatbot?source=pwa&action=new-chat","icons":[{"src":"/chatbot-pwa/icons/icon-192.png","sizes":"192x192","type":"image/png"}]}
+  ]
+}

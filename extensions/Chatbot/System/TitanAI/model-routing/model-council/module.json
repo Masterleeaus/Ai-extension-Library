@@ -1,0 +1,14 @@
+{
+  "id": "model-council",
+  "name": "Model Council",
+  "tier": 0,
+  "role": "runtime",
+  "system_ai_chat": true,
+  "cleaning_scope": true,
+  "operational_writes": "workcore_only",
+  "source_metadata": {
+    "name": "ModelCouncil",
+    "version": "1.5",
+    "description": "Model Council extension for MagicAI — TG: @heew_support"
+  }
+}

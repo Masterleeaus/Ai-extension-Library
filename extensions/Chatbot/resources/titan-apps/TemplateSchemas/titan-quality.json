@@ -1,0 +1,218 @@
+{
+  "schema_version": "1.0.0",
+  "identity": {
+    "name": "Titan Quality",
+    "slug": "titan-quality",
+    "icon": "quality",
+    "accent": "var(--lqd-ext-chat-primary)"
+  },
+  "navigation": {
+    "default_view": "inspections",
+    "primary": [
+      {
+        "id": "inspections",
+        "label": "Inspections",
+        "icon": "inspections",
+        "offline": true
+      },
+      {
+        "id": "incidents",
+        "label": "Incidents",
+        "icon": "incidents",
+        "offline": true
+      },
+      {
+        "id": "compliance",
+        "label": "Compliance",
+        "icon": "compliance",
+        "offline": true
+      },
+      {
+        "id": "feedback",
+        "label": "Feedback",
+        "icon": "feedback",
+        "offline": true
+      }
+    ],
+    "drawer": [
+      {
+        "id": "checklists",
+        "label": "Checklists",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "certifications",
+        "label": "Certifications",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "violations",
+        "label": "Violations",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "audits",
+        "label": "Audits",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "surveys",
+        "label": "Surveys",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "nps",
+        "label": "NPS",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "reviews",
+        "label": "Reviews",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "reports",
+        "label": "Reports",
+        "icon": "chevron-right",
+        "offline": false
+      },
+      {
+        "id": "follow-ups",
+        "label": "Follow-ups",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "evidence",
+        "label": "Evidence",
+        "icon": "chevron-right",
+        "offline": true
+      }
+    ],
+    "header_actions": [
+      "sync",
+      "notifications",
+      "settings"
+    ]
+  },
+  "home": {
+    "widgets": [
+      "inspections_due",
+      "open_incidents",
+      "compliance_status",
+      "feedback_alerts"
+    ],
+    "quick_actions": [
+      "incidents",
+      "compliance"
+    ]
+  },
+  "chat": {
+    "persistent": true,
+    "role": "Titan Quality",
+    "suggested_prompts": [
+      "Check compliance",
+      "Create an inspection",
+      "Document this incident"
+    ],
+    "context_policy": {
+      "minimum_scope": true,
+      "send_full_record": false,
+      "requires_permission": true
+    }
+  },
+  "workcore": {
+    "domains": [
+      "Compliance",
+      "Forms",
+      "Reviews",
+      "Credentials",
+      "Operations",
+      "Premises"
+    ],
+    "commands": [
+      "perform_inspection",
+      "report_incident",
+      "record_violation",
+      "submit_feedback"
+    ],
+    "read_models": [
+      "assigned_inspections",
+      "checklists",
+      "safety_procedures",
+      "incident_drafts",
+      "evidence",
+      "certification_summaries"
+    ]
+  },
+  "offline": {
+    "records": [
+      "assigned_inspections",
+      "checklists",
+      "safety_procedures",
+      "incident_drafts",
+      "evidence",
+      "certification_summaries"
+    ],
+    "packs": [
+      "titan-quality-default"
+    ],
+    "retention": {
+      "completed_days": 30
+    },
+    "conflict_rules": {
+      "server_authoritative": true,
+      "preserve_local_copy": true
+    }
+  },
+  "permissions": [
+    "perform_inspection",
+    "report_incident",
+    "record_violation",
+    "submit_feedback"
+  ],
+  "privacy": {
+    "default_mode": "device-first",
+    "redact_before_cloud": true,
+    "attachment_confirmation": true,
+    "provider_allowlist": []
+  },
+  "notifications": [
+    "assignment",
+    "approval",
+    "sync_failure",
+    "conflict"
+  ],
+  "settings_sections": [
+    "ai-providers",
+    "privacy",
+    "device-security",
+    "offline-sync",
+    "workcore",
+    "permissions",
+    "notifications",
+    "channels",
+    "appearance",
+    "accessibility",
+    "diagnostics"
+  ],
+  "preview_states": [
+    "mobile",
+    "tablet",
+    "desktop",
+    "drawer-open",
+    "settings-open",
+    "offline",
+    "syncing",
+    "conflict",
+    "empty",
+    "populated"
+  ]
+}

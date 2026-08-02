@@ -1,0 +1,7 @@
+﻿{
+    "name":  "AI Agent: Gmail",
+    "type":  "extension",
+    "version":  "1.0",
+    "description":  "Integrates Gmail with AIAgent: email reading, composing, and management via Google Gmail API. — TG: @heew_support",
+    "support_telegram":  "heew_support"
+}

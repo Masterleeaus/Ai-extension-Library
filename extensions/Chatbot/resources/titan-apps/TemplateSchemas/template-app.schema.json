@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://titanzero.local/schemas/template-app.schema.json",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "identity",
+    "navigation",
+    "home",
+    "chat",
+    "workcore",
+    "offline",
+    "permissions",
+    "privacy",
+    "notifications",
+    "settings_sections",
+    "preview_states"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string"
+    },
+    "identity": {
+      "type": "object",
+      "required": [
+        "name",
+        "slug",
+        "icon",
+        "accent"
+      ]
+    },
+    "navigation": {
+      "type": "object",
+      "required": [
+        "default_view",
+        "primary",
+        "drawer",
+        "header_actions"
+      ]
+    },
+    "home": {
+      "type": "object"
+    },
+    "chat": {
+      "type": "object"
+    },
+    "workcore": {
+      "type": "object"
+    },
+    "offline": {
+      "type": "object"
+    },
+    "permissions": {
+      "type": "array"
+    },
+    "privacy": {
+      "type": "object"
+    },
+    "notifications": {
+      "type": "array"
+    },
+    "settings_sections": {
+      "type": "array"
+    },
+    "preview_states": {
+      "type": "array"
+    }
+  }
+}

@@ -1,0 +1,7 @@
+﻿{
+    "name":  "Video Editor",
+    "type":  "extension",
+    "version":  "1.0",
+    "description":  "Timeline-based multi-track video editor with AI generation, drag-and-drop editing, and server-side export. — TG: @heew_support",
+    "support_telegram":  "heew_support"
+}

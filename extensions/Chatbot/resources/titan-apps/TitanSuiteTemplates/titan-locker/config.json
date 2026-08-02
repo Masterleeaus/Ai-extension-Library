@@ -1,0 +1,131 @@
+{
+  "name": "Titan Locker",
+  "slug": "titan-locker",
+  "type": "equipment-fleet-inventory",
+  "version": "2.0.0",
+  "description": "Equipment, fleet, and inventory management with maintenance tracking",
+  "icon": "🏗️",
+  "color": "#6366f1",
+  "theme": {
+    "primary": "#6366f1",
+    "gradient": "linear-gradient(135deg, #6366f1, #7c3aed)"
+  },
+  "wizard_steps": [
+    "Configure",
+    "Customize",
+    "Train",
+    "Deploy",
+    "Launch"
+  ],
+  "features": [
+    "equipment-tracking",
+    "fleet-management",
+    "inventory-management",
+    "maintenance-scheduling",
+    "maintenance-alerts",
+    "equipment-monitoring",
+    "equipment-assignment",
+    "usage-tracking",
+    "maintenance-history",
+    "warranty-tracking",
+    "equipment-status",
+    "maintenance-reports",
+    "chatbot"
+  ],
+  "chatbot": {
+    "name": "Titan Locker Assistant",
+    "role": "Equipment, fleet, and inventory management",
+    "system_prompt": "You are an equipment and inventory management assistant. Your role is to:\n- Track equipment location, status, and condition\n- Manage fleet vehicle tracking and maintenance\n- Monitor inventory levels and reorder points\n- Schedule equipment maintenance\n- Alert on maintenance due dates\n- Track equipment downtime\n- Manage equipment assignments to technicians\n- Prevent equipment failure through preventive maintenance\n\nAlways prioritize equipment availability and maintenance compliance.",
+    "suggested_prompts": [
+      "Track equipment location",
+      "Schedule maintenance",
+      "Check inventory levels",
+      "Assign equipment",
+      "View maintenance history",
+      "Alert due maintenance",
+      "Fleet status report"
+    ]
+  },
+  "tier1_manager": "OperationsManager",
+  "tier2_specialists": [
+    "EquipmentManagementSpecialist",
+    "FleetManagementSpecialist",
+    "InventorySpecialist",
+    "MaintenanceSpecialist"
+  ],
+  "tier3_actions": [
+    "TrackEquipmentAgent",
+    "AssignEquipmentAgent",
+    "UpdateEquipmentStatusAgent",
+    "AllocateEquipmentAgent",
+    "UpdateStockAgent",
+    "SetReorderPointAgent",
+    "ScheduleMaintenanceAgent",
+    "RecordMaintenanceAgent",
+    "AlertMaintenanceDueAgent",
+    "TrackEquipmentDowntimeAgent",
+    "GenerateInventoryReportAgent",
+    "GenerateMaintenanceReportAgent"
+  ],
+  "database": {
+    "tables": [
+      "equipment",
+      "equipment_assignments",
+      "equipment_maintenance",
+      "maintenance_schedules",
+      "fleet_vehicles",
+      "fleet_assignments",
+      "inventory_items",
+      "inventory_levels",
+      "reorder_points",
+      "equipment_downtime"
+    ]
+  },
+  "permissions": [
+    "equipment:create",
+    "equipment:read",
+    "equipment:update",
+    "equipment:assign",
+    "equipment:status",
+    "maintenance:create",
+    "maintenance:read",
+    "maintenance:schedule",
+    "inventory:read",
+    "inventory:update",
+    "fleet:manage"
+  ],
+  "models": [
+    "Equipment",
+    "EquipmentAssignment",
+    "EquipmentMaintenance",
+    "MaintenanceSchedule",
+    "FleetVehicle",
+    "FleetAssignment",
+    "InventoryItem",
+    "InventoryLevel",
+    "ReorderPoint",
+    "EquipmentDowntime"
+  ],
+  "settings": {
+    "maintenance_alerts": {
+      "advance_notice_days": 7,
+      "escalate_overdue_days": 3,
+      "send_notifications": true
+    },
+    "equipment_categories": [
+      "pressure_washer",
+      "van",
+      "truck",
+      "pump",
+      "tank",
+      "hose",
+      "nozzle",
+      "brush",
+      "chemical_container",
+      "other"
+    ],
+    "inventory_tracking": true,
+    "auto_reorder": true,
+    "downtime_tracking": true
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "app_slug": "titan-teams",
+  "app_name": "Titan Teams",
+  "workcore_enabled": true,
+  "workcore_authority": true,
+  "offline_first": true,
+  "domain": "workforce",
+  "workcore": {
+    "read_tools": [
+      "workcore.workers.list",
+      "workcore.teams.list",
+      "workcore.availability.list",
+      "workcore.timesheets.list",
+      "workcore.leave.list"
+    ],
+    "action_tools": [
+      "workcore.availability.update",
+      "workcore.timesheet.submit",
+      "workcore.leave.request",
+      "workcore.team.assign",
+      "workcore.worker.note"
+    ],
+    "requires_tenant_context": true,
+    "requires_actor_context": true,
+    "idempotent_actions": true,
+    "confirmation_for_high_risk": true
+  },
+  "offline_projection": {
+    "stores": [
+      "workers",
+      "teams",
+      "availability",
+      "timesheets",
+      "leave",
+      "team_conversations"
+    ],
+    "writes_are_provisional": true,
+    "sync_via": "chatbot_outbox",
+    "conflicts_via": "chatbot_conflict_centre"
+  },
+  "governance": {
+    "executor": "GovernedToolExecutor",
+    "fact_verification": "WorkCoreFactVerifier",
+    "risk_classification": true
+  }
+}

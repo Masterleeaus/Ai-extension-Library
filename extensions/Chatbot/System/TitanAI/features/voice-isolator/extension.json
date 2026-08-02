@@ -1,0 +1,39 @@
+{
+  "name": "AI Voice Isolator",
+  "type": "extension",
+  "version": "2.10.0",
+  "description": "Voice isolation interface with capability registration and upload safety configuration.",
+  "support_telegram": "heew_support",
+  "requires": {
+    "php": ">=8.2",
+    "system-ai-chat": ">=3.8.0"
+  },
+  "capabilities": [
+    "system-ai-chat.voice-isolator"
+  ],
+  "upgrade_notes": "Pass 7: CI-ready package verification, static-analysis configuration, operations metadata, maintenance runbooks, and regression checks.",
+  "compatibility": {
+    "ai_chat_pro": ">=3.8.0"
+  },
+  "upgrade_pass": 7,
+  "runtime": {
+    "contract_version": "1.0",
+    "mode": "media",
+    "dependencies": [
+      "system-ai-chat.runtime"
+    ],
+    "tools": [
+      "voice_isolator.process"
+    ],
+    "health_checks": [
+      "views:ai-voice-isolator"
+    ],
+    "performance_profile": "bounded-v1",
+    "operations_profile": "maintained-v1",
+    "diagnostics": {
+      "manifest": "extension.json",
+      "runtime_descriptor": "System/Support/RuntimeDescriptor.php",
+      "verification_script": "tools/verify-package.php"
+    }
+  }
+}

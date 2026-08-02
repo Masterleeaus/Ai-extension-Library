@@ -1,0 +1,42 @@
+{
+  "name": "SystemAIChat Memory",
+  "type": "extension",
+  "version": "1.12.0",
+  "description": "Conversation instruction memory with bounded retention and capability registration.",
+  "support_telegram": "heew_support",
+  "requires": {
+    "php": ">=8.2",
+    "system-ai-chat": ">=3.8.0"
+  },
+  "capabilities": [
+    "system-ai-chat.memory"
+  ],
+  "upgrade_notes": "Pass 7: CI-ready package verification, static-analysis configuration, operations metadata, maintenance runbooks, and regression checks.",
+  "compatibility": {
+    "ai_chat_pro": ">=3.8.0"
+  },
+  "upgrade_pass": 7,
+  "runtime": {
+    "contract_version": "1.0",
+    "mode": "context",
+    "dependencies": [
+      "system-ai-chat.runtime"
+    ],
+    "tools": [
+      "memory.get_instructions",
+      "memory.save_instructions",
+      "memory.clear_instructions"
+    ],
+    "health_checks": [
+      "config:system-ai-chat-memory",
+      "routes:system-ai-chat-memory.get-instructions"
+    ],
+    "performance_profile": "bounded-v1",
+    "operations_profile": "maintained-v1",
+    "diagnostics": {
+      "manifest": "extension.json",
+      "runtime_descriptor": "System/Support/RuntimeDescriptor.php",
+      "verification_script": "tools/verify-package.php"
+    }
+  }
+}

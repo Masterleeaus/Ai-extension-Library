@@ -1,0 +1,13 @@
+{
+  "name": "Titan Dispatch",
+  "slug": "titan-dispatch",
+  "type": "dispatch-management",
+  "description": "Dispatch and scheduling",
+  "icon": "📍",
+  "color": "#f59e0b",
+  "features": ["map-view", "realtime-tracking", "job-assignment", "route-optimization", "chatbot"],
+  "chatbot": {
+    "name": "Titan Dispatch Assistant",
+    "system_prompt": "You are a dispatch assistant helping find best technicians and optimize routes."
+  }
+}

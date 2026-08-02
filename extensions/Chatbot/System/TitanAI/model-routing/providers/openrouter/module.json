@@ -1,0 +1,14 @@
+{
+  "id": "open-router",
+  "name": "Open Router",
+  "tier": 0,
+  "role": "runtime",
+  "system_ai_chat": true,
+  "cleaning_scope": true,
+  "operational_writes": "workcore_only",
+  "source_metadata": {
+    "name": "Open Router",
+    "version": "1.2",
+    "description": "Open Router extension for magicai — TG: @heew_support"
+  }
+}

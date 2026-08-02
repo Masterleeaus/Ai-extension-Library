@@ -1,0 +1,13 @@
+{
+  "name": "Chat share",
+  "type": "extension",
+  "version": "2.8.0",
+  "description": "Secure, expiring and revocable conversation sharing for SystemAIChat.",
+  "support_telegram": "heew_support",
+  "dependencies": {
+    "system-ai-chat": ">=3.8.0"
+  },
+  "capabilities": [
+    "system-ai-chat.shared-chat"
+  ]
+}

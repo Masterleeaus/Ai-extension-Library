@@ -1,0 +1,58 @@
+.titan-train-shell{display:grid;gap:1rem;padding:1rem;max-width:72rem;margin:0 auto;color:var(--lqd-ext-chat-window-text,#151827)}
+.titan-train-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem}
+.titan-train-heading h2{margin:.15rem 0;font-size:1.55rem;line-height:1.15}
+.titan-train-heading p{margin:0;max-width:42rem;opacity:.72}
+.titan-train-eyebrow{font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#4f46e5}
+.titan-train-icon-button,.titan-train-shell button{border:0;border-radius:.8rem;cursor:pointer;font:inherit}
+.titan-train-icon-button{width:2.5rem;height:2.5rem;background:color-mix(in srgb,#4f46e5 10%,transparent)}
+.titan-train-shell button:focus-visible{outline:3px solid color-mix(in srgb,#4f46e5 35%,transparent);outline-offset:2px}
+.titan-train-shell button:disabled{cursor:wait;opacity:.6}
+.titan-train-readiness{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.55rem}
+.titan-train-readiness>div{display:grid;gap:.18rem;padding:.75rem;border:1px solid color-mix(in srgb,currentColor 12%,transparent);border-radius:.85rem;background:color-mix(in srgb,var(--lqd-ext-chat-window-bg,#fff) 92%,#4f46e5 8%)}
+.titan-train-readiness span,.titan-train-card header span,.titan-train-row span,.titan-train-qualification>span,.titan-train-profile span,.titan-train-certificate span{font-size:.7rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;opacity:.66}
+.titan-train-list,.titan-train-section{display:grid;gap:.75rem}
+.titan-train-card,.titan-train-section,.titan-train-qualification,.titan-train-profile,.titan-train-prompts{border:1px solid color-mix(in srgb,currentColor 12%,transparent);border-radius:1rem;background:var(--lqd-ext-chat-window-bg,#fff);box-shadow:0 10px 35px color-mix(in srgb,#111827 8%,transparent)}
+.titan-train-card{display:grid;gap:.85rem;padding:1rem}
+.titan-train-card header{display:flex;justify-content:space-between;gap:1rem}
+.titan-train-card h3,.titan-train-section h3,.titan-train-qualification h3,.titan-train-profile h3,.titan-train-prompts h3{margin:.1rem 0;font-size:1rem}
+.titan-train-card p,.titan-train-qualification p,.titan-train-profile p{margin:.2rem 0;opacity:.72}
+.titan-train-progress{height:.5rem;overflow:hidden;border-radius:999px;background:color-mix(in srgb,currentColor 10%,transparent)}
+.titan-train-progress i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#4f46e5,#7c3aed)}
+.titan-train-card dl,.titan-train-details{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.5rem;margin:0}
+.titan-train-card dl div,.titan-train-details div{display:grid;gap:.1rem;padding:.55rem;border-radius:.7rem;background:color-mix(in srgb,currentColor 5%,transparent)}
+.titan-train-card dt,.titan-train-details dt{font-size:.7rem;opacity:.65}
+.titan-train-card dd,.titan-train-details dd{margin:0;font-weight:650}
+.titan-train-next{display:grid;gap:.28rem;padding:.85rem;border-radius:.85rem;background:color-mix(in srgb,#4f46e5 8%,transparent)}
+.titan-train-next>span,.titan-train-next small{font-size:.75rem;opacity:.72}
+.titan-train-next button,.titan-train-actions button,.titan-train-row button,.titan-train-state button{justify-self:start;padding:.65rem .9rem;background:#4f46e5;color:#fff;font-weight:700}
+.titan-train-link{justify-self:start;padding:.25rem 0;background:transparent;color:#4f46e5;font-weight:700}
+.titan-train-complete{padding:.75rem;border-radius:.75rem;background:color-mix(in srgb,#16a34a 12%,transparent);color:#166534;font-weight:700}
+.titan-train-section{padding:1rem}
+.titan-train-section>header{display:flex;align-items:center;justify-content:space-between}
+.titan-train-section>header>span{display:grid;place-items:center;min-width:1.7rem;height:1.7rem;border-radius:999px;background:color-mix(in srgb,#4f46e5 12%,transparent);font-weight:700}
+.titan-train-row,.titan-train-channel{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.75rem 0;border-top:1px solid color-mix(in srgb,currentColor 10%,transparent)}
+.titan-train-row>div:first-child,.titan-train-channel>span:first-child{display:grid;gap:.12rem;text-align:left}
+.titan-train-row small,.titan-train-channel small{opacity:.68}
+.titan-train-row__actions{display:flex;align-items:center;gap:.5rem}
+.titan-train-row__actions em{font-size:.75rem;font-style:normal}
+.titan-train-channel{width:100%;background:transparent;color:inherit}
+.titan-train-qualification{display:grid;gap:.35rem;padding:1rem;border-left:4px solid #f59e0b}
+.titan-train-qualification.is-ready{border-left-color:#16a34a}
+.titan-train-competency-count{display:flex;align-items:baseline;gap:.4rem;margin-top:.4rem}
+.titan-train-competency-count strong{font-size:1.7rem}
+.titan-train-certificate{display:grid;gap:.2rem;padding:.9rem;border-radius:.8rem;background:linear-gradient(135deg,color-mix(in srgb,#4f46e5 12%,transparent),color-mix(in srgb,#7c3aed 8%,transparent))}
+.titan-train-profile{display:flex;align-items:center;gap:.85rem;padding:1rem}
+.titan-train-avatar{display:grid;place-items:center;width:3rem;height:3rem;border-radius:1rem;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;font-weight:800}
+.titan-train-details{grid-template-columns:repeat(2,minmax(0,1fr))}
+.titan-train-actions{display:flex;flex-wrap:wrap;gap:.65rem}
+.titan-train-prompts{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem;padding:.85rem}
+.titan-train-prompts h3{width:100%}
+.titan-train-prompts button{padding:.55rem .75rem;background:color-mix(in srgb,#4f46e5 10%,transparent);color:inherit;text-align:left}
+.titan-train-state{display:grid;place-items:center;gap:.7rem;min-height:16rem;padding:2rem;text-align:center}
+.titan-train-state p{max-width:32rem;margin:0;opacity:.72}
+.titan-train-state__icon{font-size:2rem}
+.titan-train-spinner{width:2rem;height:2rem;border:3px solid color-mix(in srgb,#4f46e5 18%,transparent);border-top-color:#4f46e5;border-radius:50%;animation:titan-train-spin .8s linear infinite}
+.titan-train-muted{margin:.4rem 0;opacity:.68}
+@keyframes titan-train-spin{to{transform:rotate(360deg)}}
+@media(max-width:640px){.titan-train-shell{padding:.75rem}.titan-train-readiness{grid-template-columns:repeat(2,minmax(0,1fr))}.titan-train-card dl,.titan-train-details{grid-template-columns:1fr}.titan-train-row{align-items:flex-start;flex-direction:column}.titan-train-row__actions{width:100%;justify-content:space-between}}
+@media(prefers-reduced-motion:reduce){.titan-train-spinner{animation:none}}

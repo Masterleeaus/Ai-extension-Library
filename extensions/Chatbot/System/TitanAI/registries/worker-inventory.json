@@ -1,0 +1,1006 @@
+{
+  "tier1": [
+    {
+      "class": "AIConsciousnessOrchestrator",
+      "id": "ai-consciousness-orchestrator",
+      "name": "Organisational Awareness Orchestrator",
+      "tier": 1,
+      "path": "System/TitanAI/tier1/managers/AIConsciousnessOrchestrator.php"
+    },
+    {
+      "class": "BiologicalBusinessEvolutionManager",
+      "id": "biological-business-evolution-manager",
+      "name": "Adaptive Business Evolution Manager",
+      "tier": 1,
+      "path": "System/TitanAI/tier1/managers/BiologicalBusinessEvolutionManager.php"
+    },
+    {
+      "class": "BusinessSingularityManager",
+      "id": "business-singularity-manager",
+      "name": "Enterprise Orchestration Manager",
+      "tier": 1,
+      "path": "System/TitanAI/tier1/managers/BusinessSingularityManager.php"
+    },
+    {
+      "class": "CollectiveIntelligenceManager",
+      "id": "collective-intelligence-manager",
+      "name": "Collective Intelligence Manager",
+      "tier": 1,
+      "path": "System/TitanAI/tier1/managers/CollectiveIntelligenceManager.php"
+    },
+    {
+      "class": "CustomerManager",
+      "id": "customer-manager",
+      "name": "Customer Manager",
+      "tier": 1,
+      "path": "System/TitanAI/tier1/managers/CustomerManager.php"
+    },
+    {
+      "class": "FieldStaffManager",
+      "id": "field-staff-manager",
+      "name": "Field Staff Manager",
+      "tier": 1,
+      "path": "System/TitanAI/tier1/managers/FieldStaffManager.php"
+    },
+    {
+      "class": "FinanceManager",
+      "id": "finance-manager",
+      "name": "Finance Manager",
+      "tier": 1,
+      "path": "System/TitanAI/tier1/managers/FinanceManager.php"
+    },
+    {
+      "class": "FractalBusinessGrowthManager",
+      "id": "fractal-business-growth-manager",
+      "name": "Pattern-Based Growth Manager",
+      "tier": 1,
+      "path": "System/TitanAI/tier1/managers/FractalBusinessGrowthManager.php"
+    },
+    {
+      "class": "InfiniteLearningLoopManager",
+      "id": "infinite-learning-loop-manager",
+      "name": "Continuous Learning Manager",
+      "tier": 1,
+      "path": "System/TitanAI/tier1/managers/InfiniteLearningLoopManager.php"
+    },
+    {
+      "class": "MarketingManager",
+      "id": "marketing-manager",
+      "name": "Marketing Manager",
+      "tier": 1,
+      "path": "System/TitanAI/tier1/managers/MarketingManager.php"
+    },
+    {
+      "class": "OperationsManager",
+      "id": "operations-manager",
+      "name": "Operations Manager",
+      "tier": 1,
+      "path": "System/TitanAI/tier1/managers/OperationsManager.php"
+    },
+    {
+      "class": "QualitySafetyManager",
+      "id": "quality-safety-manager",
+      "name": "Quality and Safety Manager",
+      "tier": 1,
+      "path": "System/TitanAI/tier1/managers/QualitySafetyManager.php"
+    },
+    {
+      "class": "QuantumBusinessOrchestrator",
+      "id": "quantum-business-orchestrator",
+      "name": "Scenario Business Orchestrator",
+      "tier": 1,
+      "path": "System/TitanAI/tier1/managers/QuantumBusinessOrchestrator.php"
+    },
+    {
+      "class": "QuantumTimeTravelManager",
+      "id": "quantum-time-travel-manager",
+      "name": "Forecasting & Backcasting Manager",
+      "tier": 1,
+      "path": "System/TitanAI/tier1/managers/QuantumTimeTravelManager.php"
+    },
+    {
+      "class": "RealityManipulationManager",
+      "id": "reality-manipulation-manager",
+      "name": "Assumption & Perception Strategy Manager",
+      "tier": 1,
+      "path": "System/TitanAI/tier1/managers/RealityManipulationManager.php"
+    },
+    {
+      "class": "SalesManager",
+      "id": "sales-manager",
+      "name": "Sales Manager",
+      "tier": 1,
+      "path": "System/TitanAI/tier1/managers/SalesManager.php"
+    },
+    {
+      "class": "StrategicBusinessGrowthManager",
+      "id": "strategic-business-growth-manager",
+      "name": "Strategic Business Growth Manager",
+      "tier": 1,
+      "path": "System/TitanAI/tier1/managers/StrategicBusinessGrowthManager.php"
+    },
+    {
+      "class": "StrategicCustomerExperienceManager",
+      "id": "strategic-customer-experience-manager",
+      "name": "Strategic Customer Experience Manager",
+      "tier": 1,
+      "path": "System/TitanAI/tier1/managers/StrategicCustomerExperienceManager.php"
+    },
+    {
+      "class": "StrategicCustomerManager",
+      "id": "strategic-customer-manager",
+      "name": "Strategic Customer Manager",
+      "tier": 1,
+      "path": "System/TitanAI/tier1/managers/StrategicCustomerManager.php"
+    },
+    {
+      "class": "StrategicFieldStaffManager",
+      "id": "strategic-field-staff-manager",
+      "name": "Strategic Field Staff Manager",
+      "tier": 1,
+      "path": "System/TitanAI/tier1/managers/StrategicFieldStaffManager.php"
+    },
+    {
+      "class": "StrategicFinanceManager",
+      "id": "strategic-finance-manager",
+      "name": "Strategic Finance Manager",
+      "tier": 1,
+      "path": "System/TitanAI/tier1/managers/StrategicFinanceManager.php"
+    },
+    {
+      "class": "StrategicMarketingManager",
+      "id": "strategic-marketing-manager",
+      "name": "Strategic Marketing Manager",
+      "tier": 1,
+      "path": "System/TitanAI/tier1/managers/StrategicMarketingManager.php"
+    },
+    {
+      "class": "StrategicOperationsManager",
+      "id": "strategic-operations-manager",
+      "name": "Strategic Operations Manager",
+      "tier": 1,
+      "path": "System/TitanAI/tier1/managers/StrategicOperationsManager.php"
+    },
+    {
+      "class": "StrategicPerformanceAnalyticsManager",
+      "id": "strategic-performance-analytics-manager",
+      "name": "Strategic Performance Analytics Manager",
+      "tier": 1,
+      "path": "System/TitanAI/tier1/managers/StrategicPerformanceAnalyticsManager.php"
+    },
+    {
+      "class": "StrategicQualitySafetyManager",
+      "id": "strategic-quality-safety-manager",
+      "name": "Strategic Quality & Safety Manager",
+      "tier": 1,
+      "path": "System/TitanAI/tier1/managers/StrategicQualitySafetyManager.php"
+    },
+    {
+      "class": "StrategicRiskComplianceManager",
+      "id": "strategic-risk-compliance-manager",
+      "name": "Strategic Risk & Compliance Manager",
+      "tier": 1,
+      "path": "System/TitanAI/tier1/managers/StrategicRiskComplianceManager.php"
+    },
+    {
+      "class": "StrategicSalesManager",
+      "id": "strategic-sales-manager",
+      "name": "Strategic Sales Manager",
+      "tier": 1,
+      "path": "System/TitanAI/tier1/managers/StrategicSalesManager.php"
+    },
+    {
+      "class": "StrategicSupplyChainManager",
+      "id": "strategic-supply-chain-manager",
+      "name": "Strategic Supply Chain Manager",
+      "tier": 1,
+      "path": "System/TitanAI/tier1/managers/StrategicSupplyChainManager.php"
+    },
+    {
+      "class": "StrategicTechnologyInnovationManager",
+      "id": "strategic-technology-innovation-manager",
+      "name": "Strategic Technology & Innovation Manager",
+      "tier": 1,
+      "path": "System/TitanAI/tier1/managers/StrategicTechnologyInnovationManager.php"
+    },
+    {
+      "class": "SuppliesEquipmentManager",
+      "id": "supplies-equipment-manager",
+      "name": "Supplies and Equipment Manager",
+      "tier": 1,
+      "path": "System/TitanAI/tier1/managers/SuppliesEquipmentManager.php"
+    }
+  ],
+  "tier2": [
+    {
+      "class": "AutonomousDispatchAssistant",
+      "id": "autonomous-dispatch-assistant",
+      "name": "AutonomousDispatchAssistant",
+      "tier": 2,
+      "path": "System/TitanAI/tier2/assistants/AutonomousDispatchAssistant.php"
+    },
+    {
+      "class": "AutonomousPricingAssistant",
+      "id": "autonomous-pricing-assistant",
+      "name": "AutonomousPricingAssistant",
+      "tier": 2,
+      "path": "System/TitanAI/tier2/assistants/AutonomousPricingAssistant.php"
+    },
+    {
+      "class": "CleaningVerticalAssistant",
+      "id": "cleaning-vertical-assistant",
+      "name": "CleaningVerticalAssistant",
+      "tier": 2,
+      "path": "System/TitanAI/tier2/assistants/CleaningVerticalAssistant.php"
+    },
+    {
+      "class": "CustomerAnalyticsAssistant",
+      "id": "customer-analytics-assistant",
+      "name": "Customer Analytics Assistant",
+      "tier": 2,
+      "path": "System/TitanAI/tier2/assistants/CustomerAnalyticsAssistant.php"
+    },
+    {
+      "class": "CustomerServiceAssistant",
+      "id": "customer-service-assistant",
+      "name": "Customer Service Assistant",
+      "tier": 2,
+      "path": "System/TitanAI/tier2/assistants/CustomerServiceAssistant.php"
+    },
+    {
+      "class": "DispatchAssistant",
+      "id": "dispatch-assistant",
+      "name": "Dispatch Assistant",
+      "tier": 2,
+      "path": "System/TitanAI/tier2/assistants/DispatchAssistant.php"
+    },
+    {
+      "class": "ElectricalVerticalAssistant",
+      "id": "electrical-vertical-assistant",
+      "name": "ElectricalVerticalAssistant",
+      "tier": 2,
+      "path": "System/TitanAI/tier2/assistants/ElectricalVerticalAssistant.php"
+    },
+    {
+      "class": "FieldServiceAnalyticsAssistant",
+      "id": "field-service-analytics-assistant",
+      "name": "FieldServiceAnalyticsAssistant",
+      "tier": 2,
+      "path": "System/TitanAI/tier2/assistants/FieldServiceAnalyticsAssistant.php"
+    },
+    {
+      "class": "FleetManagementAssistant",
+      "id": "fleet-management-assistant",
+      "name": "Fleet Management Assistant",
+      "tier": 2,
+      "path": "System/TitanAI/tier2/assistants/FleetManagementAssistant.php"
+    },
+    {
+      "class": "HVACVerticalAssistant",
+      "id": "h-v-a-c-vertical-assistant",
+      "name": "HVACVerticalAssistant",
+      "tier": 2,
+      "path": "System/TitanAI/tier2/assistants/HVACVerticalAssistant.php"
+    },
+    {
+      "class": "HandymenVerticalAssistant",
+      "id": "handymen-vertical-assistant",
+      "name": "HandymenVerticalAssistant",
+      "tier": 2,
+      "path": "System/TitanAI/tier2/assistants/HandymenVerticalAssistant.php"
+    },
+    {
+      "class": "IntelligentCustomerSuccessAssistant",
+      "id": "intelligent-customer-success-assistant",
+      "name": "IntelligentCustomerSuccessAssistant",
+      "tier": 2,
+      "path": "System/TitanAI/tier2/assistants/IntelligentCustomerSuccessAssistant.php"
+    },
+    {
+      "class": "IntelligentEmergencyResponseAssistant",
+      "id": "intelligent-emergency-response-assistant",
+      "name": "IntelligentEmergencyResponseAssistant",
+      "tier": 2,
+      "path": "System/TitanAI/tier2/assistants/IntelligentEmergencyResponseAssistant.php"
+    },
+    {
+      "class": "IntelligentFleetAssistant",
+      "id": "intelligent-fleet-assistant",
+      "name": "IntelligentFleetAssistant",
+      "tier": 2,
+      "path": "System/TitanAI/tier2/assistants/IntelligentFleetAssistant.php"
+    },
+    {
+      "class": "IntelligentInventoryAssistant",
+      "id": "intelligent-inventory-assistant",
+      "name": "IntelligentInventoryAssistant",
+      "tier": 2,
+      "path": "System/TitanAI/tier2/assistants/IntelligentInventoryAssistant.php"
+    },
+    {
+      "class": "IntelligentInvoicingAssistant",
+      "id": "intelligent-invoicing-assistant",
+      "name": "IntelligentInvoicingAssistant",
+      "tier": 2,
+      "path": "System/TitanAI/tier2/assistants/IntelligentInvoicingAssistant.php"
+    },
+    {
+      "class": "IntelligentLeadScoringAssistant",
+      "id": "intelligent-lead-scoring-assistant",
+      "name": "IntelligentLeadScoringAssistant",
+      "tier": 2,
+      "path": "System/TitanAI/tier2/assistants/IntelligentLeadScoringAssistant.php"
+    },
+    {
+      "class": "IntelligentMarketingAssistant",
+      "id": "intelligent-marketing-assistant",
+      "name": "IntelligentMarketingAssistant",
+      "tier": 2,
+      "path": "System/TitanAI/tier2/assistants/IntelligentMarketingAssistant.php"
+    },
+    {
+      "class": "IntelligentPaymentsAssistant",
+      "id": "intelligent-payments-assistant",
+      "name": "IntelligentPaymentsAssistant",
+      "tier": 2,
+      "path": "System/TitanAI/tier2/assistants/IntelligentPaymentsAssistant.php"
+    },
+    {
+      "class": "IntelligentQualityAssuranceAssistant",
+      "id": "intelligent-quality-assurance-assistant",
+      "name": "IntelligentQualityAssuranceAssistant",
+      "tier": 2,
+      "path": "System/TitanAI/tier2/assistants/IntelligentQualityAssuranceAssistant.php"
+    },
+    {
+      "class": "IntelligentQuotingAssistant",
+      "id": "intelligent-quoting-assistant",
+      "name": "IntelligentQuotingAssistant",
+      "tier": 2,
+      "path": "System/TitanAI/tier2/assistants/IntelligentQuotingAssistant.php"
+    },
+    {
+      "class": "IntelligentRecurringServicesAssistant",
+      "id": "intelligent-recurring-services-assistant",
+      "name": "IntelligentRecurringServicesAssistant",
+      "tier": 2,
+      "path": "System/TitanAI/tier2/assistants/IntelligentRecurringServicesAssistant.php"
+    },
+    {
+      "class": "IntelligentReportingAssistant",
+      "id": "intelligent-reporting-assistant",
+      "name": "IntelligentReportingAssistant",
+      "tier": 2,
+      "path": "System/TitanAI/tier2/assistants/IntelligentReportingAssistant.php"
+    },
+    {
+      "class": "IntelligentRoutePlanningAssistant",
+      "id": "intelligent-route-planning-assistant",
+      "name": "IntelligentRoutePlanningAssistant",
+      "tier": 2,
+      "path": "System/TitanAI/tier2/assistants/IntelligentRoutePlanningAssistant.php"
+    },
+    {
+      "class": "IntelligentSafetyAssistant",
+      "id": "intelligent-safety-assistant",
+      "name": "IntelligentSafetyAssistant",
+      "tier": 2,
+      "path": "System/TitanAI/tier2/assistants/IntelligentSafetyAssistant.php"
+    },
+    {
+      "class": "IntelligentStaffCoordinationAssistant",
+      "id": "intelligent-staff-coordination-assistant",
+      "name": "IntelligentStaffCoordinationAssistant",
+      "tier": 2,
+      "path": "System/TitanAI/tier2/assistants/IntelligentStaffCoordinationAssistant.php"
+    },
+    {
+      "class": "IntelligentTrainingAssistant",
+      "id": "intelligent-training-assistant",
+      "name": "IntelligentTrainingAssistant",
+      "tier": 2,
+      "path": "System/TitanAI/tier2/assistants/IntelligentTrainingAssistant.php"
+    },
+    {
+      "class": "InventoryAssistant",
+      "id": "inventory-assistant",
+      "name": "Inventory Assistant",
+      "tier": 2,
+      "path": "System/TitanAI/tier2/assistants/InventoryAssistant.php"
+    },
+    {
+      "class": "InvoicingAssistant",
+      "id": "invoicing-assistant",
+      "name": "Invoicing Assistant",
+      "tier": 2,
+      "path": "System/TitanAI/tier2/assistants/InvoicingAssistant.php"
+    },
+    {
+      "class": "LandscapingVerticalAssistant",
+      "id": "landscaping-vertical-assistant",
+      "name": "LandscapingVerticalAssistant",
+      "tier": 2,
+      "path": "System/TitanAI/tier2/assistants/LandscapingVerticalAssistant.php"
+    },
+    {
+      "class": "LeadManagementAssistant",
+      "id": "lead-management-assistant",
+      "name": "Lead Management Assistant",
+      "tier": 2,
+      "path": "System/TitanAI/tier2/assistants/LeadManagementAssistant.php"
+    },
+    {
+      "class": "MarketingAssistant",
+      "id": "marketing-assistant",
+      "name": "Marketing Assistant",
+      "tier": 2,
+      "path": "System/TitanAI/tier2/assistants/MarketingAssistant.php"
+    },
+    {
+      "class": "PaymentsAssistant",
+      "id": "payments-assistant",
+      "name": "Payments Assistant",
+      "tier": 2,
+      "path": "System/TitanAI/tier2/assistants/PaymentsAssistant.php"
+    },
+    {
+      "class": "PlumbingVerticalAssistant",
+      "id": "plumbing-vertical-assistant",
+      "name": "PlumbingVerticalAssistant",
+      "tier": 2,
+      "path": "System/TitanAI/tier2/assistants/PlumbingVerticalAssistant.php"
+    },
+    {
+      "class": "PoolServiceVerticalAssistant",
+      "id": "pool-service-vertical-assistant",
+      "name": "PoolServiceVerticalAssistant",
+      "tier": 2,
+      "path": "System/TitanAI/tier2/assistants/PoolServiceVerticalAssistant.php"
+    },
+    {
+      "class": "PredictiveMaintenanceAssistant",
+      "id": "predictive-maintenance-assistant",
+      "name": "Predictive Maintenance Assistant",
+      "tier": 2,
+      "path": "System/TitanAI/tier2/assistants/PredictiveMaintenanceAssistant.php"
+    },
+    {
+      "class": "PredictiveMaintenanceOptimizationAssistant",
+      "id": "predictive-maintenance-optimization-assistant",
+      "name": "PredictiveMaintenanceOptimizationAssistant",
+      "tier": 2,
+      "path": "System/TitanAI/tier2/assistants/PredictiveMaintenanceOptimizationAssistant.php"
+    },
+    {
+      "class": "PressureWashingVerticalAssistant",
+      "id": "pressure-washing-vertical-assistant",
+      "name": "PressureWashingVerticalAssistant",
+      "tier": 2,
+      "path": "System/TitanAI/tier2/assistants/PressureWashingVerticalAssistant.php"
+    },
+    {
+      "class": "QualityInspectionAssistant",
+      "id": "quality-inspection-assistant",
+      "name": "Quality Inspection Assistant",
+      "tier": 2,
+      "path": "System/TitanAI/tier2/assistants/QualityInspectionAssistant.php"
+    },
+    {
+      "class": "QuotingAssistant",
+      "id": "quoting-assistant",
+      "name": "Quoting Assistant",
+      "tier": 2,
+      "path": "System/TitanAI/tier2/assistants/QuotingAssistant.php"
+    },
+    {
+      "class": "RecurringServicesAssistant",
+      "id": "recurring-services-assistant",
+      "name": "Recurring Services Assistant",
+      "tier": 2,
+      "path": "System/TitanAI/tier2/assistants/RecurringServicesAssistant.php"
+    },
+    {
+      "class": "ReportingAssistant",
+      "id": "reporting-assistant",
+      "name": "Reporting Assistant",
+      "tier": 2,
+      "path": "System/TitanAI/tier2/assistants/ReportingAssistant.php"
+    },
+    {
+      "class": "RoutePlanningAssistant",
+      "id": "route-planning-assistant",
+      "name": "Route Planning Assistant",
+      "tier": 2,
+      "path": "System/TitanAI/tier2/assistants/RoutePlanningAssistant.php"
+    },
+    {
+      "class": "SafetyComplianceAssistant",
+      "id": "safety-compliance-assistant",
+      "name": "Safety and Compliance Assistant",
+      "tier": 2,
+      "path": "System/TitanAI/tier2/assistants/SafetyComplianceAssistant.php"
+    },
+    {
+      "class": "SchedulingAssistant",
+      "id": "scheduling-assistant",
+      "name": "Scheduling Assistant",
+      "tier": 2,
+      "path": "System/TitanAI/tier2/assistants/SchedulingAssistant.php"
+    },
+    {
+      "class": "StaffCoordinationAssistant",
+      "id": "staff-coordination-assistant",
+      "name": "Staff Coordination Assistant",
+      "tier": 2,
+      "path": "System/TitanAI/tier2/assistants/StaffCoordinationAssistant.php"
+    },
+    {
+      "class": "TechnicianPerformanceAssistant",
+      "id": "technician-performance-assistant",
+      "name": "Technician Performance Assistant",
+      "tier": 2,
+      "path": "System/TitanAI/tier2/assistants/TechnicianPerformanceAssistant.php"
+    },
+    {
+      "class": "TrainingAndOnboardingAssistant",
+      "id": "training-onboarding-assistant",
+      "name": "Training and Onboarding Assistant",
+      "tier": 2,
+      "path": "System/TitanAI/tier2/assistants/TrainingAndOnboardingAssistant.php"
+    }
+  ],
+  "tier3": [
+    {
+      "class": "AcceptQuoteAgent",
+      "id": "accept-quote-agent",
+      "name": "Accept Quote Agent",
+      "tier": 3,
+      "path": "System/TitanAI/tier3/Actions/AcceptQuoteAgent.php"
+    },
+    {
+      "class": "AllocateEquipmentAgent",
+      "id": "allocate-equipment-agent",
+      "name": "Allocate Equipment Agent",
+      "tier": 3,
+      "path": "System/TitanAI/tier3/Actions/AllocateEquipmentAgent.php"
+    },
+    {
+      "class": "ApplyCustomerTagAgent",
+      "id": "apply-customer-tag-agent",
+      "name": "Apply Customer Tag Agent",
+      "tier": 3,
+      "path": "System/TitanAI/tier3/Actions/ApplyCustomerTagAgent.php"
+    },
+    {
+      "class": "ArchiveConversationAgent",
+      "id": "archive-conversation-agent",
+      "name": "Archive Conversation Agent",
+      "tier": 3,
+      "path": "System/TitanAI/tier3/Actions/ArchiveConversationAgent.php"
+    },
+    {
+      "class": "AssignCleanerAgent",
+      "id": "assign-cleaner-agent",
+      "name": "Assign Cleaner Agent",
+      "tier": 3,
+      "path": "System/TitanAI/tier3/Actions/AssignCleanerAgent.php"
+    },
+    {
+      "class": "AutomatedRescheduleAgent",
+      "id": "automated-reschedule-agent",
+      "name": "Automated Reschedule Agent",
+      "tier": 3,
+      "path": "System/TitanAI/tier3/Actions/AutomatedRescheduleAgent.php"
+    },
+    {
+      "class": "BookJobAgent",
+      "id": "book-job-agent",
+      "name": "Book Job Agent",
+      "tier": 3,
+      "path": "System/TitanAI/tier3/Actions/BookJobAgent.php"
+    },
+    {
+      "class": "BulkOperationsAgent",
+      "id": "bulk-operations-agent",
+      "name": "Bulk Operations Agent",
+      "tier": 3,
+      "path": "System/TitanAI/tier3/Actions/BulkOperationsAgent.php"
+    },
+    {
+      "class": "CancelJobAgent",
+      "id": "cancel-job-agent",
+      "name": "Cancel Job Agent",
+      "tier": 3,
+      "path": "System/TitanAI/tier3/Actions/CancelJobAgent.php"
+    },
+    {
+      "class": "ComplianceAuditAgent",
+      "id": "compliance-audit-agent",
+      "name": "Compliance Audit Agent",
+      "tier": 3,
+      "path": "System/TitanAI/tier3/Actions/ComplianceAuditAgent.php"
+    },
+    {
+      "class": "ConversationSummaryAgent",
+      "id": "conversation-summary-agent",
+      "name": "Conversation Summary Agent",
+      "tier": 3,
+      "path": "System/TitanAI/tier3/Actions/ConversationSummaryAgent.php"
+    },
+    {
+      "class": "CostAnalysisAgent",
+      "id": "cost-analysis-agent",
+      "name": "Cost Analysis Agent",
+      "tier": 3,
+      "path": "System/TitanAI/tier3/Actions/CostAnalysisAgent.php"
+    },
+    {
+      "class": "CreateCustomerAgent",
+      "id": "create-customer-agent",
+      "name": "Create Customer Agent",
+      "tier": 3,
+      "path": "System/TitanAI/tier3/Actions/CreateCustomerAgent.php"
+    },
+    {
+      "class": "CreateFollowUpAgent",
+      "id": "create-follow-up-agent",
+      "name": "Create Follow-up Agent",
+      "tier": 3,
+      "path": "System/TitanAI/tier3/Actions/CreateFollowUpAgent.php"
+    },
+    {
+      "class": "CreateInvoiceAgent",
+      "id": "create-invoice-agent",
+      "name": "Create Invoice Agent",
+      "tier": 3,
+      "path": "System/TitanAI/tier3/Actions/CreateInvoiceAgent.php"
+    },
+    {
+      "class": "CreateLeadAgent",
+      "id": "create-lead-agent",
+      "name": "Create Lead Agent",
+      "tier": 3,
+      "path": "System/TitanAI/tier3/Actions/CreateLeadAgent.php"
+    },
+    {
+      "class": "CreatePurchaseOrderAgent",
+      "id": "create-purchase-order-agent",
+      "name": "Create Purchase Order Agent",
+      "tier": 3,
+      "path": "System/TitanAI/tier3/Actions/CreatePurchaseOrderAgent.php"
+    },
+    {
+      "class": "CreateQuoteAgent",
+      "id": "create-quote-agent",
+      "name": "Create Quote Agent",
+      "tier": 3,
+      "path": "System/TitanAI/tier3/Actions/CreateQuoteAgent.php"
+    },
+    {
+      "class": "CreateRecurringJobAgent",
+      "id": "create-recurring-job-agent",
+      "name": "Create Recurring Job Agent",
+      "tier": 3,
+      "path": "System/TitanAI/tier3/Actions/CreateRecurringJobAgent.php"
+    },
+    {
+      "class": "CustomerLoyaltyAgent",
+      "id": "customer-loyalty-agent",
+      "name": "Customer Loyalty Agent",
+      "tier": 3,
+      "path": "System/TitanAI/tier3/Actions/CustomerLoyaltyAgent.php"
+    },
+    {
+      "class": "CustomerNotificationAgent",
+      "id": "customer-notification-agent",
+      "name": "Customer Notification Agent",
+      "tier": 3,
+      "path": "System/TitanAI/tier3/Actions/CustomerNotificationAgent.php"
+    },
+    {
+      "class": "DispatchOptimizationAgent",
+      "id": "dispatch-optimization-agent",
+      "name": "Dispatch Optimization Agent",
+      "tier": 3,
+      "path": "System/TitanAI/tier3/Actions/DispatchOptimizationAgent.php"
+    },
+    {
+      "class": "EditImageAgent",
+      "id": "edit-image-agent",
+      "name": "EditImageAgent",
+      "tier": 3,
+      "path": "System/TitanAI/tier3/Actions/EditImageAgent.php"
+    },
+    {
+      "class": "EmergencyServiceAgent",
+      "id": "emergency-service-agent",
+      "name": "Emergency Service Agent",
+      "tier": 3,
+      "path": "System/TitanAI/tier3/Actions/EmergencyServiceAgent.php"
+    },
+    {
+      "class": "FeedbackAnalysisAgent",
+      "id": "feedback-analysis-agent",
+      "name": "Feedback Analysis Agent",
+      "tier": 3,
+      "path": "System/TitanAI/tier3/Actions/FeedbackAnalysisAgent.php"
+    },
+    {
+      "class": "FieldServiceDocumentationAgent",
+      "id": "field-service-documentation-agent",
+      "name": "Field Service Documentation Agent",
+      "tier": 3,
+      "path": "System/TitanAI/tier3/Actions/FieldServiceDocumentationAgent.php"
+    },
+    {
+      "class": "GenerateBlogDraftAgent",
+      "id": "generate-blog-draft-agent",
+      "name": "GenerateBlogDraftAgent",
+      "tier": 3,
+      "path": "System/TitanAI/tier3/Actions/GenerateBlogDraftAgent.php"
+    },
+    {
+      "class": "GenerateMarketingImageAgent",
+      "id": "generate-marketing-image-agent",
+      "name": "GenerateMarketingImageAgent",
+      "tier": 3,
+      "path": "System/TitanAI/tier3/Actions/GenerateMarketingImageAgent.php"
+    },
+    {
+      "class": "GeneratePhotoShootAgent",
+      "id": "generate-photo-shoot-agent",
+      "name": "GeneratePhotoShootAgent",
+      "tier": 3,
+      "path": "System/TitanAI/tier3/Actions/GeneratePhotoShootAgent.php"
+    },
+    {
+      "class": "GenerateProductShotAgent",
+      "id": "generate-product-shot-agent",
+      "name": "GenerateProductShotAgent",
+      "tier": 3,
+      "path": "System/TitanAI/tier3/Actions/GenerateProductShotAgent.php"
+    },
+    {
+      "class": "IntelligentLeadScoringAgent",
+      "id": "intelligent-lead-scoring-agent",
+      "name": "Intelligent Lead Scoring Agent",
+      "tier": 3,
+      "path": "System/TitanAI/tier3/Actions/IntelligentLeadScoringAgent.php"
+    },
+    {
+      "class": "JobEstimationAgent",
+      "id": "job-estimation-agent",
+      "name": "Job Estimation Agent",
+      "tier": 3,
+      "path": "System/TitanAI/tier3/Actions/JobEstimationAgent.php"
+    },
+    {
+      "class": "MaintenanceSchedulerAgent",
+      "id": "maintenance-scheduler-agent",
+      "name": "Maintenance Scheduler Agent",
+      "tier": 3,
+      "path": "System/TitanAI/tier3/Actions/MaintenanceSchedulerAgent.php"
+    },
+    {
+      "class": "MarkJobCompleteAgent",
+      "id": "mark-job-complete-agent",
+      "name": "Mark Job Complete Agent",
+      "tier": 3,
+      "path": "System/TitanAI/tier3/Actions/MarkJobCompleteAgent.php"
+    },
+    {
+      "class": "NotifyCleanerAgent",
+      "id": "notify-cleaner-agent",
+      "name": "Notify Cleaner Agent",
+      "tier": 3,
+      "path": "System/TitanAI/tier3/Actions/NotifyCleanerAgent.php"
+    },
+    {
+      "class": "OptimiseRouteAgent",
+      "id": "optimise-route-agent",
+      "name": "Optimise Route Agent",
+      "tier": 3,
+      "path": "System/TitanAI/tier3/Actions/OptimiseRouteAgent.php"
+    },
+    {
+      "class": "PauseRecurringServiceAgent",
+      "id": "pause-recurring-service-agent",
+      "name": "Pause Recurring Service Agent",
+      "tier": 3,
+      "path": "System/TitanAI/tier3/Actions/PauseRecurringServiceAgent.php"
+    },
+    {
+      "class": "PerformanceMetricsAgent",
+      "id": "performance-metrics-agent",
+      "name": "Performance Metrics Agent",
+      "tier": 3,
+      "path": "System/TitanAI/tier3/Actions/PerformanceMetricsAgent.php"
+    },
+    {
+      "class": "PredictiveMaintenanceAgent",
+      "id": "predictive-maintenance-agent",
+      "name": "Predictive Maintenance Agent",
+      "tier": 3,
+      "path": "System/TitanAI/tier3/Actions/PredictiveMaintenanceAgent.php"
+    },
+    {
+      "class": "PricingOptimizationAgent",
+      "id": "pricing-optimization-agent",
+      "name": "Pricing Optimization Agent",
+      "tier": 3,
+      "path": "System/TitanAI/tier3/Actions/PricingOptimizationAgent.php"
+    },
+    {
+      "class": "PublishBlogPostAgent",
+      "id": "publish-blog-post-agent",
+      "name": "PublishBlogPostAgent",
+      "tier": 3,
+      "path": "System/TitanAI/tier3/Actions/PublishBlogPostAgent.php"
+    },
+    {
+      "class": "PublishSocialPostAgent",
+      "id": "publish-social-post-agent",
+      "name": "PublishSocialPostAgent",
+      "tier": 3,
+      "path": "System/TitanAI/tier3/Actions/PublishSocialPostAgent.php"
+    },
+    {
+      "class": "ReassignCleanerAgent",
+      "id": "reassign-cleaner-agent",
+      "name": "Reassign Cleaner Agent",
+      "tier": 3,
+      "path": "System/TitanAI/tier3/Actions/ReassignCleanerAgent.php"
+    },
+    {
+      "class": "RecordIncidentAgent",
+      "id": "record-incident-agent",
+      "name": "Record Incident Agent",
+      "tier": 3,
+      "path": "System/TitanAI/tier3/Actions/RecordIncidentAgent.php"
+    },
+    {
+      "class": "RecordInspectionAgent",
+      "id": "record-inspection-agent",
+      "name": "Record Inspection Agent",
+      "tier": 3,
+      "path": "System/TitanAI/tier3/Actions/RecordInspectionAgent.php"
+    },
+    {
+      "class": "RecordPaymentAgent",
+      "id": "record-payment-agent",
+      "name": "Record Payment Agent",
+      "tier": 3,
+      "path": "System/TitanAI/tier3/Actions/RecordPaymentAgent.php"
+    },
+    {
+      "class": "RequestReviewAgent",
+      "id": "request-review-agent",
+      "name": "Request Review Agent",
+      "tier": 3,
+      "path": "System/TitanAI/tier3/Actions/RequestReviewAgent.php"
+    },
+    {
+      "class": "RescheduleJobAgent",
+      "id": "reschedule-job-agent",
+      "name": "Reschedule Job Agent",
+      "tier": 3,
+      "path": "System/TitanAI/tier3/Actions/RescheduleJobAgent.php"
+    },
+    {
+      "class": "ResourceAllocationAgent",
+      "id": "resource-allocation-agent",
+      "name": "Resource Allocation Agent",
+      "tier": 3,
+      "path": "System/TitanAI/tier3/Actions/ResourceAllocationAgent.php"
+    },
+    {
+      "class": "ScheduleSocialPostAgent",
+      "id": "schedule-social-post-agent",
+      "name": "ScheduleSocialPostAgent",
+      "tier": 3,
+      "path": "System/TitanAI/tier3/Actions/ScheduleSocialPostAgent.php"
+    },
+    {
+      "class": "SendCustomerMessageAgent",
+      "id": "send-customer-message-agent",
+      "name": "Send Customer Message Agent",
+      "tier": 3,
+      "path": "System/TitanAI/tier3/Actions/SendCustomerMessageAgent.php"
+    },
+    {
+      "class": "SendInvoiceAgent",
+      "id": "send-invoice-agent",
+      "name": "Send Invoice Agent",
+      "tier": 3,
+      "path": "System/TitanAI/tier3/Actions/SendInvoiceAgent.php"
+    },
+    {
+      "class": "SendPaymentReminderAgent",
+      "id": "send-payment-reminder-agent",
+      "name": "Send Payment Reminder Agent",
+      "tier": 3,
+      "path": "System/TitanAI/tier3/Actions/SendPaymentReminderAgent.php"
+    },
+    {
+      "class": "SendQuoteAgent",
+      "id": "send-quote-agent",
+      "name": "Send Quote Agent",
+      "tier": 3,
+      "path": "System/TitanAI/tier3/Actions/SendQuoteAgent.php"
+    },
+    {
+      "class": "ServiceChecklistAgent",
+      "id": "service-checklist-agent",
+      "name": "Service Checklist Agent",
+      "tier": 3,
+      "path": "System/TitanAI/tier3/Actions/ServiceChecklistAgent.php"
+    },
+    {
+      "class": "ServiceQualityPredictorAgent",
+      "id": "service-quality-predictor-agent",
+      "name": "Service Quality Predictor Agent",
+      "tier": 3,
+      "path": "System/TitanAI/tier3/Actions/ServiceQualityPredictorAgent.php"
+    },
+    {
+      "class": "TechnicianCertificationAgent",
+      "id": "technician-certification-agent",
+      "name": "Technician Certification Agent",
+      "tier": 3,
+      "path": "System/TitanAI/tier3/Actions/TechnicianCertificationAgent.php"
+    },
+    {
+      "class": "TechnicianPayrollAgent",
+      "id": "technician-payroll-agent",
+      "name": "Technician Payroll Agent",
+      "tier": 3,
+      "path": "System/TitanAI/tier3/Actions/TechnicianPayrollAgent.php"
+    },
+    {
+      "class": "UpdateCustomerAgent",
+      "id": "update-customer-agent",
+      "name": "Update Customer Agent",
+      "tier": 3,
+      "path": "System/TitanAI/tier3/Actions/UpdateCustomerAgent.php"
+    },
+    {
+      "class": "UpdateStockAgent",
+      "id": "update-stock-agent",
+      "name": "Update Stock Agent",
+      "tier": 3,
+      "path": "System/TitanAI/tier3/Actions/UpdateStockAgent.php"
+    },
+    {
+      "class": "UploadJobEvidenceAgent",
+      "id": "upload-job-evidence-agent",
+      "name": "Upload Job Evidence Agent",
+      "tier": 3,
+      "path": "System/TitanAI/tier3/Actions/UploadJobEvidenceAgent.php"
+    },
+    {
+      "class": "WorkforceAvailabilityAgent",
+      "id": "workforce-availability-agent",
+      "name": "Workforce Availability Agent",
+      "tier": 3,
+      "path": "System/TitanAI/tier3/Actions/WorkforceAvailabilityAgent.php"
+    }
+  ],
+  "counts": {
+    "tier1": 30,
+    "tier2": 48,
+    "tier3": 62
+  },
+  "aliases": {
+    "assign-technician-agent": "assign-cleaner-agent",
+    "intelligent-scheduler-agent": "automated-reschedule-agent",
+    "route-optimization-agent": "optimise-route-agent",
+    "technician-availability-agent": "workforce-availability-agent",
+    "job-completion-verification-agent": "mark-job-complete-agent",
+    "service-inventory-agent": "update-stock-agent",
+    "equipment-reservation-agent": "allocate-equipment-agent",
+    "customer-communication-agent": "send-customer-message-agent",
+    "service-reminder-agent": "send-payment-reminder-agent",
+    "safety-incident-reporting-agent": "record-incident-agent",
+    "service-performance-analytics-agent": "performance-metrics-agent"
+  }
+}

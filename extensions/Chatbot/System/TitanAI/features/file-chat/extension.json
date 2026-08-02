@@ -1,0 +1,40 @@
+{
+  "name": "SystemAIChat File Chat",
+  "type": "extension",
+  "version": "1.11.0",
+  "description": "File-assisted chat integration with bounded processing configuration and capability registration.",
+  "support_telegram": "heew_support",
+  "requires": {
+    "php": ">=8.2",
+    "system-ai-chat": ">=3.8.0"
+  },
+  "capabilities": [
+    "system-ai-chat.file-chat"
+  ],
+  "upgrade_notes": "Pass 7: CI-ready package verification, static-analysis configuration, operations metadata, maintenance runbooks, and regression checks.",
+  "compatibility": {
+    "ai_chat_pro": ">=3.8.0"
+  },
+  "upgrade_pass": 7,
+  "runtime": {
+    "contract_version": "1.0",
+    "mode": "ingestion",
+    "dependencies": [
+      "system-ai-chat.runtime"
+    ],
+    "tools": [
+      "file_chat.attach",
+      "file_chat.extract"
+    ],
+    "health_checks": [
+      "config:system-ai-chat-file-chat"
+    ],
+    "performance_profile": "bounded-v1",
+    "operations_profile": "maintained-v1",
+    "diagnostics": {
+      "manifest": "extension.json",
+      "runtime_descriptor": "System/Support/RuntimeDescriptor.php",
+      "verification_script": "tools/verify-package.php"
+    }
+  }
+}

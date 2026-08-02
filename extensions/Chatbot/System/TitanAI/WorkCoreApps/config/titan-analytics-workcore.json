@@ -1,0 +1,42 @@
+{
+  "app_slug": "titan-analytics",
+  "app_name": "Titan Analytics",
+  "workcore_enabled": true,
+  "workcore_authority": true,
+  "offline_first": true,
+  "domain": "analytics",
+  "workcore": {
+    "read_tools": [
+      "workcore.analytics.operations",
+      "workcore.analytics.finance",
+      "workcore.analytics.customers",
+      "workcore.analytics.workforce",
+      "workcore.analytics.quality"
+    ],
+    "action_tools": [
+      "workcore.report.generate",
+      "workcore.dashboard.snapshot",
+      "workcore.alert.configure"
+    ],
+    "requires_tenant_context": true,
+    "requires_actor_context": true,
+    "idempotent_actions": true,
+    "confirmation_for_high_risk": true
+  },
+  "offline_projection": {
+    "stores": [
+      "metric_snapshots",
+      "reports",
+      "dashboard_specs",
+      "alerts"
+    ],
+    "writes_are_provisional": true,
+    "sync_via": "chatbot_outbox",
+    "conflicts_via": "chatbot_conflict_centre"
+  },
+  "governance": {
+    "executor": "GovernedToolExecutor",
+    "fact_verification": "WorkCoreFactVerifier",
+    "risk_classification": true
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "entrypoint": "tier0/titan-zero/system-ai-chat",
+  "model_gateway": "workcore-native-ai-runtime",
+  "worker_registry": "worker-registry",
+  "operational_actions": "workcore-only"
+}

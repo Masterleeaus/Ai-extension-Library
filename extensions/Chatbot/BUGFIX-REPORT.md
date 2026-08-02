@@ -1,0 +1,3 @@
+# Chatbot merged extension bug-fix report
+
+Fixed: TitanRegistry namespace/path and route name; removed public PHP template copy and public source publishing; added ownership-scoped sync queries and relationship validation; scoped idempotency lookups; protected conflict resolution by tenant and user; mapped revoked/unregistered devices to HTTP 403; restricted entity validation; completed migration rollback; enabled SoftDeletes; added and bootstrapped an IndexedDB chatbot sync adapter; registered devices automatically; precached sync/security assets; removed extension.json BOM; added regression contracts.
