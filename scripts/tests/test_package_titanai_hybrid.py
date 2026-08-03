@@ -108,11 +108,20 @@ class PackageTitanAIHybridTest(unittest.TestCase):
         convert(root)
         self.assertEqual([], check(root))
 
-    def test_materialisation_workflow_recreates_package_not_foundation(self) -> None:
+    def test_materialisation_workflow_recreates_all_post_base_packages(self) -> None:
         workflow = (REPO_ROOT / ".github" / "workflows" / "materialize-ai-extensions.yml").read_text(encoding="utf-8")
-        self.assertIn("python scripts/package_titanai_hybrid.py --root .", workflow)
+        restore = "python scripts/restore_extensions.py"
+        titanai = "python scripts/package_titanai_hybrid.py --root ."
+        interaction = "python scripts/apply_interaction_engine_packages.py --root ."
+        self.assertIn(restore, workflow)
+        self.assertIn(titanai, workflow)
         self.assertIn("python scripts/package_titanai_hybrid.py --root . --check", workflow)
+        self.assertIn(interaction, workflow)
+        self.assertIn("python scripts/verify_interaction_engine_architecture.py", workflow)
+        self.assertLess(workflow.index(restore), workflow.index(titanai))
+        self.assertLess(workflow.index(restore), workflow.index(interaction))
         self.assertIn("packages/titanai-hybrid-core", workflow)
+        self.assertIn("extensions/InteractionEngineChatbotBridge", workflow)
         self.assertIn("git add extensions packages", workflow)
         self.assertNotIn("git add extensions foundation", workflow)
 
