@@ -9,6 +9,10 @@ on:
       - scripts/apply_interaction_engine_packages.py
       - scripts/verify_interaction_engine_architecture.py
       - transport/interaction-engine-packages-manifest.json
+      - packages/titan-interaction-engine/**
+      - packages/titan-interaction-engine-offline/**
+      - packages/titan-interaction-contracts/**
+      - extensions/InteractionEngineChatbotBridge/**
   pull_request:
     branches:
       - main
@@ -23,7 +27,11 @@ on:
       - extensions/InteractionEngineChatbotBridge/**
 
 permissions:
-  contents: write
+  contents: read
+
+concurrency:
+  group: interaction-engine-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   materialize-and-verify:
@@ -65,17 +73,10 @@ jobs:
           npm install --ignore-scripts --no-audit --no-fund --no-package-lock
           npm test
           rm -rf node_modules
-      - name: Commit materialized package source
+      - name: Verify checked-in source matches the pinned archive
         run: |
-          git config user.name github-actions[bot]
-          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git add packages/titan-interaction-engine \
-                  packages/titan-interaction-engine-offline \
-                  packages/titan-interaction-contracts \
-                  extensions/InteractionEngineChatbotBridge
-          if git diff --cached --quiet; then
-            echo "Interaction Engine source already materialized"
-          else
-            git commit -m "Materialize Interaction Engine package architecture"
-            git push origin HEAD:${{ github.head_ref || github.ref_name }}
-          fi
+          git diff --exit-code -- \
+            packages/titan-interaction-engine \
+            packages/titan-interaction-engine-offline \
+            packages/titan-interaction-contracts \
+            extensions/InteractionEngineChatbotBridge
