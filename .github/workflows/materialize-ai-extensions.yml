@@ -3,11 +3,14 @@ name: Materialize AI extensions
 on:
   push:
     branches:
+      - main
       - agent/import-ai-extensions
+      - agent/replace-core-ai-extensions-pass3
     paths:
       - .github/workflows/materialize-ai-extensions.yml
       - scripts/restore_extensions.py
       - transport/dataset-manifest.json
+      - transport/pass3-overlay-manifest.json
   pull_request:
     branches:
       - main
@@ -25,7 +28,7 @@ jobs:
   restore-and-commit:
     if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
         with:
@@ -34,20 +37,51 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: none
       - name: Install Parquet reader
         run: python -m pip install --disable-pip-version-check pyarrow
-      - name: Restore and verify extension files
+      - name: Restore base library and apply verified Pass 3 overlay
         run: |
           DATASET_URL=$(python -c "import json; print(json.load(open('transport/dataset-manifest.json'))['url'])")
-          python scripts/restore_extensions.py --clean --url "$DATASET_URL"
+          python scripts/restore_extensions.py \
+            --clean \
+            --url "$DATASET_URL" \
+            --overlay-manifest transport/pass3-overlay-manifest.json
+      - name: Validate manifests and PHP syntax
+        run: |
+          python -m json.tool extensions/AIAgent/extension.json >/dev/null
+          python -m json.tool extensions/AIChatPro/extension.json >/dev/null
+          python -m json.tool extensions/Chatbot/extension.json >/dev/null
+          find extensions/AIAgent extensions/AIChatPro extensions/Chatbot foundation/TitanAI-Hybrid \
+            -type f -name '*.php' -print0 | xargs -0 -n1 php -l >/tmp/php-lint.log
+          echo "PHP linted $(wc -l </tmp/php-lint.log) files"
+      - name: Run packaged TitanAI Pass 3 verification
+        run: |
+          rm -rf /tmp/titanai-host
+          mkdir -p /tmp/titanai-host/app/Extensions
+          cp -a extensions/AIAgent /tmp/titanai-host/app/Extensions/
+          cp -a extensions/AIChatPro /tmp/titanai-host/app/Extensions/
+          cp -a extensions/Chatbot /tmp/titanai-host/app/Extensions/
+          cp -a foundation/TitanAI-Hybrid/. /tmp/titanai-host/
+          php /tmp/titanai-host/bin/verify-titanai-pass3.php
       - name: Write materialisation summary
         run: |
           python - <<'PY'
           from pathlib import Path
+          import json
           files = [path for path in Path('extensions').rglob('*') if path.is_file()]
           size = sum(path.stat().st_size for path in files)
+          overlay = json.load(open('transport/pass3-overlay-manifest.json'))
           Path('MATERIALIZED.md').write_text(
-              f"# Materialised source tree\n\nFiles: **{len(files):,}**  \nBytes: **{size:,}**  \nSource: MiniUp lossless Parquet transport dataset.\n",
+              '# Materialised source tree\n\n'
+              f'Files: **{len(files):,}**  \n'
+              f'Bytes: **{size:,}**  \n'
+              'Base source: MiniUp lossless Parquet transport dataset.  \n'
+              f"Core overlay: **{overlay['source_bundle']}**  \n"
+              f"Overlay SHA-256: `{overlay['archive_sha256']}`  \n",
               encoding='utf-8',
           )
           PY
@@ -55,10 +89,10 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add extensions MATERIALIZED.md docs/extension-inventory.csv docs/extension-inventory.json
+          git add extensions foundation MATERIALIZED.md docs/extension-inventory.csv docs/extension-inventory.json
           if git diff --cached --quiet; then
             echo "No source changes to commit"
           else
-            git commit -m "Materialize 78 AI extensions"
+            git commit -m "Replace core AI extensions with verified Pass 3"
             git push origin HEAD:${{ github.head_ref || github.ref_name }}
           fi
