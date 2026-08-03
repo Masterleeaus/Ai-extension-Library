@@ -57,6 +57,8 @@ jobs:
           python scripts/apply_ecommerce_overlay.py \
             --root . \
             --manifest transport/ecommerce-overlay-manifest.json
+      - name: Run Chatbot embedding ownership contract
+        run: php tests/contracts/chatbot_embedding_ownership.php
       - name: Validate manifests and PHP syntax
         run: |
           python -m json.tool extensions/AIAgent/extension.json >/dev/null
