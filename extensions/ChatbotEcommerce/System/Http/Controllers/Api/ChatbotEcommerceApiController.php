@@ -6,6 +6,7 @@ namespace App\Extensions\ChatbotEcommerce\System\Http\Controllers\Api;
 
 use App\Extensions\Chatbot\System\Models\Chatbot;
 use App\Extensions\ChatbotEcommerce\System\Models\ChatbotCart;
+use App\Extensions\ChatbotEcommerce\System\Services\CommerceCredentialRuntime;
 use App\Extensions\ChatbotEcommerce\System\Tools\ShopifyToolHandler;
 use App\Extensions\ChatbotEcommerce\System\Tools\WooCommerceToolHandler;
 use App\Http\Controllers\Controller;
@@ -54,9 +55,10 @@ class ChatbotEcommerceApiController extends Controller
 
         // Shopify
         if ($shop_source === 'shopify') {
+            $shopifyCredentials = app(CommerceCredentialRuntime::class)->resolve($chatbot, 'shopify');
             $shopifyToolHandler = new ShopifyToolHandler(
-                $chatbot->shopify_domain,
-                $chatbot->shopify_access_token
+                (string) $chatbot->shopify_domain,
+                (string) $shopifyCredentials['access_token']
             );
 
             $result = $shopifyToolHandler->getVariantIdByOptions(
@@ -81,10 +83,11 @@ class ChatbotEcommerceApiController extends Controller
 
         // WooCommerce
         if ($shop_source === 'woocommerce') {
+            $wooCredentials = app(CommerceCredentialRuntime::class)->resolve($chatbot, 'woocommerce');
             $wooToolHandler = new WooCommerceToolHandler(
-                $chatbot->woocommerce_domain,
-                $chatbot->woocommerce_consumer_key,
-                $chatbot->woocommerce_consumer_secret
+                (string) $chatbot->woocommerce_domain,
+                (string) $wooCredentials['consumer_key'],
+                (string) $wooCredentials['consumer_secret']
             );
 
             $productID = $request->get('productID');
@@ -235,9 +238,10 @@ class ChatbotEcommerceApiController extends Controller
 
         // Shopify
         if ($shop_source === 'shopify') {
+            $shopifyCredentials = app(CommerceCredentialRuntime::class)->resolve($chatbot, 'shopify');
             $shopifyToolHandler = new ShopifyToolHandler(
-                $chatbot->shopify_domain,
-                $chatbot->shopify_access_token
+                (string) $chatbot->shopify_domain,
+                (string) $shopifyCredentials['access_token']
             );
 
             $result = $shopifyToolHandler->createCheckoutByVariantIds(
@@ -262,10 +266,11 @@ class ChatbotEcommerceApiController extends Controller
 
         // WooCommerce
         if ($shop_source === 'woocommerce') {
+            $wooCredentials = app(CommerceCredentialRuntime::class)->resolve($chatbot, 'woocommerce');
             $wooToolHandler = new WooCommerceToolHandler(
-                $chatbot->woocommerce_domain,
-                $chatbot->woocommerce_consumer_key,
-                $chatbot->woocommerce_consumer_secret
+                (string) $chatbot->woocommerce_domain,
+                (string) $wooCredentials['consumer_key'],
+                (string) $wooCredentials['consumer_secret']
             );
 
             $result = $wooToolHandler->getCheckoutUrl($productAndQuantities);
