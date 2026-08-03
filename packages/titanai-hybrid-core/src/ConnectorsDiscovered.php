@@ -11,5 +11,9 @@ final class ConnectorsDiscovered
 {
     use Dispatchable, SerializesModels;
 
-    public function __construct(public array $connectors, public string $source = 'aichatpro') {}
+    /** @param array<string, array<string, mixed>> $connectors */
+    public function __construct(
+        public array $connectors,
+        public string $source = 'aichatpro',
+    ) {}
 }

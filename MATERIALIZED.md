@@ -1,7 +1,7 @@
 # Materialised source tree
 
-Files: **4,599**  
-Bytes: **82,931,903**  
+Files: **4,602**  
+Bytes: **82,932,256**  
 Base source: MiniUp lossless Parquet transport dataset.  
 Core overlay: **TitanAI-Hybrid-Complete-Upgraded-v4-Pass3.zip**  
 Core overlay SHA-256: `6fc826403f57d9e2c6278a2412052f4b7d9973592ba0414ae6fbd4e3de31a0e2`  

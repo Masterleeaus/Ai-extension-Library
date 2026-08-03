@@ -11,5 +11,9 @@ final class ActionsDiscovered
 {
     use Dispatchable, SerializesModels;
 
-    public function __construct(public array $actions, public string $source = 'aiagent') {}
+    /** @param array<string, array<string, mixed>> $actions */
+    public function __construct(
+        public array $actions,
+        public string $source = 'aiagent',
+    ) {}
 }

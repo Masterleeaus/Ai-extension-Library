@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+/** @var array<class-string,string> $aliases */
 $aliases = [
     TitanAI\Hybrid\ActionCompleted::class => 'App\\Domains\\TitanAI\\ActionCompleted',
     TitanAI\Hybrid\ActionFailed::class => 'App\\Domains\\TitanAI\\ActionFailed',
@@ -34,5 +35,5 @@ foreach ($aliases as $current => $legacy) {
         || interface_exists($legacy, false)
         || trait_exists($legacy, false)
         || (function_exists('enum_exists') && enum_exists($legacy, false));
-    if (! $legacyExists) class_alias($current, $legacy);
+    if (! $legacyExists) { class_alias($current, $legacy); }
 }

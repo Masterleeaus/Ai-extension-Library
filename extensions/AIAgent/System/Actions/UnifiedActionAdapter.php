@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Extensions\AIAgent\System\Actions;
 
-use App\Domains\TitanAI\ActionCompleted;
-use App\Domains\TitanAI\ActionFailed;
-use App\Domains\TitanAI\ActionInvoked;
-use App\Domains\TitanAI\Contracts\ActionDefinition;
-use App\Domains\TitanAI\Events\TitanAIEventBus;
+use TitanAI\Hybrid\ActionCompleted;
+use TitanAI\Hybrid\ActionFailed;
+use TitanAI\Hybrid\ActionInvoked;
+use TitanAI\Hybrid\Contracts\ActionDefinition;
+use TitanAI\Hybrid\Events\TitanAIEventBus;
 use App\Extensions\AIAgent\System\Actions\Contracts\AIAgentActionInterface;
 use App\Extensions\AIAgent\System\Models\AIAgentWorkflow;
 use App\Extensions\AIAgent\System\Models\AIAgentWorkflowRun;

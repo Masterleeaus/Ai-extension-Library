@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Extensions\Chatbot\System;
 
-use App\Domains\TitanAI\ActionCompleted;
-use App\Domains\TitanAI\ConnectorsDiscovered;
-use App\Domains\TitanAI\ExtensionBooted;
-use App\Domains\TitanAI\Events\TitanAIEventBus;
-use App\Domains\TitanAI\Registries\UnifiedRegistry;
-use App\Domains\TitanAI\SkillsDiscovered;
-use App\Domains\TitanAI\TitanAIServiceProvider;
+use TitanAI\Hybrid\ActionCompleted;
+use TitanAI\Hybrid\ConnectorsDiscovered;
+use TitanAI\Hybrid\ExtensionBooted;
+use TitanAI\Hybrid\Events\TitanAIEventBus;
+use TitanAI\Hybrid\Registries\UnifiedRegistry;
+use TitanAI\Hybrid\SkillsDiscovered;
+use TitanAI\Hybrid\TitanAIServiceProvider;
 use App\Extensions\Chatbot\System\TitanAI\Runtime\Skills\FieldServiceSkillRegistry;
 use App\Extensions\Chatbot\System\TitanAI\Runtime\Skills\UnifiedSkillAdapter;
 

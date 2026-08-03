@@ -11,5 +11,7 @@ final class ExtensionShuttingDown
 {
     use Dispatchable, SerializesModels;
 
-    public function __construct(public string $extension) {}
+    public function __construct(
+        public string $extension,
+    ) {}
 }

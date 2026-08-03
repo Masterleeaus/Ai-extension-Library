@@ -17,11 +17,16 @@ final class TitanAIServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        $this->mergeConfigFrom($this->packagePath('config/titanai.php'), 'titanai');
+        $configPath = $this->packagePath('config/titanai.php');
+        if (is_file($configPath)) {
+            $this->mergeConfigFrom($configPath, 'titanai');
+        }
 
-        $this->app->singleton(UnifiedRegistry::class, static fn (): UnifiedRegistry => new UnifiedRegistry(
-            allowOverrides: (bool) config('titanai.registry.allow_overrides', false),
-        ));
+        $this->app->singleton(UnifiedRegistry::class, static function (): UnifiedRegistry {
+            return new UnifiedRegistry(
+                allowOverrides: (bool) config('titanai.registry.allow_overrides', false),
+            );
+        });
         $this->app->alias(UnifiedRegistry::class, 'titanai.registry');
 
         $this->app->singleton(TitanAIDiagnostics::class, static fn (): TitanAIDiagnostics => new TitanAIDiagnostics(
@@ -45,10 +50,14 @@ final class TitanAIServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        $this->loadMigrationsFrom($this->packagePath('database/migrations'));
+        $migrationPath = $this->packagePath('database/migrations');
+        if (is_dir($migrationPath)) {
+            $this->loadMigrationsFrom($migrationPath);
+        }
 
         if ($this->app->runningInConsole()) {
             $this->commands([PurgeExpiredMemoriesCommand::class]);
+
             if ((bool) config('titanai.memory.auto_cleanup', true)) {
                 $this->app->booted(function (): void {
                     $this->app->make(Schedule::class)

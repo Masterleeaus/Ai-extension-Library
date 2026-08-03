@@ -11,5 +11,8 @@ final class ExtensionBooted
 {
     use Dispatchable, SerializesModels;
 
-    public function __construct(public string $extension, public array $metadata = []) {}
+    public function __construct(
+        public string $extension,
+        public array $metadata = [],
+    ) {}
 }

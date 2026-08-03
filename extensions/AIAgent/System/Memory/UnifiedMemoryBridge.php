@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Extensions\AIAgent\System\Memory;
 
-use App\Domains\TitanAI\Diagnostics\TitanAIDiagnostics;
-use App\Domains\TitanAI\Memory\Enums\MemoryScope;
-use App\Domains\TitanAI\Memory\Services\UnifiedMemoryRepository;
+use TitanAI\Hybrid\Diagnostics\TitanAIDiagnostics;
+use TitanAI\Hybrid\Memory\Enums\MemoryScope;
+use TitanAI\Hybrid\Memory\Services\UnifiedMemoryRepository;
 use InvalidArgumentException;
 use Throwable;
 

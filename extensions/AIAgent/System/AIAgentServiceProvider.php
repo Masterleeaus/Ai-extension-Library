@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Extensions\AIAgent\System;
 
-use App\Domains\TitanAI\ActionsDiscovered;
-use App\Domains\TitanAI\ConnectorsDiscovered;
-use App\Domains\TitanAI\ExtensionBooted;
-use App\Domains\TitanAI\Events\TitanAIEventBus;
-use App\Domains\TitanAI\Registries\UnifiedRegistry;
-use App\Domains\TitanAI\SkillsDiscovered;
-use App\Domains\TitanAI\TitanAIServiceProvider;
+use TitanAI\Hybrid\ActionsDiscovered;
+use TitanAI\Hybrid\ConnectorsDiscovered;
+use TitanAI\Hybrid\ExtensionBooted;
+use TitanAI\Hybrid\Events\TitanAIEventBus;
+use TitanAI\Hybrid\Registries\UnifiedRegistry;
+use TitanAI\Hybrid\SkillsDiscovered;
+use TitanAI\Hybrid\TitanAIServiceProvider;
 
 use App\Domains\Marketplace\Contracts\UninstallExtensionServiceProviderInterface;
 use App\Extensions\AIAgent\System\Actions\AiCallAction;
