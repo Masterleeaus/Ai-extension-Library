@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Extensions\Chatbot\System\Http\Controllers\Api\TitanAI;
 
+use App\Domains\TitanAI\Diagnostics\TitanAIDiagnostics;
+use App\Domains\TitanAI\Registries\UnifiedRegistry;
 use App\Extensions\Chatbot\System\TitanAI\Runtime\WorkerRouteRegistry;
 use App\Extensions\Chatbot\System\TitanAI\Runtime\AgentExecutionPathResolver;
 use App\Extensions\Chatbot\System\TitanAI\Runtime\AssistantDelegationGraph;
@@ -18,6 +20,8 @@ final class TitanAIRuntimeDiagnosticsController extends Controller
         private readonly AgentExecutionPathResolver $executionPaths,
         private readonly AssistantDelegationGraph $delegations,
         private readonly ConfidenceFallbackPolicy $fallbacks,
+        private readonly TitanAIDiagnostics $titanaiDiagnostics,
+        private readonly UnifiedRegistry $unifiedRegistry,
     ) {}
 
     public function __invoke(): JsonResponse
@@ -25,6 +29,7 @@ final class TitanAIRuntimeDiagnosticsController extends Controller
         return response()->json([
             ...$this->workers->diagnostics($this->executionPaths, $this->delegations),
             'confidence_thresholds' => $this->fallbacks->thresholds(),
+            'hybrid_foundation' => $this->titanaiDiagnostics->snapshot($this->unifiedRegistry),
         ]);
     }
 }

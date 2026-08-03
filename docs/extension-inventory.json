@@ -14,8 +14,8 @@
     "name": "AI Agent",
     "version": "1.1",
     "description": "Autonomous AI agent with multi-channel messaging, workflow automation, and user memory — TG: @heew_support",
-    "files": 169,
-    "bytes": 1352714
+    "files": 171,
+    "bytes": 1367253
   },
   {
     "folder": "AIAgentGmail",
@@ -95,8 +95,8 @@
     "name": "AIChatPro",
     "version": "3.7",
     "description": "AIChatPro extension for MagicAI — TG: @heew_support",
-    "files": 47,
-    "bytes": 328078
+    "files": 48,
+    "bytes": 336887
   },
   {
     "folder": "AIChatProDeepResearch",
@@ -336,10 +336,10 @@
     "folder": "Chatbot",
     "category": "chatbot-suite",
     "name": "Chatbot",
-    "version": "6.9.0-unified-ai-shell",
-    "description": "Unified Titan Zero chatbot with template-aware 14-app shell, offline WorkCore PWA, shared five-tier AI convergence, 28 Tier-2 assistants, expanded Tier-3 agents, governance, generative UI, staff inbox, team chat and business channels.",
-    "files": 1548,
-    "bytes": 5873858
+    "version": "7.0.0-five-application-registry",
+    "description": "Unified Titan chatbot with five canonical applications (Titan Zero, Titan Go, Titan Launch, Titan Desk and Titan Hub), legacy app-slug migration, offline WorkCore PWA, shared five-tier AI convergence, governance, generative UI, staff inbox, team chat and business channels.",
+    "files": 1554,
+    "bytes": 5900245
   },
   {
     "folder": "ChatbotAgent",

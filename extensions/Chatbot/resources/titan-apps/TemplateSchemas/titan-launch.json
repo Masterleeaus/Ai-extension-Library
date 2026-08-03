@@ -1,0 +1,72 @@
+{
+  "schema_version": "2.0.0",
+  "identity": {
+    "name": "Titan Launch",
+    "slug": "titan-launch",
+    "icon": "launch",
+    "accent": "var(--lqd-ext-chat-primary)"
+  },
+  "navigation": {
+    "default_view": "launchpad",
+    "primary": [
+      {"id": "launchpad", "label": "Launchpad", "icon": "launch", "offline": true},
+      {"id": "verticals", "label": "Verticals", "icon": "layers", "offline": true},
+      {"id": "growth", "label": "Growth", "icon": "growth", "offline": true},
+      {"id": "campaigns", "label": "Campaigns", "icon": "campaigns", "offline": true}
+    ],
+    "drawer": [
+      {"id": "business-model", "label": "Business model", "icon": "chevron-right", "offline": true},
+      {"id": "brand", "label": "Brand", "icon": "chevron-right", "offline": true},
+      {"id": "website", "label": "Website", "icon": "chevron-right", "offline": true},
+      {"id": "services", "label": "Services", "icon": "chevron-right", "offline": true},
+      {"id": "pricing", "label": "Pricing", "icon": "chevron-right", "offline": true},
+      {"id": "leads", "label": "Leads", "icon": "chevron-right", "offline": true},
+      {"id": "sales-playbooks", "label": "Sales playbooks", "icon": "chevron-right", "offline": true},
+      {"id": "training", "label": "Training", "icon": "chevron-right", "offline": true},
+      {"id": "compliance", "label": "Compliance", "icon": "chevron-right", "offline": true},
+      {"id": "sops", "label": "SOPs", "icon": "chevron-right", "offline": true},
+      {"id": "marketing", "label": "Marketing", "icon": "chevron-right", "offline": true},
+      {"id": "marketplace", "label": "Marketplace", "icon": "chevron-right", "offline": false}
+    ],
+    "header_actions": ["sync", "notifications", "settings"]
+  },
+  "home": {
+    "widgets": ["launch_progress", "growth_opportunities", "active_campaigns", "pending_decisions"],
+    "quick_actions": ["verticals", "growth"]
+  },
+  "chat": {
+    "persistent": true,
+    "role": "Titan Launch",
+    "suggested_prompts": [
+      "Build a new business vertical",
+      "Show the next launch decision",
+      "Find the best growth opportunity"
+    ],
+    "context_policy": {
+      "minimum_scope": true,
+      "send_full_record": false,
+      "requires_permission": true
+    }
+  },
+  "workcore": {
+    "domains": ["CRM", "Marketing", "Analytics", "Knowledge", "Documents", "Automation"],
+    "commands": ["create_business_plan", "generate_vertical", "launch_campaign", "approve_growth_action"],
+    "read_models": ["launch_plans", "vertical_blueprints", "campaigns", "opportunities", "brand_assets"]
+  },
+  "offline": {
+    "records": ["launch_plans", "vertical_blueprints", "campaigns", "opportunities", "brand_assets"],
+    "packs": ["titan-launch-default"],
+    "retention": {"completed_days": 30},
+    "conflict_rules": {"server_authoritative": true, "preserve_local_copy": true}
+  },
+  "permissions": ["create_business_plan", "generate_vertical", "launch_campaign", "approve_growth_action"],
+  "privacy": {
+    "default_mode": "device-first",
+    "redact_before_cloud": true,
+    "attachment_confirmation": true,
+    "provider_allowlist": []
+  },
+  "notifications": ["assignment", "approval", "sync_failure", "conflict"],
+  "settings_sections": ["ai-providers", "privacy", "device-security", "offline-sync", "workcore", "permissions", "notifications", "channels", "appearance", "accessibility", "diagnostics"],
+  "preview_states": ["mobile", "tablet", "desktop", "drawer-open", "settings-open", "offline", "syncing", "conflict", "empty", "populated"]
+}

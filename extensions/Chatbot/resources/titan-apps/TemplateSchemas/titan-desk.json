@@ -1,0 +1,70 @@
+{
+  "schema_version": "2.0.0",
+  "identity": {
+    "name": "Titan Desk",
+    "slug": "titan-desk",
+    "icon": "desk",
+    "accent": "var(--lqd-ext-chat-primary)"
+  },
+  "navigation": {
+    "default_view": "inbox",
+    "primary": [
+      {"id": "inbox", "label": "Inbox", "icon": "inbox", "offline": true},
+      {"id": "calls", "label": "Calls", "icon": "calls", "offline": true},
+      {"id": "bookings", "label": "Bookings", "icon": "bookings", "offline": true},
+      {"id": "follow-ups", "label": "Follow-ups", "icon": "follow-ups", "offline": true}
+    ],
+    "drawer": [
+      {"id": "channels", "label": "Channels", "icon": "chevron-right", "offline": true},
+      {"id": "leads", "label": "Leads", "icon": "chevron-right", "offline": true},
+      {"id": "quote-requests", "label": "Quote requests", "icon": "chevron-right", "offline": true},
+      {"id": "availability", "label": "Availability", "icon": "chevron-right", "offline": true},
+      {"id": "voicemails", "label": "Voicemails", "icon": "chevron-right", "offline": true},
+      {"id": "escalations", "label": "Escalations", "icon": "chevron-right", "offline": true},
+      {"id": "knowledge", "label": "Knowledge", "icon": "chevron-right", "offline": true},
+      {"id": "contacts", "label": "Contacts", "icon": "chevron-right", "offline": true},
+      {"id": "business-hours", "label": "Business hours", "icon": "chevron-right", "offline": true},
+      {"id": "call-history", "label": "Call history", "icon": "chevron-right", "offline": true}
+    ],
+    "header_actions": ["sync", "notifications", "settings"]
+  },
+  "home": {
+    "widgets": ["waiting_enquiries", "qualified_leads", "booking_requests", "follow_ups"],
+    "quick_actions": ["inbox", "calls"]
+  },
+  "chat": {
+    "persistent": true,
+    "role": "Titan Desk",
+    "suggested_prompts": [
+      "Draft a reply",
+      "Qualify this enquiry",
+      "Find availability for a booking request"
+    ],
+    "context_policy": {
+      "minimum_scope": true,
+      "send_full_record": false,
+      "requires_permission": true
+    }
+  },
+  "workcore": {
+    "domains": ["CRM", "Scheduling", "Communications", "Support", "Knowledge"],
+    "commands": ["reply_enquiry", "qualify_lead", "request_booking", "request_quote", "create_follow_up", "escalate"],
+    "read_models": ["inbox_summaries", "lead_summaries", "booking_requests", "quote_requests", "follow_ups", "knowledge"]
+  },
+  "offline": {
+    "records": ["inbox_summaries", "lead_summaries", "booking_requests", "quote_requests", "follow_ups", "knowledge"],
+    "packs": ["titan-desk-default"],
+    "retention": {"completed_days": 30},
+    "conflict_rules": {"server_authoritative": true, "preserve_local_copy": true}
+  },
+  "permissions": ["reply_enquiry", "qualify_lead", "request_booking", "request_quote", "create_follow_up", "escalate"],
+  "privacy": {
+    "default_mode": "device-first",
+    "redact_before_cloud": true,
+    "attachment_confirmation": true,
+    "provider_allowlist": []
+  },
+  "notifications": ["assignment", "approval", "sync_failure", "conflict"],
+  "settings_sections": ["ai-providers", "privacy", "device-security", "offline-sync", "workcore", "permissions", "notifications", "channels", "appearance", "accessibility", "diagnostics"],
+  "preview_states": ["mobile", "tablet", "desktop", "drawer-open", "settings-open", "offline", "syncing", "conflict", "empty", "populated"]
+}

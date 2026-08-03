@@ -4,8 +4,18 @@ declare(strict_types=1);
 
 namespace App\Extensions\AIChatPro\System;
 
+use App\Domains\TitanAI\ActionCompleted;
+use App\Domains\TitanAI\ActionInvoked;
+use App\Domains\TitanAI\ConnectorsDiscovered;
+use App\Domains\TitanAI\ExtensionBooted;
+use App\Domains\TitanAI\Events\TitanAIEventBus;
+use App\Domains\TitanAI\Registries\UnifiedRegistry;
+use App\Domains\TitanAI\TitanAIServiceProvider;
+
 use App\Domains\Marketplace\Contracts\UninstallExtensionServiceProviderInterface;
+use App\Extensions\AIChatPro\System\Connectors\ConnectorDefinition;
 use App\Extensions\AIChatPro\System\Connectors\ConnectorRegistry;
+use App\Extensions\AIChatPro\System\Connectors\UnifiedConnectorAdapter;
 use App\Extensions\AIChatPro\System\Connectors\Models\AIChatProConnector;
 use App\Extensions\AIChatPro\System\Connectors\Policies\AIChatProConnectorPolicy;
 use App\Extensions\AIChatPro\System\Events\ConnectorTokenInvalidated;
@@ -21,6 +31,7 @@ use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
@@ -35,6 +46,7 @@ class AIChatProServiceProvider extends ServiceProvider implements UninstallExten
 {
     public function register(): void
     {
+        $this->app->register(TitanAIServiceProvider::class);
         $this->app->singleton(ConnectorRegistry::class);
     }
 
@@ -49,6 +61,79 @@ class AIChatProServiceProvider extends ServiceProvider implements UninstallExten
             ->publishAssets()
             ->registerComponents();
 
+        if ((bool) config('titanai.extensions.aichatpro.enabled', true)) {
+            if ((bool) config('titanai.extensions.aichatpro.auto_register_to_unified_registry', true)) {
+                $this->registerConnectorsToUnifiedRegistry();
+            }
+            if ((bool) config('titanai.extensions.aichatpro.listen_to_events', true)) {
+                $this->subscribeToTitanAIEvents();
+            }
+            $this->app->make(TitanAIEventBus::class)->dispatch(
+                new ExtensionBooted('aichatpro', [
+                    'registry' => $this->app->make(UnifiedRegistry::class)->counts(),
+                ]),
+                'extension:aichatpro:booted',
+            );
+        }
+    }
+
+    private function registerConnectorsToUnifiedRegistry(): void
+    {
+        $nativeRegistry = $this->app->make(ConnectorRegistry::class);
+        $hadConnectors = $nativeRegistry->registeredClasses() !== [];
+
+        $nativeRegistry->onRegistered(function (string $key, string $definitionClass): void {
+            try {
+                $definition = $this->app->make($definitionClass);
+                if (! $definition instanceof ConnectorDefinition) {
+                    throw new \UnexpectedValueException("Connector [{$key}] does not implement the AIChatPro connector contract.");
+                }
+
+                $registry = $this->app->make(UnifiedRegistry::class);
+                if (! $registry->hasConnector($key)) {
+                    $registry->registerConnector($key, new UnifiedConnectorAdapter($definition));
+                }
+
+                if ((bool) config('titanai.extensions.aichatpro.emit_discovery_events', true)) {
+                    $metadata = $registry->connectorMetadata();
+                    $this->app->make(TitanAIEventBus::class)->dispatch(
+                        new ConnectorsDiscovered($metadata, 'aichatpro'),
+                        'discovery:connectors:aichatpro:' . hash('sha256', json_encode($metadata, JSON_THROW_ON_ERROR)),
+                    );
+                }
+            } catch (\Throwable $exception) {
+                Log::warning('AIChatPro connector could not be mirrored to UnifiedRegistry.', [
+                    'connector' => $key,
+                    'definition' => $definitionClass,
+                    'exception' => $exception,
+                ]);
+            }
+        }, replay: true, listenerKey: 'titanai.unified.connectors');
+
+        if (! $hadConnectors && (bool) config('titanai.extensions.aichatpro.emit_discovery_events', true)) {
+            $this->app->make(TitanAIEventBus::class)->dispatch(
+                new ConnectorsDiscovered([], 'aichatpro'),
+                'discovery:connectors:aichatpro:empty',
+            );
+        }
+    }
+
+    private function subscribeToTitanAIEvents(): void
+    {
+        $events = $this->app->make(TitanAIEventBus::class);
+        $events->listenOnce('aichatpro.action-invoked', ActionInvoked::class, static function (ActionInvoked $event): void {
+            Log::debug('AIChatPro observed a cross-extension action invocation.', [
+                'source' => $event->source,
+                'action' => $event->actionKey,
+            ]);
+        });
+
+        $events->listenOnce('aichatpro.action-completed', ActionCompleted::class, static function (ActionCompleted $event): void {
+            Log::debug('AIChatPro observed a cross-extension action completion.', [
+                'source' => $event->source,
+                'action' => $event->actionKey,
+            ]);
+        });
     }
 
     private function registerConnectorEvents(): static

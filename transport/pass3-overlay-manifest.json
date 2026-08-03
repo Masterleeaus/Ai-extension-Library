@@ -1,0 +1,20 @@
+{
+  "name": "TitanAI Core Suites Pass 3 Overlay",
+  "dataset_id": "0d8d0578-4186-48ba-adee-914931a493e7",
+  "source_format": "csv",
+  "hosted_format": "parquet",
+  "rows": 12,
+  "url": "https://titan-builder-ob009-artifact.miniup.app/api/data-file/titan-builder-ob009-artifact/ai-core-pass3-overlay-transfer.parquet",
+  "archive_sha256": "6fc826403f57d9e2c6278a2412052f4b7d9973592ba0414ae6fbd4e3de31a0e2",
+  "archive_bytes": 3121113,
+  "extracted_files": 1818,
+  "replace_extensions": [
+    "AIAgent",
+    "AIChatPro",
+    "Chatbot"
+  ],
+  "extension_files": 1773,
+  "foundation_files": 45,
+  "source_bundle": "TitanAI-Hybrid-Complete-Upgraded-v4-Pass3.zip",
+  "foundation_target": "foundation/TitanAI-Hybrid"
+}
