@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+// This contract runs after materialisation so it verifies the generated Chatbot source.
 $root = dirname(__DIR__, 2);
 $controllerPath = $root . '/extensions/Chatbot/System/Http/Controllers/ChatbotTrainController.php';
 $requestPath = $root . '/extensions/Chatbot/System/Http/Requests/Train/EmbedingRequest.php';
