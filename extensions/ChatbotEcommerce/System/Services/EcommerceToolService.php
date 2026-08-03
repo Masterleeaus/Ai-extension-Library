@@ -7,6 +7,10 @@ namespace App\Extensions\ChatbotEcommerce\System\Services;
 use App\Extensions\Chatbot\System\Models\Chatbot;
 use App\Extensions\ChatbotEcommerce\System\Tools\ShopifyToolHandler;
 use App\Extensions\ChatbotEcommerce\System\Tools\WooCommerceToolHandler;
+use App\Extensions\ChatbotEcommerce\System\Models\CommerceCommunicationMessage;
+use App\Extensions\ChatbotEcommerce\System\Models\CommerceCommunicationThread;
+use App\Extensions\ChatbotEcommerce\System\Services\CommerceCredentialRuntime;
+use App\Extensions\ChatbotEcommerce\System\Support\CommerceRole;
 use Illuminate\Support\Facades\Log;
 
 class EcommerceToolService
@@ -47,15 +51,38 @@ class EcommerceToolService
      */
     private function resolveToolCall(Chatbot $chatbot, string $function, array $functionArgs): ?string
     {
+        if (str_starts_with($function, 'seller_order_')) {
+            $result = app(OrderWorkbenchToolRuntime::class)->execute($chatbot, $function, $functionArgs);
+            return (string) json_encode($result['data'] ?? $result, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        }
+        if (str_starts_with($function, 'marketplace_') || str_starts_with($function, 'seller_marketplace_')) {
+            $result = app(MarketplaceToolRuntime::class)->execute($chatbot, $function, $functionArgs);
+            return (string) (($result['ui']['fallback_text'] ?? null) ?: json_encode($result['data'] ?? $result, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+        }
+        if (str_starts_with($function, 'support_')) {
+            $result = $this->resolveCustomerCommunicationTool($chatbot, $function, $functionArgs);
+            return $result === null ? null : (string) (($result['ui']['fallback_text'] ?? null) ?: json_encode($result, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+        }
+        if ($chatbot->is_shop && $chatbot->shop_source === 'internal' && ($function === 'getProducts' || str_starts_with($function, 'native_'))) {
+            $nativeFunction = $function === 'getProducts' ? 'native_search_products' : $function;
+            $sessionId = trim((string) ($functionArgs['session_id'] ?? ''));
+            if ($sessionId === '') {
+                return 'A shopping session ID is required before the native commerce tool can run.';
+            }
+            $result = app(ConversationalCommerceRuntime::class)->execute($chatbot, $sessionId, $nativeFunction, $functionArgs);
+            return (string) (($result['ui']['fallback_text'] ?? null) ?: ($result['error']['message'] ?? null) ?: json_encode($result['data'] ?? $result));
+        }
+
         // Shopify Tools
         if (
             $chatbot->is_shop &&
             $chatbot->shop_source == 'shopify' &&
             in_array($function, ['getProducts', 'getPaymentGateway'])
         ) {
+            $shopifyCredentials = app(CommerceCredentialRuntime::class)->resolve($chatbot, 'shopify');
             $shopifyToolHandler = new ShopifyToolHandler(
-                $chatbot->shopify_domain,
-                $chatbot->shopify_access_token
+                (string) $chatbot->shopify_domain,
+                (string) $shopifyCredentials['access_token']
             );
 
             switch ($function) {
@@ -87,10 +114,11 @@ class EcommerceToolService
             $chatbot->shop_source == 'woocommerce' &&
             in_array($function, ['getProducts', 'getPaymentGateway', 'getShippingMethods', 'getCoupons', 'getProductReviews'])
         ) {
+            $wooCredentials = app(CommerceCredentialRuntime::class)->resolve($chatbot, 'woocommerce');
             $wooToolHandler = new WooCommerceToolHandler(
-                $chatbot->woocommerce_domain,
-                $chatbot->woocommerce_consumer_key,
-                $chatbot->woocommerce_consumer_secret
+                (string) $chatbot->woocommerce_domain,
+                (string) $wooCredentials['consumer_key'],
+                (string) $wooCredentials['consumer_secret']
             );
 
             switch ($function) {
@@ -205,15 +233,50 @@ class EcommerceToolService
      */
     private function resolveToolCallWithUi(Chatbot $chatbot, string $function, array $functionArgs): ?array
     {
+        if (str_starts_with($function, 'seller_order_')) {
+            $result = app(OrderWorkbenchToolRuntime::class)->execute($chatbot, $function, $functionArgs);
+            return (string) json_encode($result['data'] ?? $result, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        }
+        if (str_starts_with($function, 'marketplace_') || str_starts_with($function, 'seller_marketplace_')) {
+            $result = app(MarketplaceToolRuntime::class)->execute($chatbot, $function, $functionArgs);
+            return [
+                'ai_content' => (string) (($result['ui']['fallback_text'] ?? null) ?: json_encode($result['data'] ?? $result, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)),
+                'ui' => isset($result['ui']['schema']) ? json_encode($result['ui']['schema'], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) : null,
+            ];
+        }
+        if (str_starts_with($function, 'support_')) {
+            $result = $this->resolveCustomerCommunicationTool($chatbot, $function, $functionArgs);
+            if ($result === null) {
+                return null;
+            }
+            return [
+                'ai_content' => (string) (($result['ui']['fallback_text'] ?? null) ?: json_encode($result, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)),
+                'ui' => isset($result['ui']['schema']) ? json_encode($result['ui']['schema'], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) : null,
+            ];
+        }
+        if ($chatbot->is_shop && $chatbot->shop_source === 'internal' && ($function === 'getProducts' || str_starts_with($function, 'native_'))) {
+            $nativeFunction = $function === 'getProducts' ? 'native_search_products' : $function;
+            $sessionId = trim((string) ($functionArgs['session_id'] ?? ''));
+            if ($sessionId === '') {
+                return ['ai_content' => 'A shopping session ID is required before the native commerce tool can run.', 'ui' => null];
+            }
+            $result = app(ConversationalCommerceRuntime::class)->execute($chatbot, $sessionId, $nativeFunction, $functionArgs);
+            return [
+                'ai_content' => (string) (($result['ui']['fallback_text'] ?? null) ?: ($result['error']['message'] ?? null) ?: 'Commerce action completed.'),
+                'ui' => isset($result['ui']['schema']) ? json_encode($result['ui']['schema'], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) : null,
+            ];
+        }
+
         // Shopify Tools
         if (
             $chatbot->is_shop &&
             $chatbot->shop_source == 'shopify' &&
             in_array($function, ['getProducts', 'getPaymentGateway'])
         ) {
+            $shopifyCredentials = app(CommerceCredentialRuntime::class)->resolve($chatbot, 'shopify');
             $shopifyToolHandler = new ShopifyToolHandler(
-                $chatbot->shopify_domain,
-                $chatbot->shopify_access_token
+                (string) $chatbot->shopify_domain,
+                (string) $shopifyCredentials['access_token']
             );
 
             switch ($function) {
@@ -249,10 +312,11 @@ class EcommerceToolService
             $chatbot->shop_source == 'woocommerce' &&
             in_array($function, ['getProducts', 'getPaymentGateway', 'getShippingMethods', 'getCoupons', 'getProductReviews'])
         ) {
+            $wooCredentials = app(CommerceCredentialRuntime::class)->resolve($chatbot, 'woocommerce');
             $wooToolHandler = new WooCommerceToolHandler(
-                $chatbot->woocommerce_domain,
-                $chatbot->woocommerce_consumer_key,
-                $chatbot->woocommerce_consumer_secret
+                (string) $chatbot->woocommerce_domain,
+                (string) $wooCredentials['consumer_key'],
+                (string) $wooCredentials['consumer_secret']
             );
 
             switch ($function) {
@@ -317,6 +381,51 @@ class EcommerceToolService
         return null;
     }
 
+    /** @param array<string,mixed> $arguments @return array<string,mixed>|null */
+    private function resolveCustomerCommunicationTool(Chatbot $chatbot, string $function, array $arguments): ?array
+    {
+        if (($arguments['commerce_role'] ?? CommerceRole::CUSTOMER_COMMUNICATIONS) !== CommerceRole::CUSTOMER_COMMUNICATIONS) {
+            return ['error' => ['message' => 'The support tool is unavailable outside the customer communications role.']];
+        }
+        $threadUuid = trim((string) ($arguments['thread_uuid'] ?? ''));
+        if ($threadUuid === '') {
+            return ['error' => ['message' => 'A customer communications thread UUID is required.']];
+        }
+        $thread = CommerceCommunicationThread::query()
+            ->where('chatbot_id', (int) $chatbot->getAttribute('id'))
+            ->where('uuid', $threadUuid)
+            ->firstOrFail();
+        $runtime = app(CustomerCommunicationRuntime::class);
+
+        return match ($function) {
+            'support_get_customer_context' => ['data' => $runtime->threadContext($chatbot, $thread)],
+            'support_draft_reply' => (function () use ($runtime, $chatbot, $thread, $arguments): array {
+                $message = ! empty($arguments['message_uuid'])
+                    ? CommerceCommunicationMessage::query()->where('thread_id', $thread->id)->where('uuid', (string) $arguments['message_uuid'])->firstOrFail()
+                    : null;
+                return $runtime->draftReply($chatbot, $thread, $message);
+            })(),
+            'support_prepare_action' => $runtime->prepareAction(
+                $chatbot,
+                $thread,
+                null,
+                (string) ($arguments['action_type'] ?? ''),
+                (array) ($arguments['payload'] ?? []),
+                (string) ($arguments['idempotency_key'] ?? ''),
+            ),
+            'support_handoff_to_human' => $runtime->handoff(
+                $chatbot,
+                $thread,
+                null,
+                (string) ($arguments['reason'] ?? 'human_requested'),
+                (string) ($arguments['severity'] ?? 'normal'),
+                (string) ($arguments['summary'] ?? 'The conversation requires human review.'),
+                isset($arguments['recommended_action']) ? (string) $arguments['recommended_action'] : null,
+            ),
+            default => null,
+        };
+    }
+
     /**
      * Converts a products array into a plain-text summary for AI consumption.
      *
@@ -338,13 +447,42 @@ class EcommerceToolService
      *
      * @return array<int, array<string, mixed>>
      */
-    public function getToolDefinitions(Chatbot $chatbot): array
+    public function getToolDefinitions(Chatbot $chatbot, string $commerceRole = CommerceRole::SHOPPING_ASSISTANT): array
     {
         if (! $chatbot->is_shop) {
             return [];
         }
 
         $tools = [];
+        foreach (app(MarketplaceToolRuntime::class)->toolDefinitions($commerceRole) as $definition) {
+            $tools[] = ['type' => 'function', 'function' => $definition];
+        }
+        if ($commerceRole === CommerceRole::SELLER_STEWARD) {
+            foreach (app(OrderWorkbenchToolRuntime::class)->toolDefinitions() as $definition) {
+                $tools[] = ['type' => 'function', 'function' => $definition];
+            }
+        }
+
+        if ($commerceRole === CommerceRole::CUSTOMER_COMMUNICATIONS) {
+            foreach (app(CustomerCommunicationRuntime::class)->toolDefinitions() as $definition) {
+                $tools[] = ['type' => 'function', 'function' => $definition];
+            }
+            if ($chatbot->shop_source === 'internal') {
+                foreach (app(ConversationalCommerceRuntime::class)->toolDefinitions() as $definition) {
+                    if (str_starts_with((string) ($definition['description'] ?? ''), '[inform]')) {
+                        $tools[] = ['type' => 'function', 'function' => $definition];
+                    }
+                }
+            }
+            return $tools;
+        }
+
+        if ($chatbot->shop_source === 'internal') {
+            foreach (app(ConversationalCommerceRuntime::class)->toolDefinitions() as $definition) {
+                $tools[] = ['type' => 'function', 'function' => $definition];
+            }
+            return $tools;
+        }
 
         $tools[] = [
             'type'     => 'function',
@@ -372,13 +510,42 @@ class EcommerceToolService
      *
      * @return array<int, array<string, mixed>>
      */
-    public function getAnthropicToolDefinitions(Chatbot $chatbot): array
+    public function getAnthropicToolDefinitions(Chatbot $chatbot, string $commerceRole = CommerceRole::SHOPPING_ASSISTANT): array
     {
         if (! $chatbot->is_shop) {
             return [];
         }
 
         $tools = [];
+        foreach (app(MarketplaceToolRuntime::class)->toolDefinitions($commerceRole) as $definition) {
+            $tools[] = $this->toAnthropicFormat($definition);
+        }
+        if ($commerceRole === CommerceRole::SELLER_STEWARD) {
+            foreach (app(OrderWorkbenchToolRuntime::class)->toolDefinitions() as $definition) {
+                $tools[] = $this->toAnthropicFormat($definition);
+            }
+        }
+
+        if ($commerceRole === CommerceRole::CUSTOMER_COMMUNICATIONS) {
+            foreach (app(CustomerCommunicationRuntime::class)->toolDefinitions() as $definition) {
+                $tools[] = $this->toAnthropicFormat($definition);
+            }
+            if ($chatbot->shop_source === 'internal') {
+                foreach (app(ConversationalCommerceRuntime::class)->toolDefinitions() as $definition) {
+                    if (str_starts_with((string) ($definition['description'] ?? ''), '[inform]')) {
+                        $tools[] = $this->toAnthropicFormat($definition);
+                    }
+                }
+            }
+            return $tools;
+        }
+
+        if ($chatbot->shop_source === 'internal') {
+            foreach (app(ConversationalCommerceRuntime::class)->toolDefinitions() as $definition) {
+                $tools[] = $this->toAnthropicFormat($definition);
+            }
+            return $tools;
+        }
 
         $tools[] = $this->toAnthropicFormat($this->getProductsDeclaration());
 
@@ -401,13 +568,32 @@ class EcommerceToolService
      *
      * @return array<int, array<string, mixed>>
      */
-    public function getGeminiToolDefinitions(Chatbot $chatbot): array
+    public function getGeminiToolDefinitions(Chatbot $chatbot, string $commerceRole = CommerceRole::SHOPPING_ASSISTANT): array
     {
         if (! $chatbot->is_shop) {
             return [];
         }
 
-        $declarations = [];
+        $declarations = app(MarketplaceToolRuntime::class)->toolDefinitions($commerceRole);
+        if ($commerceRole === CommerceRole::SELLER_STEWARD) {
+            $declarations = array_merge($declarations, app(OrderWorkbenchToolRuntime::class)->toolDefinitions());
+        }
+
+        if ($commerceRole === CommerceRole::CUSTOMER_COMMUNICATIONS) {
+            $declarations = array_merge($declarations, app(CustomerCommunicationRuntime::class)->toolDefinitions());
+            if ($chatbot->shop_source === 'internal') {
+                foreach (app(ConversationalCommerceRuntime::class)->toolDefinitions() as $definition) {
+                    if (str_starts_with((string) ($definition['description'] ?? ''), '[inform]')) {
+                        $declarations[] = $definition;
+                    }
+                }
+            }
+            return $declarations;
+        }
+
+        if ($chatbot->shop_source === 'internal') {
+            return array_merge($declarations, app(ConversationalCommerceRuntime::class)->toolDefinitions());
+        }
 
         $declarations[] = $this->getProductsDeclaration();
 
