@@ -1,0 +1,17 @@
+{
+  "name": "Chatbot Ecommerce v4.9.0 Overlay",
+  "dataset_id": "7bc84a49-9004-4b44-9d33-592e35fcebb9",
+  "source_format": "csv",
+  "hosted_format": "parquet",
+  "rows": 4,
+  "url": "https://titan-builder-ob009-artifact.miniup.app/api/data-file/titan-builder-ob009-artifact/chatbot-ecommerce-v4-9-0-zip-overlay.parquet",
+  "archive_sha256": "bdced150c21827980088fed1ae9173e9b2cc2e7c4c1317bd0c5d0889c151c677",
+  "archive_bytes": 506235,
+  "extracted_files": 403,
+  "replace_extensions": [
+    "ChatbotEcommerce"
+  ],
+  "extension_version": "4.9.0",
+  "source_bundle": "chatbot-ecommerce-upgraded-v4.9.0.zip",
+  "source_zip_sha256": "c9d6aaea58fba4dd5d2d115740281fff43fdd3fb5dd5f82c3db38e55aff1b42a"
+}
