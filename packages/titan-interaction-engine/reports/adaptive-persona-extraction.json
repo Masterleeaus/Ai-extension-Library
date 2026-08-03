@@ -1,0 +1,29 @@
+{
+  "source": {
+    "archive": "Adaptive-Persona-Engine-Offline-Intent-Infrastructure-main.zip",
+    "sha256": "a684d5a618f6a409d0537a8c17f077cd1b0b619bbdf8ab4ed1a49db14dae98e3",
+    "snapshot": "9d81e10408371009bdfc48b389016675f8ecc783",
+    "license": "MIT",
+    "python_lines": 399,
+    "automated_tests": 0
+  },
+  "claim_status": {
+    "sentiment_formality_metrics": "partial_implementation",
+    "rolling_drift_threshold": "documentation_only",
+    "offline_mnb": "prototype_implemented",
+    "mnb_benchmark_artifact": "missing",
+    "semantic_recency_emotion_reranker": "partial_and_inconsistent",
+    "fact_contradiction_detection": "missing",
+    "vector_clock_sync": "documentation_only"
+  },
+  "interaction_engine": {
+    "model_version": "local-brain-v2",
+    "php_components_added": 7,
+    "typescript_components_added": 4,
+    "php_tests_added": 7,
+    "typescript_tests_added": 4,
+    "pickle_used": false,
+    "heavy_python_runtime_required": false,
+    "workcore_mutation_authority_changed": false
+  }
+}

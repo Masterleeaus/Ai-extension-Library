@@ -1,0 +1,58 @@
+{
+  "name": "titanzero/interaction-engine",
+  "description": "Titan Zero universal interaction, wizard, LocalBrain v2 and offline intelligence engine for Laravel and WorkCore",
+  "type": "library",
+  "license": "proprietary",
+  "require": {
+    "php": "^8.2",
+    "ext-json": "*",
+    "ext-sodium": "*",
+    "illuminate/cache": "^10.0 || ^11.0 || ^12.0",
+    "illuminate/contracts": "^10.0 || ^11.0 || ^12.0",
+    "illuminate/database": "^10.0 || ^11.0 || ^12.0",
+    "illuminate/events": "^10.0 || ^11.0 || ^12.0",
+    "illuminate/http": "^10.0 || ^11.0 || ^12.0",
+    "illuminate/routing": "^10.0 || ^11.0 || ^12.0",
+    "illuminate/support": "^10.0 || ^11.0 || ^12.0",
+    "illuminate/view": "^10.0 || ^11.0 || ^12.0",
+    "symfony/yaml": "^6.0 || ^7.0",
+    "titanzero/interaction-contracts": "^1.0"
+  },
+  "suggest": {
+    "openai-php/client": "Required only when INTERACTION_AI_ENABLED=true"
+  },
+  "autoload": {
+    "psr-4": {
+      "TitanZero\\Interaction\\": "src/",
+      "TitanZero\\Engines\\": "src/Engines/"
+    }
+  },
+  "scripts": {
+    "test": "php tests/run.php",
+    "verify": [
+      "@test",
+      "php bin/verify.php"
+    ]
+  },
+  "config": {
+    "sort-packages": true
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "TitanZero\\Interaction\\Tests\\": "tests/"
+    }
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "TitanZero\\Interaction\\Providers\\InteractionServiceProvider"
+      ],
+      "aliases": {
+        "Interaction": "TitanZero\\Interaction\\Facades\\Interaction"
+      }
+    }
+  },
+  "support": {
+    "source": "https://github.com/Masterleeaus/Ai-extensions/tree/main/packages/titan-interaction-engine"
+  }
+}
