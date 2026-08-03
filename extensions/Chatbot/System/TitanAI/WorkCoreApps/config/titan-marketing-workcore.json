@@ -1,0 +1,44 @@
+{
+  "app_slug": "titan-marketing",
+  "app_name": "Titan Marketing",
+  "workcore_enabled": true,
+  "workcore_authority": true,
+  "offline_first": true,
+  "domain": "marketing",
+  "workcore": {
+    "read_tools": [
+      "workcore.customers.segments",
+      "workcore.marketing.campaigns",
+      "workcore.marketing.performance",
+      "workcore.reviews.list",
+      "workcore.services.list"
+    ],
+    "action_tools": [
+      "workcore.campaign.draft",
+      "workcore.campaign.schedule",
+      "workcore.customer.segment",
+      "workcore.followup.queue"
+    ],
+    "requires_tenant_context": true,
+    "requires_actor_context": true,
+    "idempotent_actions": true,
+    "confirmation_for_high_risk": true
+  },
+  "offline_projection": {
+    "stores": [
+      "customer_segments",
+      "campaign_drafts",
+      "templates",
+      "services",
+      "reviews"
+    ],
+    "writes_are_provisional": true,
+    "sync_via": "chatbot_outbox",
+    "conflicts_via": "chatbot_conflict_centre"
+  },
+  "governance": {
+    "executor": "GovernedToolExecutor",
+    "fact_verification": "WorkCoreFactVerifier",
+    "risk_classification": true
+  }
+}

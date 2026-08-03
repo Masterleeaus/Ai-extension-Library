@@ -1,0 +1,210 @@
+{
+  "schema_version": "1.0.0",
+  "identity": {
+    "name": "Titan Analytics",
+    "slug": "titan-analytics",
+    "icon": "analytics",
+    "accent": "var(--lqd-ext-chat-primary)"
+  },
+  "navigation": {
+    "default_view": "briefing",
+    "primary": [
+      {
+        "id": "briefing",
+        "label": "Briefing",
+        "icon": "briefing",
+        "offline": true
+      },
+      {
+        "id": "performance",
+        "label": "Performance",
+        "icon": "performance",
+        "offline": true
+      },
+      {
+        "id": "trends",
+        "label": "Trends",
+        "icon": "trends",
+        "offline": true
+      },
+      {
+        "id": "reports",
+        "label": "Reports",
+        "icon": "reports",
+        "offline": true
+      }
+    ],
+    "drawer": [
+      {
+        "id": "revenue",
+        "label": "Revenue",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "jobs",
+        "label": "Jobs",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "customers",
+        "label": "Customers",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "workforce",
+        "label": "Workforce",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "quality",
+        "label": "Quality",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "forecasts",
+        "label": "Forecasts",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "exceptions",
+        "label": "Exceptions",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "saved-reports",
+        "label": "Saved reports",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "data-sources",
+        "label": "Data sources",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "exports",
+        "label": "Exports",
+        "icon": "chevron-right",
+        "offline": false
+      }
+    ],
+    "header_actions": [
+      "sync",
+      "notifications",
+      "settings"
+    ]
+  },
+  "home": {
+    "widgets": [
+      "narrative_briefing",
+      "supporting_metrics",
+      "anomalies",
+      "forecast"
+    ],
+    "quick_actions": [
+      "performance",
+      "trends"
+    ]
+  },
+  "chat": {
+    "persistent": true,
+    "role": "Titan Analytics",
+    "suggested_prompts": [
+      "Explain this trend",
+      "Compare this month with last month",
+      "Show unusual changes"
+    ],
+    "context_policy": {
+      "minimum_scope": true,
+      "send_full_record": false,
+      "requires_permission": true
+    }
+  },
+  "workcore": {
+    "domains": [
+      "Analytics",
+      "Finance",
+      "Operations",
+      "CRM",
+      "Workforce",
+      "Reviews"
+    ],
+    "commands": [
+      "view_analytics",
+      "build_report",
+      "export_report"
+    ],
+    "read_models": [
+      "briefings",
+      "saved_reports",
+      "aggregated_metrics"
+    ]
+  },
+  "offline": {
+    "records": [
+      "briefings",
+      "saved_reports",
+      "aggregated_metrics"
+    ],
+    "packs": [
+      "titan-analytics-default"
+    ],
+    "retention": {
+      "completed_days": 30
+    },
+    "conflict_rules": {
+      "server_authoritative": true,
+      "preserve_local_copy": true
+    }
+  },
+  "permissions": [
+    "view_analytics",
+    "build_report",
+    "export_report"
+  ],
+  "privacy": {
+    "default_mode": "device-first",
+    "redact_before_cloud": true,
+    "attachment_confirmation": true,
+    "provider_allowlist": []
+  },
+  "notifications": [
+    "assignment",
+    "approval",
+    "sync_failure",
+    "conflict"
+  ],
+  "settings_sections": [
+    "ai-providers",
+    "privacy",
+    "device-security",
+    "offline-sync",
+    "workcore",
+    "permissions",
+    "notifications",
+    "channels",
+    "appearance",
+    "accessibility",
+    "diagnostics"
+  ],
+  "preview_states": [
+    "mobile",
+    "tablet",
+    "desktop",
+    "drawer-open",
+    "settings-open",
+    "offline",
+    "syncing",
+    "conflict",
+    "empty",
+    "populated"
+  ]
+}

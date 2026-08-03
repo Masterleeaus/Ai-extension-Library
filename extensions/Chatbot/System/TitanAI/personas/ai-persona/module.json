@@ -1,0 +1,14 @@
+{
+  "id": "ai-persona",
+  "name": "Ai Persona",
+  "tier": 0,
+  "role": "runtime",
+  "system_ai_chat": true,
+  "cleaning_scope": true,
+  "operational_writes": "workcore_only",
+  "source_metadata": {
+    "name": "AI Persona",
+    "version": "2.9",
+    "description": "AI Persona extension for magicai — TG: @heew_support"
+  }
+}

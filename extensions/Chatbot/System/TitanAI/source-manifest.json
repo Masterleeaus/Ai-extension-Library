@@ -1,0 +1,54 @@
+{
+  "name": "Titan Cleaning AI Five-Tier System",
+  "version": "9.0.0-pass9",
+  "scope": "cleaning-only",
+  "hierarchy": {
+    "tier0": "Titan Zero",
+    "tier1": "Managers",
+    "tier2": "Assistants and vertical specialists",
+    "tier3": "Atomic agents",
+    "tier4": "Tools, channels and features"
+  },
+  "counts": {
+    "managers": 8,
+    "assistants": 14,
+    "agents": 39,
+    "tools": 29,
+    "channels": 13,
+    "features": 21
+  },
+  "added_modules": [
+    "elevenlabs-voice-chat",
+    "openai-realtime-chat",
+    "ai-persona",
+    "model-council",
+    "multi-model",
+    "open-router",
+    "social-media-automation",
+    "blog-pilot",
+    "seo",
+    "social-media",
+    "ai-product-shot",
+    "nano-banana",
+    "advanced-image",
+    "ai-photoshoot"
+  ],
+  "image_creation": {
+    "features": [
+      "image-generation",
+      "product-shots",
+      "photo-shoot"
+    ],
+    "providers": [
+      "nano-banana",
+      "openai",
+      "fal-ai",
+      "clipdrop",
+      "freepik",
+      "novita",
+      "pebblely"
+    ],
+    "analysis_feature": "visual-inspector",
+    "rule": "Visual Inspector analyses evidence; image-creation features generate or edit media."
+  }
+}

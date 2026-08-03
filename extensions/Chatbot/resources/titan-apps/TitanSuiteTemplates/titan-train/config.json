@@ -1,0 +1,59 @@
+{
+  "name": "Titan Train",
+  "slug": "titan-train",
+  "type": "workforce-learning",
+  "description": "Guided cleaner onboarding, assessment, competency and job-readiness workspace.",
+  "icon": "🎓",
+  "color": "#4f46e5",
+  "theme": {
+    "primary": "#4f46e5",
+    "gradient": "linear-gradient(135deg, #4f46e5, #7c3aed)"
+  },
+  "wizard_steps": ["Configure", "Curriculum", "Assign", "Deliver", "Review"],
+  "features": [
+    "cleaner-foundation",
+    "guided-lessons",
+    "knowledge-assessment",
+    "practical-sign-off",
+    "competency-wallet",
+    "certificates",
+    "readiness",
+    "managed-training-channels",
+    "persistent-chat",
+    "online-only"
+  ],
+  "chatbot": {
+    "name": "Titan Train Coach",
+    "role": "Approved workforce learning and competency coach",
+    "system_prompt": "Guide learners through approved Titan Train content. Explain clearly, cite approved procedures where available, and never change pass criteria, grant practical competence, or bypass trainer approval.",
+    "suggested_prompts": [
+      "What training do I need next?",
+      "Show my cleaner foundation progress",
+      "Am I ready for cleaning work?"
+    ],
+    "context_fields": ["assignment_id", "program_id", "lesson_id", "assessment_id", "training_channel_id"]
+  },
+  "ui_components": {
+    "dashboard": "TitanTrainWorkspace",
+    "detail_view": "TitanTrainAssignment",
+    "actions": ["open_lesson", "complete_lesson", "start_assessment", "open_training_channel"]
+  },
+  "api_routes": [
+    "GET /api/v1/titan-train/pwa/bootstrap",
+    "GET /api/v1/titan-train/assignments",
+    "GET /api/v1/titan-train/assignments/{assignment}",
+    "POST /api/v1/titan-train/assignments/{assignment}/lessons/{lesson}/complete",
+    "POST /api/v1/titan-train/assignments/{assignment}/assessments/{assessment}/start",
+    "POST /api/v1/titan-train/attempts/{attempt}/submit"
+  ],
+  "permissions": {
+    "camera": false,
+    "background_sync": false,
+    "notification": true,
+    "online_connection": true
+  },
+  "storage": {
+    "local_tables": [],
+    "server_authoritative": true
+  }
+}

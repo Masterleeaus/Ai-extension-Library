@@ -1,0 +1,221 @@
+{
+  "schema_version": "1.0.0",
+  "identity": {
+    "name": "Titan Go",
+    "slug": "titan-go",
+    "icon": "go",
+    "accent": "var(--lqd-ext-chat-primary)"
+  },
+  "navigation": {
+    "default_view": "today",
+    "primary": [
+      {
+        "id": "today",
+        "label": "Today",
+        "icon": "today",
+        "offline": true
+      },
+      {
+        "id": "jobs",
+        "label": "Jobs",
+        "icon": "jobs",
+        "offline": true
+      },
+      {
+        "id": "capture",
+        "label": "Capture",
+        "icon": "capture",
+        "offline": true
+      },
+      {
+        "id": "queue",
+        "label": "Queue",
+        "icon": "queue",
+        "offline": true
+      }
+    ],
+    "drawer": [
+      {
+        "id": "schedule",
+        "label": "Schedule",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "customers",
+        "label": "Customers",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "premises",
+        "label": "Premises",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "checklists",
+        "label": "Checklists",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "forms",
+        "label": "Forms",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "time-entries",
+        "label": "Time entries",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "supplies",
+        "label": "Supplies",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "knowledge",
+        "label": "Knowledge",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "notifications",
+        "label": "Notifications",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "offline-packs",
+        "label": "Offline packs",
+        "icon": "chevron-right",
+        "offline": true
+      }
+    ],
+    "header_actions": [
+      "sync",
+      "notifications",
+      "settings"
+    ]
+  },
+  "home": {
+    "widgets": [
+      "next_job",
+      "day_timeline",
+      "job_alerts",
+      "pending_sync"
+    ],
+    "quick_actions": [
+      "jobs",
+      "capture"
+    ]
+  },
+  "chat": {
+    "persistent": true,
+    "role": "Titan Go",
+    "suggested_prompts": [
+      "What should I do next?",
+      "Summarise this job",
+      "Report an issue"
+    ],
+    "context_policy": {
+      "minimum_scope": true,
+      "send_full_record": false,
+      "requires_permission": true
+    }
+  },
+  "workcore": {
+    "domains": [
+      "Operations",
+      "Scheduling",
+      "CRM",
+      "Premises",
+      "Forms",
+      "Inventory",
+      "Knowledge"
+    ],
+    "commands": [
+      "job_arrive",
+      "job_start",
+      "job_complete",
+      "capture_evidence"
+    ],
+    "read_models": [
+      "assigned_jobs",
+      "premises",
+      "checklists",
+      "forms",
+      "knowledge",
+      "attachments",
+      "time_entries"
+    ]
+  },
+  "offline": {
+    "records": [
+      "assigned_jobs",
+      "premises",
+      "checklists",
+      "forms",
+      "knowledge",
+      "attachments",
+      "time_entries"
+    ],
+    "packs": [
+      "titan-go-default"
+    ],
+    "retention": {
+      "completed_days": 30
+    },
+    "conflict_rules": {
+      "server_authoritative": true,
+      "preserve_local_copy": true
+    }
+  },
+  "permissions": [
+    "job_arrive",
+    "job_start",
+    "job_complete",
+    "capture_evidence"
+  ],
+  "privacy": {
+    "default_mode": "device-first",
+    "redact_before_cloud": true,
+    "attachment_confirmation": true,
+    "provider_allowlist": []
+  },
+  "notifications": [
+    "assignment",
+    "approval",
+    "sync_failure",
+    "conflict"
+  ],
+  "settings_sections": [
+    "ai-providers",
+    "privacy",
+    "device-security",
+    "offline-sync",
+    "workcore",
+    "permissions",
+    "notifications",
+    "channels",
+    "appearance",
+    "accessibility",
+    "diagnostics"
+  ],
+  "preview_states": [
+    "mobile",
+    "tablet",
+    "desktop",
+    "drawer-open",
+    "settings-open",
+    "offline",
+    "syncing",
+    "conflict",
+    "empty",
+    "populated"
+  ]
+}

@@ -1,0 +1,7 @@
+﻿{
+    "name":  "External Voice Chatbot",
+    "type":  "extension",
+    "version":  "2.3",
+    "description":  "external voice chatbot extension for magicai — TG: @heew_support",
+    "support_telegram":  "heew_support"
+}

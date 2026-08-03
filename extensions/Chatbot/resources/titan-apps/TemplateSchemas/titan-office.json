@@ -1,0 +1,227 @@
+{
+  "schema_version": "1.0.0",
+  "identity": {
+    "name": "Titan Office",
+    "slug": "titan-office",
+    "icon": "office",
+    "accent": "var(--lqd-ext-chat-primary)"
+  },
+  "navigation": {
+    "default_view": "documents",
+    "primary": [
+      {
+        "id": "documents",
+        "label": "Documents",
+        "icon": "documents",
+        "offline": true
+      },
+      {
+        "id": "time",
+        "label": "Time",
+        "icon": "time",
+        "offline": true
+      },
+      {
+        "id": "resources",
+        "label": "Resources",
+        "icon": "resources",
+        "offline": true
+      },
+      {
+        "id": "schedule",
+        "label": "Schedule",
+        "icon": "schedule",
+        "offline": true
+      }
+    ],
+    "drawer": [
+      {
+        "id": "quotes",
+        "label": "Quotes",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "contracts",
+        "label": "Contracts",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "agreements",
+        "label": "Agreements",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "proposals",
+        "label": "Proposals",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "signatures",
+        "label": "Signatures",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "templates",
+        "label": "Templates",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "versions",
+        "label": "Versions",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "audit-trail",
+        "label": "Audit trail",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "utilisation",
+        "label": "Utilisation",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "capacity",
+        "label": "Capacity",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "overtime",
+        "label": "Overtime",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "reports",
+        "label": "Reports",
+        "icon": "chevron-right",
+        "offline": false
+      }
+    ],
+    "header_actions": [
+      "sync",
+      "notifications",
+      "settings"
+    ]
+  },
+  "home": {
+    "widgets": [
+      "recent_documents",
+      "awaiting_signatures",
+      "unsubmitted_time",
+      "capacity_warnings"
+    ],
+    "quick_actions": [
+      "time",
+      "resources"
+    ]
+  },
+  "chat": {
+    "persistent": true,
+    "role": "Titan Office",
+    "suggested_prompts": [
+      "Generate a quote",
+      "Summarise this contract",
+      "Find available resources"
+    ],
+    "context_policy": {
+      "minimum_scope": true,
+      "send_full_record": false,
+      "requires_permission": true
+    }
+  },
+  "workcore": {
+    "domains": [
+      "Documents",
+      "Finance",
+      "Workforce",
+      "Scheduling",
+      "Operations"
+    ],
+    "commands": [
+      "create_document",
+      "log_time",
+      "allocate_resource",
+      "request_signature"
+    ],
+    "read_models": [
+      "document_drafts",
+      "approved_templates",
+      "time_drafts",
+      "resource_summaries",
+      "pending_signatures"
+    ]
+  },
+  "offline": {
+    "records": [
+      "document_drafts",
+      "approved_templates",
+      "time_drafts",
+      "resource_summaries",
+      "pending_signatures"
+    ],
+    "packs": [
+      "titan-office-default"
+    ],
+    "retention": {
+      "completed_days": 30
+    },
+    "conflict_rules": {
+      "server_authoritative": true,
+      "preserve_local_copy": true
+    }
+  },
+  "permissions": [
+    "create_document",
+    "log_time",
+    "allocate_resource",
+    "request_signature"
+  ],
+  "privacy": {
+    "default_mode": "device-first",
+    "redact_before_cloud": true,
+    "attachment_confirmation": true,
+    "provider_allowlist": []
+  },
+  "notifications": [
+    "assignment",
+    "approval",
+    "sync_failure",
+    "conflict"
+  ],
+  "settings_sections": [
+    "ai-providers",
+    "privacy",
+    "device-security",
+    "offline-sync",
+    "workcore",
+    "permissions",
+    "notifications",
+    "channels",
+    "appearance",
+    "accessibility",
+    "diagnostics"
+  ],
+  "preview_states": [
+    "mobile",
+    "tablet",
+    "desktop",
+    "drawer-open",
+    "settings-open",
+    "offline",
+    "syncing",
+    "conflict",
+    "empty",
+    "populated"
+  ]
+}

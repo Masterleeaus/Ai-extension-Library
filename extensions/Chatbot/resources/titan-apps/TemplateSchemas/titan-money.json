@@ -1,0 +1,209 @@
+{
+  "schema_version": "1.0.0",
+  "identity": {
+    "name": "Titan Money",
+    "slug": "titan-money",
+    "icon": "money",
+    "accent": "var(--lqd-ext-chat-primary)"
+  },
+  "navigation": {
+    "default_view": "overview",
+    "primary": [
+      {
+        "id": "overview",
+        "label": "Overview",
+        "icon": "overview",
+        "offline": true
+      },
+      {
+        "id": "invoices",
+        "label": "Invoices",
+        "icon": "invoices",
+        "offline": true
+      },
+      {
+        "id": "payments",
+        "label": "Payments",
+        "icon": "payments",
+        "offline": true
+      },
+      {
+        "id": "expenses",
+        "label": "Expenses",
+        "icon": "expenses",
+        "offline": true
+      }
+    ],
+    "drawer": [
+      {
+        "id": "quotes",
+        "label": "Quotes",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "customers",
+        "label": "Customers",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "recurring-invoices",
+        "label": "Recurring invoices",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "overdue-accounts",
+        "label": "Overdue accounts",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "credit-notes",
+        "label": "Credit notes",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "approvals",
+        "label": "Approvals",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "reports",
+        "label": "Reports",
+        "icon": "chevron-right",
+        "offline": false
+      },
+      {
+        "id": "exports",
+        "label": "Exports",
+        "icon": "chevron-right",
+        "offline": false
+      },
+      {
+        "id": "tax",
+        "label": "Tax",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "audit-history",
+        "label": "Audit history",
+        "icon": "chevron-right",
+        "offline": true
+      }
+    ],
+    "header_actions": [
+      "sync",
+      "notifications",
+      "settings"
+    ]
+  },
+  "home": {
+    "widgets": [
+      "needs_attention",
+      "amount_due",
+      "overdue",
+      "recent_payments"
+    ],
+    "quick_actions": [
+      "invoices",
+      "payments"
+    ]
+  },
+  "chat": {
+    "persistent": true,
+    "role": "Titan Money",
+    "suggested_prompts": [
+      "Draft invoices from completed jobs",
+      "Show overdue accounts",
+      "Explain this balance"
+    ],
+    "context_policy": {
+      "minimum_scope": true,
+      "send_full_record": false,
+      "requires_permission": true
+    }
+  },
+  "workcore": {
+    "domains": [
+      "Finance",
+      "CRM",
+      "Operations"
+    ],
+    "commands": [
+      "create_invoice",
+      "record_payment",
+      "approve_expense",
+      "export_finance"
+    ],
+    "read_models": [
+      "invoice_summaries",
+      "payment_status",
+      "expense_drafts"
+    ]
+  },
+  "offline": {
+    "records": [
+      "invoice_summaries",
+      "payment_status",
+      "expense_drafts"
+    ],
+    "packs": [
+      "titan-money-default"
+    ],
+    "retention": {
+      "completed_days": 30
+    },
+    "conflict_rules": {
+      "server_authoritative": true,
+      "preserve_local_copy": true
+    }
+  },
+  "permissions": [
+    "create_invoice",
+    "record_payment",
+    "approve_expense",
+    "export_finance"
+  ],
+  "privacy": {
+    "default_mode": "device-first",
+    "redact_before_cloud": true,
+    "attachment_confirmation": true,
+    "provider_allowlist": []
+  },
+  "notifications": [
+    "assignment",
+    "approval",
+    "sync_failure",
+    "conflict"
+  ],
+  "settings_sections": [
+    "ai-providers",
+    "privacy",
+    "device-security",
+    "offline-sync",
+    "workcore",
+    "permissions",
+    "notifications",
+    "channels",
+    "appearance",
+    "accessibility",
+    "diagnostics"
+  ],
+  "preview_states": [
+    "mobile",
+    "tablet",
+    "desktop",
+    "drawer-open",
+    "settings-open",
+    "offline",
+    "syncing",
+    "conflict",
+    "empty",
+    "populated"
+  ]
+}

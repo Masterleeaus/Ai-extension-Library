@@ -1,0 +1,197 @@
+{
+  "schema_version": "1.0.0",
+  "identity": {
+    "name": "Titan Hub",
+    "slug": "titan-hub",
+    "icon": "hub",
+    "accent": "var(--lqd-ext-chat-primary)"
+  },
+  "navigation": {
+    "default_view": "home",
+    "primary": [
+      {
+        "id": "home",
+        "label": "Home",
+        "icon": "home",
+        "offline": true
+      },
+      {
+        "id": "bookings",
+        "label": "Bookings",
+        "icon": "bookings",
+        "offline": true
+      },
+      {
+        "id": "quotes",
+        "label": "Quotes",
+        "icon": "quotes",
+        "offline": true
+      },
+      {
+        "id": "payments",
+        "label": "Payments",
+        "icon": "payments",
+        "offline": true
+      }
+    ],
+    "drawer": [
+      {
+        "id": "messages",
+        "label": "Messages",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "service-history",
+        "label": "Service history",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "invoices",
+        "label": "Invoices",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "documents",
+        "label": "Documents",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "properties",
+        "label": "Properties",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "reviews",
+        "label": "Reviews",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "contact-company",
+        "label": "Contact company",
+        "icon": "chevron-right",
+        "offline": true
+      }
+    ],
+    "header_actions": [
+      "sync",
+      "notifications",
+      "settings"
+    ]
+  },
+  "home": {
+    "widgets": [
+      "upcoming_booking",
+      "quick_actions",
+      "service_timeline",
+      "amount_due"
+    ],
+    "quick_actions": [
+      "bookings",
+      "quotes"
+    ]
+  },
+  "chat": {
+    "persistent": true,
+    "role": "Titan Hub",
+    "suggested_prompts": [
+      "Book a service",
+      "Change my booking",
+      "Explain this quote"
+    ],
+    "context_policy": {
+      "minimum_scope": true,
+      "send_full_record": false,
+      "requires_permission": true
+    }
+  },
+  "workcore": {
+    "domains": [
+      "CRM",
+      "Scheduling",
+      "Finance",
+      "Reviews",
+      "Premises"
+    ],
+    "commands": [
+      "request_booking",
+      "approve_quote",
+      "view_invoice",
+      "submit_review"
+    ],
+    "read_models": [
+      "customer_profile",
+      "bookings",
+      "quotes",
+      "invoices",
+      "service_history"
+    ]
+  },
+  "offline": {
+    "records": [
+      "customer_profile",
+      "bookings",
+      "quotes",
+      "invoices",
+      "service_history"
+    ],
+    "packs": [
+      "titan-hub-default"
+    ],
+    "retention": {
+      "completed_days": 30
+    },
+    "conflict_rules": {
+      "server_authoritative": true,
+      "preserve_local_copy": true
+    }
+  },
+  "permissions": [
+    "request_booking",
+    "approve_quote",
+    "view_invoice",
+    "submit_review"
+  ],
+  "privacy": {
+    "default_mode": "device-first",
+    "redact_before_cloud": true,
+    "attachment_confirmation": true,
+    "provider_allowlist": []
+  },
+  "notifications": [
+    "assignment",
+    "approval",
+    "sync_failure",
+    "conflict"
+  ],
+  "settings_sections": [
+    "ai-providers",
+    "privacy",
+    "device-security",
+    "offline-sync",
+    "workcore",
+    "permissions",
+    "notifications",
+    "channels",
+    "appearance",
+    "accessibility",
+    "diagnostics"
+  ],
+  "preview_states": [
+    "mobile",
+    "tablet",
+    "desktop",
+    "drawer-open",
+    "settings-open",
+    "offline",
+    "syncing",
+    "conflict",
+    "empty",
+    "populated"
+  ]
+}

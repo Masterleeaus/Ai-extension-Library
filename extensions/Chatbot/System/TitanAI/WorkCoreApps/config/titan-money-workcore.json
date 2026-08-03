@@ -1,0 +1,49 @@
+{
+  "app_slug": "titan-money",
+  "app_name": "Titan Money",
+  "workcore_enabled": true,
+  "workcore_authority": true,
+  "offline_first": true,
+  "domain": "finance",
+  "workcore": {
+    "read_tools": [
+      "workcore.quotes.list",
+      "workcore.invoices.list",
+      "workcore.invoices.show",
+      "workcore.payments.list",
+      "workcore.expenses.list",
+      "workcore.finance.summary"
+    ],
+    "action_tools": [
+      "workcore.quote.create",
+      "workcore.quote.send",
+      "workcore.invoice.create",
+      "workcore.invoice.send",
+      "workcore.payment.record_cash",
+      "workcore.payment.record_declaration",
+      "workcore.expense.create"
+    ],
+    "requires_tenant_context": true,
+    "requires_actor_context": true,
+    "idempotent_actions": true,
+    "confirmation_for_high_risk": true
+  },
+  "offline_projection": {
+    "stores": [
+      "quotes",
+      "invoices",
+      "invoice_items",
+      "payment_status",
+      "expenses",
+      "pricing_rules"
+    ],
+    "writes_are_provisional": true,
+    "sync_via": "chatbot_outbox",
+    "conflicts_via": "chatbot_conflict_centre"
+  },
+  "governance": {
+    "executor": "GovernedToolExecutor",
+    "fact_verification": "WorkCoreFactVerifier",
+    "risk_classification": true
+  }
+}

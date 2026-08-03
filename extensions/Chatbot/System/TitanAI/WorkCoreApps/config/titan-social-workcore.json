@@ -1,0 +1,43 @@
+{
+  "app_slug": "titan-social",
+  "app_name": "Titan Social",
+  "workcore_enabled": true,
+  "workcore_authority": true,
+  "offline_first": true,
+  "domain": "social",
+  "workcore": {
+    "read_tools": [
+      "workcore.social.accounts",
+      "workcore.social.posts",
+      "workcore.social.analytics",
+      "workcore.marketing.calendar"
+    ],
+    "action_tools": [
+      "workcore.social.post_draft",
+      "workcore.social.post_approve",
+      "workcore.social.post_schedule",
+      "workcore.social.reply_queue"
+    ],
+    "requires_tenant_context": true,
+    "requires_actor_context": true,
+    "idempotent_actions": true,
+    "confirmation_for_high_risk": true
+  },
+  "offline_projection": {
+    "stores": [
+      "social_accounts",
+      "post_drafts",
+      "content_calendar",
+      "templates",
+      "queued_replies"
+    ],
+    "writes_are_provisional": true,
+    "sync_via": "chatbot_outbox",
+    "conflicts_via": "chatbot_conflict_centre"
+  },
+  "governance": {
+    "executor": "GovernedToolExecutor",
+    "fact_verification": "WorkCoreFactVerifier",
+    "risk_classification": true
+  }
+}

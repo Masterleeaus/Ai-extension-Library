@@ -1,0 +1,47 @@
+{
+  "app_slug": "titan-front-desk",
+  "app_name": "Titan Front Desk",
+  "workcore_enabled": true,
+  "workcore_authority": true,
+  "offline_first": true,
+  "domain": "reception",
+  "workcore": {
+    "read_tools": [
+      "workcore.customers.search",
+      "workcore.customers.show",
+      "workcore.jobs.list",
+      "workcore.schedule.availability",
+      "workcore.conversations.list"
+    ],
+    "action_tools": [
+      "workcore.customer.create",
+      "workcore.customer.update",
+      "workcore.booking.create",
+      "workcore.booking.reschedule",
+      "workcore.callback.create",
+      "workcore.message.customer"
+    ],
+    "requires_tenant_context": true,
+    "requires_actor_context": true,
+    "idempotent_actions": true,
+    "confirmation_for_high_risk": true
+  },
+  "offline_projection": {
+    "stores": [
+      "customers",
+      "properties",
+      "availability_snapshots",
+      "bookings",
+      "callbacks",
+      "conversations"
+    ],
+    "writes_are_provisional": true,
+    "sync_via": "chatbot_outbox",
+    "conflicts_via": "chatbot_conflict_centre"
+  },
+  "governance": {
+    "executor": "GovernedToolExecutor",
+    "fact_verification": "WorkCoreFactVerifier",
+    "risk_classification": true
+  }
+}

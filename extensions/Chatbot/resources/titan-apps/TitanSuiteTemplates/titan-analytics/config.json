@@ -1,0 +1,13 @@
+{
+  "name": "Titan Analytics",
+  "slug": "titan-analytics",
+  "type": "analytics-bi",
+  "description": "Analytics and business intelligence",
+  "icon": "📊",
+  "color": "#06b6d4",
+  "features": ["kpi-dashboard", "revenue-trends", "reports", "forecasting", "chatbot"],
+  "chatbot": {
+    "name": "Titan Analytics Assistant",
+    "system_prompt": "You are a business intelligence assistant helping analyze metrics, generate reports, and identify trends."
+  }
+}

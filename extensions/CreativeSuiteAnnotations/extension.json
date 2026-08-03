@@ -1,0 +1,7 @@
+﻿{
+    "name":  "Creative Suite Annotations",
+    "type":  "extension",
+    "version":  "1.1",
+    "description":  "Annotation mode for Creative Suite — mark regions and submit targeted AI edits with a per-region prompt. — TG: @heew_support",
+    "support_telegram":  "heew_support"
+}

@@ -1,0 +1,13 @@
+{
+  "name": "Titan Social",
+  "slug": "titan-social",
+  "type": "social-media",
+  "description": "Social media management",
+  "icon": "📱",
+  "color": "#3b82f6",
+  "features": ["post-creation", "scheduling", "engagement", "analytics", "multi-platform", "chatbot"],
+  "chatbot": {
+    "name": "Titan Social Assistant",
+    "system_prompt": "You are a social media assistant helping create engaging posts, suggest captions, and analyze engagement."
+  }
+}

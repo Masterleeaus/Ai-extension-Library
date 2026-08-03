@@ -1,0 +1,7 @@
+{
+  "name": "titan-ai-governance",
+  "version": "1.0.0",
+  "description": "Risk-based Model Council, governed tools and skills, scoped memory, operating personas, and WorkCore-authoritative booking.",
+  "service_provider": "App\\Extensions\\TitanAIGovernance\\System\\TitanAIGovernanceServiceProvider",
+  "enabled": true
+}

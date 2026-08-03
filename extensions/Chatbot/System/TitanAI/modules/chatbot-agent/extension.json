@@ -1,0 +1,7 @@
+{
+  "name": "Chatbot agent",
+  "type": "extension",
+  "version": "3.0.0",
+  "description": "Chatbot agent extension for magicai — TG: @heew_support",
+  "support_telegram": "heew_support"
+}

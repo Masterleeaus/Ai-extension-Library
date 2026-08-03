@@ -1,0 +1,213 @@
+{
+  "schema_version": "1.0.0",
+  "identity": {
+    "name": "Titan Dispatch",
+    "slug": "titan-dispatch",
+    "icon": "dispatch",
+    "accent": "var(--lqd-ext-chat-primary)"
+  },
+  "navigation": {
+    "default_view": "board",
+    "primary": [
+      {
+        "id": "board",
+        "label": "Board",
+        "icon": "board",
+        "offline": true
+      },
+      {
+        "id": "schedule",
+        "label": "Schedule",
+        "icon": "schedule",
+        "offline": true
+      },
+      {
+        "id": "map",
+        "label": "Map",
+        "icon": "map",
+        "offline": true
+      },
+      {
+        "id": "exceptions",
+        "label": "Exceptions",
+        "icon": "exceptions",
+        "offline": true
+      }
+    ],
+    "drawer": [
+      {
+        "id": "jobs",
+        "label": "Jobs",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "workers",
+        "label": "Workers",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "teams",
+        "label": "Teams",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "territories",
+        "label": "Territories",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "availability",
+        "label": "Availability",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "approvals",
+        "label": "Approvals",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "incidents",
+        "label": "Incidents",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "routes",
+        "label": "Routes",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "reports",
+        "label": "Reports",
+        "icon": "chevron-right",
+        "offline": false
+      },
+      {
+        "id": "offline-board",
+        "label": "Offline board",
+        "icon": "chevron-right",
+        "offline": true
+      }
+    ],
+    "header_actions": [
+      "sync",
+      "notifications",
+      "settings"
+    ]
+  },
+  "home": {
+    "widgets": [
+      "unassigned_jobs",
+      "active_jobs",
+      "worker_availability",
+      "exceptions"
+    ],
+    "quick_actions": [
+      "schedule",
+      "map"
+    ]
+  },
+  "chat": {
+    "persistent": true,
+    "role": "Titan Dispatch",
+    "suggested_prompts": [
+      "Find a worker for this job",
+      "Resolve today’s conflicts",
+      "Show jobs at risk"
+    ],
+    "context_policy": {
+      "minimum_scope": true,
+      "send_full_record": false,
+      "requires_permission": true
+    }
+  },
+  "workcore": {
+    "domains": [
+      "Dispatch",
+      "Scheduling",
+      "Operations",
+      "Workforce",
+      "Territories"
+    ],
+    "commands": [
+      "assign_job",
+      "reassign_job",
+      "approve_schedule_change"
+    ],
+    "read_models": [
+      "dispatch_board",
+      "active_schedule",
+      "worker_summaries",
+      "territories",
+      "exceptions"
+    ]
+  },
+  "offline": {
+    "records": [
+      "dispatch_board",
+      "active_schedule",
+      "worker_summaries",
+      "territories",
+      "exceptions"
+    ],
+    "packs": [
+      "titan-dispatch-default"
+    ],
+    "retention": {
+      "completed_days": 30
+    },
+    "conflict_rules": {
+      "server_authoritative": true,
+      "preserve_local_copy": true
+    }
+  },
+  "permissions": [
+    "assign_job",
+    "reassign_job",
+    "approve_schedule_change"
+  ],
+  "privacy": {
+    "default_mode": "device-first",
+    "redact_before_cloud": true,
+    "attachment_confirmation": true,
+    "provider_allowlist": []
+  },
+  "notifications": [
+    "assignment",
+    "approval",
+    "sync_failure",
+    "conflict"
+  ],
+  "settings_sections": [
+    "ai-providers",
+    "privacy",
+    "device-security",
+    "offline-sync",
+    "workcore",
+    "permissions",
+    "notifications",
+    "channels",
+    "appearance",
+    "accessibility",
+    "diagnostics"
+  ],
+  "preview_states": [
+    "mobile",
+    "tablet",
+    "desktop",
+    "drawer-open",
+    "settings-open",
+    "offline",
+    "syncing",
+    "conflict",
+    "empty",
+    "populated"
+  ]
+}

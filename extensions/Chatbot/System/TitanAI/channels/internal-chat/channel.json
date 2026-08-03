@@ -1,0 +1,16 @@
+{
+  "id": "internal-chat",
+  "name": "Internal Chat",
+  "type": "communication-channel",
+  "tier": 3,
+  "system_ai_chat": true,
+  "capabilities": [
+    "messages",
+    "threads",
+    "mentions",
+    "attachments",
+    "presence"
+  ],
+  "authority": "transport-only",
+  "rule": "Channel transports messages. It does not choose business actions or write operational records."
+}

@@ -1,0 +1,209 @@
+{
+  "schema_version": "1.0.0",
+  "identity": {
+    "name": "Titan Teams",
+    "slug": "titan-teams",
+    "icon": "teams",
+    "accent": "var(--lqd-ext-chat-primary)"
+  },
+  "navigation": {
+    "default_view": "team",
+    "primary": [
+      {
+        "id": "team",
+        "label": "Team",
+        "icon": "team",
+        "offline": true
+      },
+      {
+        "id": "roster",
+        "label": "Roster",
+        "icon": "roster",
+        "offline": true
+      },
+      {
+        "id": "attendance",
+        "label": "Attendance",
+        "icon": "attendance",
+        "offline": true
+      },
+      {
+        "id": "requests",
+        "label": "Requests",
+        "icon": "requests",
+        "offline": true
+      }
+    ],
+    "drawer": [
+      {
+        "id": "availability",
+        "label": "Availability",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "leave",
+        "label": "Leave",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "skills",
+        "label": "Skills",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "qualifications",
+        "label": "Qualifications",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "certifications",
+        "label": "Certifications",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "performance",
+        "label": "Performance",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "documents",
+        "label": "Documents",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "announcements",
+        "label": "Announcements",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "compliance",
+        "label": "Compliance",
+        "icon": "chevron-right",
+        "offline": true
+      }
+    ],
+    "header_actions": [
+      "sync",
+      "notifications",
+      "settings"
+    ]
+  },
+  "home": {
+    "widgets": [
+      "team_status",
+      "roster_gaps",
+      "attendance_exceptions",
+      "pending_requests"
+    ],
+    "quick_actions": [
+      "roster",
+      "attendance"
+    ]
+  },
+  "chat": {
+    "persistent": true,
+    "role": "Titan Teams",
+    "suggested_prompts": [
+      "Find roster gaps",
+      "Show expiring certifications",
+      "Who is available Friday?"
+    ],
+    "context_policy": {
+      "minimum_scope": true,
+      "send_full_record": false,
+      "requires_permission": true
+    }
+  },
+  "workcore": {
+    "domains": [
+      "Workforce",
+      "Rosters",
+      "Attendance",
+      "Credentials",
+      "Compliance"
+    ],
+    "commands": [
+      "view_team",
+      "edit_roster",
+      "record_attendance",
+      "approve_request"
+    ],
+    "read_models": [
+      "team_summary",
+      "roster",
+      "attendance_drafts",
+      "requests",
+      "certification_summaries"
+    ]
+  },
+  "offline": {
+    "records": [
+      "team_summary",
+      "roster",
+      "attendance_drafts",
+      "requests",
+      "certification_summaries"
+    ],
+    "packs": [
+      "titan-teams-default"
+    ],
+    "retention": {
+      "completed_days": 30
+    },
+    "conflict_rules": {
+      "server_authoritative": true,
+      "preserve_local_copy": true
+    }
+  },
+  "permissions": [
+    "view_team",
+    "edit_roster",
+    "record_attendance",
+    "approve_request"
+  ],
+  "privacy": {
+    "default_mode": "device-first",
+    "redact_before_cloud": true,
+    "attachment_confirmation": true,
+    "provider_allowlist": []
+  },
+  "notifications": [
+    "assignment",
+    "approval",
+    "sync_failure",
+    "conflict"
+  ],
+  "settings_sections": [
+    "ai-providers",
+    "privacy",
+    "device-security",
+    "offline-sync",
+    "workcore",
+    "permissions",
+    "notifications",
+    "channels",
+    "appearance",
+    "accessibility",
+    "diagnostics"
+  ],
+  "preview_states": [
+    "mobile",
+    "tablet",
+    "desktop",
+    "drawer-open",
+    "settings-open",
+    "offline",
+    "syncing",
+    "conflict",
+    "empty",
+    "populated"
+  ]
+}

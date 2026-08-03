@@ -1,0 +1,7 @@
+{
+  "name": "Agent Messaging",
+  "type": "extension",
+  "version": "1.0.0",
+  "description": "Unified messaging channels: WhatsApp, Telegram, Instagram, Messenger, SMS/Text messaging. For AI Agents.",
+  "support_telegram": "heew_support"
+}

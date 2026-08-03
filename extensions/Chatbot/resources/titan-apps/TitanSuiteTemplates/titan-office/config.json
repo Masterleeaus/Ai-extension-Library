@@ -1,0 +1,150 @@
+{
+  "name": "Titan Office",
+  "slug": "titan-office",
+  "type": "document-time-resource",
+  "version": "1.0.0",
+  "description": "Document management, contracts, time tracking, and resource allocation",
+  "icon": "📋",
+  "color": "#3b82f6",
+  "theme": {
+    "primary": "#3b82f6",
+    "gradient": "linear-gradient(135deg, #3b82f6, #2563eb)"
+  },
+  "wizard_steps": [
+    "Configure",
+    "Customize",
+    "Train",
+    "Deploy",
+    "Launch"
+  ],
+  "features": [
+    "document-generation",
+    "quote-templates",
+    "contract-management",
+    "service-agreements",
+    "digital-signatures",
+    "version-control",
+    "document-storage",
+    "document-audit-trail",
+    "time-tracking",
+    "utilization-monitoring",
+    "resource-allocation",
+    "capacity-planning",
+    "shift-scheduling",
+    "overtime-management",
+    "chatbot"
+  ],
+  "chatbot": {
+    "name": "Titan Office Assistant",
+    "role": "Document management, contracts, time and resource allocation",
+    "system_prompt": "You are an office management assistant. Your role is to:\n- Generate quotes, contracts, and service agreements from templates\n- Manage document versions and digital signatures\n- Track document audit trails\n- Monitor employee time and utilization\n- Allocate resources optimally\n- Plan capacity based on staff availability\n- Manage shift scheduling\n- Track overtime and labor costs\n\nBalance document compliance with operational efficiency.",
+    "suggested_prompts": [
+      "Generate quote",
+      "Create contract",
+      "Add signature",
+      "Log time",
+      "Check utilization",
+      "Allocate resource",
+      "Schedule shift",
+      "Forecast capacity"
+    ]
+  },
+  "tier1_manager": "OperationsManager",
+  "tier2_specialists": [
+    "DocumentSpecialist",
+    "ContractSpecialist",
+    "TimeTrackingSpecialist",
+    "ResourceAllocationSpecialist"
+  ],
+  "tier3_actions": [
+    "CreateQuoteTemplateAgent",
+    "GenerateQuoteAgent",
+    "CreateContractAgent",
+    "CreateServiceAgreementAgent",
+    "GenerateProposalAgent",
+    "AddDigitalSignatureAgent",
+    "VersionDocumentAgent",
+    "ArchiveDocumentAgent",
+    "GenerateDocumentReportAgent",
+    "LogTimeAgent",
+    "TrackUtilizationAgent",
+    "AllocateResourcesAgent",
+    "PredictCapacityAgent",
+    "OptimizeScheduleAgent",
+    "AlertOverallocationAgent",
+    "GenerateUtilizationReportAgent"
+  ],
+  "database": {
+    "tables": [
+      "documents",
+      "document_templates",
+      "quotes",
+      "contracts",
+      "service_agreements",
+      "proposals",
+      "digital_signatures",
+      "document_versions",
+      "time_logs",
+      "time_tracking",
+      "resource_allocations",
+      "shift_schedules",
+      "capacity_forecasts",
+      "utilization_metrics"
+    ]
+  },
+  "permissions": [
+    "document:create",
+    "document:read",
+    "document:update",
+    "document:delete",
+    "document:sign",
+    "document:version",
+    "quote:generate",
+    "contract:create",
+    "time:log",
+    "time:read",
+    "resource:allocate",
+    "resource:read",
+    "schedule:manage"
+  ],
+  "models": [
+    "Document",
+    "DocumentTemplate",
+    "Quote",
+    "Contract",
+    "ServiceAgreement",
+    "Proposal",
+    "DigitalSignature",
+    "DocumentVersion",
+    "TimeLog",
+    "ResourceAllocation",
+    "ShiftSchedule",
+    "CapacityForecast"
+  ],
+  "settings": {
+    "document_templates": {
+      "quote_template": "standard",
+      "contract_template": "service_agreement",
+      "proposal_template": "sales_proposal"
+    },
+    "time_tracking": {
+      "auto_clock_in": false,
+      "geolocation_required": false,
+      "photo_required": false,
+      "minimum_billable_unit": 0.25
+    },
+    "resource_allocation": {
+      "auto_allocation": false,
+      "consider_skills": true,
+      "consider_availability": true,
+      "consider_workload": true
+    },
+    "capacity_planning": {
+      "forecast_days": 30,
+      "alert_threshold_percent": 85,
+      "consider_overtime": true
+    },
+    "document_retention_days": 2555,
+    "digital_signature_provider": "docusign"
+  }
+}

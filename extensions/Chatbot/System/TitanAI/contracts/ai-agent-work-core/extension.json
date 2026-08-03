@@ -1,0 +1,7 @@
+{
+  "name": "AI Agent WorkCore",
+  "type": "extension",
+  "version": "1.0.0",
+  "description": "AI Agent access to WorkCore: CRM, Projects, Jobs, Invoicing, Time Tracking, Scheduling, and Field Operations.",
+  "support_telegram": "heew_support"
+}

@@ -1,0 +1,46 @@
+{
+  "app_slug": "titan-locker",
+  "app_name": "Titan Locker",
+  "workcore_enabled": true,
+  "workcore_authority": true,
+  "offline_first": true,
+  "domain": "inventory",
+  "workcore": {
+    "read_tools": [
+      "workcore.inventory.items",
+      "workcore.inventory.stock",
+      "workcore.equipment.list",
+      "workcore.suppliers.list",
+      "workcore.materials.usage"
+    ],
+    "action_tools": [
+      "workcore.inventory.adjust",
+      "workcore.inventory.transfer",
+      "workcore.material.consume",
+      "workcore.equipment.assign",
+      "workcore.reorder.request"
+    ],
+    "requires_tenant_context": true,
+    "requires_actor_context": true,
+    "idempotent_actions": true,
+    "confirmation_for_high_risk": true
+  },
+  "offline_projection": {
+    "stores": [
+      "inventory_items",
+      "stock_snapshots",
+      "equipment",
+      "materials",
+      "usage",
+      "reorder_requests"
+    ],
+    "writes_are_provisional": true,
+    "sync_via": "chatbot_outbox",
+    "conflicts_via": "chatbot_conflict_centre"
+  },
+  "governance": {
+    "executor": "GovernedToolExecutor",
+    "fact_verification": "WorkCoreFactVerifier",
+    "risk_classification": true
+  }
+}

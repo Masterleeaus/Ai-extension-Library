@@ -1,0 +1,226 @@
+{
+  "schema_version": "1.0.0",
+  "identity": {
+    "name": "Titan Zero",
+    "slug": "titan-zero",
+    "icon": "zero",
+    "accent": "var(--lqd-ext-chat-primary)"
+  },
+  "navigation": {
+    "default_view": "briefing",
+    "primary": [
+      {
+        "id": "briefing",
+        "label": "Briefing",
+        "icon": "briefing",
+        "offline": true
+      },
+      {
+        "id": "operations",
+        "label": "Operations",
+        "icon": "operations",
+        "offline": true
+      },
+      {
+        "id": "approvals",
+        "label": "Approvals",
+        "icon": "approvals",
+        "offline": true
+      },
+      {
+        "id": "apps",
+        "label": "Apps",
+        "icon": "apps",
+        "offline": true
+      }
+    ],
+    "drawer": [
+      {
+        "id": "customers",
+        "label": "Customers",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "work",
+        "label": "Work",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "team",
+        "label": "Team",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "money",
+        "label": "Money",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "quality",
+        "label": "Quality",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "sales",
+        "label": "Sales",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "inventory",
+        "label": "Inventory",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "documents",
+        "label": "Documents",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "marketing",
+        "label": "Marketing",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "reports",
+        "label": "Reports",
+        "icon": "chevron-right",
+        "offline": false
+      },
+      {
+        "id": "agents",
+        "label": "Agents",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "automations",
+        "label": "Automations",
+        "icon": "chevron-right",
+        "offline": true
+      }
+    ],
+    "header_actions": [
+      "sync",
+      "notifications",
+      "settings"
+    ]
+  },
+  "home": {
+    "widgets": [
+      "attention_briefing",
+      "cross_app_exceptions",
+      "pending_approvals",
+      "app_status"
+    ],
+    "quick_actions": [
+      "operations",
+      "approvals"
+    ]
+  },
+  "chat": {
+    "persistent": true,
+    "role": "Titan Zero",
+    "suggested_prompts": [
+      "What needs my attention?",
+      "Summarise the business",
+      "Show unresolved risks"
+    ],
+    "context_policy": {
+      "minimum_scope": true,
+      "send_full_record": false,
+      "requires_permission": true
+    }
+  },
+  "workcore": {
+    "domains": [
+      "CRM",
+      "Operations",
+      "Dispatch",
+      "Finance",
+      "Workforce",
+      "Compliance",
+      "Inventory",
+      "Analytics"
+    ],
+    "commands": [
+      "view_business_briefing",
+      "approve_actions",
+      "switch_apps"
+    ],
+    "read_models": [
+      "briefings",
+      "approvals",
+      "exceptions",
+      "app_status"
+    ]
+  },
+  "offline": {
+    "records": [
+      "briefings",
+      "approvals",
+      "exceptions",
+      "app_status"
+    ],
+    "packs": [
+      "titan-zero-default"
+    ],
+    "retention": {
+      "completed_days": 30
+    },
+    "conflict_rules": {
+      "server_authoritative": true,
+      "preserve_local_copy": true
+    }
+  },
+  "permissions": [
+    "view_business_briefing",
+    "approve_actions",
+    "switch_apps"
+  ],
+  "privacy": {
+    "default_mode": "device-first",
+    "redact_before_cloud": true,
+    "attachment_confirmation": true,
+    "provider_allowlist": []
+  },
+  "notifications": [
+    "assignment",
+    "approval",
+    "sync_failure",
+    "conflict"
+  ],
+  "settings_sections": [
+    "ai-providers",
+    "privacy",
+    "device-security",
+    "offline-sync",
+    "workcore",
+    "permissions",
+    "notifications",
+    "channels",
+    "appearance",
+    "accessibility",
+    "diagnostics"
+  ],
+  "preview_states": [
+    "mobile",
+    "tablet",
+    "desktop",
+    "drawer-open",
+    "settings-open",
+    "offline",
+    "syncing",
+    "conflict",
+    "empty",
+    "populated"
+  ]
+}

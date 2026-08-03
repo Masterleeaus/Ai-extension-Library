@@ -1,0 +1,64 @@
+name: Materialize AI extensions
+
+on:
+  push:
+    branches:
+      - agent/import-ai-extensions
+    paths:
+      - .github/workflows/materialize-ai-extensions.yml
+      - scripts/restore_extensions.py
+      - transport/dataset-manifest.json
+  pull_request:
+    branches:
+      - main
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: materialize-ai-extensions-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  restore-and-commit:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.head_ref || github.ref_name }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install Parquet reader
+        run: python -m pip install --disable-pip-version-check pyarrow
+      - name: Restore and verify extension files
+        run: |
+          DATASET_URL=$(python -c "import json; print(json.load(open('transport/dataset-manifest.json'))['url'])")
+          python scripts/restore_extensions.py --clean --url "$DATASET_URL"
+      - name: Write materialisation summary
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          files = [path for path in Path('extensions').rglob('*') if path.is_file()]
+          size = sum(path.stat().st_size for path in files)
+          Path('MATERIALIZED.md').write_text(
+              f"# Materialised source tree\n\nFiles: **{len(files):,}**  \nBytes: **{size:,}**  \nSource: MiniUp lossless Parquet transport dataset.\n",
+              encoding='utf-8',
+          )
+          PY
+      - name: Commit materialised source
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add extensions MATERIALIZED.md docs/extension-inventory.csv docs/extension-inventory.json
+          if git diff --cached --quiet; then
+            echo "No source changes to commit"
+          else
+            git commit -m "Materialize 78 AI extensions"
+            git push origin HEAD:${{ github.head_ref || github.ref_name }}
+          fi

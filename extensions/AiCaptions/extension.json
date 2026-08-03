@@ -1,0 +1,7 @@
+﻿{
+    "name":  "AI Captions",
+    "type":  "extension",
+    "version":  "1.2",
+    "description":  "AI Captions extension for magicai — automatically add stylized animated captions to videos via the Captions API. — TG: @heew_support",
+    "support_telegram":  "heew_support"
+}

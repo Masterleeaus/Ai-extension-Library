@@ -1,0 +1,10 @@
+{
+  "id": "reviews",
+  "name": "Reviews",
+  "tier": 4,
+  "category": "system-ai-chat-feature",
+  "system_chat": "system-ai-chat",
+  "scope": "cleaning",
+  "enabled": true,
+  "operational_authority": "WorkCore API only"
+}

@@ -1,0 +1,7 @@
+﻿{
+    "name":  "OpenAI realtime chat",
+    "type":  "extension",
+    "version":  "1.10",
+    "description":  "OpenAI realtime chat extension for magicai — TG: @heew_support",
+    "support_telegram":  "heew_support"
+}

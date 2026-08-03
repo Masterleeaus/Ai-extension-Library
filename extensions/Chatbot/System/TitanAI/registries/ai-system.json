@@ -1,0 +1,537 @@
+{
+  "tier0": {
+    "name": "Titan Zero",
+    "path": "tier0/titan-zero",
+    "responsibility": "orchestration"
+  },
+  "managers": [
+    {
+      "class": "CustomerManager",
+      "path": "tier1/managers/CustomerManager.php"
+    },
+    {
+      "class": "FieldStaffManager",
+      "path": "tier1/managers/FieldStaffManager.php"
+    },
+    {
+      "class": "OperationsManager",
+      "path": "tier1/managers/OperationsManager.php"
+    },
+    {
+      "class": "SalesManager",
+      "path": "tier1/managers/SalesManager.php"
+    },
+    {
+      "class": "FinanceManager",
+      "path": "tier1/managers/FinanceManager.php"
+    },
+    {
+      "class": "QualitySafetyManager",
+      "path": "tier1/managers/QualitySafetyManager.php"
+    },
+    {
+      "class": "SuppliesEquipmentManager",
+      "path": "tier1/managers/SuppliesEquipmentManager.php"
+    },
+    {
+      "class": "MarketingManager",
+      "path": "tier1/managers/MarketingManager.php"
+    }
+  ],
+  "assistants": [
+    {
+      "class": "SchedulingAssistant",
+      "path": "tier2/assistants/SchedulingAssistant.php"
+    },
+    {
+      "class": "DispatchAssistant",
+      "path": "tier2/assistants/DispatchAssistant.php"
+    },
+    {
+      "class": "QuotingAssistant",
+      "path": "tier2/assistants/QuotingAssistant.php"
+    },
+    {
+      "class": "InvoicingAssistant",
+      "path": "tier2/assistants/InvoicingAssistant.php"
+    },
+    {
+      "class": "PaymentsAssistant",
+      "path": "tier2/assistants/PaymentsAssistant.php"
+    },
+    {
+      "class": "CustomerServiceAssistant",
+      "path": "tier2/assistants/CustomerServiceAssistant.php"
+    },
+    {
+      "class": "StaffCoordinationAssistant",
+      "path": "tier2/assistants/StaffCoordinationAssistant.php"
+    },
+    {
+      "class": "QualityInspectionAssistant",
+      "path": "tier2/assistants/QualityInspectionAssistant.php"
+    },
+    {
+      "class": "InventoryAssistant",
+      "path": "tier2/assistants/InventoryAssistant.php"
+    },
+    {
+      "class": "SafetyComplianceAssistant",
+      "path": "tier2/assistants/SafetyComplianceAssistant.php"
+    },
+    {
+      "class": "RecurringServicesAssistant",
+      "path": "tier2/assistants/RecurringServicesAssistant.php"
+    },
+    {
+      "class": "RoutePlanningAssistant",
+      "path": "tier2/assistants/RoutePlanningAssistant.php"
+    },
+    {
+      "class": "MarketingAssistant",
+      "path": "tier2/assistants/MarketingAssistant.php"
+    },
+    {
+      "class": "ReportingAssistant",
+      "path": "tier2/assistants/ReportingAssistant.php"
+    }
+  ],
+  "agents": [
+    {
+      "class": "BookJobAgent",
+      "path": "tier3/agents/Actions/BookJobAgent.php"
+    },
+    {
+      "class": "RescheduleJobAgent",
+      "path": "tier3/agents/Actions/RescheduleJobAgent.php"
+    },
+    {
+      "class": "CancelJobAgent",
+      "path": "tier3/agents/Actions/CancelJobAgent.php"
+    },
+    {
+      "class": "AssignCleanerAgent",
+      "path": "tier3/agents/Actions/AssignCleanerAgent.php"
+    },
+    {
+      "class": "ReassignCleanerAgent",
+      "path": "tier3/agents/Actions/ReassignCleanerAgent.php"
+    },
+    {
+      "class": "CreateQuoteAgent",
+      "path": "tier3/agents/Actions/CreateQuoteAgent.php"
+    },
+    {
+      "class": "SendQuoteAgent",
+      "path": "tier3/agents/Actions/SendQuoteAgent.php"
+    },
+    {
+      "class": "AcceptQuoteAgent",
+      "path": "tier3/agents/Actions/AcceptQuoteAgent.php"
+    },
+    {
+      "class": "CreateInvoiceAgent",
+      "path": "tier3/agents/Actions/CreateInvoiceAgent.php"
+    },
+    {
+      "class": "SendInvoiceAgent",
+      "path": "tier3/agents/Actions/SendInvoiceAgent.php"
+    },
+    {
+      "class": "RecordPaymentAgent",
+      "path": "tier3/agents/Actions/RecordPaymentAgent.php"
+    },
+    {
+      "class": "SendPaymentReminderAgent",
+      "path": "tier3/agents/Actions/SendPaymentReminderAgent.php"
+    },
+    {
+      "class": "MarkJobCompleteAgent",
+      "path": "tier3/agents/Actions/MarkJobCompleteAgent.php"
+    },
+    {
+      "class": "RequestReviewAgent",
+      "path": "tier3/agents/Actions/RequestReviewAgent.php"
+    },
+    {
+      "class": "SendCustomerMessageAgent",
+      "path": "tier3/agents/Actions/SendCustomerMessageAgent.php"
+    },
+    {
+      "class": "CreateRecurringJobAgent",
+      "path": "tier3/agents/Actions/CreateRecurringJobAgent.php"
+    },
+    {
+      "class": "PauseRecurringServiceAgent",
+      "path": "tier3/agents/Actions/PauseRecurringServiceAgent.php"
+    },
+    {
+      "class": "RecordInspectionAgent",
+      "path": "tier3/agents/Actions/RecordInspectionAgent.php"
+    },
+    {
+      "class": "RecordIncidentAgent",
+      "path": "tier3/agents/Actions/RecordIncidentAgent.php"
+    },
+    {
+      "class": "UpdateStockAgent",
+      "path": "tier3/agents/Actions/UpdateStockAgent.php"
+    },
+    {
+      "class": "AllocateEquipmentAgent",
+      "path": "tier3/agents/Actions/AllocateEquipmentAgent.php"
+    },
+    {
+      "class": "UploadJobEvidenceAgent",
+      "path": "tier3/agents/Actions/UploadJobEvidenceAgent.php"
+    },
+    {
+      "class": "CreateCustomerAgent",
+      "path": "tier3/agents/Actions/CreateCustomerAgent.php"
+    },
+    {
+      "class": "UpdateCustomerAgent",
+      "path": "tier3/agents/Actions/UpdateCustomerAgent.php"
+    },
+    {
+      "class": "CreateLeadAgent",
+      "path": "tier3/agents/Actions/CreateLeadAgent.php"
+    },
+    {
+      "class": "CreateFollowUpAgent",
+      "path": "tier3/agents/Actions/CreateFollowUpAgent.php"
+    },
+    {
+      "class": "OptimiseRouteAgent",
+      "path": "tier3/agents/Actions/OptimiseRouteAgent.php"
+    },
+    {
+      "class": "NotifyCleanerAgent",
+      "path": "tier3/agents/Actions/NotifyCleanerAgent.php"
+    },
+    {
+      "class": "CreatePurchaseOrderAgent",
+      "path": "tier3/agents/Actions/CreatePurchaseOrderAgent.php"
+    },
+    {
+      "class": "ArchiveConversationAgent",
+      "path": "tier3/agents/Actions/ArchiveConversationAgent.php"
+    },
+    {
+      "class": "ApplyCustomerTagAgent",
+      "path": "tier3/agents/Actions/ApplyCustomerTagAgent.php"
+    },
+    {
+      "class": "PublishSocialPostAgent",
+      "path": "tier3/agents/Actions/PublishSocialPostAgent.php"
+    },
+    {
+      "class": "ScheduleSocialPostAgent",
+      "path": "tier3/agents/Actions/ScheduleSocialPostAgent.php"
+    },
+    {
+      "class": "GenerateBlogDraftAgent",
+      "path": "tier3/agents/Actions/GenerateBlogDraftAgent.php"
+    },
+    {
+      "class": "PublishBlogPostAgent",
+      "path": "tier3/agents/Actions/PublishBlogPostAgent.php"
+    },
+    {
+      "class": "GenerateMarketingImageAgent",
+      "path": "tier3/agents/Actions/GenerateMarketingImageAgent.php"
+    },
+    {
+      "class": "EditImageAgent",
+      "path": "tier3/agents/Actions/EditImageAgent.php"
+    },
+    {
+      "class": "GenerateProductShotAgent",
+      "path": "tier3/agents/Actions/GenerateProductShotAgent.php"
+    },
+    {
+      "class": "GeneratePhotoShootAgent",
+      "path": "tier3/agents/Actions/GeneratePhotoShootAgent.php"
+    }
+  ],
+  "tools": [
+    {
+      "class": "WorkCoreActionTool",
+      "path": "tier4/tools/System/Tools/WorkCoreActionTool.php"
+    },
+    {
+      "class": "WorkCoreReadTool",
+      "path": "tier4/tools/System/Tools/WorkCoreReadTool.php"
+    },
+    {
+      "class": "EmailDeliveryTool",
+      "path": "tier4/tools/System/Tools/EmailDeliveryTool.php"
+    },
+    {
+      "class": "SmsDeliveryTool",
+      "path": "tier4/tools/System/Tools/SmsDeliveryTool.php"
+    },
+    {
+      "class": "WhatsAppDeliveryTool",
+      "path": "tier4/tools/System/Tools/WhatsAppDeliveryTool.php"
+    },
+    {
+      "class": "InternalChatDeliveryTool",
+      "path": "tier4/tools/System/Tools/InternalChatDeliveryTool.php"
+    },
+    {
+      "class": "PushNotificationTool",
+      "path": "tier4/tools/System/Tools/PushNotificationTool.php"
+    },
+    {
+      "class": "CalendarAvailabilityTool",
+      "path": "tier4/tools/System/Tools/CalendarAvailabilityTool.php"
+    },
+    {
+      "class": "CalendarBookingTool",
+      "path": "tier4/tools/System/Tools/CalendarBookingTool.php"
+    },
+    {
+      "class": "PdfGenerationTool",
+      "path": "tier4/tools/System/Tools/PdfGenerationTool.php"
+    },
+    {
+      "class": "PaymentLinkTool",
+      "path": "tier4/tools/System/Tools/PaymentLinkTool.php"
+    },
+    {
+      "class": "RouteOptimisationTool",
+      "path": "tier4/tools/System/Tools/RouteOptimisationTool.php"
+    },
+    {
+      "class": "VisionAnalysisTool",
+      "path": "tier4/tools/System/Tools/VisionAnalysisTool.php"
+    },
+    {
+      "class": "OcrTool",
+      "path": "tier4/tools/System/Tools/OcrTool.php"
+    },
+    {
+      "class": "FileStorageTool",
+      "path": "tier4/tools/System/Tools/FileStorageTool.php"
+    },
+    {
+      "class": "NotificationTool",
+      "path": "tier4/tools/System/Tools/NotificationTool.php"
+    },
+    {
+      "class": "WeatherTool",
+      "path": "tier4/tools/System/Tools/WeatherTool.php"
+    },
+    {
+      "class": "GeocodingTool",
+      "path": "tier4/tools/System/Tools/GeocodingTool.php"
+    },
+    {
+      "class": "DistanceMatrixTool",
+      "path": "tier4/tools/System/Tools/DistanceMatrixTool.php"
+    },
+    {
+      "class": "SpreadsheetTool",
+      "path": "tier4/tools/System/Tools/SpreadsheetTool.php"
+    },
+    {
+      "class": "DocumentSignatureTool",
+      "path": "tier4/tools/System/Tools/DocumentSignatureTool.php"
+    },
+    {
+      "class": "WebhookDeliveryTool",
+      "path": "tier4/tools/System/Tools/WebhookDeliveryTool.php"
+    },
+    {
+      "class": "VisualInspectionTool",
+      "path": "tier4/tools/System/Tools/VisualInspectionTool.php"
+    },
+    {
+      "class": "AudioTranscriptionTool",
+      "path": "tier4/tools/System/Tools/AudioTranscriptionTool.php"
+    },
+    {
+      "class": "VoiceSynthesisTool",
+      "path": "tier4/tools/System/Tools/VoiceSynthesisTool.php"
+    },
+    {
+      "class": "ImageGenerationTool",
+      "path": "tier4/tools/System/Tools/ImageGenerationTool.php"
+    },
+    {
+      "class": "ImageEditingTool",
+      "path": "tier4/tools/System/Tools/ImageEditingTool.php"
+    },
+    {
+      "class": "ProductShotTool",
+      "path": "tier4/tools/System/Tools/ProductShotTool.php"
+    },
+    {
+      "class": "PhotoShootTool",
+      "path": "tier4/tools/System/Tools/PhotoShootTool.php"
+    }
+  ],
+  "channels": [
+    {
+      "id": "email",
+      "path": "tier4/channels/email"
+    },
+    {
+      "id": "instagram",
+      "path": "tier4/channels/instagram"
+    },
+    {
+      "id": "internal-chat",
+      "path": "tier4/channels/internal-chat"
+    },
+    {
+      "id": "messenger",
+      "path": "tier4/channels/messenger"
+    },
+    {
+      "id": "phone",
+      "path": "tier4/channels/phone"
+    },
+    {
+      "id": "push",
+      "path": "tier4/channels/push"
+    },
+    {
+      "id": "slack",
+      "path": "tier4/channels/slack"
+    },
+    {
+      "id": "sms",
+      "path": "tier4/channels/sms"
+    },
+    {
+      "id": "telegram",
+      "path": "tier4/channels/telegram"
+    },
+    {
+      "id": "web-chat",
+      "path": "tier4/channels/web-chat"
+    },
+    {
+      "id": "whatsapp",
+      "path": "tier4/channels/whatsapp"
+    }
+  ],
+  "features": [
+    {
+      "id": "announcements",
+      "path": "tier4/features/announcements"
+    },
+    {
+      "id": "canvas",
+      "path": "tier4/features/canvas"
+    },
+    {
+      "id": "content-manager",
+      "path": "tier4/features/content-manager"
+    },
+    {
+      "id": "customer-tags",
+      "path": "tier4/features/customer-tags"
+    },
+    {
+      "id": "ecommerce",
+      "path": "tier4/features/ecommerce"
+    },
+    {
+      "id": "file-chat",
+      "path": "tier4/features/file-chat"
+    },
+    {
+      "id": "focus-mode",
+      "path": "tier4/features/focus-mode"
+    },
+    {
+      "id": "highlight",
+      "path": "tier4/features/highlight"
+    },
+    {
+      "id": "introductions",
+      "path": "tier4/features/introductions"
+    },
+    {
+      "id": "live-customizer",
+      "path": "tier4/features/live-customizer"
+    },
+    {
+      "id": "notion",
+      "path": "tier4/features/notion"
+    },
+    {
+      "id": "onboarding",
+      "path": "tier4/features/onboarding"
+    },
+    {
+      "id": "reviews",
+      "path": "tier4/features/reviews"
+    },
+    {
+      "id": "shared-chat",
+      "path": "tier4/features/shared-chat"
+    },
+    {
+      "id": "temp-chat",
+      "path": "tier4/features/temp-chat"
+    },
+    {
+      "id": "url-chat",
+      "path": "tier4/features/url-chat"
+    },
+    {
+      "id": "visual-inspector",
+      "path": "tier4/features/visual-inspector"
+    },
+    {
+      "id": "voice-isolator",
+      "path": "tier4/features/voice-isolator"
+    },
+    {
+      "class": "ImageGenerationFeature",
+      "path": "tier4/features/image-generation/System/Features/ImageGenerationFeature.php"
+    },
+    {
+      "class": "ProductShotsFeature",
+      "path": "tier4/features/product-shots/System/Features/ProductShotsFeature.php"
+    },
+    {
+      "class": "PhotoShootFeature",
+      "path": "tier4/features/photo-shoot/System/Features/PhotoShootFeature.php"
+    }
+  ],
+  "model_routing": [
+    {
+      "id": "model-council",
+      "path": "tier0/titan-zero/model-routing/model-council"
+    },
+    {
+      "id": "multi-model",
+      "path": "tier0/titan-zero/model-routing/multi-model"
+    },
+    {
+      "id": "openrouter",
+      "path": "tier0/titan-zero/model-routing/providers/openrouter"
+    }
+  ],
+  "voice_channels": [
+    {
+      "id": "elevenlabs",
+      "path": "tier4/channels/voice/elevenlabs"
+    },
+    {
+      "id": "openai-realtime",
+      "path": "tier4/channels/voice/openai-realtime"
+    }
+  ],
+  "executable_agent_registry": "tier3/agents/Services/ServiceRegistry.php",
+  "agent_dtos": [
+    "tier3/agents/DTO/JobManagement/BookJobRequest.php",
+    "tier3/agents/DTO/CrewAssignment/AssignCleanerRequest.php",
+    "tier3/agents/DTO/Quotation/CreateQuoteRequest.php"
+  ]
+}

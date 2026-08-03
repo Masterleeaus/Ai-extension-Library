@@ -1,0 +1,209 @@
+{
+  "schema_version": "1.0.0",
+  "identity": {
+    "name": "Titan Marketing",
+    "slug": "titan-marketing",
+    "icon": "marketing",
+    "accent": "var(--lqd-ext-chat-primary)"
+  },
+  "navigation": {
+    "default_view": "campaigns",
+    "primary": [
+      {
+        "id": "campaigns",
+        "label": "Campaigns",
+        "icon": "campaigns",
+        "offline": true
+      },
+      {
+        "id": "calendar",
+        "label": "Calendar",
+        "icon": "calendar",
+        "offline": true
+      },
+      {
+        "id": "content",
+        "label": "Content",
+        "icon": "content",
+        "offline": true
+      },
+      {
+        "id": "results",
+        "label": "Results",
+        "icon": "results",
+        "offline": true
+      }
+    ],
+    "drawer": [
+      {
+        "id": "audiences",
+        "label": "Audiences",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "templates",
+        "label": "Templates",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "approvals",
+        "label": "Approvals",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "email",
+        "label": "Email",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "sms",
+        "label": "SMS",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "whatsapp",
+        "label": "WhatsApp",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "automations",
+        "label": "Automations",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "consent",
+        "label": "Consent",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "unsubscribes",
+        "label": "Unsubscribes",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "brand-library",
+        "label": "Brand library",
+        "icon": "chevron-right",
+        "offline": true
+      }
+    ],
+    "header_actions": [
+      "sync",
+      "notifications",
+      "settings"
+    ]
+  },
+  "home": {
+    "widgets": [
+      "campaign_pipeline",
+      "content_calendar",
+      "approval_queue",
+      "channel_results"
+    ],
+    "quick_actions": [
+      "calendar",
+      "content"
+    ]
+  },
+  "chat": {
+    "persistent": true,
+    "role": "Titan Marketing",
+    "suggested_prompts": [
+      "Draft a campaign",
+      "Improve this message",
+      "Suggest next month’s plan"
+    ],
+    "context_policy": {
+      "minimum_scope": true,
+      "send_full_record": false,
+      "requires_permission": true
+    }
+  },
+  "workcore": {
+    "domains": [
+      "CRM",
+      "Marketing",
+      "Analytics"
+    ],
+    "commands": [
+      "create_campaign",
+      "approve_campaign",
+      "schedule_campaign"
+    ],
+    "read_models": [
+      "campaign_drafts",
+      "content_templates",
+      "brand_assets",
+      "approval_queue"
+    ]
+  },
+  "offline": {
+    "records": [
+      "campaign_drafts",
+      "content_templates",
+      "brand_assets",
+      "approval_queue"
+    ],
+    "packs": [
+      "titan-marketing-default"
+    ],
+    "retention": {
+      "completed_days": 30
+    },
+    "conflict_rules": {
+      "server_authoritative": true,
+      "preserve_local_copy": true
+    }
+  },
+  "permissions": [
+    "create_campaign",
+    "approve_campaign",
+    "schedule_campaign"
+  ],
+  "privacy": {
+    "default_mode": "device-first",
+    "redact_before_cloud": true,
+    "attachment_confirmation": true,
+    "provider_allowlist": []
+  },
+  "notifications": [
+    "assignment",
+    "approval",
+    "sync_failure",
+    "conflict"
+  ],
+  "settings_sections": [
+    "ai-providers",
+    "privacy",
+    "device-security",
+    "offline-sync",
+    "workcore",
+    "permissions",
+    "notifications",
+    "channels",
+    "appearance",
+    "accessibility",
+    "diagnostics"
+  ],
+  "preview_states": [
+    "mobile",
+    "tablet",
+    "desktop",
+    "drawer-open",
+    "settings-open",
+    "offline",
+    "syncing",
+    "conflict",
+    "empty",
+    "populated"
+  ]
+}

@@ -1,0 +1,211 @@
+{
+  "schema_version": "1.0.0",
+  "identity": {
+    "name": "Titan Social",
+    "slug": "titan-social",
+    "icon": "social",
+    "accent": "var(--lqd-ext-chat-primary)"
+  },
+  "navigation": {
+    "default_view": "feed",
+    "primary": [
+      {
+        "id": "feed",
+        "label": "Feed",
+        "icon": "feed",
+        "offline": true
+      },
+      {
+        "id": "calendar",
+        "label": "Calendar",
+        "icon": "calendar",
+        "offline": true
+      },
+      {
+        "id": "create",
+        "label": "Create",
+        "icon": "create",
+        "offline": true
+      },
+      {
+        "id": "engagement",
+        "label": "Engagement",
+        "icon": "engagement",
+        "offline": true
+      }
+    ],
+    "drawer": [
+      {
+        "id": "drafts",
+        "label": "Drafts",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "approvals",
+        "label": "Approvals",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "media",
+        "label": "Media",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "mentions",
+        "label": "Mentions",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "comments",
+        "label": "Comments",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "channels",
+        "label": "Channels",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "analytics",
+        "label": "Analytics",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "brand-voice",
+        "label": "Brand voice",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "saved-ideas",
+        "label": "Saved ideas",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "publishing-history",
+        "label": "Publishing history",
+        "icon": "chevron-right",
+        "offline": true
+      }
+    ],
+    "header_actions": [
+      "sync",
+      "notifications",
+      "settings"
+    ]
+  },
+  "home": {
+    "widgets": [
+      "publishing_feed",
+      "calendar",
+      "drafts",
+      "engagement_queue"
+    ],
+    "quick_actions": [
+      "calendar",
+      "create"
+    ]
+  },
+  "chat": {
+    "persistent": true,
+    "role": "Titan Social",
+    "suggested_prompts": [
+      "Create a post",
+      "Adapt this for Instagram",
+      "Suggest a reply"
+    ],
+    "context_policy": {
+      "minimum_scope": true,
+      "send_full_record": false,
+      "requires_permission": true
+    }
+  },
+  "workcore": {
+    "domains": [
+      "Social",
+      "Marketing",
+      "Analytics"
+    ],
+    "commands": [
+      "create_post",
+      "approve_post",
+      "publish_post",
+      "reply_engagement"
+    ],
+    "read_models": [
+      "draft_posts",
+      "media_metadata",
+      "content_calendar",
+      "engagement_queue"
+    ]
+  },
+  "offline": {
+    "records": [
+      "draft_posts",
+      "media_metadata",
+      "content_calendar",
+      "engagement_queue"
+    ],
+    "packs": [
+      "titan-social-default"
+    ],
+    "retention": {
+      "completed_days": 30
+    },
+    "conflict_rules": {
+      "server_authoritative": true,
+      "preserve_local_copy": true
+    }
+  },
+  "permissions": [
+    "create_post",
+    "approve_post",
+    "publish_post",
+    "reply_engagement"
+  ],
+  "privacy": {
+    "default_mode": "device-first",
+    "redact_before_cloud": true,
+    "attachment_confirmation": true,
+    "provider_allowlist": []
+  },
+  "notifications": [
+    "assignment",
+    "approval",
+    "sync_failure",
+    "conflict"
+  ],
+  "settings_sections": [
+    "ai-providers",
+    "privacy",
+    "device-security",
+    "offline-sync",
+    "workcore",
+    "permissions",
+    "notifications",
+    "channels",
+    "appearance",
+    "accessibility",
+    "diagnostics"
+  ],
+  "preview_states": [
+    "mobile",
+    "tablet",
+    "desktop",
+    "drawer-open",
+    "settings-open",
+    "offline",
+    "syncing",
+    "conflict",
+    "empty",
+    "populated"
+  ]
+}

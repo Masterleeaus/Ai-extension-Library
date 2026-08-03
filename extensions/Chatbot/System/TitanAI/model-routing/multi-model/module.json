@@ -1,0 +1,14 @@
+{
+  "id": "multi-model",
+  "name": "Multi Model",
+  "tier": 0,
+  "role": "runtime",
+  "system_ai_chat": true,
+  "cleaning_scope": true,
+  "operational_writes": "workcore_only",
+  "source_metadata": {
+    "name": "MultiModel",
+    "version": "1.3",
+    "description": "MultiModel extension for MagicAI — TG: @heew_support"
+  }
+}

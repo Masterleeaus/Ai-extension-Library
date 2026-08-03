@@ -1,0 +1,10 @@
+{
+  "name": "Agent Booking",
+  "type": "extension",
+  "version": "1.0.0",
+  "description": "Unified booking system: Schedule appointments, services, resources. Integrated with WorkCore booking facility.",
+  "support_telegram": "heew_support",
+  "integrates_with": [
+    "ai-agent-work-core"
+  ]
+}

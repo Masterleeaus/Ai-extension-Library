@@ -1,0 +1,53 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Agent 3 Browser Harness</title></head>
+<body><section data-chatbot-conflict-centre></section><pre id="results">RUNNING</pre>
+<script>
+(async () => {
+  const output = document.getElementById('results');
+  const results = [];
+  const assert = (condition, message) => { if (!condition) throw new Error(message); results.push(`PASS ${message}`); };
+  await new Promise((resolve, reject) => {
+    const deletion = indexedDB.deleteDatabase('chatbot-pwa');
+    deletion.onsuccess = deletion.onerror = deletion.onblocked = resolve;
+  });
+  const ready = new Promise((resolve, reject) => {
+    window.addEventListener('chatbot:pwa-security-ready', resolve, { once:true });
+    window.addEventListener('chatbot:pwa-error', event => reject(event.detail.error), { once:true });
+  });
+  const script = document.createElement('script');
+  script.src = '../../resources/pwa/chatbot-pwa/security-integrity.js';
+  document.head.appendChild(script);
+  try {
+    await ready;
+    const security = window.chatbotPwa.security;
+    assert(security.DB_VERSION === 8, 'schema version is 8');
+    await security.initialiseVault('2468', { auto_lock_minutes:1 });
+    await security.vaultSet('sensitive-test', { token:'not-plaintext', value:42 });
+    assert((await security.vaultGet('sensitive-test')).value === 42, 'vault round trip');
+    await security.lockVault('browser-test');
+    let locked = false;
+    try { await security.vaultGet('sensitive-test'); } catch { locked = true; }
+    assert(locked, 'locked vault denies reads');
+    await security.unlockVault('2468');
+    const conflict = await security.createConflict({ entity_type:'customer', local:{local_uuid:'l-1',name:'Local'}, server:{server_id:9,name:'Server'}, record_name:'Test Customer' });
+    assert(conflict.status === 'open', 'sensitive conflict requires review');
+    const resolution = await security.resolveConflict(conflict.conflict_uuid, 'merge', { selected_fields:{name:'local'} });
+    assert(resolution.canonical.name === 'Local', 'field merge keeps selected local value');
+    await security.audit('browser.test', { token:'must-redact', safe:'visible' });
+    const chain = await security.verifyAuditChain();
+    assert(chain.healthy && chain.count > 0, 'audit hash chain verifies');
+    const vaultIntegrity = await security.verifyVaultIntegrity();
+    assert(vaultIntegrity.healthy, 'vault integrity verifies while unlocked');
+    const preparation = await security.prepareSafeReset({ mode:'cache-only' });
+    assert(preparation.confirmation_token, 'protected reset issues a confirmation token');
+    const backup = await security.exportPendingBackup();
+    assert(backup.format === 'titan-chatbot-pending-v1', 'pending backup export');
+    const integrity = await security.integrityCheck();
+    assert(integrity.schema_version === 8, 'integrity reports current schema');
+    output.textContent = `AGENT3_BROWSER_TESTS_PASSED\n${results.join('\n')}`;
+    document.documentElement.dataset.testStatus = 'passed';
+  } catch (error) {
+    output.textContent = `AGENT3_BROWSER_TESTS_FAILED\n${error.stack || error}`;
+    document.documentElement.dataset.testStatus = 'failed';
+  }
+})();
+</script></body></html>

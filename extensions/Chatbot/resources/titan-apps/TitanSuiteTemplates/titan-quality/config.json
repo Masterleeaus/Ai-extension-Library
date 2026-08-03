@@ -1,0 +1,193 @@
+{
+  "name": "Titan Quality",
+  "slug": "titan-quality",
+  "type": "quality-compliance",
+  "version": "1.0.0",
+  "description": "Quality management, compliance tracking, audits, feedback collection, and surveys",
+  "icon": "✅",
+  "color": "#f59e0b",
+  "theme": {
+    "primary": "#f59e0b",
+    "gradient": "linear-gradient(135deg, #f59e0b, #d97706)"
+  },
+  "wizard_steps": [
+    "Configure",
+    "Customize",
+    "Train",
+    "Deploy",
+    "Launch"
+  ],
+  "features": [
+    "compliance-tracking",
+    "audit-logging",
+    "inspection-checklists",
+    "certification-management",
+    "violation-alerts",
+    "compliance-reports",
+    "incident-tracking",
+    "incident-documentation",
+    "quality-inspections",
+    "inspection-reports",
+    "survey-creation",
+    "survey-distribution",
+    "feedback-collection",
+    "nps-tracking",
+    "satisfaction-measurement",
+    "sentiment-analysis",
+    "review-management",
+    "feedback-analytics",
+    "chatbot"
+  ],
+  "chatbot": {
+    "name": "Titan Quality Assistant",
+    "role": "Quality, compliance, and customer satisfaction management",
+    "system_prompt": "You are a quality and compliance assistant. Your role is to:\n- Track regulatory compliance requirements\n- Maintain audit trails of all activities\n- Create and manage inspection checklists\n- Manage certifications and their renewal dates\n- Alert on compliance violations\n- Document incidents with full context\n- Collect customer feedback and surveys\n- Calculate NPS and satisfaction scores\n- Analyze sentiment from customer feedback\n- Manage online reviews and reputation\n- Generate quality reports\n\nPrioritize compliance, safety, and customer satisfaction.",
+    "suggested_prompts": [
+      "Check compliance status",
+      "Create inspection",
+      "Track certifications",
+      "Document incident",
+      "Send survey",
+      "Check NPS score",
+      "Analyze feedback",
+      "View quality report"
+    ]
+  },
+  "tier1_manager": "QualitySafetyManager",
+  "tier2_specialists": [
+    "ComplianceSpecialist",
+    "AuditSpecialist",
+    "QualityInspectionSpecialist",
+    "FeedbackSpecialist"
+  ],
+  "tier3_actions": [
+    "TrackComplianceAgent",
+    "LogAuditEventAgent",
+    "CheckComplianceRulesAgent",
+    "GenerateComplianceReportAgent",
+    "ManageCertificationsAgent",
+    "AlertViolationAgent",
+    "CreateInspectionChecklistAgent",
+    "DocumentInspectionResultsAgent",
+    "RecordIncidentAgent",
+    "RecordInspectionAgent",
+    "RequestReviewAgent",
+    "CreateSurveyAgent",
+    "SendSurveyAgent",
+    "AnalyzeFeedbackAgent",
+    "CalculateNPSAgent",
+    "TrackSentimentAgent",
+    "RespondToReviewAgent",
+    "GenerateFeedbackReportAgent"
+  ],
+  "database": {
+    "tables": [
+      "compliance_requirements",
+      "audit_logs",
+      "audit_events",
+      "inspection_checklists",
+      "inspections",
+      "inspection_results",
+      "certifications",
+      "certification_renewals",
+      "compliance_violations",
+      "incidents",
+      "incident_documentation",
+      "surveys",
+      "survey_responses",
+      "feedback",
+      "feedback_sentiment",
+      "nps_scores",
+      "reviews",
+      "review_responses"
+    ]
+  },
+  "permissions": [
+    "compliance:read",
+    "compliance:track",
+    "audit:create",
+    "audit:read",
+    "audit:log",
+    "inspection:create",
+    "inspection:read",
+    "inspection:complete",
+    "certification:manage",
+    "incident:create",
+    "incident:read",
+    "incident:document",
+    "survey:create",
+    "survey:send",
+    "feedback:read",
+    "feedback:analyze",
+    "review:read",
+    "review:respond"
+  ],
+  "models": [
+    "ComplianceRequirement",
+    "AuditLog",
+    "AuditEvent",
+    "InspectionChecklist",
+    "Inspection",
+    "InspectionResult",
+    "Certification",
+    "CertificationRenewal",
+    "ComplianceViolation",
+    "Incident",
+    "IncidentDocumentation",
+    "Survey",
+    "SurveyResponse",
+    "Feedback",
+    "FeedbackSentiment",
+    "NPSScore",
+    "Review",
+    "ReviewResponse"
+  ],
+  "settings": {
+    "compliance": {
+      "regulatory_framework": "osha",
+      "audit_frequency_days": 90,
+      "violation_severity_levels": ["critical", "high", "medium", "low"],
+      "auto_alert_violations": true
+    },
+    "inspections": {
+      "photo_required": true,
+      "signature_required": true,
+      "geolocation_required": false,
+      "follow_up_required": true
+    },
+    "certifications": {
+      "alert_renewal_days": 60,
+      "auto_track_renewals": true
+    },
+    "incidents": {
+      "categories": [
+        "safety_incident",
+        "near_miss",
+        "property_damage",
+        "customer_complaint",
+        "quality_issue",
+        "compliance_violation",
+        "other"
+      ],
+      "required_investigation": true
+    },
+    "surveys": {
+      "nps_calculation": true,
+      "csat_calculation": true,
+      "sentiment_analysis": true
+    },
+    "feedback": {
+      "sentiment_analysis_provider": "azure",
+      "auto_respond_templates": true
+    },
+    "reviews": {
+      "monitor_platforms": [
+        "google",
+        "yelp",
+        "facebook",
+        "trustpilot"
+      ],
+      "alert_on_negative": true
+    }
+  }
+}

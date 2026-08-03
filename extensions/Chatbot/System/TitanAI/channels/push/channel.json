@@ -1,0 +1,14 @@
+{
+  "id": "push",
+  "name": "Push",
+  "type": "communication-channel",
+  "tier": 3,
+  "system_ai_chat": true,
+  "capabilities": [
+    "notifications",
+    "deep_links",
+    "delivery_receipts"
+  ],
+  "authority": "transport-only",
+  "rule": "Channel transports messages. It does not choose business actions or write operational records."
+}

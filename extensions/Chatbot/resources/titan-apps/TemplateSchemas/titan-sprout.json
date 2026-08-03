@@ -1,0 +1,213 @@
+{
+  "schema_version": "1.0.0",
+  "identity": {
+    "name": "Titan Sprout",
+    "slug": "titan-sprout",
+    "icon": "sprout",
+    "accent": "var(--lqd-ext-chat-primary)"
+  },
+  "navigation": {
+    "default_view": "pipeline",
+    "primary": [
+      {
+        "id": "pipeline",
+        "label": "Pipeline",
+        "icon": "pipeline",
+        "offline": true
+      },
+      {
+        "id": "leads",
+        "label": "Leads",
+        "icon": "leads",
+        "offline": true
+      },
+      {
+        "id": "add-lead",
+        "label": "Add Lead",
+        "icon": "add-lead",
+        "offline": true
+      },
+      {
+        "id": "hot-leads",
+        "label": "Hot Leads",
+        "icon": "hot-leads",
+        "offline": true
+      }
+    ],
+    "drawer": [
+      {
+        "id": "lead-sources",
+        "label": "Lead sources",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "assignments",
+        "label": "Assignments",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "qualification",
+        "label": "Qualification",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "follow-ups",
+        "label": "Follow-ups",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "conversions",
+        "label": "Conversions",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "imports",
+        "label": "Imports",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "tags",
+        "label": "Tags",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "reports",
+        "label": "Reports",
+        "icon": "chevron-right",
+        "offline": false
+      },
+      {
+        "id": "export",
+        "label": "Export",
+        "icon": "chevron-right",
+        "offline": true
+      },
+      {
+        "id": "notifications",
+        "label": "Notifications",
+        "icon": "chevron-right",
+        "offline": true
+      }
+    ],
+    "header_actions": [
+      "sync",
+      "notifications",
+      "settings"
+    ]
+  },
+  "home": {
+    "widgets": [
+      "pipeline_summary",
+      "hot_leads",
+      "unassigned_leads",
+      "follow_ups"
+    ],
+    "quick_actions": [
+      "leads",
+      "add-lead"
+    ]
+  },
+  "chat": {
+    "persistent": true,
+    "role": "Titan Sprout",
+    "suggested_prompts": [
+      "Score this lead",
+      "Qualify this lead",
+      "Draft a follow-up"
+    ],
+    "context_policy": {
+      "minimum_scope": true,
+      "send_full_record": false,
+      "requires_permission": true
+    }
+  },
+  "workcore": {
+    "domains": [
+      "CRM",
+      "Leads",
+      "Analytics"
+    ],
+    "commands": [
+      "create_lead",
+      "update_lead",
+      "score_lead",
+      "qualify_lead",
+      "convert_lead"
+    ],
+    "read_models": [
+      "assigned_leads",
+      "lead_notes",
+      "follow_up_drafts",
+      "pipeline_stages"
+    ]
+  },
+  "offline": {
+    "records": [
+      "assigned_leads",
+      "lead_notes",
+      "follow_up_drafts",
+      "pipeline_stages"
+    ],
+    "packs": [
+      "titan-sprout-default"
+    ],
+    "retention": {
+      "completed_days": 30
+    },
+    "conflict_rules": {
+      "server_authoritative": true,
+      "preserve_local_copy": true
+    }
+  },
+  "permissions": [
+    "create_lead",
+    "update_lead",
+    "score_lead",
+    "qualify_lead",
+    "convert_lead"
+  ],
+  "privacy": {
+    "default_mode": "device-first",
+    "redact_before_cloud": true,
+    "attachment_confirmation": true,
+    "provider_allowlist": []
+  },
+  "notifications": [
+    "assignment",
+    "approval",
+    "sync_failure",
+    "conflict"
+  ],
+  "settings_sections": [
+    "ai-providers",
+    "privacy",
+    "device-security",
+    "offline-sync",
+    "workcore",
+    "permissions",
+    "notifications",
+    "channels",
+    "appearance",
+    "accessibility",
+    "diagnostics"
+  ],
+  "preview_states": [
+    "mobile",
+    "tablet",
+    "desktop",
+    "drawer-open",
+    "settings-open",
+    "offline",
+    "syncing",
+    "conflict",
+    "empty",
+    "populated"
+  ]
+}

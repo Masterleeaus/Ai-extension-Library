@@ -1,0 +1,7 @@
+﻿{
+    "name":  "AI Agent",
+    "type":  "extension",
+    "version":  "1.1",
+    "description":  "Autonomous AI agent with multi-channel messaging, workflow automation, and user memory — TG: @heew_support",
+    "support_telegram":  "heew_support"
+}

@@ -1,0 +1,16 @@
+{
+  "id": "web-chat",
+  "name": "Web Chat",
+  "type": "communication-channel",
+  "tier": 3,
+  "system_ai_chat": true,
+  "capabilities": [
+    "visitor_chat",
+    "lead_capture",
+    "handoff",
+    "attachments",
+    "typing"
+  ],
+  "authority": "transport-only",
+  "rule": "Channel transports messages. It does not choose business actions or write operational records."
+}

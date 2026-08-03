@@ -1,0 +1,29 @@
+{
+  "id": "inventory-operations",
+  "name": "Inventory operations",
+  "surface": "admin-dashboard",
+  "theme": "titan-light",
+  "mock_data": "cleaning-business",
+  "description": "Consumables and equipment dashboard.",
+  "sections": [
+    {
+      "block": "hero",
+      "renderer": "hero",
+      "data": {
+        "eyebrow": "Inventory",
+        "heading": "Materials and equipment",
+        "copy": "Preview stock levels, low-stock items and job material intents.",
+        "primary_action": {
+          "label": "Reserve materials",
+          "intent": "workcore.inventory.reserve"
+        }
+      }
+    },
+    {
+      "block": "inventory-grid",
+      "renderer": "inventory-grid",
+      "title": "Current stock",
+      "data_source": "inventory"
+    }
+  ]
+}

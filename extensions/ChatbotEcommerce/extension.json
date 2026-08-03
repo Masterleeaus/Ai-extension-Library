@@ -1,0 +1,7 @@
+﻿{
+    "name":  "Ecommerce for External Chatbot",
+    "type":  "extension",
+    "version":  "1.0.0",
+    "description":  "Chatbot ecommerce extension for magicai — TG: @heew_support",
+    "support_telegram":  "heew_support"
+}

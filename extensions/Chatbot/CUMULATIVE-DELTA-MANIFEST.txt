@@ -1,0 +1,48 @@
+Titan Zero WorkCore PWA — Cumulative Delta through Pass 3
+
+Base target:
+  chatbot-with-titan-suite-templates-ENHANCED-PWA(2).zip
+
+Includes:
+  Initial WorkCore offline runtime
+  Pass 1 — server synchronisation runtime
+  Pass 2 — field-worker workflows
+  Pass 3 — progressive device capabilities
+
+Apply by overlaying this archive at the extension root. No files are deleted.
+
+Core additions:
+  resources/pwa/chatbot-pwa/workcore/contracts.js
+  resources/pwa/chatbot-pwa/workcore/database.js
+  resources/pwa/chatbot-pwa/workcore/attachments.js
+  resources/pwa/chatbot-pwa/workcore/client.js
+  resources/pwa/chatbot-pwa/workcore/ui.js
+  resources/pwa/chatbot-pwa/workcore/field-workspace.js
+  resources/pwa/chatbot-pwa/workcore/device-capabilities.js
+
+Pass 3 capabilities:
+  camera-first evidence capture
+  offline voice-note recording
+  QR/barcode image detection where supported
+  event-based location stamps
+  screen wake lock
+  pending-operation app badges
+  system share-out
+  file-handler launch intake
+  manifest share-target/protocol declarations
+  capability-safe progressive fallback
+
+Important host requirement:
+  The manifest share_target POST action must be accepted by the host /chatbot route
+  (or replaced with a dedicated endpoint) to complete operating-system share-in intake.
+
+PASS 4 — PRODUCTION HARDENING
+ADDED resources/pwa/chatbot-pwa/workcore/vault.js
+ADDED resources/pwa/chatbot-pwa/workcore/hardening.js
+ADDED resources/pwa/chatbot-pwa/workcore/self-tests.js
+ADDED WORKCORE-PWA-PASS4-PRODUCTION-HARDENING.md
+UPDATED resources/pwa/chatbot-pwa/workcore/contracts.js
+UPDATED resources/pwa/chatbot-pwa/workcore/attachments.js
+UPDATED resources/pwa/chatbot-pwa/workcore/client.js
+UPDATED resources/pwa/chatbot-sw.js
+UPDATED resources/views/frontend-ui/components/pwa.blade.php

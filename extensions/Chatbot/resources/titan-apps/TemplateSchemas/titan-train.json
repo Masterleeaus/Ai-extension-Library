@@ -1,0 +1,106 @@
+{
+  "schema_version": "1.0.0",
+  "online_only": true,
+  "identity": {
+    "name": "Titan Train",
+    "slug": "titan-train",
+    "icon": "training",
+    "accent": "var(--lqd-ext-chat-primary)"
+  },
+  "navigation": {
+    "default_view": "learn",
+    "primary": [
+      {"id": "learn", "label": "Learn", "icon": "book-open", "offline": false},
+      {"id": "practice", "label": "Practice", "icon": "clipboard-check", "offline": false},
+      {"id": "skills", "label": "Skills", "icon": "badge-check", "offline": false},
+      {"id": "me", "label": "Me", "icon": "user", "offline": false}
+    ],
+    "drawer": [
+      {"id": "programs", "label": "Programs", "icon": "chevron-right", "offline": false},
+      {"id": "assessments", "label": "Assessments", "icon": "chevron-right", "offline": false},
+      {"id": "certificates", "label": "Certificates", "icon": "chevron-right", "offline": false},
+      {"id": "live-training", "label": "Live training", "icon": "chevron-right", "offline": false},
+      {"id": "trainer-review", "label": "Trainer review", "icon": "chevron-right", "offline": false},
+      {"id": "readiness", "label": "Readiness", "icon": "chevron-right", "offline": false}
+    ],
+    "header_actions": ["notifications", "settings"]
+  },
+  "home": {
+    "widgets": ["training_readiness", "next_lesson", "assessment_status", "active_certificate"],
+    "quick_actions": ["learn", "practice"]
+  },
+  "chat": {
+    "persistent": true,
+    "role": "Titan Train",
+    "suggested_prompts": [
+      "What training do I need next?",
+      "Show my cleaner foundation progress",
+      "Am I ready for cleaning work?"
+    ],
+    "context_policy": {
+      "minimum_scope": true,
+      "send_full_record": false,
+      "requires_permission": true
+    }
+  },
+  "workcore": {
+    "domains": ["TitanTrain", "Workforce", "Compliance", "Documents", "Channels"],
+    "commands": [
+      "titan_train.assignments.list",
+      "titan_train.readiness.get",
+      "titan_train.lesson.complete",
+      "titan_train.cleaner.assign"
+    ],
+    "read_models": [
+      "training_assignments",
+      "learning_progress",
+      "assessment_attempts",
+      "competency_grants",
+      "training_certificates",
+      "training_channels"
+    ]
+  },
+  "offline": {
+    "enabled": false,
+    "records": [],
+    "packs": [],
+    "retention": {"completed_days": 0},
+    "conflict_rules": {
+      "server_authoritative": true,
+      "preserve_local_copy": false
+    }
+  },
+  "permissions": [
+    "training.assignments.read",
+    "training.lessons.complete",
+    "training.assessments.attempt",
+    "training.readiness.read"
+  ],
+  "privacy": {
+    "default_mode": "server-authoritative",
+    "redact_before_cloud": true,
+    "attachment_confirmation": true,
+    "provider_allowlist": []
+  },
+  "notifications": ["training_assignment", "assessment_result", "trainer_review", "certificate_issued"],
+  "settings_sections": [
+    "privacy",
+    "workcore",
+    "permissions",
+    "notifications",
+    "channels",
+    "appearance",
+    "accessibility",
+    "diagnostics"
+  ],
+  "preview_states": [
+    "mobile",
+    "tablet",
+    "desktop",
+    "drawer-open",
+    "settings-open",
+    "online-required",
+    "empty",
+    "populated"
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "version": "1.0.0",
+  "skills": [
+    {
+      "slug": "carpet-cleaning-specialist",
+      "path": "bundled/carpet-cleaning-specialist/SKILL.md",
+      "sha256": "368de451b9958d0c5373793018a36f690b1f7d0d1740e447b79495b7d34b5146",
+      "version": "1.0.0"
+    },
+    {
+      "slug": "deep-clean-planner",
+      "path": "bundled/deep-clean-planner/SKILL.md",
+      "sha256": "da348aaa5a190018e19f47546ad7ac367d8c17368d0e5d70a0b7cd033b82c8dc",
+      "version": "1.0.0"
+    },
+    {
+      "slug": "eco-friendly-cleaning-advisor",
+      "path": "bundled/eco-friendly-cleaning-advisor/SKILL.md",
+      "sha256": "ff42c1a121e936f3350c49cff830b73156a1859ef3546a264ad219e3c103ffed",
+      "version": "1.0.0"
+    },
+    {
+      "slug": "equipment-maintenance-tracker",
+      "path": "bundled/equipment-maintenance-tracker/SKILL.md",
+      "sha256": "1a2b413c6124dc14e798c2cf5ab02519b0d9a4eb1c8f10a217a77c8f0829a58a",
+      "version": "1.0.0"
+    },
+    {
+      "slug": "field-service-dispatcher",
+      "path": "bundled/field-service-dispatcher/SKILL.md",
+      "sha256": "be515f97c73ea7ff2162d1363a78da670e91681f560a155ed189dbc34a8fccfe",
+      "version": "1.0.0"
+    },
+    {
+      "slug": "handyman-quote-generator",
+      "path": "bundled/handyman-quote-generator/SKILL.md",
+      "sha256": "958343b483b90fe41e87818575fb73b00bbfd3f20c3fd4241c4136927084bfc8",
+      "version": "1.0.0"
+    },
+    {
+      "slug": "maintenance-scheduler",
+      "path": "bundled/maintenance-scheduler/SKILL.md",
+      "sha256": "d2e0005a0b234cd170532c188d3bf6e04805bbb348d262cca017e014742710ad",
+      "version": "1.0.0"
+    }
+  ]
+}

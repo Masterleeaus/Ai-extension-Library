@@ -1,0 +1,36 @@
+{
+  "id": "call-to-action",
+  "name": "Call to action",
+  "category": "Marketing",
+  "renderer": "call-to-action",
+  "authority": "presentation-only",
+  "props": [
+    "heading",
+    "copy",
+    "action"
+  ],
+  "allowed_actions": [
+    "navigate",
+    "open-modal",
+    "open-drawer",
+    "filter",
+    "search",
+    "sort",
+    "export-preview",
+    "builder.edit",
+    "workcore.customers.create",
+    "workcore.properties.create",
+    "workcore.jobs.create",
+    "workcore.jobs.assign",
+    "workcore.tasks.complete",
+    "workcore.inventory.reserve",
+    "titanmoney.quotes.create",
+    "titanmoney.invoices.issue",
+    "zeropay.payment-intent.create",
+    "communications.message.send"
+  ],
+  "data_contract": {
+    "type": "object"
+  },
+  "responsive": true
+}

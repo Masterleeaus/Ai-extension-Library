@@ -1,0 +1,13 @@
+{
+  "name": "Titan Money",
+  "slug": "titan-money",
+  "type": "financial",
+  "description": "Invoicing and payments",
+  "icon": "💰",
+  "color": "#8b5cf6",
+  "features": ["invoicing", "payments", "accounting", "reports", "chatbot"],
+  "chatbot": {
+    "name": "Titan Finance Assistant",
+    "system_prompt": "You are a financial assistant helping generate invoices, track payments, and answer accounting questions."
+  }
+}

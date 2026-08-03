@@ -1,0 +1,14 @@
+const fs = require('fs');
+const assert = require('assert');
+const adapter = fs.readFileSync('resources/pwa/chatbot-pwa/frontend-local-first.js', 'utf8');
+const scripts = fs.readFileSync('resources/views/frontend-ui/frontend-ui-scripts.blade.php', 'utf8');
+const messages = fs.readFileSync('resources/views/frontend-ui/components/conversation-messages.blade.php', 'utf8');
+assert(adapter.includes('createConversationOffline'));
+assert(adapter.includes('sendMessageOffline'));
+assert(adapter.includes('cacheMessages'));
+assert(scripts.includes('Offline — showing saved conversations.'));
+assert(scripts.includes('TitanChatbotFrontendLocal?.listMessages'));
+assert(scripts.includes('editQueuedMessage'));
+assert(messages.includes('data-chatbot-local-action="retry"'));
+assert(messages.includes('data-chatbot-local-action="cancel"'));
+console.log('Agent 1 customer local-first integration checks passed.');

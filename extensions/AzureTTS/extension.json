@@ -1,0 +1,7 @@
+﻿{
+    "name":  "Azure TTS",
+    "type":  "extension",
+    "version":  "2.2",
+    "description":  "Azure TTS extension for magicai — TG: @heew_support",
+    "support_telegram":  "heew_support"
+}
