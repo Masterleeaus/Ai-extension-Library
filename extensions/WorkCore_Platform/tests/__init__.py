@@ -1,1 +1,0 @@
-"""WorkCore extension repository tests."""

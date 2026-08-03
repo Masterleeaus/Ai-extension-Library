@@ -1,9 +1,0 @@
-__pycache__/
-.pytest_cache/
-build/
-.worktrees/
-*.pyc
-.DS_Store
-
-*.bundle
-dist/magicai-extensions/
