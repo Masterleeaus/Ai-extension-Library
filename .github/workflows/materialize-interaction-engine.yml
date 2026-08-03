@@ -64,6 +64,7 @@ jobs:
         run: |
           npm install --ignore-scripts --no-audit --no-fund --no-package-lock
           npm test
+          rm -rf node_modules
       - name: Commit materialized package source
         run: |
           git config user.name github-actions[bot]
