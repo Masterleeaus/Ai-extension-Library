@@ -26,13 +26,13 @@ AIPlagiarism,growth-ai,AI Plagiarism,2.2,AI Plagiarism extension for magicai —
 AiPresentation,creative-ai,AI Presentation,1.4,AI Presentation extension for MagicAI — TG: @heew_support,28,195827
 AIRealtimeImage,creative-ai,AI Realtime Image,1.14,AI Realtime Image extension for magicai — TG: @heew_support,27,59120
 AISocialMedia,growth-ai,AI Social Media,4.12,AI Social Media extension for magicai — TG: @heew_support,71,371736
-AiVideoPro,creative-ai,AI Avatar Pro,3.6,AI Avatar Pro extension for magicai — TG: @heew_support,25,270350
+AiVideoPro,creative-ai,AI Video Pro,3.6,"AI video generation with provider configuration, prompt enhancement, status polling, download, history, and social-media handoff.",25,270350
 AIVideoToVideo,creative-ai,Video to Video,1.6,Video to Video extension for magicai — TG: @heew_support,17,70461
-AiViralClips,creative-ai,Example,1.5,Example extension for magicai — TG: @heew_support,21,81076
+AiViralClips,creative-ai,AI Viral Clips,1.5,"Long-video-to-short-clips workflow with clip generation, previews, export, and result storage.",21,81076
 AIVoiceIsolator,creative-ai,AI Voice Isolator,2.3,AI Voice Isolator extension for magicai — TG: @heew_support,4,5147
 AIWebChat,core-chat,AI Web Chat,2.9,AI Web Chat extension for magicai — TG: @heew_support,18,101254
 AIWriterTemplates,creative-ai,AI Writer Templates,2.1,AI Writer Templates extension for magicai — TG: @heew_support,5,113641
-AzureOpenai,model-providers,Example,1.5,Example extension for MagicAI — TG: @heew_support,9,21167
+AzureOpenai,model-providers,Azure OpenAI,1.5,Azure-hosted OpenAI streaming and provider configuration for MagicAI.,9,21167
 AzureTTS,model-providers,Azure TTS,2.2,Azure TTS extension for magicai — TG: @heew_support,6,6227
 BlogPilot,growth-ai,BlogPilot,1.4,BlogPilot extension for magicai — TG: @heew_support,74,7021802
 Canvas,core-chat,AI Chat Pro canvas,1.11,AI Chat Pro canvas extension for magicai — TG: @heew_support,10,78387
