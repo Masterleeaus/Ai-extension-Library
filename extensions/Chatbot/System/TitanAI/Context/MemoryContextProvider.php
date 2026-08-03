@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Extensions\Chatbot\System\TitanAI\Context;
 
-use App\Domains\TitanAI\Diagnostics\TitanAIDiagnostics;
-use App\Domains\TitanAI\Memory\Enums\MemoryScope;
-use App\Domains\TitanAI\Memory\Services\UnifiedMemoryRepository;
+use TitanAI\Hybrid\Diagnostics\TitanAIDiagnostics;
+use TitanAI\Hybrid\Memory\Enums\MemoryScope;
+use TitanAI\Hybrid\Memory\Services\UnifiedMemoryRepository;
 use App\Extensions\Chatbot\System\TitanAI\Contracts\MemoryContextProviderContract;
 use App\Extensions\Chatbot\System\TitanAI\DTO\TitanAIRequest;
 use Throwable;

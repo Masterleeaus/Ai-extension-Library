@@ -9,18 +9,19 @@ Deep-scanned and losslessly extracted AI extension library from `Extensions(2).z
 - **81,372,739 raw extension bytes**
 - Core suites: **AIChatPro**, **Chatbot**, and **AIAgent**
 - Canonical chatbot: **Chatbot 7.0.0-five-application-registry**
-- Shared host overlay: `foundation/TitanAI-Hybrid/`
+- Shared Composer foundation: `packages/titanai-hybrid-core/` (`titanai/hybrid-core:1.0.0`)
 
 ## Materialisation
 
 The base extraction is stored as a lossless MiniUp Parquet transport dataset. Each row preserves the original path, file bytes compressed with zlib and base64, raw byte count, category and SHA-256 checksum.
 
-A second verified MiniUp transport dataset contains the TitanAI Hybrid Pass 3 replacements for `AIAgent`, `AIChatPro` and `Chatbot`, plus the required shared foundation. The GitHub Actions workflow restores the original 78-extension library, atomically replaces those three folders, validates the overlay archive, runs PHP and Pass 3 verification, regenerates the inventories and commits the result.
+A second verified MiniUp transport dataset contains the TitanAI Hybrid Pass 3 replacements for `AIAgent`, `AIChatPro` and `Chatbot`, plus the original shared foundation source. The GitHub Actions workflow restores that verified source, deterministically converts the foundation into `packages/titanai-hybrid-core`, updates the three shared integrations, validates the package, regenerates inventories and commits the result.
 
 This two-layer process preserves the other 75 extensions unchanged and prevents future materialisation runs from reverting the upgraded core suites.
 
 ## Documentation
 
+- [`docs/TITANAI-COMPOSER-PACKAGE.md`](docs/TITANAI-COMPOSER-PACKAGE.md) — package layout, WorkCore installation, compatibility and versioning.
 - [`docs/CORE-SUITES-PASS3-REPLACEMENT.md`](docs/CORE-SUITES-PASS3-REPLACEMENT.md) — current replacement scan, measured structure, architecture and verification.
 - [`docs/CORE-SUITES-DEEP-SCAN.md`](docs/CORE-SUITES-DEEP-SCAN.md) — original architecture and capability analysis of AIChatPro, Chatbot and AIAgent.
 - [`docs/EXTENSION-CATALOG.md`](docs/EXTENSION-CATALOG.md) — features, routes, data models, dependencies, external services and public functions for all 78 selected extensions.
@@ -40,6 +41,6 @@ This two-layer process preserves the other 75 extensions unchanged and prevents 
 
 ## Installation model
 
-These are MagicAI/Laravel marketplace extensions. Keep each extension folder name unchanged when copying it into the host extension directory. Install the shared TitanAI foundation overlay before enabling the upgraded core suites, then install the core extension before its add-ons and run the host migration and publish process in a controlled environment.
+These are MagicAI/Laravel marketplace extensions. Keep each extension folder name unchanged when copying it into the host extension directory. Install `titanai/hybrid-core:^1.0` in the WorkCore host before enabling the upgraded core suites, then install each core extension before its add-ons and run the host migration and publish process in a controlled environment.
 
 Do not enable every package simultaneously without resolving the duplicated authority boundaries described in the architecture reports.
