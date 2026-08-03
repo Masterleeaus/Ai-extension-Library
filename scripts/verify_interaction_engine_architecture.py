@@ -28,13 +28,21 @@ def main() -> None:
     require(composer["name"] == "titanzero/interaction-engine", "wrong Composer name")
     require(composer["type"] == "library", "server package must be a Composer library")
     require("extra" in composer and "laravel" in composer["extra"], "Laravel discovery missing")
-    for forbidden in ("extension.json", "module.json", "package.json", "src/Extensions", "resources/ts"):
+    for forbidden in (
+        "extension.json",
+        "module.json",
+        "package.json",
+        "package-lock.json",
+        "src/Extensions",
+        "resources/ts",
+    ):
         require(not (SERVER / forbidden).exists(), f"mixed packaging remains in server package: {forbidden}")
 
     offline = load(OFFLINE / "package.json")
     require(offline["name"] == "@titanzero/interaction-engine-offline", "wrong offline package name")
     require((OFFLINE / "src/index.ts").is_file(), "offline entry source missing")
     require((OFFLINE / "dist/index.js").is_file(), "offline compiled distribution missing")
+    require(not (OFFLINE / "node_modules").exists(), "offline dependencies must not be committed")
 
     contracts_npm = load(CONTRACTS / "package.json")
     contracts_composer = load(CONTRACTS / "composer.json")
