@@ -1,0 +1,11 @@
+{
+  "name": "@titanzero/interaction-contracts",
+  "version": "1.0.0",
+  "private": false,
+  "description": "Shared Titan Interaction Engine OpenAPI and JSON Schema contracts",
+  "files": [
+    "schemas",
+    "openapi.yaml",
+    "README.md"
+  ]
+}
