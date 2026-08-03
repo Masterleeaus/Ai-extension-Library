@@ -1,0 +1,5 @@
+{
+  "package": "titanai/hybrid-core",
+  "constraint": "^1.0",
+  "provider": "TitanAI\\Hybrid\\TitanAIServiceProvider"
+}
