@@ -40,7 +40,7 @@ Chatbot,chatbot-suite,Chatbot,7.0.0-five-application-registry,"Unified Titan cha
 ChatbotAgent,chatbot-suite,Chatbot agent,2.10,Chatbot agent extension for magicai — TG: @heew_support,30,200487
 ChatbotBooking,chatbot-suite,Booking for External Chatbot,1.0.0,Chatbot booking extension for magicai — TG: @heew_support,11,10411
 ChatbotCustomerTag,chatbot-suite,ChatbotCustomerTag,1.0.0,Customer tag management tools for chatbot conversations — TG: @heew_support,10,24580
-ChatbotEcommerce,chatbot-suite,Ecommerce for External Chatbot,1.0.0,Chatbot ecommerce extension for magicai — TG: @heew_support,17,117161
+ChatbotEcommerce,chatbot-suite,Ecommerce for External Chatbot,4.9.0,"Three-role conversational commerce extension with unified native and external order workbench, settlement reconciliation, exception management, encrypted credentials, strict tenant isolation, marketplace operations, customer communications, BNPL, orders and returns.",403,1676325
 ChatbotReview,chatbot-suite,ChatbotReview,1.0.0,Adds review and feedback configuration to the Chatbot extension. — TG: @heew_support,7,13307
 ChatbotVoice,chatbot-suite,External Voice Chatbot,2.3,external voice chatbot extension for magicai — TG: @heew_support,57,219231
 ChatbotVoiceCall,chatbot-suite,Chatbot Voice Call,1.1,Voice call for chatbot — TG: @heew_support,12,56539
