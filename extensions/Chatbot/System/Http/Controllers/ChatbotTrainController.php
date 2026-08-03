@@ -85,7 +85,7 @@ class ChatbotTrainController extends Controller
 
         $data = $request->validated('data');
 
-        $embeddings = ChatbotEmbedding::query()
+        $embeddings = $chatbot->embeddings()
             ->whereNull('embedding')
             ->whereIn('id', $data)
             ->get();

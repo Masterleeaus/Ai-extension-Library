@@ -10,6 +10,7 @@ on:
       - .github/workflows/materialize-ai-extensions.yml
       - scripts/restore_extensions.py
       - scripts/apply_ecommerce_overlay.py
+      - scripts/apply_chatbot_embedding_scope_patch.py
       - transport/dataset-manifest.json
       - transport/pass3-overlay-manifest.json
       - transport/ecommerce-overlay-manifest.json
@@ -57,6 +58,10 @@ jobs:
           python scripts/apply_ecommerce_overlay.py \
             --root . \
             --manifest transport/ecommerce-overlay-manifest.json
+      - name: Apply Chatbot embedding ownership patch
+        run: python scripts/apply_chatbot_embedding_scope_patch.py
+      - name: Run Chatbot embedding ownership contract
+        run: php tests/contracts/chatbot_embedding_ownership.php
       - name: Validate manifests and PHP syntax
         run: |
           python -m json.tool extensions/AIAgent/extension.json >/dev/null
