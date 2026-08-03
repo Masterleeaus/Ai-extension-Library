@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Extensions\AIChatPro\System\Connectors;
 
-use TitanAI\Hybrid\Contracts\ConnectorDefinition as UnifiedConnectorDefinition;
+use App\Domains\TitanAI\Contracts\ConnectorDefinition as UnifiedConnectorDefinition;
 use App\Extensions\AIChatPro\System\Connectors\Models\AIChatProConnector;
 use InvalidArgumentException;
 use LogicException;

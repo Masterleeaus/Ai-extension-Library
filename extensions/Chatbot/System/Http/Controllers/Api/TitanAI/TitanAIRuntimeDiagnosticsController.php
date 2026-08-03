@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Extensions\Chatbot\System\Http\Controllers\Api\TitanAI;
 
-use TitanAI\Hybrid\Diagnostics\TitanAIDiagnostics;
-use TitanAI\Hybrid\Registries\UnifiedRegistry;
+use App\Domains\TitanAI\Diagnostics\TitanAIDiagnostics;
+use App\Domains\TitanAI\Registries\UnifiedRegistry;
 use App\Extensions\Chatbot\System\TitanAI\Runtime\WorkerRouteRegistry;
 use App\Extensions\Chatbot\System\TitanAI\Runtime\AgentExecutionPathResolver;
 use App\Extensions\Chatbot\System\TitanAI\Runtime\AssistantDelegationGraph;

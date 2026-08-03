@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Extensions\AIChatPro\System;
 
-use TitanAI\Hybrid\ActionCompleted;
-use TitanAI\Hybrid\ActionInvoked;
-use TitanAI\Hybrid\ConnectorsDiscovered;
-use TitanAI\Hybrid\ExtensionBooted;
-use TitanAI\Hybrid\Events\TitanAIEventBus;
-use TitanAI\Hybrid\Registries\UnifiedRegistry;
-use TitanAI\Hybrid\TitanAIServiceProvider;
+use App\Domains\TitanAI\ActionCompleted;
+use App\Domains\TitanAI\ActionInvoked;
+use App\Domains\TitanAI\ConnectorsDiscovered;
+use App\Domains\TitanAI\ExtensionBooted;
+use App\Domains\TitanAI\Events\TitanAIEventBus;
+use App\Domains\TitanAI\Registries\UnifiedRegistry;
+use App\Domains\TitanAI\TitanAIServiceProvider;
 
 use App\Domains\Marketplace\Contracts\UninstallExtensionServiceProviderInterface;
 use App\Extensions\AIChatPro\System\Connectors\ConnectorDefinition;

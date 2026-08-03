@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Extensions\Chatbot\System\TitanAI\Runtime\Skills;
 
-use TitanAI\Hybrid\Contracts\SkillDefinition;
+use App\Domains\TitanAI\Contracts\SkillDefinition;
 use InvalidArgumentException;
 use LogicException;
 

@@ -9,12 +9,8 @@ on:
     paths:
       - .github/workflows/materialize-ai-extensions.yml
       - scripts/restore_extensions.py
-      - scripts/apply_ecommerce_overlay.py
-      - scripts/package_titanai_hybrid.py
-      - scripts/tests/test_package_titanai_hybrid.py
       - transport/dataset-manifest.json
       - transport/pass3-overlay-manifest.json
-      - transport/ecommerce-overlay-manifest.json
   pull_request:
     branches:
       - main
@@ -54,42 +50,23 @@ jobs:
             --clean \
             --url "$DATASET_URL" \
             --overlay-manifest transport/pass3-overlay-manifest.json
-      - name: Convert TitanAI foundation to Composer package
-        run: python scripts/package_titanai_hybrid.py --root .
-      - name: Apply verified ChatbotEcommerce overlay
-        run: |
-          python scripts/apply_ecommerce_overlay.py \
-            --root . \
-            --manifest transport/ecommerce-overlay-manifest.json
       - name: Validate manifests and PHP syntax
         run: |
           python -m json.tool extensions/AIAgent/extension.json >/dev/null
           python -m json.tool extensions/AIChatPro/extension.json >/dev/null
           python -m json.tool extensions/Chatbot/extension.json >/dev/null
-          python -m json.tool extensions/ChatbotEcommerce/extension.json >/dev/null
-          python -m json.tool packages/titanai-hybrid-core/composer.json >/dev/null
-          python -m json.tool extensions/AIAgent/titanai-package.json >/dev/null
-          python -m json.tool extensions/AIChatPro/titanai-package.json >/dev/null
-          python -m json.tool extensions/Chatbot/titanai-package.json >/dev/null
-          find extensions/AIAgent extensions/AIChatPro extensions/Chatbot extensions/ChatbotEcommerce packages/titanai-hybrid-core/src \
+          find extensions/AIAgent extensions/AIChatPro extensions/Chatbot foundation/TitanAI-Hybrid \
             -type f -name '*.php' -print0 | xargs -0 -n1 php -l >/tmp/php-lint.log
           echo "PHP linted $(wc -l </tmp/php-lint.log) files"
-      - name: Verify TitanAI Composer package conversion
+      - name: Run packaged TitanAI Pass 3 verification
         run: |
-          python -m unittest scripts.tests.test_package_titanai_hybrid -v
-          python scripts/package_titanai_hybrid.py --root . --check
-          php packages/titanai-hybrid-core/bin/verify-package.php
-          test ! -e foundation/TitanAI-Hybrid
-      - name: Run packaged ChatbotEcommerce verification
-        run: |
-          test "$(python -c "import json; print(json.load(open('extensions/ChatbotEcommerce/extension.json'))['version'])")" = "4.9.0"
-          count=0
-          for script in extensions/ChatbotEcommerce/tests/run_*.php; do
-            php "$script"
-            count=$((count + 1))
-          done
-          test "$count" -eq 38
-          echo "ChatbotEcommerce verification scripts passed: $count"
+          rm -rf /tmp/titanai-host
+          mkdir -p /tmp/titanai-host/app/Extensions
+          cp -a extensions/AIAgent /tmp/titanai-host/app/Extensions/
+          cp -a extensions/AIChatPro /tmp/titanai-host/app/Extensions/
+          cp -a extensions/Chatbot /tmp/titanai-host/app/Extensions/
+          cp -a foundation/TitanAI-Hybrid/. /tmp/titanai-host/
+          php /tmp/titanai-host/bin/verify-titanai-pass3.php
       - name: Write materialisation summary
         run: |
           python - <<'PY'
@@ -97,20 +74,14 @@ jobs:
           import json
           files = [path for path in Path('extensions').rglob('*') if path.is_file()]
           size = sum(path.stat().st_size for path in files)
-          core = json.load(open('transport/pass3-overlay-manifest.json'))
-          ecommerce = json.load(open('transport/ecommerce-overlay-manifest.json'))
+          overlay = json.load(open('transport/pass3-overlay-manifest.json'))
           Path('MATERIALIZED.md').write_text(
               '# Materialised source tree\n\n'
               f'Files: **{len(files):,}**  \n'
               f'Bytes: **{size:,}**  \n'
               'Base source: MiniUp lossless Parquet transport dataset.  \n'
-              f"Core overlay: **{core['source_bundle']}**  \n"
-              f"Core overlay SHA-256: `{core['archive_sha256']}`  \n"
-              'Composer package: **titanai/hybrid-core 1.0.0**  \n'
-              'Package path: `packages/titanai-hybrid-core/`  \n'
-              f"Ecommerce overlay: **{ecommerce['source_bundle']}**  \n"
-              f"Ecommerce version: **{ecommerce['extension_version']}**  \n"
-              f"Ecommerce overlay SHA-256: `{ecommerce['archive_sha256']}`  \n",
+              f"Core overlay: **{overlay['source_bundle']}**  \n"
+              f"Overlay SHA-256: `{overlay['archive_sha256']}`  \n",
               encoding='utf-8',
           )
           PY
@@ -118,10 +89,10 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add extensions packages scripts MATERIALIZED.md docs/extension-inventory.csv docs/extension-inventory.json
+          git add extensions foundation MATERIALIZED.md docs/extension-inventory.csv docs/extension-inventory.json
           if git diff --cached --quiet; then
             echo "No source changes to commit"
           else
-            git commit -m "Materialize verified core and ecommerce overlays"
+            git commit -m "Replace core AI extensions with verified Pass 3"
             git push origin HEAD:${{ github.head_ref || github.ref_name }}
           fi
