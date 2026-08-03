@@ -1,0 +1,223 @@
+╔═══════════════════════════════════════════════════════════════════════════════╗
+║               TitanAI REFINED EXTENSION ARCHITECTURE                          ║
+║                  27 Extensions → 12 Extensions                                ║
+╚═══════════════════════════════════════════════════════════════════════════════╝
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  CURRENT STATE (27 Extensions - Too Granular)                               │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+CHATBOT TIER:
+  ├─ ChatbotAgent                    [Core conversations]
+  ├─ ChatbotBooking                  [Reservations]
+  ├─ ChatbotVoice                    [Voice capture]          ┐
+  ├─ ChatbotVoiceCall                [Phone calls]            ├─ VOICE COHESION
+  ├─ PhoneCallAgent                  [Phone routing]          ┘ (Should merge)
+  ├─ ChatbotEcommerce                [Shopping]              
+  ├─ ChatbotReview                   [Feedback]              ┐
+  └─ ChatbotCustomerTag              [Segmentation]          └─ CUSTOMER COHESION
+                                                                  (Should merge)
+
+AIAGENT TIER:
+  ├─ AIAgentGmail                    [Email]
+  ├─ AIAgentSlackChannel             [Slack adapter]         ┐
+  ├─ AIAgentWhatsappChannel          [WhatsApp adapter]      ├─ CHANNEL PATTERN
+  ├─ AIAgentToolChatbot              [Chatbot tool]          ┐ (Should merge)
+  ├─ AIAgentToolMarketingBot         [Marketing tool]        ├─ TOOLS PATTERN
+  └─ AIAgentToolSocialMediaAgent     [Social tool]           ┘ (Should merge)
+
+AICHATPRO TIER:
+  ├─ AIChatProSkills                 [Skill library]
+  ├─ AIChatProFolders                [Folder organization]
+  ├─ ChatProTempChat                 [Temp conversations]
+  ├─ ChatSetting                     [Config]               ┬─ CORE FEATURES
+  ├─ AIChatProDeepResearch           [Research]             ┐ (Should merge)
+  ├─ AIChatProFileChat               [File Q&A]             ├─ AI CAPABILITIES
+  ├─ AiChatProSmartImage             [Image gen]            ┘ (Should merge)
+  ├─ AiChatProEntityHighlight        [Entities]             ┐
+  ├─ AiChatProHighlightToAsk         [Context selection]    ├─ UX FEATURES
+  ├─ Canvas                          [Workspace UI]         ┘ (Should merge)
+  └─ ChatShare                       [Sharing]               └─ COLLABORATION
+
+ORPHANS:
+  ├─ Canvas                          [Should be in AIChatProUX]
+  ├─ ChatShare                       [Should be in AIChatProCollaboration]
+  ├─ ChatSetting                     [Should be in AIChatProCore]
+  └─ PhoneCallAgent                  [Should be in ChatbotVoiceIntegration]
+
+PROBLEM: 27 separate config files, unclear relationships, orphaned extensions
+
+───────────────────────────────────────────────────────────────────────────────
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  REFINED STATE (12 Extensions - Clear Boundaries)                           │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+CHATBOT TIER (5 extensions):
+  ┌─────────────────────────────────────────────────────────────────────────┐
+  │ ChatbotAgent                      [Core]                                │
+  │ Purpose: Manage conversations, context, routing                         │
+  └─────────────────────────────────────────────────────────────────────────┘
+  
+  ┌─────────────────────────────────────────────────────────────────────────┐
+  │ ChatbotBooking                    [Reservations Domain]                │
+  │ Purpose: Manage appointments, reservations, scheduling                 │
+  └─────────────────────────────────────────────────────────────────────────┘
+  
+  ┌─────────────────────────────────────────────────────────────────────────┐
+  │ ChatbotCommerce                   [Shopping Domain]                    │
+  ├─ Cart management                                                         │
+  ├─ Order processing (was separate)                                         │
+  ├─ Inventory checking (enhanced)                                           │
+  ├─ Fulfillment status (new)                                                │
+  └─ Payment handling (new)                                                  │
+  │ Single domain: Commerce                                                 │
+  └─────────────────────────────────────────────────────────────────────────┘
+  
+  ┌─────────────────────────────────────────────────────────────────────────┐
+  │ ChatbotCustomerIntelligence       [Customer Data Domain]               │
+  ├─ Segmentation (from CustomerTag)                                         │
+  ├─ Review collection (from Review)                                         │
+  ├─ Sentiment analysis (new)                                                │
+  ├─ Churn prediction (new)                                                  │
+  └─ Lifetime value scoring (new)                                            │
+  │ Unified customer profile API                                            │
+  └─────────────────────────────────────────────────────────────────────────┘
+  
+  ┌─────────────────────────────────────────────────────────────────────────┐
+  │ ChatbotVoiceIntegration           [Voice Domain]                        │
+  ├─ Voice capture (from Voice)                                              │
+  ├─ Phone calls (from VoiceCall)                                            │
+  ├─ Phone routing (from PhoneCallAgent)                                     │
+  ├─ Audio synthesis (unified)                                               │
+  ├─ Call transcription (shared)                                             │
+  └─ Conference calls (new)                                                  │
+  │ Unified call state, single config, shared audio service                 │
+  └─────────────────────────────────────────────────────────────────────────┘
+
+AIAGENT TIER (3 extensions):
+  ┌─────────────────────────────────────────────────────────────────────────┐
+  │ AIAgentChannels                   [Messaging Adapters]                  │
+  ├─ Slack adapter (from SlackChannel)                                       │
+  ├─ WhatsApp adapter (from WhatsappChannel)                                 │
+  ├─ SMS adapter (future)                                                    │
+  ├─ Telegram adapter (future)                                               │
+  ├─ Discord adapter (future)                                                │
+  └─ Shared channel registry (new pattern)                                   │
+  │ Adapter pattern obvious, easy to extend to new channels                 │
+  └─────────────────────────────────────────────────────────────────────────┘
+  
+  ┌─────────────────────────────────────────────────────────────────────────┐
+  │ AIAgentGmail                      [Email Integration]                   │
+  │ Purpose: Gmail read/compose/manage, OAuth, conversation threading      │
+  │ Keep separate: OAuth complexity, Google API specifics                   │
+  └─────────────────────────────────────────────────────────────────────────┘
+  
+  ┌─────────────────────────────────────────────────────────────────────────┐
+  │ AIAgentTools                      [Tool Registry]                       │
+  ├─ Chatbot tool (from ToolChatbot)                                         │
+  ├─ Marketing tool (from ToolMarketing)                                     │
+  ├─ Social media tool (from ToolSocial)                                     │
+  ├─ Custom tool registry (new)                                              │
+  └─ Future: Analytics tool, reporting tool, etc.                            │
+  │ Extensible pattern, easy to add custom tools                            │
+  └─────────────────────────────────────────────────────────────────────────┘
+
+AICHATPRO TIER (4 extensions):
+  ┌─────────────────────────────────────────────────────────────────────────┐
+  │ AIChatProCore                     [Foundation Layer]                    │
+  ├─ Skill library (from AIChatProSkills)                                    │
+  ├─ Folder organization (from AIChatProFolders)                             │
+  ├─ Global settings (from ChatSetting)                                      │
+  └─ Temporary conversations (from ChatProTempChat)                          │
+  │ Prerequisites for other AIChatPro extensions                            │
+  └─────────────────────────────────────────────────────────────────────────┘
+  
+  ┌─────────────────────────────────────────────────────────────────────────┐
+  │ AIChatProAI                       [AI Capabilities]                     │
+  ├─ Deep research (from AIChatProDeepResearch)                              │
+  ├─ File Q&A / RAG (from AIChatProFileChat)                                 │
+  ├─ Smart image generation (from AiChatProSmartImage)                       │
+  └─ Unified model configuration, shared LLM connection pool                │
+  │ Grouped AI features, easier testing                                     │
+  └─────────────────────────────────────────────────────────────────────────┘
+  
+  ┌─────────────────────────────────────────────────────────────────────────┐
+  │ AIChatProUX                       [User Experience Layer]               │
+  ├─ Entity extraction (from AiChatProEntityHighlight)                       │
+  ├─ Context selection (from AiChatProHighlightToAsk)                        │
+  ├─ Canvas/workspace UI (from Canvas)                                       │
+  └─ Unified CSS/JS management, clear UI dependencies                       │
+  │ All UI features grouped together                                        │
+  └─────────────────────────────────────────────────────────────────────────┘
+  
+  ┌─────────────────────────────────────────────────────────────────────────┐
+  │ AIChatProCollaboration            [Collaboration Layer]                 │
+  ├─ Share conversations (from ChatShare)                                    │
+  ├─ Comments/annotations (future)                                           │
+  ├─ Real-time collaboration (future)                                        │
+  └─ Growth path: Share → Comments → Annotations → Live sync                 │
+  │ Clear expansion path for collaboration features                         │
+  └─────────────────────────────────────────────────────────────────────────┘
+
+RESULT: 12 extensions with clear boundaries, logical groupings, obvious patterns
+
+───────────────────────────────────────────────────────────────────────────────
+
+BENEFITS OF REFINEMENT:
+
+Configuration:
+  ✓ 27 config files → 12 config files (55% reduction)
+  ✓ Related features grouped together
+  ✓ Clear prerequisites (AIChatProCore required for others)
+
+Mental Model:
+  ✓ Developers understand "ChatbotCommerce" = all shopping features
+  ✓ "AIAgentChannels" = adapter registry pattern
+  ✓ "AIChatProCore" = foundation layer concept
+  ✓ Patterns become obvious for future extensions
+
+Maintainability:
+  ✓ Fewer interdependencies to track
+  ✓ Clearer ownership boundaries
+  ✓ Easier to test (fewer mock setups)
+  ✓ Simpler migrations
+
+Scalability:
+  ✓ Add new channel? Just write SMS adapter in AIAgentChannels
+  ✓ Add new tool? Register in AIAgentTools
+  ✓ Add new commerce feature? Add to ChatbotCommerce
+  ✓ Pattern becomes obvious
+
+───────────────────────────────────────────────────────────────────────────────
+
+EFFORT & RISK:
+
+Timeline: ~4 weeks for all merges
+  - Week 1: Prepare & test (parallel running)
+  - Week 2: Test complex groups
+  - Week 3: Staging deployment
+  - Week 4: Production + monitoring
+
+Risk: LOW
+  - No code logic changes, only reorganization
+  - Parallel running catches issues
+  - Easy rollback (revert directories)
+  - Can merge one group at a time
+
+Start with: Voice integration (clearest, smallest group)
+Then: Channels (establishes adapter pattern for others)
+
+───────────────────────────────────────────────────────────────────────────────
+
+RECOMMENDATION: ✓ YES - Proceed with refinement
+
+Reasoning:
+  • 55% fewer extensions to maintain
+  • Clearer structure for developers
+  • Better patterns emerge
+  • Low risk (structural only)
+  • High benefit (clarity, maintainability, scalability)
+  • Can be done incrementally
+  • BaseExtensionServiceProvider works perfectly with merged extensions
+

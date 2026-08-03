@@ -1,0 +1,393 @@
+╔═══════════════════════════════════════════════════════════════════════════════╗
+║            TitanAI SKILLS, TOOLS, PROMPTS & ARCHITECTURE                    ║
+║                    Unified Component Model Across All Systems                ║
+╚═══════════════════════════════════════════════════════════════════════════════╝
+
+
+COMPONENT LAYERS
+───────────────────────────────────────────────────────────────────────────────
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                          TitanAI EXTENSIONS LAYER                           │
+│  (TitanAI-Voice, TitanAI-Channels, TitanAI-Email, TitanAI-Research, etc.)  │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                        ↓
+                    UNIFIED COMPONENT REGISTRATION
+                    
+┌──────────────────┬──────────────────┬──────────────────┬──────────────────┐
+│   SKILLS         │   ACTIONS        │   TOOLS          │   PROMPTS        │
+│                  │                  │                  │                  │
+│ • Discrete       │ • Operations     │ • LLM-callable   │ • System prompts │
+│   capabilities   │   to execute     │   functions      │ • Few-shot ex.   │
+│                  │                  │   with schemas   │ • Behavior guide │
+│ • Self-contained │ • With params    │                  │                  │
+│ • Reusable       │ • Return results │ • For function   │ • Context-aware  │
+│                  │                  │   calling        │ • LLM guidance   │
+│ • Stateless      │ • Observable     │ • Chainable      │                  │
+│                  │ • Trackable      │ • LLM-callable   │ • Temperature    │
+│                  │                  │                  │ • Top-k config   │
+└──────────────────┴──────────────────┴──────────────────┴──────────────────┘
+                                        ↓
+                        CONNECTORS (External APIs)
+                                        ↓
+        Twilio ║ Gmail ║ Slack ║ OpenAI ║ Anthropic ║ etc.
+                                        ↓
+┌──────────────────────────────────────────────────────────────────────────────┐
+│              UNIFIED REGISTRY (Central Component Store)                      │
+└──────────────────────────────────────────────────────────────────────────────┘
+                    ↙              ↓              ↓              ↘
+        ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐
+        │   CHATBOT    │  │  AIAGENT     │  │  AICHATPRO   │  │  FUTURE      │
+        └──────────────┘  └──────────────┘  └──────────────┘  └──────────────┘
+
+
+HOW COMPONENTS WORK
+───────────────────────────────────────────────────────────────────────────────
+
+SKILL LIFECYCLE (Example: TitanAI-Voice.call)
+
+    Register (In Extension)
+         ↓
+    class TitanAIVoiceServiceProvider {
+        protected function getSkills() {
+            return ['call' => new VoiceCallSkill()];
+        }
+    }
+         ↓
+    UnifiedRegistry stores as: "titanai-voice.call"
+         ↓
+    CHATBOT: Uses skill for "handle voice call" conversation step
+    AIAGENT: Uses skill as capability for agent to reference
+    AICHATPRO: Uses skill as available enhancement
+
+
+ACTION LIFECYCLE (Example: TitanAI-Voice.initiate-call)
+
+    Register (In Extension)
+         ↓
+    class TitanAIVoiceServiceProvider {
+        protected function getActions() {
+            return ['initiate-call' => new InitiateCallAction()];
+        }
+    }
+         ↓
+    UnifiedRegistry stores as: "titanai-voice.initiate-call"
+    With Parameters: ['recipient', 'caller_id', 'context']
+         ↓
+    CHATBOT: Execute during conversation ("Make a call to...")
+    AIAGENT: Agent can invoke via decision logic
+    AICHATPRO: Chat can trigger from user request
+
+
+TOOL LIFECYCLE (Example: TitanAI-Research.web-search)
+
+    Register (In Extension)
+         ↓
+    class TitanAIResearchServiceProvider {
+        protected function getTools() {
+            return ['web-search' => new WebSearchTool()];
+        }
+    }
+         ↓
+    UnifiedRegistry stores as: "titanai-research.web-search"
+    With Schema (for LLM function calling):
+    {
+        "name": "titanai_research_web_search",
+        "description": "Search the web for information",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "query": {"type": "string"},
+                "limit": {"type": "integer", "default": 10}
+            },
+            "required": ["query"]
+        }
+    }
+         ↓
+    CHATBOT: Make tool available for conversation via tool use
+    AIAGENT: Agent calls via function calling API
+    AICHATPRO: Chat can invoke for deep research
+
+
+PROMPT LIFECYCLE (Example: TitanAI-Research.expert)
+
+    Register (In Extension)
+         ↓
+    class TitanAIResearchServiceProvider {
+        protected function getPrompts() {
+            return ['expert' => new ResearchExpertPrompt()];
+        }
+    }
+         ↓
+    UnifiedRegistry stores as: "titanai-research.expert"
+    Returns: "You are a research expert. Your role is to..."
+         ↓
+    CHATBOT: Set system prompt for conversation about research
+    AIAGENT: Set system prompt to guide agent behavior
+    AICHATPRO: Set system prompt for chat expertise mode
+
+
+NAMING CONVENTION
+───────────────────────────────────────────────────────────────────────────────
+
+All components follow same pattern:
+
+    {extension-name}.{component-name}
+
+Examples:
+    titanai-voice.call              (Skill)
+    titanai-voice.initiate-call     (Action)
+    titanai-voice.transcriber       (Tool)
+    titanai-voice.call-handler      (Prompt)
+    titanai-voice.twilio            (Connector)
+
+    titanai-research.deep-search    (Skill)
+    titanai-research.web-search     (Tool)
+    titanai-research.code-executor  (Tool)
+    titanai-research.expert         (Prompt)
+    titanai-research.openai         (Connector)
+
+    titanai-email.send              (Action)
+    titanai-email.parser            (Tool)
+    titanai-email.gmail             (Connector)
+
+
+UNIFIED REGISTRY QUERIES
+───────────────────────────────────────────────────────────────────────────────
+
+Get ALL Voice Components (Across All Types):
+    $registry->getComponentsByExtension('titanai-voice')
+    Returns: {
+        "skills": [VoiceCallSkill, ...],
+        "actions": [InitiateCallAction, ...],
+        "tools": [TranscriberTool, ...],
+        "prompts": [CallHandlerPrompt, ...],
+        "connectors": [TwilioConnector, ...]
+    }
+
+Get All Tools for LLM Function Calling:
+    $registry->getToolsForFunctionCalling('titanai-research.*')
+    Returns: [
+        {
+            "type": "function",
+            "function": {
+                "name": "titanai_research_web_search",
+                "description": "...",
+                "parameters": {...}
+            }
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "titanai_research_code_executor",
+                ...
+            }
+        }
+    ]
+
+Get All Research Prompts:
+    $registry->getPrompts('titanai-research.*')
+    Returns: [
+        ResearchExpertPrompt,
+        CodeReviewerPrompt,
+        DataAnalystPrompt
+    ]
+
+Get Component by Full Key:
+    $registry->getSkill('titanai-voice.call')
+    Returns: VoiceCallSkill instance
+
+Get All Components by System:
+    $registry->getComponentsBySystem('chatbot')
+    Returns summary of all chatbot-related components
+
+
+CROSS-SYSTEM USAGE
+───────────────────────────────────────────────────────────────────────────────
+
+SCENARIO: TitanAI-Voice registered once, used by all three systems
+
+    TitanAI-Voice Extension (Defines Once):
+    ├─ Skill:      VoiceCallSkill ("handle incoming call")
+    ├─ Action:     InitiateCallAction ("make a call")
+    ├─ Tool:       CallTransferTool (for function calling)
+    ├─ Prompt:     CallHandlerPrompt ("You handle calls professionally...")
+    └─ Connector:  TwilioConnector (actual API)
+
+    CHATBOT uses it:
+    ├─ Skill available for conversations: "Voice call received, handling..."
+    ├─ Action available in flow: "Make a call to customer"
+    ├─ Tool available for tool use: Call transfer
+    ├─ Prompt for context: "You are a professional call handler"
+    └─ Connector provides: Twilio API access
+
+    AIAGENT uses same components:
+    ├─ Action available: Agent can "initiate-call" to customer
+    ├─ Tool available: Agent can "call-transfer" via function calling
+    ├─ Prompt guides: Agent behavior during calls
+    └─ Connector provides: Same Twilio API
+
+    AICHATPRO uses same components:
+    ├─ Tool available: Chat can invoke "call-transcriber"
+    ├─ Skill available: Deep research via "voice-analysis"
+    ├─ Prompt available: "You analyze voice calls professionally"
+    └─ Connector provides: Same Twilio API
+
+
+REGISTRY ARCHITECTURE
+───────────────────────────────────────────────────────────────────────────────
+
+class UnifiedRegistry {
+    
+    // Storage (Internal)
+    private $skills = [];       // ['titanai-voice.call' => VoiceCallSkill]
+    private $actions = [];      // ['titanai-voice.initiate-call' => InitiateCallAction]
+    private $tools = [];        // ['titanai-research.web-search' => WebSearchTool]
+    private $prompts = [];      // ['titanai-research.expert' => ResearchExpertPrompt]
+    private $connectors = [];   // ['titanai-voice.twilio' => TwilioConnector]
+    
+    // Registration APIs
+    public function registerSkill(string $key, SkillInterface $skill)
+    public function registerAction(string $key, ActionInterface $action)
+    public function registerTool(string $key, ToolInterface $tool)
+    public function registerPrompt(string $key, PromptInterface $prompt)
+    public function registerConnector(string $key, ConnectorInterface $connector)
+    
+    // Retrieval APIs
+    public function getSkill(string $key): ?SkillInterface
+    public function getAction(string $key): ?ActionInterface
+    public function getTool(string $key): ?ToolInterface
+    public function getPrompt(string $key): ?PromptInterface
+    public function getConnector(string $key): ?ConnectorInterface
+    
+    // Bulk APIs (with filtering)
+    public function getSkills(string $filter = null): array
+    public function getActions(string $filter = null): array
+    public function getTools(string $filter = null): array
+    public function getPrompts(string $filter = null): array
+    public function getConnectors(string $filter = null): array
+    
+    // Smart APIs
+    public function getToolsForFunctionCalling(string $filter = null): array
+    public function getComponentsByExtension(string $extension): array
+    public function getComponentsBySystem(string $system): array
+    public function getSummary(): array
+}
+
+
+EXAMPLE: TitanAI-Voice Extension Implementation
+
+class TitanAIVoiceServiceProvider extends BaseExtensionServiceProvider {
+    
+    public function getExtensionKey(): string {
+        return 'titanai-voice';
+    }
+    
+    protected function getSkills(): array {
+        return [
+            'call' => new VoiceCallSkill(),
+            'answer' => new AnswerCallSkill(),
+            'transcribe' => new TranscribeSkill(),
+        ];
+    }
+    
+    protected function getActions(): array {
+        return [
+            'initiate-call' => new InitiateCallAction(),
+            'transfer-call' => new TransferCallAction(),
+            'end-call' => new EndCallAction(),
+        ];
+    }
+    
+    protected function getTools(): array {
+        return [
+            'transcriber' => new TranscriberTool(),
+            'call-transfer' => new CallTransferTool(),
+            'conference' => new ConferenceTool(),
+        ];
+    }
+    
+    protected function getPrompts(): array {
+        return [
+            'handler' => new CallHandlerPrompt(),
+            'support' => new CallSupportPrompt(),
+            'sales' => new CallSalesPrompt(),
+        ];
+    }
+    
+    protected function getConnectors(): array {
+        return [
+            'twilio' => new TwilioConnector(),
+            'vonage' => new VonageConnector(),
+        ];
+    }
+}
+
+Result: Automatic registration produces:
+├─ Skills:     titanai-voice.call, titanai-voice.answer, titanai-voice.transcribe
+├─ Actions:    titanai-voice.initiate-call, titanai-voice.transfer-call, titanai-voice.end-call
+├─ Tools:      titanai-voice.transcriber, titanai-voice.call-transfer, titanai-voice.conference
+├─ Prompts:    titanai-voice.handler, titanai-voice.support, titanai-voice.sales
+└─ Connectors: titanai-voice.twilio, titanai-voice.vonage
+
+
+COMPONENT MATRIX: WHICH SYSTEMS USE WHAT?
+───────────────────────────────────────────────────────────────────────────────
+
+                 Chatbot      AIAgent      AIChatPro
+Skills           ✓ Yes        ✓ Yes        ✓ Yes
+Actions          ✓ Yes        ✓ Yes        ✓ Yes
+Tools            ✓ Yes        ✓ Yes        ✓ Yes
+Prompts          ✓ Yes        ✓ Yes        ✓ Yes
+Connectors       ✓ Yes        ✓ Yes        ✓ Yes
+
+
+SUMMARY: UNIFIED COMPONENT ARCHITECTURE
+───────────────────────────────────────────────────────────────────────────────
+
+Component    Description              Naming                    Example
+─────────────────────────────────────────────────────────────────────────────
+SKILL        Discrete capability      {ext}.{action-noun}       titanai-voice.call
+ACTION       Operation to execute     {ext}.{verb}-{object}     titanai-voice.initiate-call
+TOOL         LLM-callable function    {ext}.{tool-name}         titanai-research.web-search
+PROMPT       LLM system instruction   {ext}.{role-or-purpose}   titanai-research.expert
+CONNECTOR    External API integration {ext}.{provider}          titanai-voice.twilio
+
+ALL:
+  ✓ Registered to UnifiedRegistry
+  ✓ Available to Chatbot, AIAgent, AIChatPro
+  ✓ Follow same naming convention
+  ✓ Can be queried by extension/system/type
+  ✓ Support filtering via wildcards
+
+
+BENEFITS
+───────────────────────────────────────────────────────────────────────────────
+
+Clarity:
+  ✓ All component types have clear definitions
+  ✓ Each system knows what to do with each type
+  ✓ Naming is consistent and predictable
+
+Reusability:
+  ✓ Voice components defined once, used by all three systems
+  ✓ Research tools work for AIAgent, Chatbot, AIChatPro
+  ✓ No duplication across systems
+
+Discoverability:
+  ✓ Get all voice components in one query
+  ✓ Get all tools ready for LLM function calling
+  ✓ Get all research prompts
+  ✓ Get components by extension or system
+
+Maintainability:
+  ✓ Bug fix to Twilio connector helps all systems
+  ✓ New prompt improves all three systems
+  ✓ Tool enhancement benefits all users
+  ✓ Single source of truth for each component
+
+Extensibility:
+  ✓ Add new component types easily (e.g., Validators)
+  ✓ Add new systems easily (each gets access to all components)
+  ✓ Add new extensions easily (follow same pattern)
+

@@ -1,0 +1,288 @@
+╔═══════════════════════════════════════════════════════════════════════════════╗
+║            TitanAI UNIFIED NAMING & CROSS-TYPE ARCHITECTURE                  ║
+║                   11 Extensions (4 Cross-Type, 7 Type-Specific)              ║
+╚═══════════════════════════════════════════════════════════════════════════════╝
+
+CROSS-TYPE EXTENSIONS (Work on ALL 3 Main Systems)
+───────────────────────────────────────────────────────────────────────────────
+
+    TitanAI-Voice
+    ├─ Chatbot:    Skill (handle-voice-call)
+    ├─ AIAgent:    Action (initiate-call, transfer-call, end-call)
+    ├─ AIChatPro:  Connector (Twilio, Vonage)
+    └─ Shared:     Audio service, call state, transcription, synthesis
+
+    TitanAI-Channels
+    ├─ Chatbot:    Skill (read-slack, parse-whatsapp)
+    ├─ AIAgent:    Action (post-to-slack, send-whatsapp)
+    ├─ AIChatPro:  Connector (channel-sync, message-queue)
+    └─ Shared:     Channel adapters (Slack, WhatsApp, SMS, Telegram)
+
+    TitanAI-Email
+    ├─ Chatbot:    Skill (read-email, parse-attachments)
+    ├─ AIAgent:    Action (send-email, create-draft)
+    ├─ AIChatPro:  Connector (gmail-sync, conversation-threading)
+    └─ Shared:     Gmail API client, OAuth handling
+
+    TitanAI-Share
+    ├─ Chatbot:    Skill (share-response)
+    ├─ AIAgent:    Action (generate-share-link, email-result)
+    ├─ AIChatPro:  Feature (built-in share, collaboration)
+    └─ Shared:     Link generation, access control, expiry
+
+
+TYPE-SPECIFIC EXTENSIONS
+───────────────────────────────────────────────────────────────────────────────
+
+CHATBOT TIER (Works on Chatbot only):
+
+    TitanAI-Commerce
+    ├─ Purpose:   Shopping domain
+    ├─ Features:  Cart, orders, inventory, fulfillment, payments
+    └─ Why:       Chatbot-specific (user shopping context)
+
+    TitanAI-Reservations
+    ├─ Purpose:   Booking domain
+    ├─ Features:  Appointments, calendar, availability, confirmations
+    └─ Why:       Chatbot-specific (conversation-driven booking)
+
+    TitanAI-CRM
+    ├─ Purpose:   Customer data domain
+    ├─ Features:  Segmentation, reviews, sentiment, churn, LTV
+    └─ Why:       Chatbot-specific (customer context for conversations)
+
+
+AIAGENT TIER (Works on AIAgent only):
+
+    TitanAI-Agents
+    ├─ Purpose:   Tool registry
+    ├─ Features:  Chatbot tool, marketing tool, social tool, custom registry
+    └─ Why:       AIAgent-specific (agents need tools)
+
+
+AICHATPRO TIER (Works on AIChatPro only):
+
+    TitanAI-Core
+    ├─ Purpose:   Foundation layer
+    ├─ Features:  Skills, folders, settings, temp chats
+    └─ Why:       AIChatPro-specific (prerequisite for other AIChatPro extensions)
+
+    TitanAI-Research
+    ├─ Purpose:   AI capabilities
+    ├─ Features:  Deep research, file Q&A (RAG), smart image generation
+    └─ Why:       AIChatPro-specific (enhances chat capabilities)
+
+    TitanAI-UI
+    ├─ Purpose:   User experience layer
+    ├─ Features:  Entity highlighting, context selection, canvas UI
+    └─ Why:       AIChatPro-specific (chat UI enhancements)
+
+
+CROSS-TYPE ARCHITECTURE
+───────────────────────────────────────────────────────────────────────────────
+
+How a Cross-Type Extension (TitanAI-Voice) Works:
+
+    Extension Loads
+         ↓
+    Check Configuration
+         ├─ config('titanai.extensions.chatbot.auto_register') → YES
+         ├─ config('titanai.extensions.aiagent.auto_register') → YES
+         └─ config('titanai.extensions.aichatpro.auto_register') → YES
+         ↓
+    Register Components for Chatbot
+         ├─ Register Skills: voice-call, voice-message
+         ├─ Config: TITANAI_VOICE_ENABLED_CHATBOT=true
+         └─ Events: Subscribe to ChatbotEvents
+         ↓
+    Register Components for AIAgent
+         ├─ Register Actions: initiate-call, transfer-call, end-call
+         ├─ Config: TITANAI_VOICE_ENABLED_AIAGENT=true
+         └─ Events: Subscribe to AIAgentEvents
+         ↓
+    Register Components for AIChatPro
+         ├─ Register Connectors: twilio, vonage
+         ├─ Config: TITANAI_VOICE_ENABLED_AICHATPRO=true
+         └─ Events: Subscribe to AIChatProEvents
+         ↓
+    Unified Service Layer
+         └─ SharedAudioService, CallStateManager, TranscriptionService
+
+
+NAMING COMPARISON
+───────────────────────────────────────────────────────────────────────────────
+
+BEFORE (Type-Specific Naming):
+    ChatbotVoiceIntegration
+    AIAgentChannels
+    AIChatProCore
+    → Each name suggests it only works with that type
+    → Confusing relationships between similar extensions
+    → 27 separate configuration concerns
+
+AFTER (Unified TitanAI Naming):
+    TitanAI-Voice (cross-type)
+    TitanAI-Channels (cross-type)
+    TitanAI-Core (type-specific to AIChatPro)
+    → Clear that TitanAI-Voice works everywhere
+    → Clear relationships (4 infrastructure, 7 domain-specific)
+    → 11 logical groups
+
+
+CONFIGURATION EXAMPLE
+───────────────────────────────────────────────────────────────────────────────
+
+ENABLE TitanAI-Voice on ALL Systems:
+
+    .env:
+        TITANAI_VOICE_ENABLED=true
+    
+    config/titanai.php:
+        'extensions' => [
+            'chatbot' => [
+                'auto_register_to_unified_registry' => true,
+            ],
+            'aiagent' => [
+                'auto_register_to_unified_registry' => true,
+            ],
+            'aichatpro' => [
+                'auto_register_to_unified_registry' => true,
+            ],
+        ]
+
+    Result: TitanAI-Voice registers on all three systems
+
+
+ENABLE ONLY on Chatbot & AIAgent:
+
+    config/titanai.php:
+        'extensions' => [
+            'chatbot' => [
+                'auto_register_to_unified_registry' => true,  ✓ Voice active
+            ],
+            'aiagent' => [
+                'auto_register_to_unified_registry' => true,  ✓ Voice active
+            ],
+            'aichatpro' => [
+                'auto_register_to_unified_registry' => false, ✗ Voice inactive
+            ],
+        ]
+
+    Result: TitanAI-Voice only registers skills & actions (AIChatPro not activated)
+
+
+BENEFITS OF UNIFIED TITANAI NAMING + CROSS-TYPE
+───────────────────────────────────────────────────────────────────────────────
+
+Clarity
+  ✓ TitanAI-Voice = voice system (works on Chatbot, AIAgent, AIChatPro)
+  ✓ TitanAI-Commerce = shopping (Chatbot only)
+  ✓ Clear intent in naming
+
+No Duplication
+  ✓ Voice logic in ONE place (not replicated for each system)
+  ✓ Channel adapters in ONE place
+  ✓ Email integration in ONE place
+  ✓ Shared infrastructure code reused
+
+Configuration Clarity
+  ✓ Enable/disable per system based on config
+  ✓ Single extension, multiple activation points
+  ✓ Reduces extension count from 27 to 11
+
+Scalability
+  ✓ Add new system? Just extend getExtensionTypes()
+  ✓ Add new channel? Just add adapter to TitanAI-Channels
+  ✓ New tools? Register in TitanAI-Agents
+
+Maintenance
+  ✓ Bug in voice? Fix once in TitanAI-Voice, all systems benefit
+  ✓ New Twilio feature? Add to TitanAI-Voice connectors once
+  ✓ Single ownership for infrastructure extensions
+
+
+IMPLEMENTATION CHECKLIST
+───────────────────────────────────────────────────────────────────────────────
+
+Phase 0: Modify BaseExtensionServiceProvider
+  ☐ Add getExtensionTypes(): array method
+  ☐ Update boot() to loop through types
+  ☐ Backwards compatible (single-type extensions still work)
+  ☐ Time: ~2 hours
+
+Phase 1: Rename Extensions to TitanAI Prefix
+  ☐ ChatbotVoiceIntegration → TitanAI-Voice
+  ☐ AIAgentChannels → TitanAI-Channels
+  ☐ All others...
+  ☐ Time: ~4 hours
+
+Phase 2: Enable Cross-Type for 4 Infrastructure Extensions
+  ☐ TitanAI-Voice: return ['chatbot', 'aiagent', 'aichatpro']
+  ☐ TitanAI-Channels: return ['chatbot', 'aiagent', 'aichatpro']
+  ☐ TitanAI-Email: return ['chatbot', 'aiagent', 'aichatpro']
+  ☐ TitanAI-Share: return ['chatbot', 'aiagent', 'aichatpro']
+  ☐ Time: ~4 hours
+
+Phase 3: Keep Type-Specific for 7 Domain Extensions
+  ☐ TitanAI-Commerce: return ['chatbot']
+  ☐ TitanAI-Reservations: return ['chatbot']
+  ☐ TitanAI-CRM: return ['chatbot']
+  ☐ TitanAI-Agents: return ['aiagent']
+  ☐ TitanAI-Core: return ['aichatpro']
+  ☐ TitanAI-Research: return ['aichatpro']
+  ☐ TitanAI-UI: return ['aichatpro']
+  ☐ Time: ~2 hours
+
+Phase 4: Test Cross-Type Functionality
+  ☐ TitanAI-Voice registers skills on Chatbot
+  ☐ TitanAI-Voice registers actions on AIAgent
+  ☐ TitanAI-Voice registers connectors on AIChatPro
+  ☐ Config enables/disables per system
+  ☐ Time: ~8 hours
+
+Total: ~20 hours
+
+
+FINAL RESULT
+───────────────────────────────────────────────────────────────────────────────
+
+BEFORE:
+  27 extensions
+  Type-specific naming (ChatbotX, AIAgentX, AIChatProX)
+  Duplicated infrastructure logic
+  Unclear relationships
+  27 config files
+
+AFTER:
+  11 TitanAI-branded extensions
+  4 work on all 3 systems (infrastructure)
+  7 work on 1 system (domain-specific)
+  Infrastructure logic unified once
+  Clear naming and relationships
+  Single TitanAI configuration structure
+
+Benefit Summary:
+  ✓ 55% fewer extensions
+  ✓ 0% feature reduction
+  ✓ 100% backwards compatible
+  ✓ Clearer mental model
+  ✓ Easier maintenance
+  ✓ Simpler configuration
+  ✓ Cross-type support enables future growth
+
+
+RECOMMENDATION
+───────────────────────────────────────────────────────────────────────────────
+
+✅ YES - Use TitanAI prefix for all extensions
+
+✅ YES - Enable cross-type support for 4 infrastructure extensions
+       (Voice, Channels, Email, Share)
+
+✅ YES - Keep type-specific for 7 domain extensions
+       (Commerce, Reservations, CRM, Agents, Core, Research, UI)
+
+Timeline: ~20 hours (1 week of work)
+Risk: LOW (backwards compatible)
+Benefit: HIGH (clarity, maintenance, scalability)
+
