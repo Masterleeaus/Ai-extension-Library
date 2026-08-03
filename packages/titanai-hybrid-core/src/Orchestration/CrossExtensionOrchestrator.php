@@ -9,9 +9,6 @@ use TitanAI\Hybrid\Registries\UnifiedRegistry;
 use LogicException;
 use Throwable;
 
-/**
- * Structured execution surface for components discovered across extensions.
- */
 final class CrossExtensionOrchestrator
 {
     public function __construct(
@@ -19,7 +16,6 @@ final class CrossExtensionOrchestrator
         private readonly TitanAIDiagnostics $diagnostics,
     ) {}
 
-    /** @return array{ok:bool,type:string,key:string,correlation_id:string,result?:mixed,error_code?:string,message?:string} */
     public function executeAction(string $key, array $payload, array $context = []): array
     {
         if (! (bool) config('titanai.features.cross_extension_actions', true)) {
@@ -47,7 +43,6 @@ final class CrossExtensionOrchestrator
         }
     }
 
-    /** @return array{ok:bool,type:string,key:string,correlation_id:string,result?:mixed,error_code?:string,message?:string} */
     public function send(string $key, array $data, array $context = []): array
     {
         if (! (bool) config('titanai.features.cross_extension_connectors', true)) {
@@ -78,7 +73,6 @@ final class CrossExtensionOrchestrator
         }
     }
 
-    /** @return list<array<string,mixed>> */
     public function matchingSkills(string $intent): array
     {
         $matches = [];
@@ -95,7 +89,6 @@ final class CrossExtensionOrchestrator
         return $matches;
     }
 
-    /** @return array{ok:false,type:string,key:string,correlation_id:string,error_code:string,message:string} */
     private function failure(
         string $type,
         string $key,
@@ -125,7 +118,6 @@ final class CrossExtensionOrchestrator
         ];
     }
 
-    /** @param array<string,mixed> $context */
     private function correlationId(array $context): string
     {
         $provided = trim((string) ($context['correlation_id'] ?? ''));

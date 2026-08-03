@@ -52,9 +52,6 @@ final class TitanAIEventBus
             $this->diagnostics->recordEvent('published', $event, $idempotencyKey);
             return true;
         } catch (Throwable $exception) {
-            // Keep the idempotency key: Laravel listeners run sequentially, so a
-            // listener may already have produced side effects before a later one
-            // throws. Retrying the same event could duplicate those side effects.
             $this->diagnostics->recordEvent('failed', $event, $idempotencyKey, $exception);
             Log::warning('TitanAI event listener failed; native operation was isolated.', [
                 'event' => $event::class,

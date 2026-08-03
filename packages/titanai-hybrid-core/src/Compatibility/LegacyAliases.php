@@ -35,5 +35,7 @@ foreach ($aliases as $current => $legacy) {
         || interface_exists($legacy, false)
         || trait_exists($legacy, false)
         || (function_exists('enum_exists') && enum_exists($legacy, false));
-    if (! $legacyExists) { class_alias($current, $legacy); }
+    if (! $legacyExists) {
+        class_alias($current, $legacy);
+    }
 }

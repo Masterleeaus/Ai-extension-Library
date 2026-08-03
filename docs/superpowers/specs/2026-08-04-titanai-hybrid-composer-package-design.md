@@ -82,4 +82,4 @@ Tests cover package metadata, namespace migration, provider paths, compatibility
 
 ## Branch and merge policy
 
-Implementation occurs on short-lived branches with small focused commits. After verification and review, pull requests are merged into `main`. Future package work should follow the same short-branch, frequent-merge pattern rather than accumulating long-lived branches.
+Implementation occurs on `agent/package-titanai-hybrid-core` with small focused commits. After verification and review, the pull request is merged into `main`. Future package work should follow the same short-branch, frequent-merge pattern rather than accumulating long-lived branches.

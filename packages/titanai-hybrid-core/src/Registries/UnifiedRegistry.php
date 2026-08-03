@@ -13,20 +13,14 @@ use Illuminate\Support\Collection;
 use InvalidArgumentException;
 use LogicException;
 
-/**
- * Central in-process component discovery registry shared by TitanAI extensions.
- */
 final class UnifiedRegistry
 {
     /** @var Collection<string, SkillDefinition> */
     private Collection $skills;
-
     /** @var Collection<string, ActionDefinition> */
     private Collection $actions;
-
     /** @var Collection<string, ConnectorDefinition> */
     private Collection $connectors;
-
     /** @var Collection<string, ToolDefinition> */
     private Collection $tools;
 
@@ -52,21 +46,9 @@ final class UnifiedRegistry
         return $this;
     }
 
-    public function getSkill(string $key): ?SkillDefinition
-    {
-        return $this->skills->get($key);
-    }
-
-    /** @return Collection<string, SkillDefinition> */
-    public function allSkills(): Collection
-    {
-        return clone $this->skills;
-    }
-
-    public function hasSkill(string $key): bool
-    {
-        return $this->skills->has($key);
-    }
+    public function getSkill(string $key): ?SkillDefinition { return $this->skills->get($key); }
+    public function allSkills(): Collection { return clone $this->skills; }
+    public function hasSkill(string $key): bool { return $this->skills->has($key); }
 
     public function registerAction(string $key, ActionDefinition $action): self
     {
@@ -74,21 +56,9 @@ final class UnifiedRegistry
         return $this;
     }
 
-    public function getAction(string $key): ?ActionDefinition
-    {
-        return $this->actions->get($key);
-    }
-
-    /** @return Collection<string, ActionDefinition> */
-    public function allActions(): Collection
-    {
-        return clone $this->actions;
-    }
-
-    public function hasAction(string $key): bool
-    {
-        return $this->actions->has($key);
-    }
+    public function getAction(string $key): ?ActionDefinition { return $this->actions->get($key); }
+    public function allActions(): Collection { return clone $this->actions; }
+    public function hasAction(string $key): bool { return $this->actions->has($key); }
 
     public function registerConnector(string $key, ConnectorDefinition $connector): self
     {
@@ -96,21 +66,9 @@ final class UnifiedRegistry
         return $this;
     }
 
-    public function getConnector(string $key): ?ConnectorDefinition
-    {
-        return $this->connectors->get($key);
-    }
-
-    /** @return Collection<string, ConnectorDefinition> */
-    public function allConnectors(): Collection
-    {
-        return clone $this->connectors;
-    }
-
-    public function hasConnector(string $key): bool
-    {
-        return $this->connectors->has($key);
-    }
+    public function getConnector(string $key): ?ConnectorDefinition { return $this->connectors->get($key); }
+    public function allConnectors(): Collection { return clone $this->connectors; }
+    public function hasConnector(string $key): bool { return $this->connectors->has($key); }
 
     public function registerTool(string $key, ToolDefinition $tool): self
     {
@@ -118,23 +76,10 @@ final class UnifiedRegistry
         return $this;
     }
 
-    public function getTool(string $key): ?ToolDefinition
-    {
-        return $this->tools->get($key);
-    }
+    public function getTool(string $key): ?ToolDefinition { return $this->tools->get($key); }
+    public function allTools(): Collection { return clone $this->tools; }
+    public function hasTool(string $key): bool { return $this->tools->has($key); }
 
-    /** @return Collection<string, ToolDefinition> */
-    public function allTools(): Collection
-    {
-        return clone $this->tools;
-    }
-
-    public function hasTool(string $key): bool
-    {
-        return $this->tools->has($key);
-    }
-
-    /** @return array{skills:list<string>,actions:list<string>,connectors:list<string>,tools:list<string>,total:int} */
     public function summary(): array
     {
         return [
@@ -146,7 +91,6 @@ final class UnifiedRegistry
         ];
     }
 
-    /** @return array{skills:int,actions:int,connectors:int,tools:int,total:int} */
     public function counts(): array
     {
         return [
@@ -158,23 +102,9 @@ final class UnifiedRegistry
         ];
     }
 
-    /** @return array<string, array<string, mixed>> */
-    public function skillMetadata(): array
-    {
-        return $this->metadataFor($this->skills);
-    }
-
-    /** @return array<string, array<string, mixed>> */
-    public function actionMetadata(): array
-    {
-        return $this->metadataFor($this->actions);
-    }
-
-    /** @return array<string, array<string, mixed>> */
-    public function connectorMetadata(): array
-    {
-        return $this->metadataFor($this->connectors);
-    }
+    public function skillMetadata(): array { return $this->metadataFor($this->skills); }
+    public function actionMetadata(): array { return $this->metadataFor($this->actions); }
+    public function connectorMetadata(): array { return $this->metadataFor($this->connectors); }
 
     public function flush(): self
     {
@@ -185,7 +115,6 @@ final class UnifiedRegistry
         return $this;
     }
 
-    /** @param Collection<string, Registrable> $collection */
     private function put(Collection $collection, string $key, Registrable $component, string $type): void
     {
         $key = trim($key);
@@ -201,10 +130,6 @@ final class UnifiedRegistry
         $collection->put($key, $component);
     }
 
-    /**
-     * @param Collection<string, Registrable> $collection
-     * @return array<string, array<string, mixed>>
-     */
     private function metadataFor(Collection $collection): array
     {
         return $collection->mapWithKeys(static function (Registrable $component, string $key): array {

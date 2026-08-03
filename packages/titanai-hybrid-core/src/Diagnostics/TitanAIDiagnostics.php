@@ -7,13 +7,6 @@ namespace TitanAI\Hybrid\Diagnostics;
 use TitanAI\Hybrid\Registries\UnifiedRegistry;
 use Throwable;
 
-/**
- * Lightweight in-process diagnostics for the shared TitanAI foundation.
- *
- * The service deliberately stores only bounded, non-sensitive summaries so it
- * can be exposed through host diagnostics without retaining prompts, payloads,
- * connector credentials, or memory values.
- */
 final class TitanAIDiagnostics
 {
     /** @var array<string,array<string,int>> */
@@ -44,7 +37,6 @@ final class TitanAIDiagnostics
         ]);
     }
 
-    /** @param array<string,mixed> $context */
     public function recordMemory(string $status, string $operation, array $context = [], ?Throwable $exception = null): void
     {
         $counter = match ($status) {
@@ -63,7 +55,6 @@ final class TitanAIDiagnostics
         ]);
     }
 
-    /** @param array<string,mixed> $context */
     public function recordOrchestration(string $status, string $componentType, string $key, array $context = [], ?Throwable $exception = null): void
     {
         $counter = $status === 'succeeded' ? 'succeeded' : 'failed';
@@ -76,16 +67,6 @@ final class TitanAIDiagnostics
         ]);
     }
 
-    /**
-     * @return array{
-     *   health:string,
-     *   events:array<string,int>,
-     *   memory:array<string,int>,
-     *   orchestration:array<string,int>,
-     *   registry?:array{skills:int,actions:int,connectors:int,tools:int,total:int},
-     *   recent:list<array<string,mixed>>
-     * }
-     */
     public function snapshot(?UnifiedRegistry $registry = null): array
     {
         $failed = $this->counters['events']['failed']
@@ -115,7 +96,6 @@ final class TitanAIDiagnostics
         $this->recent = [];
     }
 
-    /** @param array<string,mixed> $context */
     private function remember(string $category, string $status, array $context): void
     {
         $this->recent[] = [
