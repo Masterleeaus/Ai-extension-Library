@@ -4,6 +4,16 @@ declare(strict_types=1);
 
 namespace App\Extensions\Chatbot\System;
 
+use App\Domains\TitanAI\ActionCompleted;
+use App\Domains\TitanAI\ConnectorsDiscovered;
+use App\Domains\TitanAI\ExtensionBooted;
+use App\Domains\TitanAI\Events\TitanAIEventBus;
+use App\Domains\TitanAI\Registries\UnifiedRegistry;
+use App\Domains\TitanAI\SkillsDiscovered;
+use App\Domains\TitanAI\TitanAIServiceProvider;
+use App\Extensions\Chatbot\System\TitanAI\Runtime\Skills\FieldServiceSkillRegistry;
+use App\Extensions\Chatbot\System\TitanAI\Runtime\Skills\UnifiedSkillAdapter;
+
 use App\Extensions\Chatbot\System\Http\Controllers\Api\TitanAI\ProjectArchitectureDiagnosticsController;
 
 use App\Extensions\Chatbot\System\Models\ChatbotConversation;
@@ -60,7 +70,9 @@ use App\Http\Middleware\CheckTemplateTypeAndPlan;
 use App\Support\TitanZero\TitanZeroFeatureFlags;
 use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Routing\Router;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 
@@ -68,6 +80,7 @@ class ChatbotServiceProvider extends ServiceProvider implements ExtensionRegiste
 {
     public function register(): void
     {
+        $this->app->register(TitanAIServiceProvider::class);
         $this->mergeConfigFrom(__DIR__.'/../config/titan_project_architecture.php', 'titan_project_architecture');
         $this->app->singleton(BuilderRegistry::class);
         $this->app->singleton(GenerativeUiSpecNormaliser::class);
@@ -163,6 +176,67 @@ class ChatbotServiceProvider extends ServiceProvider implements ExtensionRegiste
             ->registerTeamChatBroadcastChannels()
             ->registerCommand();
 
+        if ((bool) config('titanai.extensions.chatbot.enabled', true)) {
+            if ((bool) config('titanai.extensions.chatbot.auto_register_to_unified_registry', true)) {
+                $this->registerSkillsToUnifiedRegistry();
+            }
+            if ((bool) config('titanai.extensions.chatbot.listen_to_events', true)) {
+                $this->subscribeToTitanAIEvents();
+            }
+            $this->app->make(TitanAIEventBus::class)->dispatch(
+                new ExtensionBooted('chatbot', [
+                    'registry' => $this->app->make(UnifiedRegistry::class)->counts(),
+                ]),
+                'extension:chatbot:booted',
+            );
+        }
+    }
+
+    private function registerSkillsToUnifiedRegistry(): void
+    {
+        try {
+            $registry = $this->app->make(UnifiedRegistry::class);
+            $nativeRegistry = $this->app->make(FieldServiceSkillRegistry::class);
+
+            foreach ($nativeRegistry->all() as $definition) {
+                $skill = new UnifiedSkillAdapter($definition);
+                if (! $registry->hasSkill($skill->key())) {
+                    $registry->registerSkill($skill->key(), $skill);
+                }
+            }
+
+            if ((bool) config('titanai.extensions.chatbot.emit_discovery_events', true)) {
+                $metadata = $registry->skillMetadata();
+                $this->app->make(TitanAIEventBus::class)->dispatch(
+                    new SkillsDiscovered($metadata, 'chatbot'),
+                    'discovery:skills:chatbot:' . hash('sha256', json_encode($metadata, JSON_THROW_ON_ERROR)),
+                );
+            }
+        } catch (\Throwable $exception) {
+            Log::error('Chatbot unified skill registration failed.', [
+                'exception' => $exception,
+            ]);
+        }
+    }
+
+    private function subscribeToTitanAIEvents(): void
+    {
+        $events = $this->app->make(TitanAIEventBus::class);
+        $events->listenOnce('chatbot.action-completed', ActionCompleted::class, static function (ActionCompleted $event): void {
+            if ($event->source !== 'chatbot') {
+                Log::info('Chatbot received a cross-extension action result.', [
+                    'source' => $event->source,
+                    'action' => $event->actionKey,
+                ]);
+            }
+        });
+
+        $events->listenOnce('chatbot.connectors-discovered', ConnectorsDiscovered::class, static function (ConnectorsDiscovered $event): void {
+            Log::debug('Chatbot connector discovery snapshot updated.', [
+                'source' => $event->source,
+                'count' => count($event->connectors),
+            ]);
+        });
     }
 
     public function registerPolicies(): self
