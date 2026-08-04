@@ -1,0 +1,43 @@
+{
+  "verified_at": "2026-08-03T08:06:36+00:00",
+  "release_version": "1.2.0-offline.1",
+  "model_version": "local-brain-v2",
+  "policy": {
+    "offline_only": true,
+    "cloud_llm_clients": 0,
+    "cloud_ai_api_keys": 0,
+    "non_local_ai_network_calls": 0,
+    "python_bridge": "local PHP subprocess over JSON stdin/stdout"
+  },
+  "checks": {
+    "core_php": 26,
+    "template_catalogue": 10,
+    "assurance_workflows": 9,
+    "commerce_vertical_workflows": 8,
+    "localbrain_v2_php": 8,
+    "offline_policy_php": 1,
+    "total_php_behavior_checks": 62,
+    "offline_typescript": 8,
+    "python_agent_api_and_memory": 9,
+    "static_offline_policy": 2,
+    "total_unique_behavior_and_policy_checks": 81,
+    "php_files_linted": 361,
+    "checksummed_interaction_files": 516
+  },
+  "benchmarks": {
+    "php": {
+      "runtime": "8.4.16",
+      "predictions": 10000,
+      "total_ms": 159.443,
+      "mean_ms": 0.015944,
+      "estimated_model_bytes": 11547,
+      "note": "Classifier microbenchmark only; not an end-to-end API latency guarantee."
+    }
+  },
+  "limitations": [
+    "Connected WorkCore host mappings and end-to-end production activation remain unverified.",
+    "LocalBrain output is deterministic and template/rule based, not unrestricted local-LLM text generation.",
+    "Only the eight bundled school ERP read-only tools are connected through the Python fa\u00e7ade."
+  ],
+  "source_archive_sha256": "a684d5a618f6a409d0537a8c17f077cd1b0b619bbdf8ab4ed1a49db14dae98e3"
+}

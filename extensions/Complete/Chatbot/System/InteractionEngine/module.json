@@ -1,0 +1,26 @@
+{
+  "name": "InteractionEngine",
+  "alias": "interaction",
+  "version": "10.2.0-offline",
+  "description": "Titan Zero universal interaction, wizard and offline-only LocalBrain v2 intelligence engine",
+  "keywords": [
+    "titan-zero",
+    "interaction",
+    "wizard",
+    "offline-first",
+    "local-intelligence",
+    "workcore",
+    "adaptive-persona",
+    "naive-bayes",
+    "vector-clock",
+    "conflict-reranking"
+  ],
+  "active": 1,
+  "order": 1,
+  "providers": [
+    "TitanZero\\Interaction\\Providers\\InteractionServiceProvider"
+  ],
+  "aliases": {
+    "Interaction": "TitanZero\\Interaction\\Facades\\Interaction"
+  }
+}
