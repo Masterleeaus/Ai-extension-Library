@@ -19,8 +19,13 @@
         ids.forEach(id => params.append('ids[]', id));
 
         fetch('{{ route('dashboard.user.video-dubbing.check') }}?' + params.toString())
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) throw new Error(`HTTP ${response.status}: Failed to check dubbing status`);
+                return response.json();
+            })
             .then(data => {
+                if (!data.data) return;
+
                 for (const [id, item] of Object.entries(data.data)) {
                     const el = document.getElementById(item.divId);
                     if (el) {
@@ -32,7 +37,9 @@
                     window.dispatchEvent(new CustomEvent('dubbing-videos-updated', { detail: data.videos }));
                 }
             })
-            .catch(error => console.error('Error checking dubbing status:', error));
+            .catch(error => {
+                console.error('Error checking dubbing status:', error);
+            });
     }
 
     document.addEventListener('DOMContentLoaded', function() {

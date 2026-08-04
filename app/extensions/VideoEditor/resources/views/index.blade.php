@@ -182,7 +182,10 @@
 					},
 					body: JSON.stringify(Object.fromEntries(formData)),
 				})
-				.then(res => res.json())
+				.then(res => {
+					if (!res.ok) throw new Error(`HTTP ${res.status}: Failed to create project`);
+					return res.json();
+				})
 				.then(data => {
 					if (data.status === 'success' && data.project) {
 						window.location.href = '{{ url('dashboard/user/video-editor/editor') }}/' + data.project.id;
@@ -190,7 +193,10 @@
 						toastr.error(data.message || '{{ __('Failed to create project') }}');
 					}
 				})
-				.catch(() => toastr.error('{{ __('Something went wrong') }}'));
+				.catch(error => {
+					console.error('Project creation failed:', error);
+					toastr.error(error.message || '{{ __('Failed to create project. Please try again.') }}');
+				});
 		}
 
 		function duplicateProject(projectId) {
@@ -201,7 +207,10 @@
 						'Accept': 'application/json',
 					},
 				})
-				.then(res => res.json())
+				.then(res => {
+					if (!res.ok) throw new Error(`HTTP ${res.status}: Failed to duplicate project`);
+					return res.json();
+				})
 				.then(data => {
 					if (data.status === 'success') {
 						toastr.success(data.message);
@@ -209,6 +218,10 @@
 					} else {
 						toastr.error(data.message || '{{ __('Failed to duplicate project') }}');
 					}
+				})
+				.catch(error => {
+					console.error('Project duplication failed:', error);
+					toastr.error(error.message || '{{ __('Failed to duplicate project. Please try again.') }}');
 				});
 		}
 
@@ -224,22 +237,21 @@
 					},
 				})
 				.then(res => {
-					if (!res.ok) throw new Error('Delete failed: ' + res.status);
+					if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
 					return res.json();
 				})
 				.then(data => {
 					if (data.status === 'success') {
-						// Remove card from DOM immediately
 						const card = document.querySelector('[data-project-id="' + projectId + '"]');
 						if (card) card.remove();
-						if (window.toastr) toastr.success(data.message || '{{ __('Project deleted') }}');
+						if (window.toastr) toastr.success(data.message || '{{ __('Project deleted successfully') }}');
 					} else {
 						if (window.toastr) toastr.error(data.message || '{{ __('Failed to delete project') }}');
 					}
 				})
-				.catch(err => {
-					console.error('Delete error:', err);
-					if (window.toastr) toastr.error('{{ __('Failed to delete project') }}');
+				.catch(error => {
+					console.error('Project deletion failed:', error);
+					if (window.toastr) toastr.error(error.message || '{{ __('Failed to delete project. Please try again.') }}');
 				});
 		}
 	</script>
