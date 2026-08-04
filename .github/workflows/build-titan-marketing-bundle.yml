@@ -1,0 +1,168 @@
+name: Build Titan Marketing Bundle
+
+on:
+  push:
+    branches:
+      - agent/ai-extensions-deep-scan-2026-08-04
+    paths:
+      - '.github/workflows/build-titan-marketing-bundle.yml'
+      - 'docs/titan-marketing/**'
+      - 'extensions/MarketingBot/**'
+      - 'extensions/AIAgentToolMarketingBot/**'
+      - 'extensions/AIAgent/**'
+      - 'extensions/AIAgentGmail/**'
+      - 'extensions/AIAgentWhatsappChannel/**'
+      - 'extensions/AIAgentSlackChannel/**'
+      - 'extensions/PhoneCallAgent/**'
+      - 'extensions/ChatbotVoiceCall/**'
+      - 'extensions/ChatbotVoice/**'
+      - 'extensions/ElevenLabsVoiceChat/**'
+      - 'extensions/AzureTTS/**'
+      - 'extensions/SEOTool/**'
+      - 'extensions/BlogPilot/**'
+      - 'extensions/ContentManager/**'
+      - 'extensions/AIPlagiarism/**'
+      - 'extensions/AIWriterTemplates/**'
+      - 'extensions/UrlToVideo/**'
+      - 'extensions/AiViralClips/**'
+      - 'extensions/UGCCreator/**'
+      - 'extensions/UGCFactory/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build install-ready bundle
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT="Titan-Marketing-Extension-Bundle"
+          DEST="$ROOT/app/Extensions"
+          mkdir -p "$DEST" "$ROOT/docs"
+
+          extensions=(
+            MarketingBot
+            AIAgentToolMarketingBot
+            AIAgent
+            AIAgentGmail
+            AIAgentWhatsappChannel
+            AIAgentSlackChannel
+            PhoneCallAgent
+            ChatbotVoiceCall
+            ChatbotVoice
+            ElevenLabsVoiceChat
+            AzureTTS
+            SEOTool
+            BlogPilot
+            ContentManager
+            AIPlagiarism
+            AIWriterTemplates
+            UrlToVideo
+            AiViralClips
+            UGCCreator
+            UGCFactory
+          )
+
+          for extension in "${extensions[@]}"; do
+            test -d "extensions/$extension"
+            cp -a "extensions/$extension" "$DEST/$extension"
+          done
+
+          cp docs/titan-marketing/TITAN-MARKETING-BUILD-PROMPT.md "$ROOT/TITAN-MARKETING-BUILD-PROMPT.md"
+
+          cat > "$ROOT/README.md" <<'EOF'
+          # Titan Marketing Extension Bundle
+
+          This package preserves every original MagicAI extension folder name for straightforward installation under `app/Extensions`.
+
+          The primary extension remains internally named and installed as `MarketingBot`. Its customer-facing UI should be renamed to **Titan Marketing** by following `TITAN-MARKETING-BUILD-PROMPT.md`.
+
+          ## Included extensions
+
+          ### Core marketing orchestration
+          - MarketingBot
+          - AIAgentToolMarketingBot
+          - AIAgent
+
+          ### Communication channels
+          - AIAgentGmail
+          - AIAgentWhatsappChannel
+          - AIAgentSlackChannel
+
+          ### Voice and calling
+          - PhoneCallAgent
+          - ChatbotVoiceCall
+          - ChatbotVoice
+          - ElevenLabsVoiceChat
+          - AzureTTS
+
+          ### Content, SEO and campaign creative
+          - SEOTool
+          - BlogPilot
+          - ContentManager
+          - AIPlagiarism
+          - AIWriterTemplates
+          - UrlToVideo
+          - AiViralClips
+          - UGCCreator
+          - UGCFactory
+
+          SocialMedia, SocialMediaAgent, SocialMediaAutomation and AISocialMedia are intentionally excluded so Titan Social can remain a separate product. Titan Marketing should integrate with Titan Social through an optional adapter.
+
+          ## Installation
+
+          Copy the folders inside `app/Extensions` into the target MagicAI installation's `app/Extensions` directory. Install and enable them through the normal MagicAI extension process in dependency order. Review each extension's own setup documentation and configure provider credentials through secure settings.
+
+          This is a source bundle, not a guarantee that every optional provider can boot without its platform prerequisites. Validate in a staging environment before production deployment.
+          EOF
+
+          cat > "$ROOT/bundle-manifest.json" <<'EOF'
+          {
+            "product_display_name": "Titan Marketing",
+            "primary_install_identity": "MarketingBot",
+            "layout": "app/Extensions/<OriginalExtensionName>",
+            "social_extensions_excluded": true,
+            "extensions": [
+              "MarketingBot",
+              "AIAgentToolMarketingBot",
+              "AIAgent",
+              "AIAgentGmail",
+              "AIAgentWhatsappChannel",
+              "AIAgentSlackChannel",
+              "PhoneCallAgent",
+              "ChatbotVoiceCall",
+              "ChatbotVoice",
+              "ElevenLabsVoiceChat",
+              "AzureTTS",
+              "SEOTool",
+              "BlogPilot",
+              "ContentManager",
+              "AIPlagiarism",
+              "AIWriterTemplates",
+              "UrlToVideo",
+              "AiViralClips",
+              "UGCCreator",
+              "UGCFactory"
+            ]
+          }
+          EOF
+
+          find "$ROOT" -type f -print0 | sort -z | xargs -0 sha256sum > "$ROOT/SHA256SUMS.txt"
+          zip -r -q Titan-Marketing-Extension-Bundle.zip "$ROOT"
+          sha256sum Titan-Marketing-Extension-Bundle.zip > Titan-Marketing-Extension-Bundle.zip.sha256
+
+      - name: Upload bundle artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Titan-Marketing-Extension-Bundle
+          path: |
+            Titan-Marketing-Extension-Bundle.zip
+            Titan-Marketing-Extension-Bundle.zip.sha256
+          if-no-files-found: error
+          retention-days: 30
