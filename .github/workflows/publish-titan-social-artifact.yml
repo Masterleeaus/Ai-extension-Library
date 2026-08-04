@@ -1,0 +1,127 @@
+name: Publish Titan Social Artifact
+
+on:
+  push:
+    branches:
+      - agent/ai-extensions-deep-scan-2026-08-04
+    paths:
+      - '.github/workflows/publish-titan-social-artifact.yml'
+      - 'docs/titan-social/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/ai-extensions-deep-scan-2026-08-04
+          fetch-depth: 0
+
+      - name: Build Titan Social bundle
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT="Titan-Social-Extension-Bundle"
+          DEST="$ROOT/app/Extensions"
+          rm -rf "$ROOT" Titan-Social-Extension-Bundle.zip Titan-Social-Extension-Bundle.zip.sha256
+          mkdir -p "$DEST"
+
+          extensions=(
+            SocialMedia
+            AISocialMedia
+            SocialMediaAgent
+            SocialMediaAutomation
+            AIAgent
+            AIAgentToolSocialMediaAgent
+            InfluencerAvatar
+            UGCCreator
+            UGCFactory
+            AiViralClips
+            UrlToVideo
+            AiCaptions
+            VideoEditor
+          )
+
+          for extension in "${extensions[@]}"; do
+            test -d "extensions/$extension"
+            cp -a "extensions/$extension" "$DEST/$extension"
+          done
+
+          cp docs/titan-social/TITAN-SOCIAL-BUILD-PROMPT.md "$ROOT/TITAN-SOCIAL-BUILD-PROMPT.md"
+
+          cat > "$ROOT/README.md" <<'EOF'
+          # Titan Social Extension Bundle
+
+          The primary extension remains internally installed as `SocialMedia` and is renamed only in customer-facing UI to **Titan Social**.
+
+          `AIAgent` and `AIAgentToolSocialMediaAgent` remain separate installable extensions. The bridge must be expanded but not merged.
+
+          Consolidation donors:
+          - AISocialMedia
+          - SocialMediaAgent
+          - SocialMediaAutomation
+
+          Creative donors:
+          - InfluencerAvatar
+          - UGCCreator
+          - UGCFactory
+          - AiViralClips
+          - UrlToVideo
+          - AiCaptions
+          - VideoEditor
+
+          Follow `TITAN-SOCIAL-BUILD-PROMPT.md` for the complete architecture, migration, governance, security and testing requirements.
+          EOF
+
+          cat > "$ROOT/bundle-manifest.json" <<'EOF'
+          {
+            "product_display_name": "Titan Social",
+            "primary_install_identity": "SocialMedia",
+            "primary_install_path": "app/Extensions/SocialMedia",
+            "standalone_extensions": ["AIAgent", "AIAgentToolSocialMediaAgent"],
+            "consolidation_donors": ["AISocialMedia", "SocialMediaAgent", "SocialMediaAutomation"],
+            "creative_donors": ["InfluencerAvatar", "UGCCreator", "UGCFactory", "AiViralClips", "UrlToVideo", "AiCaptions", "VideoEditor"]
+          }
+          EOF
+
+          find "$ROOT" -type f ! -name SHA256SUMS.txt -print0 | sort -z | xargs -0 sha256sum > "$ROOT/SHA256SUMS.txt"
+          zip -r -q Titan-Social-Extension-Bundle.zip "$ROOT"
+          sha256sum Titan-Social-Extension-Bundle.zip > Titan-Social-Extension-Bundle.zip.sha256
+
+      - name: Upload bundle artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Titan-Social-Extension-Bundle
+          path: |
+            Titan-Social-Extension-Bundle.zip
+            Titan-Social-Extension-Bundle.zip.sha256
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Commit run marker
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p generated
+          ZIP_SHA=$(awk '{print $1}' Titan-Social-Extension-Bundle.zip.sha256)
+          ZIP_BYTES=$(stat -c '%s' Titan-Social-Extension-Bundle.zip)
+          cat > generated/titan-social-artifact-run.json <<EOF
+          {
+            "run_id": $GITHUB_RUN_ID,
+            "run_number": $GITHUB_RUN_NUMBER,
+            "artifact_name": "Titan-Social-Extension-Bundle",
+            "file_name": "Titan-Social-Extension-Bundle.zip",
+            "zip_bytes": $ZIP_BYTES,
+            "sha256": "$ZIP_SHA",
+            "head_sha": "$GITHUB_SHA"
+          }
+          EOF
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add generated/titan-social-artifact-run.json
+          git commit -m "build: record Titan Social artifact run [skip ci]"
+          git push origin HEAD:agent/ai-extensions-deep-scan-2026-08-04
