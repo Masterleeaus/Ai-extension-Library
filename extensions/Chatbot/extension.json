@@ -1,0 +1,22 @@
+{
+  "name": "Chatbot",
+  "title": "Chatbot PWA",
+  "description": "Progressive Web App Chatbot with WorkCore integration, connector management, and offline support",
+  "version": "1.0.0",
+  "type": "system",
+  "category": "chat",
+  "author": "Claude",
+  "license": "MIT",
+  "requires": {
+    "workcore": ">=1.0.0",
+    "php": ">=8.1"
+  },
+  "keywords": [
+    "chatbot",
+    "pwa",
+    "offline",
+    "connectors",
+    "workcore"
+  ],
+  "status": "completed"
+}
