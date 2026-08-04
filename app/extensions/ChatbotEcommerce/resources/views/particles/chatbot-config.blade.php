@@ -78,7 +78,8 @@
 		placeholder="{{ __('Enter access token') }}"
 		name="shopify_access_token"
 		size="lg"
-		x-model="activeChatbot.shopify_access_token"
+		type="password"
+		autocomplete="new-password"
 	/>
 </div>
 
@@ -107,7 +108,8 @@
 		placeholder="{{ __('Enter consumer key') }}"
 		name="woocommerce_consumer_key"
 		size="lg"
-		x-model="activeChatbot.woocommerce_consumer_key"
+		type="password"
+		autocomplete="new-password"
 	/>
 </div>
 
@@ -121,7 +123,8 @@
 		placeholder="{{ __('Enter consumer secret') }}"
 		name="woocommerce_consumer_secret"
 		size="lg"
-		x-model="activeChatbot.woocommerce_consumer_secret"
+		type="password"
+		autocomplete="new-password"
 	/>
 </div>
 

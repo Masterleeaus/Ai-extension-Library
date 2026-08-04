@@ -1,0 +1,31 @@
+{
+  "verified_at": "2026-08-03T03:46:00+10:00",
+  "model_version": "local-brain-v2",
+  "checks": {
+    "core_php": 26,
+    "template_catalogue": 10,
+    "assurance_workflows": 9,
+    "commerce_vertical_workflows": 8,
+    "localbrain_v2_php": 7,
+    "offline_typescript": 8,
+    "total_php_checks": 60,
+    "total_checks": 68
+  },
+  "benchmarks": {
+    "php": {
+      "runtime": "8.4.16",
+      "predictions": 10000,
+      "total_ms": 103.03,
+      "mean_ms": 0.010303,
+      "estimated_model_bytes": 6949
+    },
+    "node": {
+      "runtime": "v22.16.0",
+      "predictions": 10000,
+      "total_ms": 60.797,
+      "mean_ms": 0.00608,
+      "estimated_model_bytes": 6964
+    }
+  },
+  "source_archive_sha256": "a684d5a618f6a409d0537a8c17f077cd1b0b619bbdf8ab4ed1a49db14dae98e3"
+}

@@ -4,11 +4,20 @@ declare(strict_types=1);
 
 namespace App\Extensions\AIAgent\System;
 
+use TitanAI\Hybrid\ActionsDiscovered;
+use TitanAI\Hybrid\ConnectorsDiscovered;
+use TitanAI\Hybrid\ExtensionBooted;
+use TitanAI\Hybrid\Events\TitanAIEventBus;
+use TitanAI\Hybrid\Registries\UnifiedRegistry;
+use TitanAI\Hybrid\SkillsDiscovered;
+use TitanAI\Hybrid\TitanAIServiceProvider;
+
 use App\Domains\Marketplace\Contracts\UninstallExtensionServiceProviderInterface;
 use App\Extensions\AIAgent\System\Actions\AiCallAction;
 use App\Extensions\AIAgent\System\Actions\GenerateReportAction;
 use App\Extensions\AIAgent\System\Actions\PathAction;
 use App\Extensions\AIAgent\System\Actions\SendMessageAction;
+use App\Extensions\AIAgent\System\Actions\UnifiedActionAdapter;
 use App\Extensions\AIAgent\System\Connectors\ConnectorRegistry;
 use App\Extensions\AIAgent\System\Connectors\MagicAiConnector;
 use App\Extensions\AIAgent\System\Connectors\TelegramConnector;
@@ -38,7 +47,9 @@ use App\Extensions\AIAgent\System\Policies\AIAgentWorkflowPolicy;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Routing\Router;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 
@@ -46,6 +57,7 @@ class AIAgentServiceProvider extends ServiceProvider implements UninstallExtensi
 {
     public function register(): void
     {
+        $this->app->register(TitanAIServiceProvider::class);
         $this->registerConfig();
         $this->app->singleton(ConnectorRegistry::class);
         $this->app->singleton(AIAgentActionRegistry::class);
@@ -63,6 +75,78 @@ class AIAgentServiceProvider extends ServiceProvider implements UninstallExtensi
             ->registerComponents()
             ->registerTelegramConnector()
             ->registerBuiltInActions();
+
+        if ((bool) config('titanai.extensions.aiagent.enabled', true)) {
+            if ((bool) config('titanai.extensions.aiagent.auto_register_to_unified_registry', true)) {
+                $this->registerActionsToUnifiedRegistry();
+            }
+            if ((bool) config('titanai.extensions.aiagent.listen_to_events', true)) {
+                $this->subscribeToTitanAIEvents();
+            }
+            $this->app->make(TitanAIEventBus::class)->dispatch(
+                new ExtensionBooted('aiagent', [
+                    'registry' => $this->app->make(UnifiedRegistry::class)->counts(),
+                ]),
+                'extension:aiagent:booted',
+            );
+        }
+    }
+
+    private function registerActionsToUnifiedRegistry(): void
+    {
+        $nativeRegistry = $this->app->make(AIAgentActionRegistry::class);
+
+        $nativeRegistry->onRegistered(function (string $key, string $_actionClass): void {
+            try {
+                $nativeRegistry = $this->app->make(AIAgentActionRegistry::class);
+                $nativeAction = $nativeRegistry->resolve($key);
+                if (! $nativeAction instanceof \App\Extensions\AIAgent\System\Actions\Contracts\AIAgentActionInterface) {
+                    throw new \UnexpectedValueException(
+                        "AI Agent action [{$key}] does not implement the unified action metadata contract.",
+                    );
+                }
+
+                $registry = $this->app->make(UnifiedRegistry::class);
+                if (! $registry->hasAction($key)) {
+                    $registry->registerAction($key, new UnifiedActionAdapter(
+                        $key,
+                        $nativeAction,
+                        $this->app->make(TitanAIEventBus::class),
+                    ));
+                }
+
+                if ((bool) config('titanai.extensions.aiagent.emit_discovery_events', true)) {
+                    $metadata = $registry->actionMetadata();
+                    $this->app->make(TitanAIEventBus::class)->dispatch(
+                        new ActionsDiscovered($metadata, 'aiagent'),
+                        'discovery:actions:aiagent:' . hash('sha256', json_encode($metadata, JSON_THROW_ON_ERROR)),
+                    );
+                }
+            } catch (\Throwable $exception) {
+                Log::warning('AI Agent action could not be mirrored to UnifiedRegistry.', [
+                    'action' => $key,
+                    'exception' => $exception,
+                ]);
+            }
+        }, replay: true, listenerKey: 'titanai.unified.actions');
+    }
+
+    private function subscribeToTitanAIEvents(): void
+    {
+        $events = $this->app->make(TitanAIEventBus::class);
+        $events->listenOnce('aiagent.skills-discovered', SkillsDiscovered::class, static function (SkillsDiscovered $event): void {
+            Log::debug('AI Agent skill discovery snapshot updated.', [
+                'source' => $event->source,
+                'count' => count($event->skills),
+            ]);
+        });
+
+        $events->listenOnce('aiagent.connectors-discovered', ConnectorsDiscovered::class, static function (ConnectorsDiscovered $event): void {
+            Log::debug('AI Agent connector discovery snapshot updated.', [
+                'source' => $event->source,
+                'count' => count($event->connectors),
+            ]);
+        });
     }
 
     private function registerBuiltInActions(): static

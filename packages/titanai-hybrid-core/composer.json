@@ -1,0 +1,34 @@
+{
+  "name": "titanai/hybrid-core",
+  "description": "Shared Laravel foundation for TitanAI Chatbot, AIChatPro, and AIAgent.",
+  "type": "library",
+  "license": "proprietary",
+  "version": "1.0.0",
+  "require": {
+    "php": "^8.1",
+    "illuminate/console": "^10.0 || ^11.0 || ^12.0 || ^13.0",
+    "illuminate/database": "^10.0 || ^11.0 || ^12.0 || ^13.0",
+    "illuminate/events": "^10.0 || ^11.0 || ^12.0 || ^13.0",
+    "illuminate/support": "^10.0 || ^11.0 || ^12.0 || ^13.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "TitanAI\\Hybrid\\": "src/"
+    },
+    "files": [
+      "src/Compatibility/LegacyAliases.php"
+    ]
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "TitanAI\\Hybrid\\TitanAIServiceProvider"
+      ]
+    }
+  },
+  "config": {
+    "sort-packages": true
+  },
+  "minimum-stability": "stable",
+  "prefer-stable": true
+}

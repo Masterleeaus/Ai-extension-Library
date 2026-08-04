@@ -1,0 +1,10 @@
+{
+  "name": "titanzero/interaction-contracts",
+  "description": "Versioned protocol and JSON Schema contracts shared by Titan Interaction Engine server and offline runtimes",
+  "type": "library",
+  "license": "proprietary",
+  "require": {
+    "php": "^8.2",
+    "ext-json": "*"
+  }
+}

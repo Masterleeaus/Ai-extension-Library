@@ -3,11 +3,23 @@ name: Materialize AI extensions
 on:
   push:
     branches:
+      - main
       - agent/import-ai-extensions
+      - agent/replace-core-ai-extensions-pass3
+      - agent/package-titanai-hybrid-core-r2
     paths:
       - .github/workflows/materialize-ai-extensions.yml
       - scripts/restore_extensions.py
+      - scripts/apply_ecommerce_overlay.py
+      - scripts/apply_chatbot_embedding_scope_patch.py
+      - scripts/package_titanai_hybrid.py
+      - scripts/tests/test_package_titanai_hybrid.py
+      - scripts/apply_interaction_engine_packages.py
+      - scripts/verify_interaction_engine_architecture.py
       - transport/dataset-manifest.json
+      - transport/pass3-overlay-manifest.json
+      - transport/ecommerce-overlay-manifest.json
+      - transport/interaction-engine-packages-manifest.json
   pull_request:
     branches:
       - main
@@ -25,7 +37,7 @@ jobs:
   restore-and-commit:
     if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 50
     steps:
       - uses: actions/checkout@v4
         with:
@@ -34,20 +46,105 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: none
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
       - name: Install Parquet reader
         run: python -m pip install --disable-pip-version-check pyarrow
-      - name: Restore and verify extension files
+      - name: Restore base library and apply verified Pass 3 overlay
         run: |
           DATASET_URL=$(python -c "import json; print(json.load(open('transport/dataset-manifest.json'))['url'])")
-          python scripts/restore_extensions.py --clean --url "$DATASET_URL"
+          python scripts/restore_extensions.py \
+            --clean \
+            --url "$DATASET_URL" \
+            --overlay-manifest transport/pass3-overlay-manifest.json
+      - name: Convert TitanAI foundation to Composer package
+        run: python scripts/package_titanai_hybrid.py --root .
+      - name: Apply verified ChatbotEcommerce overlay
+        run: |
+          python scripts/apply_ecommerce_overlay.py \
+            --root . \
+            --manifest transport/ecommerce-overlay-manifest.json
+      - name: Restore Interaction Engine packages and bridge
+        run: python scripts/apply_interaction_engine_packages.py --root .
+      - name: Apply Chatbot embedding ownership patch
+        run: python scripts/apply_chatbot_embedding_scope_patch.py
+      - name: Run Chatbot embedding ownership contract
+        run: php tests/contracts/chatbot_embedding_ownership.php
+      - name: Validate manifests and PHP syntax
+        run: |
+          python -m json.tool extensions/AIAgent/extension.json >/dev/null
+          python -m json.tool extensions/AIChatPro/extension.json >/dev/null
+          python -m json.tool extensions/Chatbot/extension.json >/dev/null
+          python -m json.tool extensions/ChatbotEcommerce/extension.json >/dev/null
+          python -m json.tool extensions/InteractionEngineChatbotBridge/extension.json >/dev/null
+          python -m json.tool packages/titanai-hybrid-core/composer.json >/dev/null
+          python -m json.tool packages/titan-interaction-engine/composer.json >/dev/null
+          python -m json.tool packages/titan-interaction-contracts/composer.json >/dev/null
+          python -m json.tool packages/titan-interaction-contracts/package.json >/dev/null
+          python -m json.tool packages/titan-interaction-engine-offline/package.json >/dev/null
+          python -m json.tool extensions/AIAgent/titanai-package.json >/dev/null
+          python -m json.tool extensions/AIChatPro/titanai-package.json >/dev/null
+          python -m json.tool extensions/Chatbot/titanai-package.json >/dev/null
+          find extensions/AIAgent extensions/AIChatPro extensions/Chatbot extensions/ChatbotEcommerce \
+            extensions/InteractionEngineChatbotBridge packages/titanai-hybrid-core/src \
+            packages/titan-interaction-engine packages/titan-interaction-contracts \
+            -type f -name '*.php' -print0 | xargs -0 -n1 php -l >/tmp/php-lint.log
+          echo "PHP linted $(wc -l </tmp/php-lint.log) files"
+      - name: Verify TitanAI Composer package conversion
+        run: |
+          python -m unittest scripts.tests.test_package_titanai_hybrid -v
+          python scripts/package_titanai_hybrid.py --root . --check
+          php packages/titanai-hybrid-core/bin/verify-package.php
+          test ! -e foundation/TitanAI-Hybrid
+      - name: Verify Interaction Engine packages
+        run: |
+          python scripts/verify_interaction_engine_architecture.py
+          php packages/titan-interaction-engine/tests/run.php
+          php packages/titan-interaction-engine/bin/verify.php
+          php extensions/InteractionEngineChatbotBridge/tests/verify.php
+      - name: Verify Interaction Engine offline package
+        working-directory: packages/titan-interaction-engine-offline
+        run: |
+          npm install --ignore-scripts --no-audit --no-fund --no-package-lock
+          npm test
+          rm -rf node_modules
+      - name: Run packaged ChatbotEcommerce verification
+        run: |
+          test "$(python -c "import json; print(json.load(open('extensions/ChatbotEcommerce/extension.json'))['version'])")" = "4.9.0"
+          count=0
+          for script in extensions/ChatbotEcommerce/tests/run_*.php; do
+            php "$script"
+            count=$((count + 1))
+          done
+          test "$count" -eq 38
+          echo "ChatbotEcommerce verification scripts passed: $count"
       - name: Write materialisation summary
         run: |
           python - <<'PY'
           from pathlib import Path
+          import json
           files = [path for path in Path('extensions').rglob('*') if path.is_file()]
           size = sum(path.stat().st_size for path in files)
+          core = json.load(open('transport/pass3-overlay-manifest.json'))
+          ecommerce = json.load(open('transport/ecommerce-overlay-manifest.json'))
           Path('MATERIALIZED.md').write_text(
-              f"# Materialised source tree\n\nFiles: **{len(files):,}**  \nBytes: **{size:,}**  \nSource: MiniUp lossless Parquet transport dataset.\n",
+              '# Materialised source tree\n\n'
+              f'Files: **{len(files):,}**  \n'
+              f'Bytes: **{size:,}**  \n'
+              'Base source: MiniUp lossless Parquet transport dataset.  \n'
+              f"Core overlay: **{core['source_bundle']}**  \n"
+              f"Core overlay SHA-256: `{core['archive_sha256']}`  \n"
+              'Composer package: **titanai/hybrid-core 1.0.0**  \n'
+              'Package path: `packages/titanai-hybrid-core/`  \n'
+              'Interaction Engine packages: **preserved and verified**  \n'
+              f"Ecommerce overlay: **{ecommerce['source_bundle']}**  \n"
+              f"Ecommerce version: **{ecommerce['extension_version']}**  \n"
+              f"Ecommerce overlay SHA-256: `{ecommerce['archive_sha256']}`  \n",
               encoding='utf-8',
           )
           PY
@@ -55,10 +152,10 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add extensions MATERIALIZED.md docs/extension-inventory.csv docs/extension-inventory.json
+          git add extensions packages scripts MATERIALIZED.md docs/extension-inventory.csv docs/extension-inventory.json
           if git diff --cached --quiet; then
             echo "No source changes to commit"
           else
-            git commit -m "Materialize 78 AI extensions"
+            git commit -m "Materialize verified AI extension packages"
             git push origin HEAD:${{ github.head_ref || github.ref_name }}
           fi

@@ -1,4 +1,5 @@
 {
+<<<<<<< HEAD
   "schema_version": "1.0.0",
   "templates": [
     {
@@ -2992,4 +2993,53 @@
       ]
     }
   ]
+=======
+  "schema_version": "2.0.0",
+  "kind": "platform-application-index",
+  "templates": [
+    {
+      "identity": {"name": "Titan Zero", "slug": "titan-zero", "icon": "zero"},
+      "schema": "titan-zero.json",
+      "audience": ["owner", "manager", "administrator"]
+    },
+    {
+      "identity": {"name": "Titan Go", "slug": "titan-go", "icon": "go"},
+      "schema": "titan-go.json",
+      "audience": ["dispatcher", "supervisor", "field-worker", "cleaner"]
+    },
+    {
+      "identity": {"name": "Titan Launch", "slug": "titan-launch", "icon": "launch"},
+      "schema": "titan-launch.json",
+      "audience": ["owner", "manager", "sales", "marketing"],
+      "internal_engines": ["titan-sprout"]
+    },
+    {
+      "identity": {"name": "Titan Desk", "slug": "titan-desk", "icon": "desk"},
+      "schema": "titan-desk.json",
+      "audience": ["reception", "dispatcher", "sales", "manager"]
+    },
+    {
+      "identity": {"name": "Titan Hub", "slug": "titan-hub", "icon": "hub"},
+      "schema": "titan-hub.json",
+      "audience": ["customer"]
+    }
+  ],
+  "legacy_slug_map": {
+    "titan-dispatch": "titan-go",
+    "titan-front-desk": "titan-desk",
+    "titan-sprout": "titan-launch",
+    "titan-marketing": "titan-launch",
+    "titan-social": "titan-launch",
+    "titan-money": "titan-zero",
+    "titan-teams": "titan-zero",
+    "titan-analytics": "titan-zero",
+    "titan-locker": "titan-zero",
+    "titan-office": "titan-zero",
+    "titan-quality": "titan-zero"
+  },
+  "notes": {
+    "vertical_templates": "Legacy and industry-specific schema files remain available for template tooling but are not top-level platform applications.",
+    "workcore": "WorkCore remains the operational record authority for all five applications."
+  }
+>>>>>>> update-extensions-review-upgrade-nvbncq
 }

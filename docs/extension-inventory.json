@@ -14,8 +14,8 @@
     "name": "AI Agent",
     "version": "1.1",
     "description": "Autonomous AI agent with multi-channel messaging, workflow automation, and user memory — TG: @heew_support",
-    "files": 169,
-    "bytes": 1352714
+    "files": 172,
+    "bytes": 1367298
   },
   {
     "folder": "AIAgentGmail",
@@ -95,8 +95,8 @@
     "name": "AIChatPro",
     "version": "3.7",
     "description": "AIChatPro extension for MagicAI — TG: @heew_support",
-    "files": 47,
-    "bytes": 328078
+    "files": 49,
+    "bytes": 336967
   },
   {
     "folder": "AIChatProDeepResearch",
@@ -336,10 +336,10 @@
     "folder": "Chatbot",
     "category": "chatbot-suite",
     "name": "Chatbot",
-    "version": "6.9.0-unified-ai-shell",
-    "description": "Unified Titan Zero chatbot with template-aware 14-app shell, offline WorkCore PWA, shared five-tier AI convergence, 28 Tier-2 assistants, expanded Tier-3 agents, governance, generative UI, staff inbox, team chat and business channels.",
-    "files": 1548,
-    "bytes": 5873858
+    "version": "7.0.0-five-application-registry",
+    "description": "Unified Titan chatbot with five canonical applications (Titan Zero, Titan Go, Titan Launch, Titan Desk and Titan Hub), legacy app-slug migration, offline WorkCore PWA, shared five-tier AI convergence, governance, generative UI, staff inbox, team chat and business channels.",
+    "files": 1555,
+    "bytes": 5900300
   },
   {
     "folder": "ChatbotAgent",
@@ -372,10 +372,10 @@
     "folder": "ChatbotEcommerce",
     "category": "chatbot-suite",
     "name": "Ecommerce for External Chatbot",
-    "version": "1.0.0",
-    "description": "Chatbot ecommerce extension for magicai — TG: @heew_support",
-    "files": 17,
-    "bytes": 117161
+    "version": "4.9.0",
+    "description": "Three-role conversational commerce extension with unified native and external order workbench, settlement reconciliation, exception management, encrypted credentials, strict tenant isolation, marketplace operations, customer communications, BNPL, orders and returns.",
+    "files": 403,
+    "bytes": 1676325
   },
   {
     "folder": "ChatbotReview",

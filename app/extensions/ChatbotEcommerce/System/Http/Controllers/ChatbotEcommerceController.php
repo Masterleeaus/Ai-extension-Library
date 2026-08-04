@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Extensions\ChatbotBooking\System\Http\Controllers;
+namespace App\Extensions\ChatbotEcommerce\System\Http\Controllers;
 
 use App\Extensions\Chatbot\System\Services\ChatbotService;
 use App\Http\Controllers\Controller;

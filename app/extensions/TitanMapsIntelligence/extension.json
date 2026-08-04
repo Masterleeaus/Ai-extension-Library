@@ -1,0 +1,113 @@
+{
+  "schema_version": "2.0",
+  "id": "titan-maps-intelligence",
+  "name": "Titan Maps Intelligence",
+  "description": "Provider-neutral business discovery, place intelligence, provider sourcing, candidate governance and WorkCore promotion for Titan Zero.",
+  "version": "1.0.0",
+  "type": "integration",
+  "provider": "App\\Extensions\\TitanMapsIntelligence\\TitanMapsIntelligenceServiceProvider",
+  "enabled_by_default": false,
+  "requires": {
+    "host": [
+      "identity",
+      "companies",
+      "memberships",
+      "permissions",
+      "active-company-context",
+      "queues",
+      "audit",
+      "titan-vault",
+      "extension-registry",
+      "capability-registry",
+      "private-export-store"
+    ],
+    "workcore": [
+      "crm",
+      "supply"
+    ]
+  },
+  "provides": [
+    "titan-maps-intelligence.search.businesses",
+    "titan-maps-intelligence.search.read",
+    "titan-maps-intelligence.search.cancel",
+    "titan-maps-intelligence.search.export",
+    "titan-maps-intelligence.candidates.list",
+    "titan-maps-intelligence.candidate.match",
+    "titan-maps-intelligence.candidate.classify",
+    "titan-maps-intelligence.candidate.approve",
+    "titan-maps-intelligence.candidate.reject",
+    "titan-maps-intelligence.candidate.promote",
+    "titan-maps-intelligence.territory.analyse",
+    "titan-maps-intelligence.usage.read"
+  ],
+  "permissions": [
+    "titan-maps-intelligence.search.create",
+    "titan-maps-intelligence.search.read",
+    "titan-maps-intelligence.search.cancel",
+    "titan-maps-intelligence.search.export",
+    "titan-maps-intelligence.candidate.read",
+    "titan-maps-intelligence.candidate.classify",
+    "titan-maps-intelligence.candidate.approve",
+    "titan-maps-intelligence.candidate.reject",
+    "titan-maps-intelligence.candidate.promote",
+    "titan-maps-intelligence.provider.manage",
+    "titan-maps-intelligence.territory.analyse",
+    "titan-maps-intelligence.usage.read",
+    "titan-maps-intelligence.raw-data.read"
+  ],
+  "settings": [
+    {
+      "key": "titan-maps-intelligence.enabled",
+      "type": "boolean",
+      "default": false,
+      "sensitive": false
+    },
+    {
+      "key": "titan-maps-intelligence.default-provider",
+      "type": "string",
+      "default": "google-places",
+      "sensitive": false
+    },
+    {
+      "key": "titan-maps-intelligence.google-credential-reference",
+      "type": "string",
+      "default": "",
+      "sensitive": false
+    },
+    {
+      "key": "titan-maps-intelligence.timeout-seconds",
+      "type": "integer",
+      "default": 10,
+      "sensitive": false
+    },
+    {
+      "key": "titan-maps-intelligence.retry-attempts",
+      "type": "integer",
+      "default": 2,
+      "sensitive": false
+    },
+    {
+      "key": "titan-maps-intelligence.maximum-results",
+      "type": "integer",
+      "default": 100,
+      "sensitive": false
+    }
+  ],
+  "ai": {
+    "tier": "quattro",
+    "capabilities": [
+      "titan-maps-intelligence.search.businesses",
+      "titan-maps-intelligence.search.read",
+      "titan-maps-intelligence.search.cancel",
+      "titan-maps-intelligence.search.export",
+      "titan-maps-intelligence.candidates.list",
+      "titan-maps-intelligence.candidate.match",
+      "titan-maps-intelligence.candidate.classify",
+      "titan-maps-intelligence.candidate.approve",
+      "titan-maps-intelligence.candidate.reject",
+      "titan-maps-intelligence.candidate.promote",
+      "titan-maps-intelligence.territory.analyse",
+      "titan-maps-intelligence.usage.read"
+    ]
+  }
+}

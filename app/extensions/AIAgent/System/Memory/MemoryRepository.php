@@ -6,9 +6,12 @@ namespace App\Extensions\AIAgent\System\Memory;
 
 use App\Extensions\AIAgent\System\Models\AIAgentMemory;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
 class MemoryRepository
 {
+    public function __construct(private readonly UnifiedMemoryBridge $unifiedMemory) {}
+
     /**
      * Load all memory entries for a user.
      *
@@ -42,10 +45,16 @@ class MemoryRepository
      */
     public function remember(int $userId, string $memory): AIAgentMemory
     {
-        return AIAgentMemory::query()->create([
-            'user_id' => $userId,
-            'memory'  => $memory,
-        ]);
+        return DB::transaction(function () use ($userId, $memory): AIAgentMemory {
+            $entry = AIAgentMemory::query()->create([
+                'user_id' => $userId,
+                'memory'  => $memory,
+            ]);
+
+            $this->unifiedMemory->remember($userId, (string) $entry->getKey(), $memory);
+
+            return $entry;
+        });
     }
 
     /**
@@ -53,9 +62,12 @@ class MemoryRepository
      */
     public function update(AIAgentMemory $memory, string $content): AIAgentMemory
     {
-        $memory->update(['memory' => $content]);
+        return DB::transaction(function () use ($memory, $content): AIAgentMemory {
+            $memory->update(['memory' => $content]);
+            $this->unifiedMemory->remember((int) $memory->user_id, (string) $memory->getKey(), $content);
 
-        return $memory;
+            return $memory;
+        });
     }
 
     /**
@@ -63,7 +75,12 @@ class MemoryRepository
      */
     public function forget(AIAgentMemory $memory): void
     {
-        $memory->delete();
+        DB::transaction(function () use ($memory): void {
+            $userId = (int) $memory->user_id;
+            $memoryId = (string) $memory->getKey();
+            $memory->delete();
+            $this->unifiedMemory->forget($userId, $memoryId);
+        });
     }
 
     /**
@@ -71,7 +88,10 @@ class MemoryRepository
      */
     public function forgetAll(int $userId): void
     {
-        AIAgentMemory::query()->where('user_id', $userId)->delete();
+        DB::transaction(function () use ($userId): void {
+            AIAgentMemory::query()->where('user_id', $userId)->delete();
+            $this->unifiedMemory->forgetAll($userId);
+        });
     }
 
     public function countForUser(int $userId): int
