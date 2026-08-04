@@ -1,0 +1,7 @@
+﻿{
+    "name":  "ChatbotCustomerTag",
+    "type":  "extension",
+    "version":  "1.0.0",
+    "description":  "Customer tag management tools for chatbot conversations — TG: @heew_support",
+    "support_telegram":  "heew_support"
+}

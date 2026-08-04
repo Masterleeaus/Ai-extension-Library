@@ -1,0 +1,7 @@
+﻿{
+    "name":  "Phone Call Agent",
+    "type":  "extension",
+    "version":  "1.0",
+    "description":  "Inbound AI phone call agent using Twilio or ElevenLabs — TG: @heew_support",
+    "support_telegram":  "heew_support"
+}
