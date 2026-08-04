@@ -1,0 +1,190 @@
+name: Build Titan Social Bundle
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - agent/ai-extensions-deep-scan-2026-08-04
+    paths:
+      - '.github/workflows/build-titan-social-bundle.yml'
+      - 'docs/titan-social/**'
+      - 'extensions/SocialMedia/**'
+      - 'extensions/AISocialMedia/**'
+      - 'extensions/SocialMediaAgent/**'
+      - 'extensions/SocialMediaAutomation/**'
+      - 'extensions/AIAgent/**'
+      - 'extensions/AIAgentToolSocialMediaAgent/**'
+      - 'extensions/InfluencerAvatar/**'
+      - 'extensions/UGCCreator/**'
+      - 'extensions/UGCFactory/**'
+      - 'extensions/AiViralClips/**'
+      - 'extensions/UrlToVideo/**'
+      - 'extensions/AiCaptions/**'
+      - 'extensions/VideoEditor/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build install-ready bundle
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT="Titan-Social-Extension-Bundle"
+          DEST="$ROOT/app/Extensions"
+          mkdir -p "$DEST"
+
+          extensions=(
+            SocialMedia
+            AISocialMedia
+            SocialMediaAgent
+            SocialMediaAutomation
+            AIAgent
+            AIAgentToolSocialMediaAgent
+            InfluencerAvatar
+            UGCCreator
+            UGCFactory
+            AiViralClips
+            UrlToVideo
+            AiCaptions
+            VideoEditor
+          )
+
+          for extension in "${extensions[@]}"; do
+            test -d "extensions/$extension"
+            cp -a "extensions/$extension" "$DEST/$extension"
+          done
+
+          cp docs/titan-social/TITAN-SOCIAL-BUILD-PROMPT.md "$ROOT/TITAN-SOCIAL-BUILD-PROMPT.md"
+
+          cat > "$ROOT/README.md" <<'EOF'
+          # Titan Social Extension Bundle
+
+          This source bundle supports consolidation of the existing MagicAI social-media packages into one customer-facing **Titan Social** product.
+
+          ## Branding and installation
+
+          - Primary internal install identity: `SocialMedia`
+          - Primary install path: `app/Extensions/SocialMedia`
+          - Customer-facing product name: **Titan Social**
+
+          Do not rename the `SocialMedia` folder, PHP namespace, service provider, routes, migrations, tables or configuration keys only for branding.
+
+          Follow `TITAN-SOCIAL-BUILD-PROMPT.md` for the complete consolidation and upgrade requirements.
+
+          ## Critical architecture boundary
+
+          These extensions remain separate and must not be merged into `SocialMedia`:
+
+          - `AIAgent` — independent general AI-agent runtime
+          - `AIAgentToolSocialMediaAgent` — optional governed bridge between AI Agent and Titan Social
+
+          The bridge must be expanded to expose the consolidated Titan Social capabilities. Titan Social must continue to work when AI Agent is not installed.
+
+          ## Social product consolidation donors
+
+          - `AISocialMedia`
+          - `SocialMediaAgent`
+          - `SocialMediaAutomation`
+
+          Their useful publishing, generation, intelligence, trend, comment, mention and direct-message automation capabilities may be integrated into Titan Social. Avoid duplicate account, post, webhook, analytics and scheduler authorities.
+
+          ## Creative donors
+
+          - `InfluencerAvatar`
+          - `UGCCreator`
+          - `UGCFactory`
+          - `AiViralClips`
+          - `UrlToVideo`
+          - `AiCaptions`
+          - `VideoEditor`
+
+          These may be integrated into Titan Social's Creative Studio, Video Studio, UGC Studio and Influencer Studio.
+
+          ## Product boundary
+
+          Titan Marketing remains a separate product. Titan Social owns public social publishing, engagement, listening and social analytics. Titan Marketing owns broader email, SMS, WhatsApp, Messenger and voice journeys. Connect them through optional contracts rather than merging their domain authorities.
+
+          ## Installation layout
+
+          The bundle preserves each original source folder under `app/Extensions/<OriginalExtensionName>` for straightforward installation, migration and comparison.
+
+          The donor folders are included as source material. Do not automatically uninstall donor extensions in production. Consolidate through tested migrations, compatibility adapters, feature parity checks and rollback documentation.
+          EOF
+
+          cat > "$ROOT/bundle-manifest.json" <<'EOF'
+          {
+            "product_display_name": "Titan Social",
+            "primary_install_identity": "SocialMedia",
+            "primary_install_path": "app/Extensions/SocialMedia",
+            "layout": "app/Extensions/<OriginalExtensionName>",
+            "architecture": {
+              "consolidated_product": "SocialMedia",
+              "standalone_extensions": [
+                {
+                  "name": "AIAgent",
+                  "role": "Independent general AI-agent runtime",
+                  "must_not_be_merged": true
+                },
+                {
+                  "name": "AIAgentToolSocialMediaAgent",
+                  "role": "Optional governed bridge between AIAgent and Titan Social",
+                  "must_not_be_merged": true,
+                  "must_be_expanded": true
+                }
+              ],
+              "social_consolidation_donors": [
+                "AISocialMedia",
+                "SocialMediaAgent",
+                "SocialMediaAutomation"
+              ],
+              "creative_donors": [
+                "InfluencerAvatar",
+                "UGCCreator",
+                "UGCFactory",
+                "AiViralClips",
+                "UrlToVideo",
+                "AiCaptions",
+                "VideoEditor"
+              ],
+              "separate_product": "Titan Marketing"
+            },
+            "included_extensions": [
+              "SocialMedia",
+              "AISocialMedia",
+              "SocialMediaAgent",
+              "SocialMediaAutomation",
+              "AIAgent",
+              "AIAgentToolSocialMediaAgent",
+              "InfluencerAvatar",
+              "UGCCreator",
+              "UGCFactory",
+              "AiViralClips",
+              "UrlToVideo",
+              "AiCaptions",
+              "VideoEditor"
+            ]
+          }
+          EOF
+
+          find "$ROOT" -type f ! -name SHA256SUMS.txt -print0 | sort -z | xargs -0 sha256sum > "$ROOT/SHA256SUMS.txt"
+          zip -r -q Titan-Social-Extension-Bundle.zip "$ROOT"
+          sha256sum Titan-Social-Extension-Bundle.zip > Titan-Social-Extension-Bundle.zip.sha256
+
+      - name: Upload bundle artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Titan-Social-Extension-Bundle
+          path: |
+            Titan-Social-Extension-Bundle.zip
+            Titan-Social-Extension-Bundle.zip.sha256
+          if-no-files-found: error
+          retention-days: 30
