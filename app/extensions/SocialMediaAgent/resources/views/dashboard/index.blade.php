@@ -117,7 +117,10 @@
                         'Accept': 'application/json'
                     }
                 })
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) throw new Error(`HTTP ${response.status}: Failed to fetch pending count`);
+                    return response.json();
+                })
                 .then(data => {
                     if (data.success && data.count > 0) {
                         const badge = document.getElementById('pending-count-badge');
@@ -127,7 +130,9 @@
                         }
                     }
                 })
-                .catch(error => console.error('Error fetching pending count:', error));
+                .catch(error => {
+                    console.error('Error fetching pending post count:', error);
+                });
         }
 
         // Update count on page load

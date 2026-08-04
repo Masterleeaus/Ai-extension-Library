@@ -325,6 +325,8 @@
                             const eventPopup = event.el.querySelector('.lqd-event-card');
                             const scroller = eventEl.closest('.fc-scroller');
 
+                            if (!eventPopup) return;
+
                             computePosition(eventEl, eventPopup, {
                                 placement: 'top',
                                 strategy: 'fixed',
@@ -348,6 +350,8 @@
                                     left: `${x}px`,
                                     top: `${y}px`,
                                 });
+                            }).catch(error => {
+                                console.error('Failed to position event popup:', error);
                             });
                         },
 
