@@ -1,0 +1,7 @@
+﻿{
+    "name":  "Chatbot Voice Call",
+    "type":  "extension",
+    "version":  "1.1",
+    "description":  "Voice call for chatbot — TG: @heew_support",
+    "support_telegram":  "heew_support"
+}

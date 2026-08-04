@@ -63,3 +63,19 @@
 ---
 
 Last Updated: 2026-08-04
+
+6. **ChatbotVoice** (Voice Interactions)
+   - ✅ Webhook Security Tests (3-4)
+   - ✅ Provider Lifecycle Tests (4-5)
+   - ✅ Voice I/O Tests (3-4)
+   - ✅ Transcript Tests (2-3)
+   - ✅ WorkCore Integration Provider
+   - Status: TEST COVERAGE COMPLETE
+
+7. **ChatbotVoiceCall** (OpenAI Realtime)
+   - ✅ Realtime Protocol Tests
+   - ✅ Call Session Management Tests
+   - ✅ Audio Streaming Tests
+   - ✅ Quality Metrics Tests
+   - Status: OPENAI INTEGRATION COMPLETE
+
