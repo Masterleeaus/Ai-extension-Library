@@ -1,0 +1,13 @@
+{
+  "name": "Titan Omni",
+  "slug": "titan-omni",
+  "type": "marketing-platform",
+  "description": "Omnichannel marketing platform, campaigns, audience management, and engagement",
+  "icon": "🌐",
+  "color": "#14b8a6",
+  "features": ["whatsapp-campaigns", "email-campaigns", "sms-campaigns", "telegram-campaigns", "audience-segmentation", "campaign-analytics", "chatbot"],
+  "chatbot": {
+    "name": "Titan Omni Marketing Assistant",
+    "system_prompt": "You are a marketing assistant helping create effective omnichannel campaigns, segment audiences, analyze performance, and schedule sends across multiple channels."
+  }
+}
