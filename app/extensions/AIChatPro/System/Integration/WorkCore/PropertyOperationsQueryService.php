@@ -1,6 +1,7 @@
 <?php declare(strict_types=1);
 namespace App\Extensions\AIChatPro\System\Integration\WorkCore;
 
+<<<<<<< HEAD
 use Illuminate\Support\Collection;
 
 /**
@@ -24,10 +25,22 @@ final class PropertyOperationsQueryService extends BaseWorkCoreService
             'owner' => $prop['owner_name'],
             'value' => $prop['property_value'],
         ])->toArray();
+=======
+/**
+ * WorkCore PropertyOperations Integration for AiChatPro
+ * Issue #191: PropertyOperations → AiChatPro Properties
+ */
+final class PropertyOperationsQueryService extends BaseWorkCoreService
+{
+    public function listProperties(int $limit = 100): array
+    {
+        return $this->authorize('read', 'property') ? $this->list('property', $limit) : [];
+>>>>>>> update-7ayh0k
     }
 
     public function getProperty(string $propertyId): ?array
     {
+<<<<<<< HEAD
         if (!$this->authorize('read', 'property')) return null;
         
         $tenantId = $this->getTenantId();
@@ -44,10 +57,14 @@ final class PropertyOperationsQueryService extends BaseWorkCoreService
             'assets' => $this->listAssets($propertyId),
             'documents' => $this->getDocuments($propertyId),
         ];
+=======
+        return $this->authorize('read', 'property') ? null : null;
+>>>>>>> update-7ayh0k
     }
 
     public function listAssets(string $propertyId): array
     {
+<<<<<<< HEAD
         if (!$this->authorize('read', 'asset')) return [];
         
         $assets = $this->queryAssets($propertyId);
@@ -59,10 +76,14 @@ final class PropertyOperationsQueryService extends BaseWorkCoreService
             'condition' => $asset['condition'],
             'maintenance_due' => $asset['next_maintenance'],
         ])->toArray();
+=======
+        return $this->authorize('read', 'asset') ? [] : [];
+>>>>>>> update-7ayh0k
     }
 
     public function getDocuments(string $propertyId): array
     {
+<<<<<<< HEAD
         if (!$this->authorize('read', 'document')) return [];
         
         $docs = $this->queryDocuments($propertyId);
@@ -88,4 +109,8 @@ final class PropertyOperationsQueryService extends BaseWorkCoreService
     private function queryAssets(string $propertyId): Collection { return collect([]); }
     private function queryDocuments(string $propertyId): Collection { return collect([]); }
     private function scheduleMaintenanceInDatabase(string $assetId, string $date): bool { return false; }
+=======
+        return $this->authorize('read', 'document') ? [] : [];
+    }
+>>>>>>> update-7ayh0k
 }

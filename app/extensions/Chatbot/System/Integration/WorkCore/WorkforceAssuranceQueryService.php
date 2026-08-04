@@ -1,6 +1,7 @@
 <?php declare(strict_types=1);
 namespace App\Extensions\Chatbot\System\Integration\WorkCore;
 
+<<<<<<< HEAD
 final class WorkforceAssuranceQueryService extends BaseWorkCoreService
 {
     public function getStaffInfo(string $staffId): string
@@ -29,4 +30,9 @@ final class WorkforceAssuranceQueryService extends BaseWorkCoreService
 
     private function queryStaff(string $staffId, int $tenantId): ?array { return null; }
     private function queryAttendance(string $staffId, string $period): array { return []; }
+=======
+final class ${service_name} extends BaseWorkCoreService
+{
+    // Conversational query methods optimized for chatbot context
+>>>>>>> update-7ayh0k
 }

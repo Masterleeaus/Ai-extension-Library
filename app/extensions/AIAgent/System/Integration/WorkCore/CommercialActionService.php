@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <?php
 
 declare(strict_types=1);
@@ -202,4 +203,12 @@ final class CommercialActionService extends BaseWorkCoreService
     private function updatePrice(string $productId, int $tenantId, float $newPrice): bool { return true; }
     private function persistRefund(string $orderId, int $tenantId, array $refundData): bool { return true; }
     private function publishEvent(string $eventName, array $data): void { }
+=======
+<?php declare(strict_types=1);
+namespace App\Extensions\AIAgent\System\Integration\WorkCore;
+
+final class ${service_name} extends BaseWorkCoreService
+{
+    // Autonomous action handlers with approval workflows
+>>>>>>> update-7ayh0k
 }

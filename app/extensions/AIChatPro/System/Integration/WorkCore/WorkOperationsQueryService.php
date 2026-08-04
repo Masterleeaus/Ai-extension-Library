@@ -1,6 +1,7 @@
 <?php declare(strict_types=1);
 namespace App\Extensions\AIChatPro\System\Integration\WorkCore;
 
+<<<<<<< HEAD
 use Illuminate\Support\Collection;
 
 /**
@@ -24,10 +25,22 @@ final class WorkOperationsQueryService extends BaseWorkCoreService
             'scheduled_at' => $job['scheduled_at'],
             'assigned_to' => $job['assigned_technician'],
         ])->toArray();
+=======
+/**
+ * WorkCore WorkOperations Integration for AiChatPro
+ * Issue #190: WorkOperations → AiChatPro Operations
+ */
+final class WorkOperationsQueryService extends BaseWorkCoreService
+{
+    public function listJobs(int $limit = 100): array
+    {
+        return $this->authorize('read', 'job') ? $this->list('job', $limit) : [];
+>>>>>>> update-7ayh0k
     }
 
     public function getJob(string $jobId): ?array
     {
+<<<<<<< HEAD
         if (!$this->authorize('read', 'job')) return null;
         
         $tenantId = $this->getTenantId();
@@ -61,10 +74,19 @@ final class WorkOperationsQueryService extends BaseWorkCoreService
             'date' => $sched['date'],
             'jobs_count' => $this->getJobCountForSchedule($sched['id']),
         ])->toArray();
+=======
+        return $this->authorize('read', 'job') ? null : null;
+    }
+
+    public function listSchedules(int $limit = 100): array
+    {
+        return $this->authorize('read', 'schedule') ? $this->list('schedule', $limit) : [];
+>>>>>>> update-7ayh0k
     }
 
     public function getFleetStatus(): ?array
     {
+<<<<<<< HEAD
         if (!$this->authorize('read', 'fleet')) return null;
         
         $tenantId = $this->getTenantId();
@@ -110,4 +132,8 @@ final class WorkOperationsQueryService extends BaseWorkCoreService
     private function createJobInDatabase(int $tenantId, string $customerId, array $jobData): ?string { return null; }
     private function assignJobInDatabase(string $jobId, int $tenantId, string $technicianId): bool { return false; }
     private function publishEvent(string $eventName, array $data): void {}
+=======
+        return $this->authorize('read', 'fleet') ? null : null;
+    }
+>>>>>>> update-7ayh0k
 }

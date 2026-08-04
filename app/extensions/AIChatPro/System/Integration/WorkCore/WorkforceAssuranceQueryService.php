@@ -1,6 +1,7 @@
 <?php declare(strict_types=1);
 namespace App\Extensions\AIChatPro\System\Integration\WorkCore;
 
+<<<<<<< HEAD
 use Illuminate\Support\Collection;
 
 /**
@@ -24,10 +25,22 @@ final class WorkforceAssuranceQueryService extends BaseWorkCoreService
             'status' => $person['employment_status'],
             'compliance_status' => $this->getComplianceStatus($person['id']),
         ])->toArray();
+=======
+/**
+ * WorkCore WorkforceAssurance Integration for AiChatPro
+ * Issue #192: WorkforceAssurance → AiChatPro HR Operations
+ */
+final class WorkforceAssuranceQueryService extends BaseWorkCoreService
+{
+    public function listStaff(int $limit = 100): array
+    {
+        return $this->authorize('read', 'staff') ? $this->list('staff', $limit) : [];
+>>>>>>> update-7ayh0k
     }
 
     public function getStaffProfile(string $staffId): ?array
     {
+<<<<<<< HEAD
         if (!$this->authorize('read', 'staff')) return null;
         
         $tenantId = $this->getTenantId();
@@ -61,10 +74,19 @@ final class WorkforceAssuranceQueryService extends BaseWorkCoreService
             'late_arrivals' => $attendance['late_count'] ?? 0,
             'attendance_rate' => $attendance['attendance_rate'] ?? 0,
         ];
+=======
+        return $this->authorize('read', 'staff') ? null : null;
+    }
+
+    public function getAttendance(string $staffId): ?array
+    {
+        return $this->authorize('read', 'attendance') ? null : null;
+>>>>>>> update-7ayh0k
     }
 
     public function getCompliance(string $staffId): ?array
     {
+<<<<<<< HEAD
         if (!$this->authorize('read', 'compliance')) return null;
         
         $compliance = $this->queryCompliance($staffId);
@@ -116,4 +138,13 @@ final class WorkforceAssuranceQueryService extends BaseWorkCoreService
     private function queryCompliance(string $staffId): array { return []; }
     private function queryCredentials(string $staffId): Collection { return collect([]); }
     private function recordAttendanceInDatabase(string $staffId, int $tenantId, string $date, string $status): bool { return false; }
+=======
+        return $this->authorize('read', 'compliance') ? null : null;
+    }
+
+    public function getCredentials(string $staffId): ?array
+    {
+        return $this->authorize('read', 'credentials') ? null : null;
+    }
+>>>>>>> update-7ayh0k
 }

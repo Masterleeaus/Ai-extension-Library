@@ -1,6 +1,7 @@
 <?php declare(strict_types=1);
 namespace App\Extensions\Chatbot\System\Integration\WorkCore;
 
+<<<<<<< HEAD
 final class CommercialQueryService extends BaseWorkCoreService
 {
     public function getInventoryStatus(string $productId): string
@@ -45,4 +46,9 @@ final class CommercialQueryService extends BaseWorkCoreService
     private function queryInventory(string $productId, int $tenantId): ?array { return null; }
     private function queryPrice(string $productId, int $tenantId): ?array { return null; }
     private function queryOrder(string $orderId, int $tenantId): ?array { return null; }
+=======
+final class ${service_name} extends BaseWorkCoreService
+{
+    // Conversational query methods optimized for chatbot context
+>>>>>>> update-7ayh0k
 }

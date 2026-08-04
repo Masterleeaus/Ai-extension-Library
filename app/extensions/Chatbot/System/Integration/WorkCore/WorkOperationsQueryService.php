@@ -1,6 +1,7 @@
 <?php declare(strict_types=1);
 namespace App\Extensions\Chatbot\System\Integration\WorkCore;
 
+<<<<<<< HEAD
 final class WorkOperationsQueryService extends BaseWorkCoreService
 {
     public function checkJobStatus(string $jobId): string
@@ -25,4 +26,9 @@ final class WorkOperationsQueryService extends BaseWorkCoreService
 
     private function queryJob(string $jobId, int $tenantId): ?array { return null; }
     private function createJobInDatabase(int $tenantId, array $data): ?string { return null; }
+=======
+final class ${service_name} extends BaseWorkCoreService
+{
+    // Conversational query methods optimized for chatbot context
+>>>>>>> update-7ayh0k
 }

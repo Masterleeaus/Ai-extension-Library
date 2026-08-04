@@ -1,6 +1,7 @@
 <?php declare(strict_types=1);
 namespace App\Extensions\AIChatPro\System\Integration\WorkCore;
 
+<<<<<<< HEAD
 use Illuminate\Support\Collection;
 
 /**
@@ -12,11 +13,17 @@ use Illuminate\Support\Collection;
  * - Pricing, availability, and product info
  * - Order processing and tracking
  * - Financial reporting and analytics
+=======
+/**
+ * WorkCore Commercial Integration for AiChatPro
+ * Issue #189: Commercial → AiChatPro Commerce Operations
+>>>>>>> update-7ayh0k
  */
 final class CommercialQueryService extends BaseWorkCoreService
 {
     public function listInventory(int $limit = 100, int $offset = 0): array
     {
+<<<<<<< HEAD
         if (!$this->authorize('read', 'inventory')) {
             return [];
         }
@@ -33,10 +40,14 @@ final class CommercialQueryService extends BaseWorkCoreService
             'reorder_level' => $item['reorder_level'],
             'last_updated' => $item['updated_at'],
         ])->toArray();
+=======
+        return $this->authorize('read', 'inventory') ? $this->list('inventory', $limit, $offset) : [];
+>>>>>>> update-7ayh0k
     }
 
     public function getPricing(string $productId): ?array
     {
+<<<<<<< HEAD
         if (!$this->authorize('read', 'pricing')) {
             return null;
         }
@@ -52,10 +63,14 @@ final class CommercialQueryService extends BaseWorkCoreService
             'margin' => ($pricing['current_price'] - $pricing['cost']) / max($pricing['current_price'], 1),
             'currency' => $pricing['currency'],
         ];
+=======
+        return $this->authorize('read', 'pricing') ? null : null;
+>>>>>>> update-7ayh0k
     }
 
     public function getOrder(string $orderId): ?array
     {
+<<<<<<< HEAD
         if (!$this->authorize('read', 'order')) {
             return null;
         }
@@ -119,4 +134,13 @@ final class CommercialQueryService extends BaseWorkCoreService
     private function queryOrders(int $tenantId, ?string $status, int $limit, int $offset): Collection { return collect([]); }
     private function queryFinancialSummary(int $tenantId, string $period): array { return []; }
     private function publishEvent(string $eventName, array $data): void {}
+=======
+        return $this->authorize('read', 'order') ? null : null;
+    }
+
+    public function listOrders(int $limit = 100): array
+    {
+        return $this->authorize('read', 'order') ? $this->list('order', $limit) : [];
+    }
+>>>>>>> update-7ayh0k
 }

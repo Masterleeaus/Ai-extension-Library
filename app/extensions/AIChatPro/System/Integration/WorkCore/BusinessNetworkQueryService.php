@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Extensions\AIChatPro\System\Integration\WorkCore;
 
+<<<<<<< HEAD
 use App\Domains\WorkCore\System\Authorization\CompanyRecordAuthorizer;
 use App\Domains\WorkCore\System\Tenancy\TenantContext;
 use Illuminate\Database\Eloquent\Builder;
@@ -18,11 +19,27 @@ use Illuminate\Support\Collection;
  * - Catalogue browsing and product info
  * - Knowledge base access
  * - Territory and review management
+=======
+/**
+ * WorkCore BusinessNetwork Integration for AiChatPro.
+ * Issue #188: BusinessNetwork → AiChatPro CRM Operations
+ *
+ * Provides CRM operations including:
+ * - Customer profile lookup
+ * - Catalogue browsing
+ * - Knowledge base access
+ * - Territory management
+>>>>>>> update-7ayh0k
  */
 final class BusinessNetworkQueryService extends BaseWorkCoreService
 {
     /**
+<<<<<<< HEAD
      * Get customer profile by ID with full details.
+=======
+     * Get customer profile by ID.
+     * Ensures tenant isolation and authorization.
+>>>>>>> update-7ayh0k
      */
     public function getCustomerProfile(string $customerId): ?array
     {
@@ -30,6 +47,7 @@ final class BusinessNetworkQueryService extends BaseWorkCoreService
             return null;
         }
 
+<<<<<<< HEAD
         // Query: SELECT * FROM customers WHERE id = ? AND company_id = ?
         $customer = $this->queryCustomer($customerId);
         if (!$customer) {
@@ -54,11 +72,23 @@ final class BusinessNetworkQueryService extends BaseWorkCoreService
      * List all customers for current tenant with pagination.
      */
     public function listCustomers(int $limit = 50, int $offset = 0): array
+=======
+        // Query WorkCore BusinessNetwork module for customer data
+        // Return tenant-scoped result
+        return null; // Placeholder
+    }
+
+    /**
+     * List all customers for current tenant.
+     */
+    public function listCustomers(int $limit = 100, int $offset = 0): array
+>>>>>>> update-7ayh0k
     {
         if (!$this->authorize('read', 'customer')) {
             return [];
         }
 
+<<<<<<< HEAD
         $tenantId = $this->getTenantId();
 
         // Query: SELECT * FROM customers WHERE company_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?
@@ -99,6 +129,13 @@ final class BusinessNetworkQueryService extends BaseWorkCoreService
 
     /**
      * Get catalogue/product information.
+=======
+        return $this->list('customer', $limit, $offset);
+    }
+
+    /**
+     * Get catalogue information.
+>>>>>>> update-7ayh0k
      */
     public function getCatalogue(string $catalogueId): ?array
     {
@@ -106,6 +143,7 @@ final class BusinessNetworkQueryService extends BaseWorkCoreService
             return null;
         }
 
+<<<<<<< HEAD
         $tenantId = $this->getTenantId();
 
         // Query: SELECT * FROM catalogues WHERE id = ? AND company_id = ?
@@ -149,6 +187,13 @@ final class BusinessNetworkQueryService extends BaseWorkCoreService
 
     /**
      * Get knowledge base entry by ID.
+=======
+        return null; // Placeholder
+    }
+
+    /**
+     * Get knowledge base entry.
+>>>>>>> update-7ayh0k
      */
     public function getKnowledgeBaseEntry(string $entryId): ?array
     {
@@ -156,6 +201,7 @@ final class BusinessNetworkQueryService extends BaseWorkCoreService
             return null;
         }
 
+<<<<<<< HEAD
         $tenantId = $this->getTenantId();
 
         // Query: SELECT * FROM knowledge_base WHERE id = ? AND company_id = ?
@@ -244,6 +290,9 @@ final class BusinessNetworkQueryService extends BaseWorkCoreService
             'quota' => $territory['quota'],
             'ytd_sales' => $territory['ytd_sales'],
         ];
+=======
+        return null; // Placeholder
+>>>>>>> update-7ayh0k
     }
 
     /**
@@ -255,6 +304,7 @@ final class BusinessNetworkQueryService extends BaseWorkCoreService
             return false;
         }
 
+<<<<<<< HEAD
         $tenantId = $this->getTenantId();
 
         // Verify ownership
@@ -413,5 +463,11 @@ final class BusinessNetworkQueryService extends BaseWorkCoreService
     {
         // In production: Publish domain event
         // event(new CustomerEvent($eventName, $data));
+=======
+        // Publish domain event for audit trail
+        // Apply update with tenant context
+        // Return success status
+        return false; // Placeholder
+>>>>>>> update-7ayh0k
     }
 }
