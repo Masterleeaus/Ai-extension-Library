@@ -1,308 +1,110 @@
-# Issue #61: Build Shared Connector Runtime and Migrate Gmail, Slack and WhatsApp Adapters
+# Issue #61: Build shared Connector Runtime and migrate Gmail, Slack and WhatsApp adapters (Phase 5)
 
-**Status:** HIGH | Phase 5  
-**Effort:** 3-4 weeks  
-**Depends on:** #143-146, #20, #25, #31, #58, #64
+## Overview
+Implement unified Connector Runtime with standardized adapter interface to consolidate email (Gmail), chat (Slack), and messaging (WhatsApp) integrations across all extensions.
 
-## Problem: Duplicate Connector Concerns Across Extensions
+## Problem Statement
+- Connector logic scattered across extensions
+- Duplicate adapter implementations
+- Difficult to add new connectors
+- No standardized error handling
+- Missing rate limit enforcement
 
-Currently Gmail, Slack, WhatsApp, Telegram, and Meta extensions each implement their own:
-- OAuth credential handling
-- Webhook registration and verification
-- Inbound message normalization
-- Outbound dispatch with retries
-- Rate limit handling
-- Health monitoring
-- Dead letter queues
+## Requirements
 
-## Solution: Canonical Connector Runtime
+### Connector Runtime Architecture
+1. **Unified Connector Interface**
+   - Standard adapter contract
+   - Connect/disconnect lifecycle
+   - Standardized message types
+   - Error handling framework
+   - Rate limiting
 
-Define ONE authoritative system for all connector operations, with provider-specific adapters.
+2. **Adapter Types**
+   - Synchronous adapters (direct API calls)
+   - Asynchronous adapters (job queue)
+   - Webhook-based adapters
+   - Long-polling adapters
+   - Bidirectional adapters
 
-### Connector Runtime Responsibilities
+### Adapters to Migrate
+1. **Gmail Adapter**
+   - Send email
+   - Receive email (webhooks)
+   - Thread management
+   - Attachment handling
+   - Label management
 
-```php
-class ConnectorRuntime {
-    /**
-     * 1. Connector Installation & Lifecycle
-     */
-    public function installConnector(
-        string $tenantId,
-        string $providerName,  // "gmail", "slack", "whatsapp"
-        array $config
-    ): InstalledConnector {
-        // Validate provider
-        $provider = $this->providerRegistry->get($providerName);
-        
-        // Store credential reference in vault
-        $credentialRef = $this->vault->store(
-            $tenantId,
-            "$providerName-credentials",
-            $config['oauth_token'] ?? $config['api_key']
-        );
-        
-        // Register webhook
-        $webhookUrl = $this->registerWebhook($provider, $credentialRef);
-        
-        // Create connector instance
-        return InstalledConnector::create([
-            'tenant_id' => $tenantId,
-            'provider' => $providerName,
-            'webhook_url' => $webhookUrl,
-            'credential_reference' => $credentialRef,
-            'status' => 'ACTIVE',
-        ]);
-    }
-    
-    /**
-     * 2. Verified Inbound Normalization
-     */
-    public function handleInboundEvent(Request $request): InboundMessage {
-        // Verify request signature (from #146)
-        $connector = $this->findConnectorByWebhookUrl($request->path);
-        $verifier = $this->providerRegistry->getVerifier($connector->provider);
-        
-        if (!$verifier->verify(WebhookRequest::fromRequest($request))) {
-            throw new InvalidWebhookSignature();
-        }
-        
-        // Normalize to canonical format
-        $normalizer = $this->providerRegistry->getNormalizer($connector->provider);
-        $message = $normalizer->normalize($request->all());
-        
-        // Ensure tenant isolation
-        $message->tenant_id = $connector->tenant_id;
-        
-        // Record for idempotency
-        $this->idempotencyLedger->registerEvent(
-            $connector->tenant_id,
-            $message->externalId,
-            $message
-        );
-        
-        return $message;
-    }
-    
-    /**
-     * 3. Observable Outbound Dispatch
-     */
-    public function sendMessage(
-        InstalledConnector $connector,
-        OutboundMessage $message
-    ): DeliveryReceipt {
-        // Get credential from vault
-        $credential = $this->vault->retrieve($connector->credential_reference);
-        
-        // Normalize parameters for provider
-        $formatted = $this->providerRegistry->getFormatter($connector->provider)
-            ->format($message);
-        
-        // Send with retry
-        $attempt = 0;
-        $lastError = null;
-        
-        while ($attempt < 3) {
-            try {
-                $externalId = $this->dispatch($connector->provider, $credential, $formatted);
-                
-                // Record success
-                return DeliveryReceipt::success(
-                    external_id: $externalId,
-                    sent_at: now(),
-                    provider: $connector->provider
-                );
-            } catch (TransientError $e) {
-                $lastError = $e;
-                $attempt++;
-                sleep(2 ** $attempt);  // Exponential backoff
-            }
-        }
-        
-        // Failed after retries - queue as dead letter
-        $this->deadLetterQueue->enqueue($message, $lastError);
-        
-        return DeliveryReceipt::failed(error: $lastError);
-    }
-    
-    /**
-     * 4. Rate Limit & Health Monitoring
-     */
-    public function monitorConnectorHealth(
-        InstalledConnector $connector
-    ): ConnectorHealth {
-        // Check rate limit status
-        $rateLimitStatus = $this->getRateLimitStatus($connector);
-        
-        // Check recent delivery success rate
-        $successRate = $this->getRecentSuccessRate($connector, minutes: 5);
-        
-        // Determine overall health
-        $health = match(true) {
-            $rateLimitStatus->isExceeded() => ConnectorHealth::THROTTLED,
-            $successRate < 0.95 => ConnectorHealth::DEGRADED,
-            default => ConnectorHealth::HEALTHY,
-        };
-        
-        return new ConnectorHealth(
-            connector_id: $connector->id,
-            status: $health,
-            rate_limit: $rateLimitStatus,
-            success_rate: $successRate,
-            last_event_at: $this->getLastEventTime($connector)
-        );
-    }
-    
-    /**
-     * 5. Consent & Customer Identity
-     */
-    public function enforceConsent(
-        InstalledConnector $connector,
-        string $customerId
-    ): void {
-        $consent = $this->consentService->getConsent(
-            $connector->tenant_id,
-            $customerId,
-            $connector->provider
-        );
-        
-        if (!$consent->isActive()) {
-            throw new ConsentNotGrantedException(
-                "Customer has not consented to communication via {$connector->provider}"
-            );
-        }
-        
-        // Check quiet hours
-        if ($this->quietHoursService->isInQuietHours($customerId)) {
-            throw new QuietHoursException("Outside communication hours");
-        }
-    }
-}
-```
+2. **Slack Adapter**
+   - Send messages
+   - Receive messages (webhooks)
+   - File uploads
+   - Interactive components
+   - User mentions
 
-### Connector Capability Manifests
+3. **WhatsApp Adapter**
+   - Send messages
+   - Receive messages (webhooks)
+   - Media handling (with quarantine from #211)
+   - Group management
+   - Status updates
 
-```php
-class ConnectorCapabilityManifest {
-    public string $provider;
-    public array $capabilities;  // [MESSAGE, REACTIONS, THREADS, MEDIA, etc]
-    public array $rateLimits;    // Requests/min, daily limit
-    public array $messageTypes;  // TEXT, IMAGE, VIDEO, FILE, RICH_CARD
-    public bool $supportsThreads;
-    public bool $supportsReactions;
-    public bool $supportsEdits;
-    public bool $supportsDeletion;
-    public int $maxMessageLength;
-    public array $supportedMediaTypes;
-}
-```
+### Runtime Features
+1. **Connection Management**
+   - Credential storage (vault references)
+   - Connection pooling
+   - Connection health checks
+   - Auto-reconnect logic
 
-### Provider Adapters (Conformance Pattern)
+2. **Message Handling**
+   - Standardized message envelope
+   - Type coercion between adapters
+   - Payload transformation
+   - Error message standardization
 
-```php
-// Each provider implements this contract
-interface ConnectorAdapter {
-    public function getManifest(): ConnectorCapabilityManifest;
-    public function authorize(array $config): void;
-    public function registerWebhook(string $url): string;
-    public function normalizeInbound(array $payload): InboundMessage;
-    public function formatOutbound(OutboundMessage $message): array;
-    public function getRateLimitStatus(): RateLimitStatus;
-    public function handleDeliveryStatus(array $event): void;
-}
+3. **Rate Limiting**
+   - Per-adapter rate limits
+   - Per-tenant rate limits
+   - Backoff strategies
+   - Quota tracking
 
-// Gmail adapter
-class GmailConnectorAdapter implements ConnectorAdapter {
-    public function normalizeInbound(array $payload): InboundMessage {
-        return InboundMessage::create([
-            'external_id' => $payload['historyId'],
-            'provider' => 'gmail',
-            'sender' => $payload['payload']['headers']['From'],
-            'content' => $payload['payload']['parts'][0]['data'],
-            'received_at' => $payload['internalDate'],
-            'message_type' => 'EMAIL',
-        ]);
-    }
-}
+4. **Observability**
+   - Adapter metrics (messages sent/received)
+   - Error rates per adapter
+   - Latency metrics
+   - Connection status
 
-// Slack adapter  
-class SlackConnectorAdapter implements ConnectorAdapter {
-    public function normalizeInbound(array $payload): InboundMessage {
-        return InboundMessage::create([
-            'external_id' => $payload['event']['ts'],
-            'provider' => 'slack',
-            'sender' => $payload['event']['user'],
-            'channel' => $payload['event']['channel'],
-            'content' => $payload['event']['text'],
-            'received_at' => $payload['event']['ts'],
-            'message_type' => 'CHANNEL_MESSAGE',
-        ]);
-    }
-}
+### Dead Letter Queue
+- Failed message handling
+- Retry mechanism
+- Manual intervention capability
+- Audit trail
 
-// WhatsApp adapter
-class WhatsappConnectorAdapter implements ConnectorAdapter {
-    public function normalizeInbound(array $payload): InboundMessage {
-        $message = $payload['entry'][0]['changes'][0]['value']['messages'][0];
-        
-        return InboundMessage::create([
-            'external_id' => $message['id'],
-            'provider' => 'whatsapp',
-            'sender' => $message['from'],
-            'content' => $message['text']['body'] ?? null,
-            'media' => $this->normalizeMedia($message['media'] ?? null),
-            'received_at' => $message['timestamp'],
-            'message_type' => $this->getMessageType($message),
-        ]);
-    }
-}
-```
+## Testing Requirements
+- Unit tests for each adapter
+- Integration tests for message flow
+- Tests for rate limiting
+- Tests for error handling
+- Tests for retry logic
+- Performance tests (message throughput)
+- Security tests (credential handling)
 
-### Dead Letter Queue & Retry
-
-```php
-class DeadLetterQueue {
-    public function enqueue(OutboundMessage $message, \Throwable $error): void {
-        DeadLetter::create([
-            'provider' => $message->connector->provider,
-            'external_id' => $message->externalId,
-            'payload' => $message->toJson(),
-            'error_type' => $error::class,
-            'error_message' => $error->getMessage(),
-            'attempts' => $message->retryCount,
-            'created_at' => now(),
-        ]);
-    }
-    
-    public function retryAll(): void {
-        $deadLetters = DeadLetter::where('last_retry_at', '<', now()->subHours(1))
-            ->where('attempts', '<', 5)
-            ->get();
-        
-        foreach ($deadLetters as $letter) {
-            try {
-                $message = OutboundMessage::fromJson($letter->payload);
-                $this->connectorRuntime->sendMessage($message);
-                $letter->delete();
-            } catch (\Exception $e) {
-                $letter->increment('attempts');
-                $letter->update(['last_retry_at' => now()]);
-            }
-        }
-    }
-}
-```
-
-## Exit Criteria
-
-- ✅ Connector Runtime canonical system built
-- ✅ Gmail adapter conforms and passes tests
-- ✅ Slack adapter conforms and passes tests
-- ✅ WhatsApp adapter conforms and passes tests
-- ✅ Webhook verification working (from #146)
-- ✅ Credential references used (from #145)
-- ✅ Rate limiting and health monitoring working
+## Acceptance Criteria
+- ✅ Connector Runtime operational
+- ✅ All adapters migrated
+- ✅ Rate limiting enforced
+- ✅ Credential vault integration
+- ✅ Error recovery working
 - ✅ Dead letter queue operational
-- ✅ Consent enforcement active
-- ✅ All existing functionality preserved
-- ✅ Cross-connector integration tests passing
+- ✅ All tests pass (32+ assertions)
+- ✅ Performance: <100ms message processing
 
+## Related Issues
+- Depends on: #143-146, #20, #67, #68, #70, #71
+- Related: #211 (WhatsApp media quarantine)
+- Blocks: None (standalone)
+
+## Timeline
+- **Phase 5 Connector Integration**
+- Start after: #71
+- Estimated effort: 5 days
