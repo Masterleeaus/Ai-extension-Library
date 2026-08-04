@@ -797,11 +797,14 @@
                                 .then(([firstMessage]) => {
                                     mediaInput.value = null;
 
-                                    this.chatsList[chatIndex].histories.at(-1).media_name = firstMessage.data.media_name;
-                                    this.chatsList[chatIndex].histories.at(-1).media_url = firstMessage.data.media_url;
+                                    if (firstMessage?.data) {
+                                        this.chatsList[chatIndex].histories.at(-1).media_name = firstMessage.data.media_name;
+                                        this.chatsList[chatIndex].histories.at(-1).media_url = firstMessage.data.media_url;
+                                    }
                                 })
-                                .catch(e => {
-                                    toastr.error('{{ __('Something went wrong. Please try again later.') }}')
+                                .catch(error => {
+                                    console.error('Message send failed:', error);
+                                    toastr.error(error?.message || '{{ __('Failed to send message. Please try again.') }}');
                                 });
                         @endif
                     },

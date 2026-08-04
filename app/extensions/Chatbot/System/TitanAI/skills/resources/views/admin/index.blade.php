@@ -641,14 +641,20 @@
                         'X-Requested-With': 'XMLHttpRequest'
                     }
                 })
-                .then(res => res.json())
+                .then(res => {
+                    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+                    return res.json();
+                })
                 .then(data => {
                     if (data.message) {
                         toastr.success(data.message);
                         setTimeout(() => location.reload(), 1000);
                     }
                 })
-                .catch(() => toastr.error('An error occurred.'));
+                .catch(error => {
+                    console.error('Skill deletion failed:', error);
+                    toastr.error(error.message || 'Failed to delete skill. Please try again.');
+                });
             }
         </script>
     @endpush

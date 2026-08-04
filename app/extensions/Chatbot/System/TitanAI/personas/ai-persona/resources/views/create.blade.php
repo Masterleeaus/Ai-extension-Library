@@ -254,9 +254,9 @@
                         .then(() => {
                             this.isLoading = false;
                         })
-                        .catch((error) => {
+                        .catch(error => {
                             console.error("Audio playback error:", error);
-                            alert("{{ __('Failed to play the selected audio.') }}");
+                            toastr?.error?.("{{ __('Failed to play the selected audio.') }}") || alert("{{ __('Failed to play the selected audio.') }}");
                             this.isLoading = false;
                         });
 
