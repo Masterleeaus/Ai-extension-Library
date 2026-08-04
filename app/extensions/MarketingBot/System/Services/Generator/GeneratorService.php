@@ -49,11 +49,9 @@ class GeneratorService
     {
         $setting = Setting::getCache();
 
-        // TODO: chatbot model default openai_default_model
-        //		$model = $this->chatbot->getAttribute('ai_model');
-        $model = $setting->openai_default_model;
+        $model = $this->chatbot?->getAttribute('ai_model') ?? $setting->openai_default_model;
 
-        $this->entityEnum = EntityEnum::fromSlug($setting->openai_default_model);
+        $this->entityEnum = EntityEnum::fromSlug($model);
 
         $engine = $this->entityEnum->engine();
 

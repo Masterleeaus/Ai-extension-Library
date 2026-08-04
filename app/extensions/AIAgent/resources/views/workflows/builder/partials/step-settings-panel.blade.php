@@ -61,7 +61,7 @@
             @foreach ([
         ['schedule', __('Schedule'), 'tabler-clock'],
         ['channel_message', __('Channel Message'), 'tabler-message'],
-        // ['webhook',         __('Webhook'),         'tabler-webhook'], // TODO: add webhook trigger support in the future
+        ['webhook', __('Webhook'), 'tabler-webhook'],
     ] as [$val, $lbl, $icon])
                 <button
                     class="flex flex-col items-center justify-center gap-1 rounded-lg border p-3.5 text-center font-medium text-[2xs] transition active:scale-95"
