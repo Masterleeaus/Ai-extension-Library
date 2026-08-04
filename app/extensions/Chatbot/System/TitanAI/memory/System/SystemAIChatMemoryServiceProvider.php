@@ -125,7 +125,11 @@ class SystemAIChatMemoryServiceProvider extends ServiceProvider implements Exten
 
     public static function uninstall(): void
     {
-        // TODO: Implement uninstall() method.
+        $path = public_path("vendor/chatbot");
+        if (is_dir($path)) {
+            array_map(static fn ($f) => @unlink($f), glob("$path/*.*"));
+            @rmdir($path);
+        }
     }
 
     public function registerKey(): string

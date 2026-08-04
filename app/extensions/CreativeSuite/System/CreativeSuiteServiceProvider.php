@@ -119,6 +119,10 @@ class CreativeSuiteServiceProvider extends ServiceProvider implements UninstallE
 
     public static function uninstall(): void
     {
-        // TODO: Implement uninstall() method.
+        $path = public_path("vendor/creativesuite");
+        if (is_dir($path)) {
+            array_map(static fn ($f) => @unlink($f), glob("$path/*.*"));
+            @rmdir($path);
+        }
     }
 }

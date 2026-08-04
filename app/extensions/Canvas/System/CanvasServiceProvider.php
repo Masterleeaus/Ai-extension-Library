@@ -63,6 +63,10 @@ class CanvasServiceProvider extends ServiceProvider implements UninstallExtensio
 
     public static function uninstall(): void
     {
-        // TODO: Implement uninstall() method.
+        $path = public_path("vendor/canvas");
+        if (is_dir($path)) {
+            array_map(static fn ($f) => @unlink($f), glob("$path/*.*"));
+            @rmdir($path);
+        }
     }
 }

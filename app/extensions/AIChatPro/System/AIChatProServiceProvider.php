@@ -181,6 +181,10 @@ class AIChatProServiceProvider extends ServiceProvider implements UninstallExten
 
     public static function uninstall(): void
     {
-        // TODO: Implement uninstall() method.
+        $path = public_path("vendor/aichatpro");
+        if (is_dir($path)) {
+            array_map(static fn ($f) => @unlink($f), glob("$path/*.*"));
+            @rmdir($path);
+        }
     }
 }

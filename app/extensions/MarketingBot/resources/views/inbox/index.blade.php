@@ -461,42 +461,116 @@
                     },
 
                     async handleChangeTitle() {
-                        // TODO: Implement change title logic
+                        if (!this.activeChat) {
+                            alert('Please select a conversation to rename');
+                            return;
+                        }
+
+                        const newTitle = prompt('Enter new conversation title:', this.activeChat.name);
+                        if (newTitle === null || newTitle.trim() === '') {
+                            return;
+                        }
+
+                        try {
+                            const response = await fetch(
+                                '{{ route('dashboard.user.marketing-bot.inbox.conversations.name.update') }}',
+                                {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'Accept': 'application/json',
+                                        'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content,
+                                    },
+                                    body: JSON.stringify({
+                                        conversation_id: this.activeChat.id,
+                                        name: newTitle.trim(),
+                                    }),
+                                }
+                            );
+
+                            const data = await response.json();
+                            if (data.status === 'success') {
+                                this.activeChat.name = newTitle.trim();
+                                const idx = this.chatsList.findIndex(c => c.id === this.activeChat.id);
+                                if (idx !== -1) this.chatsList[idx].name = newTitle.trim();
+                            } else {
+                                alert('Failed to update conversation name: ' + (data.message || 'Unknown error'));
+                            }
+                        } catch (error) {
+                            console.error('Error updating title:', error);
+                            alert('An error occurred while updating the conversation name');
+                        }
                     },
                     async handleDelete() {
                         if (!this.activeChat) {
-                            alert('Please select the conversation which you want delete');
+                            alert('Please select the conversation which you want to delete');
                             return;
                         }
 
-                        // TODO: Implement delete logic
-                        if (!confirm('Do you want delete this conversation history?')) {
+                        if (!confirm('Are you sure you want to delete this conversation history? This action cannot be undone.')) {
                             return;
                         }
 
-                        const res = await fetch(
-                            '{{ route('dashboard.user.marketing-bot.inbox.destroy') }}', {
-                                method: 'DELETE',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                    'Accept': 'application/json',
-                                },
-                                body: JSON.stringify({
-                                    conversation_id: this.activeChat.id,
-                                }),
-                            });
-                        const responseData = await res.json();
+                        try {
+                            const res = await fetch(
+                                '{{ route('dashboard.user.marketing-bot.inbox.destroy') }}', {
+                                    method: 'DELETE',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'Accept': 'application/json',
+                                        'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content,
+                                    },
+                                    body: JSON.stringify({
+                                        conversation_id: this.activeChat.id,
+                                    }),
+                                });
+                            const responseData = await res.json();
 
-                        if (responseData.status == 'success') {
-                            this.chatsList = this.chatsList.filter((element) => {
-                                return element.id != this.activeChat.id;
-                            })
+                            if (responseData.status == 'success') {
+                                this.chatsList = this.chatsList.filter((element) => {
+                                    return element.id != this.activeChat.id;
+                                })
 
-                            this.activeChat = this.chatsList[0];
+                                this.activeChat = this.chatsList.length > 0 ? this.chatsList[0] : null;
+                                alert('Conversation deleted successfully');
+                            } else {
+                                alert('Failed to delete conversation: ' + (responseData.message || 'Unknown error'));
+                            }
+                        } catch (error) {
+                            console.error('Error deleting conversation:', error);
+                            alert('An error occurred while deleting the conversation');
                         }
                     },
                     async handleSummarize() {
-                        // TODO: Implement delete logic
+                        if (!this.activeChat) {
+                            alert('Please select a conversation to summarize');
+                            return;
+                        }
+
+                        this.isLoadingSummarize = true;
+                        try {
+                            const response = await fetch(
+                                `{{ route('dashboard.user.marketing-bot.inbox.conversations') }}?chat_id=${this.activeChat.id}&action=summarize`,
+                                {
+                                    method: 'GET',
+                                    headers: {
+                                        'Accept': 'application/json',
+                                    },
+                                }
+                            );
+
+                            const data = await response.json();
+                            if (data.summary) {
+                                alert('Conversation Summary:\n\n' + data.summary);
+                            } else {
+                                alert('No summary available for this conversation');
+                            }
+                        } catch (error) {
+                            console.error('Error summarizing conversation:', error);
+                            alert('An error occurred while summarizing the conversation');
+                        } finally {
+                            this.isLoadingSummarize = false;
+                        }
                     },
                     async setActiveChat(chatId) {
                         if (chatId == null) return;
