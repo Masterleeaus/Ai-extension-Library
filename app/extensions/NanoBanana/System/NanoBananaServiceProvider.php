@@ -105,7 +105,11 @@ class NanoBananaServiceProvider extends ServiceProvider implements ExtensionRegi
 
     public static function uninstall(): void
     {
+<<<<<<< HEAD
         $path = public_path("vendor/nanobanana");
+=======
+        $path = public_path("vendor/chatbot");
+>>>>>>> update-ai-suite-extensions-issues-cvrb3y
         if (is_dir($path)) {
             array_map(static fn ($f) => @unlink($f), glob("$path/*.*"));
             @rmdir($path);
