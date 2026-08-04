@@ -1,0 +1,129 @@
+name: Materialize Titan Social Bundle
+
+on:
+  push:
+    branches:
+      - agent/ai-extensions-deep-scan-2026-08-04
+    paths:
+      - '.github/workflows/materialize-titan-social-bundle.yml'
+      - 'docs/titan-social/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  materialize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/ai-extensions-deep-scan-2026-08-04
+          fetch-depth: 0
+
+      - name: Build Titan Social bundle
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT="Titan-Social-Extension-Bundle"
+          DEST="$ROOT/app/Extensions"
+          OUT="generated/titan-social-bundle"
+          rm -rf "$ROOT" "$OUT" Titan-Social-Extension-Bundle.zip
+          mkdir -p "$DEST" "$OUT"
+
+          extensions=(
+            SocialMedia
+            AISocialMedia
+            SocialMediaAgent
+            SocialMediaAutomation
+            AIAgent
+            AIAgentToolSocialMediaAgent
+            InfluencerAvatar
+            UGCCreator
+            UGCFactory
+            AiViralClips
+            UrlToVideo
+            AiCaptions
+            VideoEditor
+          )
+
+          for extension in "${extensions[@]}"; do
+            test -d "extensions/$extension"
+            cp -a "extensions/$extension" "$DEST/$extension"
+          done
+
+          cp docs/titan-social/TITAN-SOCIAL-BUILD-PROMPT.md "$ROOT/TITAN-SOCIAL-BUILD-PROMPT.md"
+
+          cat > "$ROOT/README.md" <<'EOF'
+          # Titan Social Extension Bundle
+
+          Primary internal identity: `SocialMedia`.
+          Customer-facing product name: **Titan Social**.
+
+          `AIAgent` and `AIAgentToolSocialMediaAgent` remain separate installable extensions. The bridge must be expanded but not merged.
+
+          Consolidation donors:
+          - AISocialMedia
+          - SocialMediaAgent
+          - SocialMediaAutomation
+
+          Creative donors:
+          - InfluencerAvatar
+          - UGCCreator
+          - UGCFactory
+          - AiViralClips
+          - UrlToVideo
+          - AiCaptions
+          - VideoEditor
+
+          Follow `TITAN-SOCIAL-BUILD-PROMPT.md` for complete architecture, migration, governance, security and testing requirements.
+          EOF
+
+          cat > "$ROOT/bundle-manifest.json" <<'EOF'
+          {
+            "product_display_name": "Titan Social",
+            "primary_install_identity": "SocialMedia",
+            "primary_install_path": "app/Extensions/SocialMedia",
+            "standalone_extensions": ["AIAgent", "AIAgentToolSocialMediaAgent"],
+            "consolidation_donors": ["AISocialMedia", "SocialMediaAgent", "SocialMediaAutomation"],
+            "creative_donors": ["InfluencerAvatar", "UGCCreator", "UGCFactory", "AiViralClips", "UrlToVideo", "AiCaptions", "VideoEditor"]
+          }
+          EOF
+
+          find "$ROOT" -type f ! -name SHA256SUMS.txt -print0 | sort -z | xargs -0 sha256sum > "$ROOT/SHA256SUMS.txt"
+          zip -r -q Titan-Social-Extension-Bundle.zip "$ROOT"
+
+          ZIP_SHA=$(sha256sum Titan-Social-Extension-Bundle.zip | awk '{print $1}')
+          ZIP_BYTES=$(stat -c '%s' Titan-Social-Extension-Bundle.zip)
+
+          base64 -w 8192 Titan-Social-Extension-Bundle.zip > "$OUT/Titan-Social-Extension-Bundle.zip.b64"
+          split -d -a 3 -l 500 "$OUT/Titan-Social-Extension-Bundle.zip.b64" "$OUT/part-"
+          rm "$OUT/Titan-Social-Extension-Bundle.zip.b64"
+
+          PART_COUNT=$(find "$OUT" -maxdepth 1 -type f -name 'part-*' | wc -l | tr -d ' ')
+          cat > "$OUT/manifest.json" <<EOF
+          {
+            "file_name": "Titan-Social-Extension-Bundle.zip",
+            "encoding": "base64-lines",
+            "line_width": 8192,
+            "lines_per_part": 500,
+            "part_prefix": "part-",
+            "part_count": $PART_COUNT,
+            "zip_bytes": $ZIP_BYTES,
+            "sha256": "$ZIP_SHA"
+          }
+          EOF
+
+      - name: Commit materialized transport
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add generated/titan-social-bundle
+          if git diff --cached --quiet; then
+            echo "No materialized changes"
+            exit 0
+          fi
+          git commit -m "build: materialize Titan Social bundle"
+          git push origin HEAD:agent/ai-extensions-deep-scan-2026-08-04
