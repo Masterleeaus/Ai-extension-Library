@@ -215,27 +215,31 @@
 
     function checkImageStatusMidjourney() {
         fetch('{{ route('dashboard.midjourney.check-status') }}')
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) throw new Error(`HTTP ${response.status}: Failed to check image status`);
+                return response.json();
+            })
             .then(data => {
-                if (data.data) {
-                    for (const [id, item] of Object.entries(data.data)) {
-                        let imgElement = document.getElementById(item.imgId);
-                        let imgElementPayloadId = document.getElementById(item.payloadId);
-                        let imgElementDownload = document.getElementById(item.imgId + '-download');
-                        if (imgElement) {
-                            imgElement.closest('.image-result')?.classList?.remove('lqd-image-result-in-queue');
-                            imgElement.src = item.img;
-                            imgElementDownload.setAttribute('href', item.img)
-                            imgElementDownload.setAttribute('target', '_blank')
-                            imgElementPayloadId.setAttribute('data-payload', JSON.stringify(item));
-                            refreshFsLightbox();
-                            location.reload();
-                        }
+                if (!data.data) return;
+
+                for (const [id, item] of Object.entries(data.data)) {
+                    let imgElement = document.getElementById(item.imgId);
+                    let imgElementPayloadId = document.getElementById(item.payloadId);
+                    let imgElementDownload = document.getElementById(item.imgId + '-download');
+                    if (imgElement) {
+                        imgElement.closest('.image-result')?.classList?.remove('lqd-image-result-in-queue');
+                        imgElement.src = item.img;
+                        imgElementDownload.setAttribute('href', item.img)
+                        imgElementDownload.setAttribute('target', '_blank')
+                        imgElementPayloadId.setAttribute('data-payload', JSON.stringify(item));
+                        refreshFsLightbox();
+                        location.reload();
                     }
                 }
-
             })
-            .catch(error => console.error('Error:', error))
+            .catch(error => {
+                console.error('Failed to check image status:', error);
+            });
     }
 
     document.addEventListener('DOMContentLoaded', function() {
