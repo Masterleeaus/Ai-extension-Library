@@ -207,7 +207,10 @@
 
     function checkImageStatus() {
         fetch('/dashboard/user/openai/generator/check/status')
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) throw new Error(`HTTP ${response.status}: Failed to check image status`);
+                return response.json();
+            })
             .then(data => {
                 // console.log(data);
                 if (data.data) {
@@ -225,9 +228,10 @@
                         }
                     }
                 }
-
             })
-            .catch(error => console.error('Error:', error));
+            .catch(error => {
+                console.error('Failed to check image status:', error);
+            });
     }
 
     document.addEventListener('DOMContentLoaded', function() {

@@ -46,7 +46,10 @@
                     method: 'POST',
                     body: formData,
                 })
-                .then(r => r.json())
+                .then(r => {
+                    if (!r.ok) throw new Error(`HTTP ${r.status}: ${r.statusText}`);
+                    return r.json();
+                })
                 .then(data => {
                     this.loading = false;
                     if (data.status === 'error') { toastr.error(data.message); return; }
@@ -54,7 +57,11 @@
                     this.autoDetect();
                     this.step = 'map';
                 })
-                .catch(() => { this.loading = false; toastr.error('{{ __('Something went wrong.') }}'); });
+                .catch(error => {
+                    this.loading = false;
+                    console.error('CSV Header parsing failed:', error);
+                    toastr.error(error.message || '{{ __('Failed to parse CSV file. Please try again.') }}');
+                });
             },
             buildMappingFormData(formData) {
                 if (this.mapping.name)         formData.append('mapping[name]', this.mapping.name);
@@ -72,7 +79,10 @@
                     method: 'POST',
                     body: formData,
                 })
-                .then(r => r.json())
+                .then(r => {
+                    if (!r.ok) throw new Error(`HTTP ${r.status}: ${r.statusText}`);
+                    return r.json();
+                })
                 .then(data => {
                     this.loading = false;
                     if (data.status === 'error') { toastr.error(data.message); return; }
@@ -81,7 +91,11 @@
                     this.selectedIndices = data.valid.map(() => true);
                     this.step            = 'preview';
                 })
-                .catch(() => { this.loading = false; toastr.error('{{ __('Something went wrong.') }}'); });
+                .catch(error => {
+                    this.loading = false;
+                    console.error('CSV preview failed:', error);
+                    toastr.error(error.message || '{{ __('Failed to preview CSV data. Please try again.') }}');
+                });
             },
             confirmImport() {
                 if (!this.fileInput || !this.fileInput.files.length) return;
@@ -99,7 +113,10 @@
                     method: 'POST',
                     body: formData,
                 })
-                .then(r => r.json())
+                .then(r => {
+                    if (!r.ok) throw new Error(`HTTP ${r.status}: ${r.statusText}`);
+                    return r.json();
+                })
                 .then(data => {
                     this.loading = false;
                     if (data.status === 'error') { toastr.error(data.message); return; }
@@ -108,7 +125,11 @@
                     this.step = 'upload';
                     setTimeout(() => window.location.reload(), 600);
                 })
-                .catch(() => { this.loading = false; toastr.error('{{ __('Something went wrong.') }}'); });
+                .catch(error => {
+                    this.loading = false;
+                    console.error('CSV import failed:', error);
+                    toastr.error(error.message || '{{ __('Failed to import contacts. Please try again.') }}');
+                });
             },
             reset() {
                 this.step            = 'upload';

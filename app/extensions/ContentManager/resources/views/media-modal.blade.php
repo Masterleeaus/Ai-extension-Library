@@ -133,6 +133,7 @@
 						items.map(async (item, index) => {
 							try {
 								const response = await fetch(item.url);
+								if (!response.ok) throw new Error(`HTTP ${response.status}: Failed to fetch ${item.url}`);
 								const blob = await response.blob();
 
 								const file = new File([blob], item.title || `file-${index}`, {
@@ -149,6 +150,7 @@
 					).then((downloadedFiles) => {
 						const files = downloadedFiles.filter(file => file instanceof File);
 						if (files.length === 0) {
+							console.warn('⚠️ No files were successfully downloaded from media manager selection');
 							return;
 						}
 
@@ -165,6 +167,9 @@
 						// Trigger change and input events
 						input.dispatchEvent(new Event('change', { bubbles: true }));
 						input.dispatchEvent(new Event('input', { bubbles: true }));
+					}).catch(error => {
+						console.error('❌ Error processing downloaded media files:', error);
+						toastr?.error?.('Failed to process selected media. Please try again.');
 					});
 
 					// Dispatch custom event
