@@ -27,6 +27,32 @@ on:
       - 'extensions/AiViralClips/**'
       - 'extensions/UGCCreator/**'
       - 'extensions/UGCFactory/**'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/build-titan-marketing-bundle.yml'
+      - 'docs/titan-marketing/**'
+      - 'extensions/MarketingBot/**'
+      - 'extensions/AIAgentToolMarketingBot/**'
+      - 'extensions/AIAgent/**'
+      - 'extensions/AIAgentGmail/**'
+      - 'extensions/AIAgentWhatsappChannel/**'
+      - 'extensions/AIAgentSlackChannel/**'
+      - 'extensions/PhoneCallAgent/**'
+      - 'extensions/ChatbotVoiceCall/**'
+      - 'extensions/ChatbotVoice/**'
+      - 'extensions/ElevenLabsVoiceChat/**'
+      - 'extensions/AzureTTS/**'
+      - 'extensions/SEOTool/**'
+      - 'extensions/BlogPilot/**'
+      - 'extensions/ContentManager/**'
+      - 'extensions/AIPlagiarism/**'
+      - 'extensions/AIWriterTemplates/**'
+      - 'extensions/UrlToVideo/**'
+      - 'extensions/AiViralClips/**'
+      - 'extensions/UGCCreator/**'
+      - 'extensions/UGCFactory/**'
   workflow_dispatch:
 
 permissions:
