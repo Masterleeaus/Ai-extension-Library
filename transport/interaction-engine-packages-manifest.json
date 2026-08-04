@@ -1,0 +1,17 @@
+{
+  "source_bundle": "Interaction Engine.zip",
+  "architecture_version": "1.0.0",
+  "dataset_id": "54bb5371-b28e-41ea-a7d6-457aaee83bd4",
+  "dataset_url": "https://titan-builder-ob009-artifact.miniup.app/api/data-file/titan-builder-ob009-artifact/interaction-engine-packages-v1-0-0.parquet",
+  "archive_sha256": "3f003ab1475430f05839acdfe670af5dacbe62a6512b6c82359d9e0dbb00c983",
+  "archive_bytes": 258298,
+  "dataset_rows": 3,
+  "materialized_files": 515,
+  "materialized_bytes": 1103866,
+  "targets": [
+    "packages/titan-interaction-engine",
+    "packages/titan-interaction-engine-offline",
+    "packages/titan-interaction-contracts",
+    "extensions/InteractionEngineChatbotBridge"
+  ]
+}

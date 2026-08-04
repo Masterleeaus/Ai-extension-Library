@@ -8,6 +8,8 @@ use App\Extensions\AIAgent\System\Actions\Contracts\ActionInterface;
 use App\Extensions\AIAgent\System\Actions\Contracts\AIAgentActionInterface;
 use Exception;
 use Illuminate\Contracts\Container\BindingResolutionException;
+use InvalidArgumentException;
+use LogicException;
 
 class AIAgentActionRegistry
 {
@@ -17,14 +19,76 @@ class AIAgentActionRegistry
     /** @var array<int, array{key: string, label: string}> */
     private array $failed = [];
 
+    /** @var list<callable(string, class-string<ActionInterface>): void> */
+    private array $registeredListeners = [];
+
+    /** @var array<string,true> */
+    private array $registeredListenerKeys = [];
+
     /**
-     * Register an action class under a key.
+     * Register an action class under a stable key.
      *
-     * @param  class-string<ActionInterface>  $actionClass
+     * Re-registering the same key/class pair is idempotent. Replacing an
+     * existing key with another class is rejected so native and unified
+     * registries cannot silently drift apart.
+     *
+     * @param class-string<ActionInterface> $actionClass
      */
     public function register(string $key, string $actionClass): void
     {
+        $key = trim($key);
+        if ($key === '') {
+            throw new InvalidArgumentException('AI Agent action key cannot be empty.');
+        }
+        if (! is_a($actionClass, ActionInterface::class, true)) {
+            throw new InvalidArgumentException("AI Agent action [{$actionClass}] must implement " . ActionInterface::class . '.');
+        }
+
+        $existing = $this->actions[$key] ?? null;
+        if ($existing === $actionClass) {
+            return;
+        }
+        if ($existing !== null) {
+            throw new LogicException("AI Agent action [{$key}] is already registered by [{$existing}].");
+        }
+
         $this->actions[$key] = $actionClass;
+        foreach ($this->registeredListeners as $listener) {
+            $listener($key, $actionClass);
+        }
+    }
+
+    /**
+     * Observe action registration. Replay lets a late unified-registry bridge
+     * mirror actions that were registered earlier in provider boot.
+     *
+     * @param callable(string, class-string<ActionInterface>): void $listener
+     */
+    public function onRegistered(
+        callable $listener,
+        bool $replay = true,
+        ?string $listenerKey = null,
+    ): void {
+        $listenerKey = $listenerKey !== null ? trim($listenerKey) : null;
+        if ($listenerKey !== null && $listenerKey !== '' && isset($this->registeredListenerKeys[$listenerKey])) {
+            return;
+        }
+        if ($listenerKey !== null && $listenerKey !== '') {
+            $this->registeredListenerKeys[$listenerKey] = true;
+        }
+        $this->registeredListeners[] = $listener;
+
+        if ($replay) {
+            foreach ($this->actions as $key => $actionClass) {
+                $listener($key, $actionClass);
+            }
+        }
+    }
+
+    /** @return array<string, class-string<ActionInterface>> */
+    public function registeredClasses(): array
+    {
+        return $this->actions;
     }
 
     /**
@@ -100,21 +164,13 @@ class AIAgentActionRegistry
         return $grouped;
     }
 
-    /**
-     * Return actions for a specific category.
-     *
-     * @return array<int, array<string, mixed>>
-     */
+    /** @return array<int, array<string, mixed>> */
     public function byCategory(string $category): array
     {
         return $this->all()[$category] ?? [];
     }
 
-    /**
-     * Return a flat list of all registered action keys.
-     *
-     * @return string[]
-     */
+    /** @return string[] */
     public function keys(): array
     {
         return array_keys($this->actions);

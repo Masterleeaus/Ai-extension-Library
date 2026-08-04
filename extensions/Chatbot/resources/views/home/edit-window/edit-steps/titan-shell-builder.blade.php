@@ -11,14 +11,14 @@
     <div class="mb-5 flex items-start justify-between gap-3">
         <div>
             <h3 class="text-sm font-semibold">@lang('App shell and navigation')</h3>
-            <p class="mt-1 text-2xs/5 opacity-60">@lang('Configure the operational links, drawer, settings policy and live preview for this Titan app.')</p>
+            <p class="mt-1 text-2xs/5 opacity-60">@lang('Configure the operational links, drawer, settings policy and live preview for this Titan application.')</p>
         </div>
-        <span class="rounded-full bg-primary/10 px-2 py-1 text-[10px] font-semibold text-primary">14 apps</span>
+        <span class="rounded-full bg-primary/10 px-2 py-1 text-[10px] font-semibold text-primary">{{ count($titanBuilderSchemas) }} apps</span>
     </div>
 
     <div class="grid gap-4">
         <label class="grid gap-1 text-2xs font-medium">
-            <span>@lang('Titan app')</span>
+            <span>@lang('Titan application')</span>
             <select class="rounded-lg border border-heading-foreground/10 bg-background px-3 py-2" x-model="selectedSlug" @change="selectTemplate(selectedSlug)">
                 <template x-for="item in schemas" :key="item.identity.slug">
                     <option :value="item.identity.slug" x-text="item.identity.name"></option>

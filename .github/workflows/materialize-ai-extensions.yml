@@ -36,18 +36,48 @@ jobs:
           python-version: '3.12'
       - name: Install Parquet reader
         run: python -m pip install --disable-pip-version-check pyarrow
-      - name: Restore and verify extension files
+      - name: Restore, overlay, and verify extension files
         run: |
-          DATASET_URL=$(python -c "import json; print(json.load(open('transport/dataset-manifest.json'))['url'])")
-          python scripts/restore_extensions.py --clean --url "$DATASET_URL"
+          python - <<'PY'
+          import json
+          import subprocess
+          import sys
+
+          with open('transport/dataset-manifest.json', encoding='utf-8') as handle:
+              manifest = json.load(handle)
+
+          command = [
+              sys.executable,
+              'scripts/restore_extensions.py',
+              '--clean',
+              '--url',
+              manifest['url'],
+          ]
+          for overlay in manifest.get('overlays', []):
+              command.extend(['--overlay-url', overlay['url']])
+
+          subprocess.run(command, check=True)
+          PY
       - name: Write materialisation summary
         run: |
           python - <<'PY'
+          import json
           from pathlib import Path
+
           files = [path for path in Path('extensions').rglob('*') if path.is_file()]
           size = sum(path.stat().st_size for path in files)
+          manifest = json.loads(Path('transport/dataset-manifest.json').read_text(encoding='utf-8'))
+          overlays = manifest.get('overlays', [])
+          overlay_lines = ''.join(
+              f"- {item['target']}: **v{item['version']}**, {item['rows']:,} files\n"
+              for item in overlays
+          )
           Path('MATERIALIZED.md').write_text(
-              f"# Materialised source tree\n\nFiles: **{len(files):,}**  \nBytes: **{size:,}**  \nSource: MiniUp lossless Parquet transport dataset.\n",
+              f"# Materialised source tree\n\n"
+              f"Files: **{len(files):,}**  \n"
+              f"Bytes: **{size:,}**  \n"
+              f"Source: MiniUp lossless Parquet transport datasets.\n\n"
+              f"## Applied overlays\n\n{overlay_lines or '- None\n'}",
               encoding='utf-8',
           )
           PY
@@ -59,6 +89,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "No source changes to commit"
           else
-            git commit -m "Materialize 78 AI extensions"
+            git commit -m "Materialize AI extensions with verified overlays"
             git push origin HEAD:${{ github.head_ref || github.ref_name }}
           fi

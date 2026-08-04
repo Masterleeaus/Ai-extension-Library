@@ -1,0 +1,82 @@
+name: Materialize Interaction Engine packages
+
+on:
+  push:
+    branches:
+      - agent/import-interaction-engine-packages
+    paths:
+      - .github/workflows/materialize-interaction-engine.yml
+      - scripts/apply_interaction_engine_packages.py
+      - scripts/verify_interaction_engine_architecture.py
+      - transport/interaction-engine-packages-manifest.json
+      - packages/titan-interaction-engine/**
+      - packages/titan-interaction-engine-offline/**
+      - packages/titan-interaction-contracts/**
+      - extensions/InteractionEngineChatbotBridge/**
+  pull_request:
+    branches:
+      - main
+    paths:
+      - .github/workflows/materialize-interaction-engine.yml
+      - scripts/apply_interaction_engine_packages.py
+      - scripts/verify_interaction_engine_architecture.py
+      - transport/interaction-engine-packages-manifest.json
+      - packages/titan-interaction-engine/**
+      - packages/titan-interaction-engine-offline/**
+      - packages/titan-interaction-contracts/**
+      - extensions/InteractionEngineChatbotBridge/**
+
+permissions:
+  contents: read
+
+concurrency:
+  group: interaction-engine-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  materialize-and-verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.head_ref || github.ref_name }}
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install materializer dependency
+        run: python -m pip install --disable-pip-version-check pyarrow
+      - name: Materialize verified package archive
+        run: python scripts/apply_interaction_engine_packages.py --root .
+      - name: Validate package boundaries and manifests
+        run: |
+          python scripts/verify_interaction_engine_architecture.py
+          python -m json.tool packages/titan-interaction-engine/composer.json >/dev/null
+          python -m json.tool packages/titan-interaction-engine-offline/package.json >/dev/null
+          python -m json.tool packages/titan-interaction-contracts/composer.json >/dev/null
+          python -m json.tool packages/titan-interaction-contracts/package.json >/dev/null
+          python -m json.tool extensions/InteractionEngineChatbotBridge/extension.json >/dev/null
+      - name: Verify PHP runtime and bridge
+        run: |
+          php packages/titan-interaction-engine/tests/run.php
+          php packages/titan-interaction-engine/bin/verify.php
+          php extensions/InteractionEngineChatbotBridge/tests/verify.php
+          find packages/titan-interaction-engine extensions/InteractionEngineChatbotBridge \
+            -type f -name '*.php' -print0 | xargs -0 -n1 php -l >/tmp/interaction-php-lint.log
+          echo "PHP linted $(wc -l </tmp/interaction-php-lint.log) files"
+      - name: Verify offline PWA package
+        working-directory: packages/titan-interaction-engine-offline
+        run: |
+          npm install --ignore-scripts --no-audit --no-fund --no-package-lock
+          npm test
+          rm -rf node_modules
+      - name: Verify checked-in source matches the pinned archive
+        run: |
+          git diff --exit-code -- \
+            packages/titan-interaction-engine \
+            packages/titan-interaction-engine-offline \
+            packages/titan-interaction-contracts \
+            extensions/InteractionEngineChatbotBridge

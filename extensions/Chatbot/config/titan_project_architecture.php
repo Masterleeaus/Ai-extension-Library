@@ -11,5 +11,16 @@ return [
         'ai_system_extensions' => ['authority' => 'donor', 'role' => 'AI capabilities and adapters subject to canonical ownership'],
         'base_system_extensions' => ['authority' => 'donor', 'role' => 'optional host capabilities subject to extension registry'],
     ],
+
+    'chatbot_extension' => [
+        'slug' => 'chatbot',
+        'authoritative_path' => 'app/Extensions/Chatbot',
+        'authoritative_provider' => 'App\\Extensions\\Chatbot\\System\\ChatbotServiceProvider',
+        'legacy_path' => 'app/Extensions/TitanZeroChatbot',
+        'legacy_provider' => 'App\\Extensions\\TitanZeroChatbot\\System\\ChatbotServiceProvider',
+        'legacy_boot_enabled' => false,
+        'compatibility_mode' => 'retained-files-no-provider-no-routes-no-migrations',
+    ],
+
     'legacy_embedded_workcore_enabled' => (bool) env('TITAN_LEGACY_EMBEDDED_WORKCORE', false),
 ];

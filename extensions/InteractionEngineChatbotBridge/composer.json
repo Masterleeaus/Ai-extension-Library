@@ -1,0 +1,16 @@
+{
+  "name": "titanzero/interaction-engine-chatbot-bridge",
+  "description": "Chatbot marketplace bridge for Titan Interaction Engine",
+  "type": "library",
+  "license": "proprietary",
+  "require": {
+    "php": "^8.2",
+    "titanzero/interaction-engine": "^1.0",
+    "illuminate/support": "^10.0 || ^11.0 || ^12.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "TitanZero\\InteractionBridge\\": ""
+    }
+  }
+}

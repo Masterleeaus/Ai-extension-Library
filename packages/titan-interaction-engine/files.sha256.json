@@ -1,0 +1,2506 @@
+{
+  "algorithm": "sha256",
+  "file_count": 500,
+  "files": [
+    {
+      "path": ".github/workflows/verify-interaction-engine.yml",
+      "bytes": 858,
+      "sha256": "c723c14d45da8cf1a6c09c1d023ee218a6a09d70d77f7f20fee0299ffc733c78"
+    },
+    {
+      "path": ".gitignore",
+      "bytes": 13,
+      "sha256": "6f33123f15c1cc93f414069b258cb19762212cc566ea927ff03b83a6a2fc3bb2"
+    },
+    {
+      "path": "CHANGELOG_PHASE10_FIX_PASS.md",
+      "bytes": 10651,
+      "sha256": "a279c59a1b4271722c71f8e10cda3fb99ceb9240b6c06c65da2059926aea918f"
+    },
+    {
+      "path": "CHANGELOG_PHASE11_COGNITIVE_EVENTS.md",
+      "bytes": 1242,
+      "sha256": "0237a28ca6ba981918ddf899bbb406f9ab7ed4860645e685e0ba0fac674e9f0b"
+    },
+    {
+      "path": "CHANGELOG_PHASE14_AUTHORITY_CONTROLS.md",
+      "bytes": 959,
+      "sha256": "056bdba898a2e4b7d4071fdfd5aa1479cb922c38eb1a212168c7f1ddd580b73f"
+    },
+    {
+      "path": "EXTRACTION-NOTES.md",
+      "bytes": 276,
+      "sha256": "2ed06b11c7ebe1eb956a8bc7a8f557301e78ed13d631ef33c13fb7d2a1379bb1"
+    },
+    {
+      "path": "MERGE_MANIFEST.json",
+      "bytes": 2150,
+      "sha256": "a857960197c0b680d029c3a42b7cfb92c0a3d10b679b3c2d299f18e2e36ef231"
+    },
+    {
+      "path": "PHASE11_BUILD_REPORT.md",
+      "bytes": 1309,
+      "sha256": "fc8560a32baa3bdb20b9367e9218a8ef148e61d2a4d229d25640c018bdf2d2dd"
+    },
+    {
+      "path": "PHASE14_BUILD_REPORT.md",
+      "bytes": 1468,
+      "sha256": "49904d0161dfc0a6565fb29eb409a7cac9c6a4f2a441a1723a3366a18cceef94"
+    },
+    {
+      "path": "PHASE8_IMPORT.txt",
+      "bytes": 28372,
+      "sha256": "64b77c2da78ba832af3e6e3297ac5990dbaec39bd4da04b5498e794f5bfd8edd"
+    },
+    {
+      "path": "PHASE9_80_ENGINE_LIBRARY_IMPORT.txt",
+      "bytes": 328,
+      "sha256": "d4c8d49c0ddb1fe7245cec5b8dd4af4ca460e5e16b0fbcf3720405adb1611b1f"
+    },
+    {
+      "path": "README.md",
+      "bytes": 10810,
+      "sha256": "a8e2f071caea4432222eed182cb7f129da2a009e0156e777f11da4e8373d4227"
+    },
+    {
+      "path": "SOURCE-PROVENANCE.json",
+      "bytes": 71143,
+      "sha256": "f5e55db786c711e94bfc6c7427c4be019bf47adecd9f408b690ef836fbe94890"
+    },
+    {
+      "path": "_Architecture/ExecutionEngine.md",
+      "bytes": 1381,
+      "sha256": "a5542f8f5f85942c4503a6f0b80611d0ab4b78dae916a189b87dd2ab4c14ae8a"
+    },
+    {
+      "path": "_Architecture/Roadmap.md",
+      "bytes": 627,
+      "sha256": "ed3745cba0c7febaa810a611d8fe416060521a6154d07e85e523776b11636a95"
+    },
+    {
+      "path": "benchmarks/localbrain-v2.php",
+      "bytes": 1115,
+      "sha256": "6001ecfe85a079193688a758fd67191ca5e64ec6e717123efe5a1bf5227b2f83"
+    },
+    {
+      "path": "benchmarks/performance.md",
+      "bytes": 858,
+      "sha256": "cca098edabe40d1269013f58b16872f07b836a39e83c80002651503194441d48"
+    },
+    {
+      "path": "bin/verify.php",
+      "bytes": 1321,
+      "sha256": "c46ecc1f9195b3814e98ab8c05e8aff124f341a74092509be9db031e0af2914b"
+    },
+    {
+      "path": "composer.json",
+      "bytes": 1145,
+      "sha256": "b79ca85318962df55f73a1a11766cd96cef1fd3dd5d1956cd8bde9e2bd41fbcd"
+    },
+    {
+      "path": "config/interaction.php",
+      "bytes": 2581,
+      "sha256": "5996509e843c88bf9ffb382b936554c755c273096a4b8aed182b0b9c37232026"
+    },
+    {
+      "path": "database/migrations/2026_08_03_000000_create_long_term_memory_table.php",
+      "bytes": 1198,
+      "sha256": "f71ddab32a641c891d4b8076727d6410b85002dc3dc5fb132e1c8956464725d2"
+    },
+    {
+      "path": "database/migrations/2026_08_04_000000_create_interaction_cognitive_events_table.php",
+      "bytes": 2070,
+      "sha256": "16c7a0d2ecdf311e5ecfe4f173c92355e0966ecaea8ee9876d61d688e67d61ec"
+    },
+    {
+      "path": "dist/resources/ts/offline/cognitive-event-outbox.d.ts",
+      "bytes": 676,
+      "sha256": "77e7a33bebe46410229ee68cdc389e39e33b08e5df506cc7495646e5b49aa118"
+    },
+    {
+      "path": "dist/resources/ts/offline/cognitive-event-outbox.js",
+      "bytes": 3039,
+      "sha256": "6216ed203b69660d0616338ef6d26723c3668d7c3086aad4e62a8813ee257085"
+    },
+    {
+      "path": "dist/resources/ts/offline/command-outbox.d.ts",
+      "bytes": 709,
+      "sha256": "04940f79021d169941121d73815e497d6d38a3596053a3800f8f1ba63bb2b166"
+    },
+    {
+      "path": "dist/resources/ts/offline/command-outbox.js",
+      "bytes": 2835,
+      "sha256": "1423a87558f35157364246b7bc1117cb3fcd5041e565b14ca3f48a46cd052b04"
+    },
+    {
+      "path": "dist/resources/ts/offline/crypto.d.ts",
+      "bytes": 269,
+      "sha256": "7c659226d5238f28d09103e2f456059a15d2b21f63b0b29613aafc7ba2cfa029"
+    },
+    {
+      "path": "dist/resources/ts/offline/crypto.js",
+      "bytes": 1819,
+      "sha256": "81f98fcce270b8552e4dddd3d0e6eaf4d72feb9e764b6e57918e2243fb3fe7b0"
+    },
+    {
+      "path": "dist/resources/ts/offline/index.d.ts",
+      "bytes": 435,
+      "sha256": "eeeab2e3a2461da6d6c6a01e459672c2d0f4790c3b8e489f857213f2e76eca97"
+    },
+    {
+      "path": "dist/resources/ts/offline/index.js",
+      "bytes": 1426,
+      "sha256": "e5ed5547ae37535ecbab033200ecf4d715ba9542972e317b09f28f12f83d1ab7"
+    },
+    {
+      "path": "dist/resources/ts/offline/indexeddb-store.d.ts",
+      "bytes": 454,
+      "sha256": "332e00b9568b185ea7815f99c5f37c2fd35ca01a6ce8cfab0a34a211f877b78a"
+    },
+    {
+      "path": "dist/resources/ts/offline/indexeddb-store.js",
+      "bytes": 1954,
+      "sha256": "ee4548ef4aa05592aa698960a606c70af1e9fe4414bd908416769193759f0e87"
+    },
+    {
+      "path": "dist/resources/ts/offline/local-language.d.ts",
+      "bytes": 186,
+      "sha256": "5913467859fd659327811ff5800136940dfce71580b2b5b6a9d2376716e8c622"
+    },
+    {
+      "path": "dist/resources/ts/offline/local-language.js",
+      "bytes": 2476,
+      "sha256": "49569f26ced386e8a03977a8d7aa6e1385bb42bee7a7405fcc690a2ff3504fe7"
+    },
+    {
+      "path": "dist/resources/ts/offline/memory-reranker.d.ts",
+      "bytes": 994,
+      "sha256": "d48d9e16dacdf72d93dde9faa4199673c939a5ad6fc0d9067246ae65049d725b"
+    },
+    {
+      "path": "dist/resources/ts/offline/memory-reranker.js",
+      "bytes": 2908,
+      "sha256": "d154e35bfb9b5a85adc87efba4d99ea5242d6a8e8550b0bbc01ef6e468066698"
+    },
+    {
+      "path": "dist/resources/ts/offline/memory-store.d.ts",
+      "bytes": 300,
+      "sha256": "ee040ced944206641afe128d98fa2b54a91ed92f988e7cf2ad5e3b5e45594c06"
+    },
+    {
+      "path": "dist/resources/ts/offline/memory-store.js",
+      "bytes": 585,
+      "sha256": "518da9dfb2fa07d5a9f6d4bd0b227d2adb14df7a1090a44d4f83ac58fbf1d59d"
+    },
+    {
+      "path": "dist/resources/ts/offline/naive-bayes-intent.d.ts",
+      "bytes": 804,
+      "sha256": "24027f4da6934f73d1d75001fa229e3bcaceba31511afd96b5bde756e5086d8c"
+    },
+    {
+      "path": "dist/resources/ts/offline/naive-bayes-intent.js",
+      "bytes": 7234,
+      "sha256": "c4725f11006d1905f8a7ad72101452710d0fba2b38c5e1ef3f907593a9434ee2"
+    },
+    {
+      "path": "dist/resources/ts/offline/persona-drift.d.ts",
+      "bytes": 979,
+      "sha256": "a78a92917268090ba3f9b1f294384b8d9c9c1dd6402421b562a080bbc4a1c058"
+    },
+    {
+      "path": "dist/resources/ts/offline/persona-drift.js",
+      "bytes": 5945,
+      "sha256": "97753436dbcce396a3bb0b90e632f135a1035aa9e8960b39822d1b34b2959c72"
+    },
+    {
+      "path": "dist/resources/ts/offline/sync-client.d.ts",
+      "bytes": 443,
+      "sha256": "d5c171c8c65b19f615dbcf67b3803196ec38419a3d89e8cc0fba3a9ff4162cf3"
+    },
+    {
+      "path": "dist/resources/ts/offline/sync-client.js",
+      "bytes": 1624,
+      "sha256": "587ef3dbec98610138b8a72b5150e814f650632964c2f0308eb833a8c7b75174"
+    },
+    {
+      "path": "dist/resources/ts/offline/types.d.ts",
+      "bytes": 2617,
+      "sha256": "df3b5e4b61a2d1abb04ec216f25ced819f37bcaf79dc36c296ea246a03fb116d"
+    },
+    {
+      "path": "dist/resources/ts/offline/types.js",
+      "bytes": 77,
+      "sha256": "d43aa81f5bc89faa359e0f97c814ba25155591ff078fbb9bfd40f8c7c9683230"
+    },
+    {
+      "path": "dist/resources/ts/offline/vector-clock.d.ts",
+      "bytes": 916,
+      "sha256": "1988c51e48646e4e371bb2cc2166067eef83b3ca0f66c7ab75b0ff1a8778b8a8"
+    },
+    {
+      "path": "dist/resources/ts/offline/vector-clock.js",
+      "bytes": 3206,
+      "sha256": "278de8a9b507cffabf8345d061c84421c7513f7ad94d540a7cadd6a41871bf1e"
+    },
+    {
+      "path": "dist/resources/ts/offline/wizard-draft-store.d.ts",
+      "bytes": 362,
+      "sha256": "b07ff68eb3cd0256958aabb55ccba7f227751885fb71e354e77a9aaed42765bc"
+    },
+    {
+      "path": "dist/resources/ts/offline/wizard-draft-store.js",
+      "bytes": 646,
+      "sha256": "da2f0b75e0d5be66eb9bc147f426ead6a7e9e23e55ed75d40689c438bea1f8eb"
+    },
+    {
+      "path": "docs/ADAPTIVE_PERSONA_LOCALBRAIN_V2_SCAN.md",
+      "bytes": 7859,
+      "sha256": "c407ff08237f2f69e7d5997544eedc2446d05c01e9f8b7be51e81b2e2a598898"
+    },
+    {
+      "path": "docs/ARCHITECTURE.md",
+      "bytes": 4254,
+      "sha256": "b8876e1f2aede1d13455dd825d5ac02375908675fe34380035cc2df8dbd319a7"
+    },
+    {
+      "path": "docs/ASSURANCE_WORKFLOWS.md",
+      "bytes": 3849,
+      "sha256": "8837256f903003a65d54d5bc48fda7bdc27ab37c96de2c0654d652912f219314"
+    },
+    {
+      "path": "docs/BUILD_REPORT.md",
+      "bytes": 3182,
+      "sha256": "15cc268b4645d522a8ba7a43fb62888b23f27e4ba6699a0f4f51cc16200fd01a"
+    },
+    {
+      "path": "docs/COMMERCE_MULTI_VERTICAL_TEMPLATE_PACK.md",
+      "bytes": 5050,
+      "sha256": "6f42a2dd3e121a3a55cdd315504f1eb38c1446c87eeff7461ca5abeea568dfbe"
+    },
+    {
+      "path": "docs/ENGINE_LIBRARY_80.md",
+      "bytes": 2402,
+      "sha256": "2351f609d6b7d9e3d9d56a714fd204d309a055884060d0631419c2da6fa9d7d5"
+    },
+    {
+      "path": "docs/LOCALBRAIN_V2.md",
+      "bytes": 2035,
+      "sha256": "6ffb4265e4b99af4ed16ebcfb813e6860d660e2e08fff3410c09d868eeea3ce2"
+    },
+    {
+      "path": "docs/SOURCE_REQUIREMENTS_SUMMARY.md",
+      "bytes": 2513,
+      "sha256": "593efc41af65b5bc0a3778ba1295a2765632268a01c11a93a8fd4c4444bdc4cb"
+    },
+    {
+      "path": "docs/superpowers/plans/2026-07-29-local-intelligence-wizard-engine.md",
+      "bytes": 2987,
+      "sha256": "cc345fe3dc51e5d3729dd953de5d91f578fd00af174f85ec47c572f510ab031b"
+    },
+    {
+      "path": "docs/superpowers/plans/2026-08-03-commerce-multi-vertical-templates.md",
+      "bytes": 8597,
+      "sha256": "67260505966ba48e3e7e5c73994adf51583c61e04d0788bffe57effdd0fab43e"
+    },
+    {
+      "path": "docs/superpowers/specs/2026-08-03-commerce-multi-vertical-templates-design.md",
+      "bytes": 4074,
+      "sha256": "237daa761e3d24968b8fadb92314e19ae537fcb448e3483af439bd7e3b4a54be"
+    },
+    {
+      "path": "extension.json",
+      "bytes": 374,
+      "sha256": "8c1452a7bb642b6e92df889ee8c8d521194be1ef05db6826a4008bc9586786b5"
+    },
+    {
+      "path": "interactions/ai_assisted.json",
+      "bytes": 1042,
+      "sha256": "ea21ac6ea6b5a16494633bd8aa79e9d93c3ae02eef7aeadafc609e1829e2b266"
+    },
+    {
+      "path": "interactions/new_customer.json",
+      "bytes": 2278,
+      "sha256": "db9eac8ee7a9ec174d371355631aa6d6a578a07dc46a40e174ce4f192e1847a0"
+    },
+    {
+      "path": "module.json",
+      "bytes": 610,
+      "sha256": "68becaa36ad6fea4bf4ca8db9b503c6325a0db4aa6793444d6bfdb3c8ea6cb23"
+    },
+    {
+      "path": "package.json",
+      "bytes": 350,
+      "sha256": "3e1fc57d46b6f353ef69da4db482fba8066556ae7c3723be32f4de8380465d37"
+    },
+    {
+      "path": "reports/adaptive-persona-extraction.json",
+      "bytes": 1020,
+      "sha256": "213db9c2a8b869d08aaaa15e531ca1424de433a738f440e02c653241460e10e2"
+    },
+    {
+      "path": "reports/github-import-trigger.json",
+      "bytes": 348,
+      "sha256": "4276e7da1d67f2bbc626b379d0885ace97517d5c5dafb7bd58142509faa3164f"
+    },
+    {
+      "path": "reports/localbrain-v2-verification.json",
+      "bytes": 778,
+      "sha256": "7f56817eca5d0a337a89b350848f131b6be9c10fddfea5017a5e20df2a2ea697"
+    },
+    {
+      "path": "reports/workcore-compatibility.json",
+      "bytes": 25064,
+      "sha256": "6157e966e9f1a248452eee91163520fd1025c6e03de5ee4883887c4c05fbb302"
+    },
+    {
+      "path": "resources/openapi.yaml",
+      "bytes": 7065,
+      "sha256": "a81b54f5faba3e6dad9ad19acd048f7151a4001c613ad391dde6ff51a47d24b0"
+    },
+    {
+      "path": "resources/samples/new_customer.json",
+      "bytes": 485,
+      "sha256": "8380c0c0585865db17dec4ce37da4447673dc055bc8f358fae8d8c488599b97b"
+    },
+    {
+      "path": "resources/ts/offline/cognitive-event-outbox.ts",
+      "bytes": 3043,
+      "sha256": "c854f3233d5641e89b496e357ab073d26dab601c5eb2f50ac17c5ba745c93748"
+    },
+    {
+      "path": "resources/ts/offline/command-outbox.ts",
+      "bytes": 2837,
+      "sha256": "7b9a92806ffbfe86c7bf2ff5702ccea49ed8c107f233cd13b454bfc0bd2a28df"
+    },
+    {
+      "path": "resources/ts/offline/crypto.ts",
+      "bytes": 1920,
+      "sha256": "30518f98bf5706a8132cb5baf0631994a2a44b7c8a59c2db18b1ec6cda1d6944"
+    },
+    {
+      "path": "resources/ts/offline/index.ts",
+      "bytes": 435,
+      "sha256": "eeeab2e3a2461da6d6c6a01e459672c2d0f4790c3b8e489f857213f2e76eca97"
+    },
+    {
+      "path": "resources/ts/offline/indexeddb-store.ts",
+      "bytes": 2018,
+      "sha256": "2910f3c198c5526976269832490f85133889a4a2164da8b09d4cc7a46a226a06"
+    },
+    {
+      "path": "resources/ts/offline/local-language.ts",
+      "bytes": 2273,
+      "sha256": "2f40458208ff791f22d1594a739e5d545dfaa7b9b6a1ebe32314db476094224e"
+    },
+    {
+      "path": "resources/ts/offline/memory-reranker.ts",
+      "bytes": 3123,
+      "sha256": "7e55799ccfcab28bd8d9757968ab1f6c89ba4085ee10ad6718cf8cea018e0180"
+    },
+    {
+      "path": "resources/ts/offline/memory-store.ts",
+      "bytes": 619,
+      "sha256": "bcd28c8fa6ddab25f69b39500c3805f5c9bd6cce0e6902c6706fbc411551e3d4"
+    },
+    {
+      "path": "resources/ts/offline/naive-bayes-intent.ts",
+      "bytes": 7242,
+      "sha256": "e7646cdb7256b39fac35bebc829eca6d4df0be54cef77433e3c569f3779301f4"
+    },
+    {
+      "path": "resources/ts/offline/persona-drift.ts",
+      "bytes": 5970,
+      "sha256": "1cb4bf861bb76fcd12856b94a574b21775cbfc03b314726c1ea88a14c4ec3fb4"
+    },
+    {
+      "path": "resources/ts/offline/sync-client.ts",
+      "bytes": 1440,
+      "sha256": "9c76165fd0102f2d719bfc2080b412b0868b64f5005e92355c393d626e1f8699"
+    },
+    {
+      "path": "resources/ts/offline/types.ts",
+      "bytes": 2519,
+      "sha256": "ea6333234bd5931cf3d04b7201c682411df94c31f38804300170c62ba9c04fb0"
+    },
+    {
+      "path": "resources/ts/offline/vector-clock.ts",
+      "bytes": 3449,
+      "sha256": "57bb0d431b406a46981b6bb707f72388e10c858ea502757c4a06997aa673ee72"
+    },
+    {
+      "path": "resources/ts/offline/wizard-draft-store.ts",
+      "bytes": 649,
+      "sha256": "e15a3bb24022fa9f6cdeb2a86dc125e9d4adbb7045a10013a7e6734265257101"
+    },
+    {
+      "path": "resources/views/interaction/run.blade.php",
+      "bytes": 6077,
+      "sha256": "8b67b4ecbf4771109c18338204fa563ea3ec3c6aab4e751c1ad6e8fa5f20cfac"
+    },
+    {
+      "path": "resources/views/interaction/wrapper.blade.php",
+      "bytes": 2805,
+      "sha256": "b926c8d4ab679c6feafba0d266ede8c24d8be52c23dcb6692602808aebc35846"
+    },
+    {
+      "path": "routes/api.php",
+      "bytes": 2215,
+      "sha256": "5f4579ea51cefeffd965bec4b264a8798149f359235c4ba652c72733067cbdaa"
+    },
+    {
+      "path": "routes/web.php",
+      "bytes": 437,
+      "sha256": "82a46834a3afa856cffc22d2c51e30aa01651c2bbbac13cd8fc19d3c10462095"
+    },
+    {
+      "path": "src/AI/AIServiceInterface.php",
+      "bytes": 177,
+      "sha256": "808eb5ab04dd85501d10d6befa1930ce1a5eb3d35012dbd296df1ecadc0a6db4"
+    },
+    {
+      "path": "src/AI/NullAIService.php",
+      "bytes": 316,
+      "sha256": "dcd4b7ba827e7cc438dc89b6887d7e3ba9a4bf4d805bc7d38beee83efd0b6483"
+    },
+    {
+      "path": "src/AI/OpenAIService.php",
+      "bytes": 942,
+      "sha256": "bef1214a039716843a341b4b7d6823e63cf62f9f2c86af937ad3cded791977ca"
+    },
+    {
+      "path": "src/Authority/ApprovalSigner.php",
+      "bytes": 1588,
+      "sha256": "be5106e5e5e38d8f813bbce8cec018da8dbcf030bbd18fc31f80df433070f1b1"
+    },
+    {
+      "path": "src/Authority/AuthorityDecision.php",
+      "bytes": 844,
+      "sha256": "d5adc9443cdf01f38677ff875fec155b582a4de6a16fdd9f391bf1f4534d73d5"
+    },
+    {
+      "path": "src/Authority/AuthorityLevel.php",
+      "bytes": 367,
+      "sha256": "2a1af41ac71bb8e70e075eefe8a38dc5e207eff06aa6826c0d94377984e582bb"
+    },
+    {
+      "path": "src/Authority/CapabilityPolicy.php",
+      "bytes": 569,
+      "sha256": "745d8abe1e5d9278e988291a909ef80f0a829242604132588c121f0210c28575"
+    },
+    {
+      "path": "src/AutoComplete/AutoCompleteEngine.php",
+      "bytes": 4722,
+      "sha256": "b8e312593b7e444427d394fba0a9bb356f2474f1a9390b7a7e4c986b8e8dc04d"
+    },
+    {
+      "path": "src/Capabilities/CrmCustomerCreateHandler.php",
+      "bytes": 647,
+      "sha256": "746abc61f526b36cff0a174c19e6897aeaf55c26e05c41b253dc266abc6c9bcf"
+    },
+    {
+      "path": "src/Cognition/Correlation/CausalityWindow.php",
+      "bytes": 669,
+      "sha256": "dea293f073ccaf7178be346b93e0fbef3f2a1b8d85a3a39d1030efc95a68c221"
+    },
+    {
+      "path": "src/Cognition/Decision/DecisionRecorder.php",
+      "bytes": 3738,
+      "sha256": "b7f2761b89a60b521e87012a385f5c09afac7e0096c1c235bfad3f9bd2e596cc"
+    },
+    {
+      "path": "src/Cognition/Events/CognitiveEvent.php",
+      "bytes": 6373,
+      "sha256": "14112df39d2724934a3aea9e7df7af1c03abb3d785ed53286949f540bee47801"
+    },
+    {
+      "path": "src/Cognition/Events/CognitiveEventStoreInterface.php",
+      "bytes": 386,
+      "sha256": "a43f6219e315544bd710b9c4c79b74c9da0ec902d42786063c8640ca67026e5f"
+    },
+    {
+      "path": "src/Cognition/Events/CognitiveEventType.php",
+      "bytes": 933,
+      "sha256": "942e8ea6a8c864d4d95a2452764ef8e2470e01c8149148d92e68c7157c706615"
+    },
+    {
+      "path": "src/Cognition/Events/EloquentCognitiveEventStore.php",
+      "bytes": 1649,
+      "sha256": "401db89ac5f79b73cb13403abb3003e7776b2cf4098715cd1b59e8407842fb1a"
+    },
+    {
+      "path": "src/Cognition/Events/InMemoryCognitiveEventStore.php",
+      "bytes": 1076,
+      "sha256": "c05d4e0f4e985b95f321a734efefe3611f2faeb51066377d7cb6d9ce013b7d88"
+    },
+    {
+      "path": "src/Cognition/Observation/ObservationRecorder.php",
+      "bytes": 1215,
+      "sha256": "e680572b568e38c8b0c23e34f210b339698742b3ab5bccf154ee915e387d2e19"
+    },
+    {
+      "path": "src/Cognition/Outcome/OutcomeLinker.php",
+      "bytes": 2262,
+      "sha256": "9864482590933739b0dff1bba2860622de375b7e0b5148703beb7f662af31c60"
+    },
+    {
+      "path": "src/Cognition/Outcome/OutcomeRecorder.php",
+      "bytes": 1287,
+      "sha256": "a9e348f3675a2f725e9380c13634e419c020135e6e0d1101e1e9d28d1503e484"
+    },
+    {
+      "path": "src/Command/CommandBus.php",
+      "bytes": 4836,
+      "sha256": "b328e36d120de433de91303b441d4a9b4e03d30810317352d5743e5be87f6e57"
+    },
+    {
+      "path": "src/Commands/CompileInteractionCommand.php",
+      "bytes": 923,
+      "sha256": "a98a789e47eddb7c519c180d78c2ebfd92769697669140dbf244da90b43c91df"
+    },
+    {
+      "path": "src/Commands/HealthCheckCommand.php",
+      "bytes": 1181,
+      "sha256": "3646e51f23cd4cb9d5a7165c1322dc10b3eb3a83b3ee6ae3001219b47fdd0f00"
+    },
+    {
+      "path": "src/Commands/InstallCommand.php",
+      "bytes": 1338,
+      "sha256": "5b78357934b87717729cbf8e41bcc2792092113894a0250025dd6a6bf7a092c7"
+    },
+    {
+      "path": "src/Commands/ListTemplatesCommand.php",
+      "bytes": 2508,
+      "sha256": "aa863a0799849da57838cee78aa9e07f736c32dd3f253c06425d7761279c8e35"
+    },
+    {
+      "path": "src/Commands/SeedCommand.php",
+      "bytes": 1851,
+      "sha256": "f0492f8b88e80a884d0a1a3418daffc5914395b7011b830727deba2e67157654"
+    },
+    {
+      "path": "src/Commands/SyncInteractionCommand.php",
+      "bytes": 785,
+      "sha256": "91ea4cf4a1fa0a0c29785d453335ec36fc4ffc6a4fa47a2905af71ae91390242"
+    },
+    {
+      "path": "src/Compiler/ConditionRegistry.php",
+      "bytes": 702,
+      "sha256": "4e3dbd8580255dbab892be580d5984a12827619bdfd79655d88e405c13893bd1"
+    },
+    {
+      "path": "src/Compiler/FragmentResolver.php",
+      "bytes": 1564,
+      "sha256": "1ec98042053607c34e4113fbeea1961e392522015d92248125a0a9705ce71e00"
+    },
+    {
+      "path": "src/Compiler/InteractionCompiler.php",
+      "bytes": 3792,
+      "sha256": "0b62ad4ad68209a0fd8582f64956540b48b8643ae5d99e67cb3a9ff45fa7a987"
+    },
+    {
+      "path": "src/Compiler/SchemaValidator.php",
+      "bytes": 4873,
+      "sha256": "5f8c45bbd323541ed1b4260ae2861c564a0092cc334754a1f99a887f81bab34e"
+    },
+    {
+      "path": "src/Context/ContextBuilder.php",
+      "bytes": 2464,
+      "sha256": "e654d78dc460a575c158c9e80c419219a6f7c82dd73fd17a671e47ff4a498e72"
+    },
+    {
+      "path": "src/Context/ContextGraph.php",
+      "bytes": 3444,
+      "sha256": "da0c175d0ef90d2134c178f21f98ca2c2139be6e21fc46b29695647e77cc1ba6"
+    },
+    {
+      "path": "src/Context/Providers/CustomerContextProvider.php",
+      "bytes": 1482,
+      "sha256": "13487e0d7e606cf59cb5d9c4bbb84e801ca08bf9fad409d4f595e9052e6712bd"
+    },
+    {
+      "path": "src/Context/Providers/PolicyContextProvider.php",
+      "bytes": 1263,
+      "sha256": "972579b7114e969d7a87795718df5f3a8b59dbace01ebb67d0c0a178ab2853bf"
+    },
+    {
+      "path": "src/Contracts/CapabilityHandlerInterface.php",
+      "bytes": 161,
+      "sha256": "5926d30fa7b7093310194485adb7cfd2066f143025d30c4225117835d48669e3"
+    },
+    {
+      "path": "src/Contracts/CognitiveOrchestratorInterface.php",
+      "bytes": 116,
+      "sha256": "1a0453144f4891cd5a589d977cbcc848be99888ea0e066b37e3a261d42d521bf"
+    },
+    {
+      "path": "src/Contracts/CommandBusInterface.php",
+      "bytes": 322,
+      "sha256": "21685719ce82c4276276cd8619890e3fbd3b996a17e86be0ee809bac5ace6a17"
+    },
+    {
+      "path": "src/Contracts/ConflictResolverInterface.php",
+      "bytes": 230,
+      "sha256": "a774416efe7a4eaa7714dd232df67ebb78e2ee0da782cb3b2a55542ccda29071"
+    },
+    {
+      "path": "src/Contracts/ContextProviderInterface.php",
+      "bytes": 165,
+      "sha256": "dc84e609f8050875a402b587d59b63f1d368d8daa7d22d38f213c86f8cad1394"
+    },
+    {
+      "path": "src/Contracts/DomainAdapterInterface.php",
+      "bytes": 436,
+      "sha256": "e32aa8678ffc8c13cbb01a1b294e3d09bc620e645895b43346cdb9cc60cab83a"
+    },
+    {
+      "path": "src/Contracts/EventRecorderInterface.php",
+      "bytes": 229,
+      "sha256": "ce7a701761e944e7b32149199f8bf7140f95d0ffc6f8649f68baddd80164f0c0"
+    },
+    {
+      "path": "src/Contracts/ExecutiveEngineInterface.php",
+      "bytes": 414,
+      "sha256": "f53285a13005fc1cb104ac12c419b2317d753a34c36483ccb0cf13c7aa5ec29f"
+    },
+    {
+      "path": "src/Contracts/GeneratorInterface.php",
+      "bytes": 315,
+      "sha256": "6624f0f663cba9e181fad8f85cdf469786b62b9dc6603b4bb04bcecb3f495c5b"
+    },
+    {
+      "path": "src/Contracts/HealerInterface.php",
+      "bytes": 247,
+      "sha256": "ad6861f384b3623ccae31432af7ae863d0a7c0f9c249cdb9b4910447bba58dba"
+    },
+    {
+      "path": "src/Contracts/KnowledgeSourceInterface.php",
+      "bytes": 269,
+      "sha256": "c971c679ff3d7129103f6f288a71adbb9d5810b93580ac7e03920b19f1977425"
+    },
+    {
+      "path": "src/Contracts/LearnerInterface.php",
+      "bytes": 292,
+      "sha256": "b1c754a337ed7318026bbbe2c75b9da444337887d0e00678e039b7eba6c703cf"
+    },
+    {
+      "path": "src/Contracts/NavigationEngineInterface.php",
+      "bytes": 366,
+      "sha256": "71ebd130db880c3bf2f10689959f4e84180f15500d9c93e76f1bf4baa2ab1835"
+    },
+    {
+      "path": "src/Contracts/NavigationStrategyInterface.php",
+      "bytes": 155,
+      "sha256": "00af1b827064d5ddcde8994e633f95e27bd0684b9cf6ee1cd1760ff3d2de102d"
+    },
+    {
+      "path": "src/Contracts/OfflineQueueInterface.php",
+      "bytes": 429,
+      "sha256": "7d7c262a46ed9e3e34c6103fb7c2eca9bf5632f72a323299d5f2e6aa0a9004c4"
+    },
+    {
+      "path": "src/Contracts/PolicyEngineInterface.php",
+      "bytes": 576,
+      "sha256": "d8ee1d36bde8f2c8be86205170af7b3546b264078504d86709a89cadfd36d91d"
+    },
+    {
+      "path": "src/Contracts/PredictorInterface.php",
+      "bytes": 310,
+      "sha256": "81be9ca50f72c954b41b1af3472108102a76020af733fd55b4f63ac8b3eb7f63"
+    },
+    {
+      "path": "src/Contracts/QuestionResolverInterface.php",
+      "bytes": 242,
+      "sha256": "2061d6581b8669bde702b520c591e15bff91be9f071c346a0f9171548b5348b4"
+    },
+    {
+      "path": "src/Contracts/RendererInterface.php",
+      "bytes": 268,
+      "sha256": "232c270e4aab2395e2288813f4ca4b968568a7f720bb8e0c4cb5a90cbe5854b8"
+    },
+    {
+      "path": "src/Contracts/StateManagerInterface.php",
+      "bytes": 751,
+      "sha256": "4015241c51aff0cbbe541e184de625fa53c3488cc36fd6f4add10967c7a325cc"
+    },
+    {
+      "path": "src/Contracts/ValidationEngineInterface.php",
+      "bytes": 228,
+      "sha256": "4775a1412994f58221a41d517a0863f672f5ca0679f46e82c3e275d1f5cc0730"
+    },
+    {
+      "path": "src/Contracts/ValidationProviderInterface.php",
+      "bytes": 157,
+      "sha256": "64f1ca55bbe864f30f068296f791355c1b223affacd5b6b1f43cefdb883bd229"
+    },
+    {
+      "path": "src/Contracts/WorldModelInterface.php",
+      "bytes": 105,
+      "sha256": "15d4700df5b29aa2a795d74cb43ae5e864d62c657c56f4769bccd8f2d789bfa2"
+    },
+    {
+      "path": "src/DTO/Answer.php",
+      "bytes": 468,
+      "sha256": "563974375d66d738693f762838a113c72ed433ac1d22039ee33d4707f7d3780c"
+    },
+    {
+      "path": "src/DTO/AnswerCollection.php",
+      "bytes": 738,
+      "sha256": "d5d1afba1be4071ffeab00a65198bc6b7066a898963d1202b87c219d31d6bcec"
+    },
+    {
+      "path": "src/DTO/InteractionDefinition.php",
+      "bytes": 1068,
+      "sha256": "3cc3205a42204deaa342bb42e4329c425d3a102c3f0dcf69c30039b78b4d5eaa"
+    },
+    {
+      "path": "src/DTO/Question.php",
+      "bytes": 602,
+      "sha256": "f8d7d920b504996677e0b7a67a8463573e122d7bd38ac2b9200b07bdce889495"
+    },
+    {
+      "path": "src/DTO/Section.php",
+      "bytes": 303,
+      "sha256": "b1714a45b491762fc7e76b6c52e629ffb8aa1a001730c00b1004869bf38a0c76"
+    },
+    {
+      "path": "src/Domain/Adapters/WorkCoreAdapter.php",
+      "bytes": 8367,
+      "sha256": "deb05d2c121c7e56c6e9254e13f92c682bdb0072e81b57b7d7df29d9808c3039"
+    },
+    {
+      "path": "src/Domain/DomainAdapter.php",
+      "bytes": 495,
+      "sha256": "c6a5ffd194291e927facf0af62dd97e5934dd8207728f4b0ef6e8516dc9f64b5"
+    },
+    {
+      "path": "src/Engines/AIInfrastructure/Contracts/EmbeddingEngineInterface.php",
+      "bytes": 275,
+      "sha256": "52d3bbe35a0e3ca6a4bd92efbd68de1f7dfe4febfd174b64908e2f4b07e96a73"
+    },
+    {
+      "path": "src/Engines/AIInfrastructure/Contracts/EvaluationEngineInterface.php",
+      "bytes": 334,
+      "sha256": "1bbb4d1601aa23e05aa1bbd8c3293551d3f053c4ed23dd33c9ef0839460e2493"
+    },
+    {
+      "path": "src/Engines/AIInfrastructure/Contracts/FunctionCallingEngineInterface.php",
+      "bytes": 327,
+      "sha256": "03515e4f1c10078f6833f1a2a63d0da1caf3f744e9effd94edb2f4a2d186f039"
+    },
+    {
+      "path": "src/Engines/AIInfrastructure/Contracts/GuardrailEngineInterface.php",
+      "bytes": 294,
+      "sha256": "e5238b1a49c5e385864007b4e36ed9e4a61389eaae8053f9387c32b45edd340b"
+    },
+    {
+      "path": "src/Engines/AIInfrastructure/Contracts/ModelSelectionEngineInterface.php",
+      "bytes": 304,
+      "sha256": "ee10bfe5082831fe74ab90712784247aabadf7c418632c87e52b1a1e35793f06"
+    },
+    {
+      "path": "src/Engines/AIInfrastructure/Contracts/PromptEngineInterface.php",
+      "bytes": 283,
+      "sha256": "c1ca8dc6a64bc1faa9da396a1ea87c61ff1f8dc33cc10bccf48c49b6def1afb8"
+    },
+    {
+      "path": "src/Engines/AIInfrastructure/Contracts/PromptOptimizationEngineInterface.php",
+      "bytes": 309,
+      "sha256": "fb825037af1c826fb9cd7b5e5082b45dfa96e205f2f8d75bca4daa3fead5e3a8"
+    },
+    {
+      "path": "src/Engines/AIInfrastructure/Contracts/RetrievalEngineInterface.php",
+      "bytes": 306,
+      "sha256": "f24c3b517800e5e452d06affcbd3ebc07d504e5bdfaea9a94b39f698f35e7c6e"
+    },
+    {
+      "path": "src/Engines/AIInfrastructure/Contracts/ToolCallingEngineInterface.php",
+      "bytes": 307,
+      "sha256": "2a31040ecf0c7484127a7a8dd5c3d9011b42e2e48a25adea0afe9bffb9cc939b"
+    },
+    {
+      "path": "src/Engines/AIInfrastructure/Contracts/VectorSearchEngineInterface.php",
+      "bytes": 296,
+      "sha256": "fb7d7ac0dde0985e1c1febee57cd0030b4f217f5810e4a644e7cd3112ba8ae9a"
+    },
+    {
+      "path": "src/Engines/AIInfrastructure/Implementations/EmbeddingEngine.php",
+      "bytes": 1275,
+      "sha256": "bfc95977f789b530d49b5d89097c84776aeab395cb39e96a74843f4421d0d317"
+    },
+    {
+      "path": "src/Engines/AIInfrastructure/Implementations/EvaluationEngine.php",
+      "bytes": 1805,
+      "sha256": "31a8a4afdc9af783efd81c60d2a85c45b87a6bed21c2ffefc2e15402b2c23576"
+    },
+    {
+      "path": "src/Engines/AIInfrastructure/Implementations/FunctionCallingEngine.php",
+      "bytes": 815,
+      "sha256": "b47ad39727cdab8d17b9b6c35522b768b84eac2068ab4a6ef3aa4d4aa0dc9047"
+    },
+    {
+      "path": "src/Engines/AIInfrastructure/Implementations/GuardrailEngine.php",
+      "bytes": 936,
+      "sha256": "1473ffd57098a3a8aa4141e43aae5c32d81211c459f4afac915637fe515134e1"
+    },
+    {
+      "path": "src/Engines/AIInfrastructure/Implementations/ModelSelectionEngine.php",
+      "bytes": 1938,
+      "sha256": "5e5f0cee151cf22da6944bb28bef8f6254d3aee5da13501a30e1ec692c1b1da6"
+    },
+    {
+      "path": "src/Engines/AIInfrastructure/Implementations/PromptEngine.php",
+      "bytes": 534,
+      "sha256": "e18fdd7fbe8da1a34d416ca32c6cce1b8254a83085cc7bba2df535c140e4f12f"
+    },
+    {
+      "path": "src/Engines/AIInfrastructure/Implementations/PromptOptimizationEngine.php",
+      "bytes": 2351,
+      "sha256": "2c39d6e60cc0094159bd81462125eb0887871e70ba720f62fb6eef61273053e1"
+    },
+    {
+      "path": "src/Engines/AIInfrastructure/Implementations/RetrievalEngine.php",
+      "bytes": 1558,
+      "sha256": "97c1f2dd479b88dac3a15b420a45f65859e524d13040dca442fb240213b29d47"
+    },
+    {
+      "path": "src/Engines/AIInfrastructure/Implementations/ToolCallingEngine.php",
+      "bytes": 747,
+      "sha256": "c716a896b2f699313045d0e83b470c965450fc5607d66af56d118a9a3080ecbc"
+    },
+    {
+      "path": "src/Engines/AIInfrastructure/Implementations/VectorSearchEngine.php",
+      "bytes": 1734,
+      "sha256": "6a0a267b7499e1d57f2683f3ead30091a3e5d82308dd67ac089a764ae775d212"
+    },
+    {
+      "path": "src/Engines/BusinessIntelligence/Contracts/AnalyticsEngineInterface.php",
+      "bytes": 308,
+      "sha256": "8b89808cd3e77e8dc1efc9c588d192ba6a4fa27d846c04feb590ee19b024045f"
+    },
+    {
+      "path": "src/Engines/BusinessIntelligence/Contracts/AuditEngineInterface.php",
+      "bytes": 278,
+      "sha256": "359474b37fbc10994be411df782eaf9a9c53362feedde08430c6b9a0601ef4b3"
+    },
+    {
+      "path": "src/Engines/BusinessIntelligence/Contracts/AutomationEngineInterface.php",
+      "bytes": 303,
+      "sha256": "c4af949e0b3e05a3e00187a860f27f3f222d9d9b342cabd32a455f20f2f40eda"
+    },
+    {
+      "path": "src/Engines/BusinessIntelligence/Contracts/BusinessBuilderEngineInterface.php",
+      "bytes": 303,
+      "sha256": "94e603f31c657ebda0b309a26d1e529713b6a612de5a4dfbd31cbdc0f55aa765"
+    },
+    {
+      "path": "src/Engines/BusinessIntelligence/Contracts/CRMIntelligenceEngineInterface.php",
+      "bytes": 327,
+      "sha256": "7fc3eb198897c825a0b7e0c4ea1d18db277213dee639429fef5b5f7c01c72bbe"
+    },
+    {
+      "path": "src/Engines/BusinessIntelligence/Contracts/ComplianceEngineInterface.php",
+      "bytes": 303,
+      "sha256": "1beb80f021dfd97e92d09f0500a758a3c3e1a87a2e6e703fb6ae926d3feceb1b"
+    },
+    {
+      "path": "src/Engines/BusinessIntelligence/Contracts/DispatchEngineInterface.php",
+      "bytes": 312,
+      "sha256": "3f5de8da9a28dbb501d76baf33efa124a58f91678d152d3cb60ccac95bb793e4"
+    },
+    {
+      "path": "src/Engines/BusinessIntelligence/Contracts/FinancialInsightEngineInterface.php",
+      "bytes": 285,
+      "sha256": "094f9d3716f94ce86659936d6260178e0bfbf1971a96cc3ec630b6a98c79c039"
+    },
+    {
+      "path": "src/Engines/BusinessIntelligence/Contracts/MonitoringEngineInterface.php",
+      "bytes": 285,
+      "sha256": "b9b16bb436a363827417fd514b67cbafaacdc30ba556379c0e54b30d01eb5f29"
+    },
+    {
+      "path": "src/Engines/BusinessIntelligence/Contracts/OperationsEngineInterface.php",
+      "bytes": 312,
+      "sha256": "6cd9ac3624b0851aedbad5dd6aa9385f5df1464748bc3e83d7aaee5b20183815"
+    },
+    {
+      "path": "src/Engines/BusinessIntelligence/Implementations/AnalyticsEngine.php",
+      "bytes": 2566,
+      "sha256": "26cf6cecbb425061af4d574e279587ef3a5e6fb369354f28ac82e3c87003cd21"
+    },
+    {
+      "path": "src/Engines/BusinessIntelligence/Implementations/AuditEngine.php",
+      "bytes": 923,
+      "sha256": "6ac6de42aee5f94e6a99ea3986a4432ff8a108f79bf03fff5be1169b13f7b2a5"
+    },
+    {
+      "path": "src/Engines/BusinessIntelligence/Implementations/AutomationEngine.php",
+      "bytes": 596,
+      "sha256": "a0339eb869aca371cae5ce7b837a1920f0405ac8d2948849ed9e19c7115864b2"
+    },
+    {
+      "path": "src/Engines/BusinessIntelligence/Implementations/BusinessBuilderEngine.php",
+      "bytes": 662,
+      "sha256": "bb46d60b0bebe6f7db2152202c311e26830acc45e80721913d6266753a691126"
+    },
+    {
+      "path": "src/Engines/BusinessIntelligence/Implementations/CRMIntelligenceEngine.php",
+      "bytes": 3142,
+      "sha256": "99cdbdb008102c7a6a2f1002b996f9e6add29c3d693c5e0fb4a262970fce0d1a"
+    },
+    {
+      "path": "src/Engines/BusinessIntelligence/Implementations/ComplianceEngine.php",
+      "bytes": 1984,
+      "sha256": "fbd37d33db1abd94213da6a44c1766b64ad067f204c924396ee83625e9fe470c"
+    },
+    {
+      "path": "src/Engines/BusinessIntelligence/Implementations/DispatchEngine.php",
+      "bytes": 783,
+      "sha256": "a69fcce8fee642451f5ec92a6f75ca43f47b6adb00df23fcd1bd672b62905371"
+    },
+    {
+      "path": "src/Engines/BusinessIntelligence/Implementations/FinancialInsightEngine.php",
+      "bytes": 591,
+      "sha256": "97f8350fbf36634384beb9ce2ae0cb86f3b79d71fbfea629d161405dab9d789c"
+    },
+    {
+      "path": "src/Engines/BusinessIntelligence/Implementations/MonitoringEngine.php",
+      "bytes": 630,
+      "sha256": "de5b2d4c9db9c47686ae708ed88ea165fcba041315f2a8ec4b82dabfc0685173"
+    },
+    {
+      "path": "src/Engines/BusinessIntelligence/Implementations/OperationsEngine.php",
+      "bytes": 2225,
+      "sha256": "c196bfbbd885c1005c99ee0a68141da7b6e085c31847296e1e52a232ba9ae5f9"
+    },
+    {
+      "path": "src/Engines/Cognitive/Contracts/AbstractionEngineInterface.php",
+      "bytes": 310,
+      "sha256": "83d7064205604d2aa1d507e5f01fd11e69a8f6bbf58006bae0d4bbaafa8b4195"
+    },
+    {
+      "path": "src/Engines/Cognitive/Contracts/AnalogyEngineInterface.php",
+      "bytes": 319,
+      "sha256": "b045b6eb758b99761d6e50ca8c43e2a044c4ef4c843e4efe3424c19b9dcf5fa6"
+    },
+    {
+      "path": "src/Engines/Cognitive/Contracts/CognitiveOrchestratorInterface.php",
+      "bytes": 694,
+      "sha256": "d694798bfa3cc2a2801690fda4e275df16188d536ed61d2f27c9bde945a16f9b"
+    },
+    {
+      "path": "src/Engines/Cognitive/Contracts/ConceptEngineInterface.php",
+      "bytes": 372,
+      "sha256": "63dce29089c5934cbb82b3feb6bedfd553ae4138e55826817b4b2595ff4f8e2c"
+    },
+    {
+      "path": "src/Engines/Cognitive/Contracts/CreativityEngineInterface.php",
+      "bytes": 289,
+      "sha256": "ba81bfa5b057f629d74ac86404f5ec536a5ddbb8e445a7be509a4dcf61ab2694"
+    },
+    {
+      "path": "src/Engines/Cognitive/Contracts/ExplainabilityEngineInterface.php",
+      "bytes": 311,
+      "sha256": "44d61ba35dc7337870746b4a766a2470baa0213e2aefc68bb3f827b96d1907c3"
+    },
+    {
+      "path": "src/Engines/Cognitive/Contracts/InferenceEngineInterface.php",
+      "bytes": 325,
+      "sha256": "8c637b6b51d7e3600bfa35c3663d19cfd38173f489b2faa58c604a9cae4039b5"
+    },
+    {
+      "path": "src/Engines/Cognitive/Contracts/ReasoningEngineInterface.php",
+      "bytes": 337,
+      "sha256": "15ed25fb52193521d06ac5f2cf6e0638f4cd2805be03f726c4ea575dc215ea5e"
+    },
+    {
+      "path": "src/Engines/Cognitive/Contracts/ReflectionEngineInterface.php",
+      "bytes": 278,
+      "sha256": "14d46fb6e37286c3c8239f2c285b3e3d70d3c481e7cc219bfff1c068f64ff486"
+    },
+    {
+      "path": "src/Engines/Cognitive/Contracts/SemanticEngineInterface.php",
+      "bytes": 223,
+      "sha256": "2674dcea24c623e539b16aa5a911841209168c5d7e2a4ef804f4a4b86c0fcbec"
+    },
+    {
+      "path": "src/Engines/Cognitive/Implementations/AbstractionEngine.php",
+      "bytes": 1904,
+      "sha256": "1e7b63eb00d953a34a85299388036311db840f05aa7a53e4c7c7cb4a3d8a61fc"
+    },
+    {
+      "path": "src/Engines/Cognitive/Implementations/AnalogyEngine.php",
+      "bytes": 2049,
+      "sha256": "4d694f109974562973bddaebd25161d7a942a9a0efa1dc8a28d36ddd4294d653"
+    },
+    {
+      "path": "src/Engines/Cognitive/Implementations/CognitiveOrchestrator.php",
+      "bytes": 2203,
+      "sha256": "6fa6332de77465fcce2cde73c2b19d5d1aeec5789f76271ffb09dd200ce0e9c2"
+    },
+    {
+      "path": "src/Engines/Cognitive/Implementations/ConceptEngine.php",
+      "bytes": 793,
+      "sha256": "ecce1623fc204c726550821dbf587238bcb855cecf74e98d6e1aaa8186941c58"
+    },
+    {
+      "path": "src/Engines/Cognitive/Implementations/CreativityEngine.php",
+      "bytes": 1940,
+      "sha256": "8975af2e5d97b61bdc64deade9f580108958db1b64082e5581b5af6479de103f"
+    },
+    {
+      "path": "src/Engines/Cognitive/Implementations/ExplainabilityEngine.php",
+      "bytes": 2319,
+      "sha256": "7433849084716c4295c973aa3071227e950d9bd63284b86d117442ea22c9188d"
+    },
+    {
+      "path": "src/Engines/Cognitive/Implementations/InferenceEngine.php",
+      "bytes": 1779,
+      "sha256": "2dbde288763c70dc5a01a038673847dec58446f8b833023da48a3ee3cfa50757"
+    },
+    {
+      "path": "src/Engines/Cognitive/Implementations/ReasoningEngine.php",
+      "bytes": 4501,
+      "sha256": "ac8067e60799333b8581f2ba89a24bf77e966d4ab01527972aea0d8011b333fd"
+    },
+    {
+      "path": "src/Engines/Cognitive/Implementations/ReflectionEngine.php",
+      "bytes": 2388,
+      "sha256": "cedbb50e9bead21f2a251dc74389d46baa2f60a7c603cb9ec5cd5b030302f817"
+    },
+    {
+      "path": "src/Engines/Cognitive/Implementations/SemanticEngine.php",
+      "bytes": 1512,
+      "sha256": "3f91e9efe1f7451c4458ffb651a6415ac6944a1f9bf4ac7bb28d34fba7b3971d"
+    },
+    {
+      "path": "src/Engines/Executive/Contracts/DecisionEngineInterface.php",
+      "bytes": 319,
+      "sha256": "0f64ee78cc695f96e083ce3e09061ab9620e9bfe84adddcc26d4a0f7ef9ff232"
+    },
+    {
+      "path": "src/Engines/Executive/Contracts/EscalationEngineInterface.php",
+      "bytes": 351,
+      "sha256": "ce954e8df2e6f719cb437edb1762d5b63aaff17f0ded2f048338ce7b18f18b56"
+    },
+    {
+      "path": "src/Engines/Executive/Contracts/ExecutiveEngineInterface.php",
+      "bytes": 459,
+      "sha256": "6a1d0ed5da024aae3191344a250e64b11df3c309be8bcf614510728a5a62edd9"
+    },
+    {
+      "path": "src/Engines/Executive/Contracts/GoalEngineInterface.php",
+      "bytes": 417,
+      "sha256": "f69ff5ebb2d632c0ae52e17b30ec485d14cee6530fea1789b9db5a41d5f8de97"
+    },
+    {
+      "path": "src/Engines/Executive/Contracts/GovernanceEngineInterface.php",
+      "bytes": 335,
+      "sha256": "0f7d6cd2c9a6a597e3ae256141ece9143667d942943d64bd6db49c00b07ae409"
+    },
+    {
+      "path": "src/Engines/Executive/Contracts/OpportunityEngineInterface.php",
+      "bytes": 361,
+      "sha256": "05a91817c298f15183a3b99c35a9607c3ddb875527deb3d3b5a038c855a29efc"
+    },
+    {
+      "path": "src/Engines/Executive/Contracts/PolicyEngineInterface.php",
+      "bytes": 373,
+      "sha256": "3616ab82cb9a2857d7a26bd85cae6777e737e48c95e43b07ce18e70139cebd90"
+    },
+    {
+      "path": "src/Engines/Executive/Contracts/PriorityEngineInterface.php",
+      "bytes": 340,
+      "sha256": "008eeee2ed0aa7dcaa9690a7a0e6e8dc39199f36773103848be3dffb6fcb79be"
+    },
+    {
+      "path": "src/Engines/Executive/Contracts/RiskEngineInterface.php",
+      "bytes": 332,
+      "sha256": "6d5b281fe559b0a8e31be30dd23a5246ed6bd371b8bb3a8ed5cf1826a3311dea"
+    },
+    {
+      "path": "src/Engines/Executive/Contracts/StrategicPlanningEngineInterface.php",
+      "bytes": 386,
+      "sha256": "0a99497d1a6194d4493b714726c25cda9a95d5a252ec72276845137e6a70ec86"
+    },
+    {
+      "path": "src/Engines/Executive/Implementations/DecisionEngine.php",
+      "bytes": 1074,
+      "sha256": "aa832f1803aec141f498d82997fbb5f259bbc05114a2cc3980d5399d4fed6de6"
+    },
+    {
+      "path": "src/Engines/Executive/Implementations/EscalationEngine.php",
+      "bytes": 1368,
+      "sha256": "92c3914c6793e963d79d994755097628384a95bd308f27fbd65ec73ecb2f45c3"
+    },
+    {
+      "path": "src/Engines/Executive/Implementations/ExecutiveEngine.php",
+      "bytes": 2424,
+      "sha256": "1953bca60541130251421b62f8668f915fbeda1b76d47ea8f29446b340d60c83"
+    },
+    {
+      "path": "src/Engines/Executive/Implementations/GoalEngine.php",
+      "bytes": 2148,
+      "sha256": "dbf76b327c54a1af57d2154dd39294e9404bec3a57841b46dcb22719aa7bcb1a"
+    },
+    {
+      "path": "src/Engines/Executive/Implementations/GovernanceEngine.php",
+      "bytes": 1908,
+      "sha256": "bf2da33ec7486936e1b73980a35c5c0115fd09facb3a0b0f9880c9e6bf5255c9"
+    },
+    {
+      "path": "src/Engines/Executive/Implementations/OpportunityEngine.php",
+      "bytes": 1250,
+      "sha256": "8de436c473a91016e91abab5d94e49d7f26381ae15d8dd61e8e7ff1179f203f2"
+    },
+    {
+      "path": "src/Engines/Executive/Implementations/PolicyEngine.php",
+      "bytes": 1001,
+      "sha256": "08ce770b2f9512a3709cd7c8f86879ee9113cf0ca32c2a3df398feee7e520fa2"
+    },
+    {
+      "path": "src/Engines/Executive/Implementations/PriorityEngine.php",
+      "bytes": 1352,
+      "sha256": "7f00d20b33d2e4cffd0e282728278668384eb849094553c50733b8fcde6c4609"
+    },
+    {
+      "path": "src/Engines/Executive/Implementations/RiskEngine.php",
+      "bytes": 1045,
+      "sha256": "6f6b1fc4cfa89bc45b42d113fd0a2716a41877d97a6a7484a3db6444861310b1"
+    },
+    {
+      "path": "src/Engines/Executive/Implementations/StrategicPlanningEngine.php",
+      "bytes": 1710,
+      "sha256": "c0d1e09a66d42084e0e11c0ed95a62fa3bd1fcdde0e56d229ab83f4353febff2"
+    },
+    {
+      "path": "src/Engines/HumanInteraction/Contracts/ClarificationEngineInterface.php",
+      "bytes": 313,
+      "sha256": "c6129e91c547035e82ea22e6aca143923c9e1e144974733d49f531620af4a480"
+    },
+    {
+      "path": "src/Engines/HumanInteraction/Contracts/ConversationEngineInterface.php",
+      "bytes": 307,
+      "sha256": "464f830bd49a82efb7b4a44b2ec7b5064343f71671c3aff071bb81199d691862"
+    },
+    {
+      "path": "src/Engines/HumanInteraction/Contracts/DialogueEngineInterface.php",
+      "bytes": 254,
+      "sha256": "675c1793a4b78ef2d41e4c8b17019a78fc55e212e314c6c263812885fba6bf4c"
+    },
+    {
+      "path": "src/Engines/HumanInteraction/Contracts/EmotionEngineInterface.php",
+      "bytes": 269,
+      "sha256": "c5b5bdc5593a6703005ed22f0debcf8af584ca41c5f384cbf164e4c1e2ae2e68"
+    },
+    {
+      "path": "src/Engines/HumanInteraction/Contracts/EmpathyEngineInterface.php",
+      "bytes": 299,
+      "sha256": "3159ff2c91df807bdf250d5e6351dc9c6e6f72a99dbe60fdb4751de12f2aa1b9"
+    },
+    {
+      "path": "src/Engines/HumanInteraction/Contracts/IntentEngineInterface.php",
+      "bytes": 276,
+      "sha256": "86627328fa39144eddd7453cfb7496fec7656d9a21e3a5df89a25bbf6e6693f7"
+    },
+    {
+      "path": "src/Engines/HumanInteraction/Contracts/PersonalityEngineInterface.php",
+      "bytes": 283,
+      "sha256": "8c91298ba5b9a4c2c9318c60195129dac0252b29427e2cf1598bae48538fe697"
+    },
+    {
+      "path": "src/Engines/HumanInteraction/Contracts/ResponseGenerationEngineInterface.php",
+      "bytes": 320,
+      "sha256": "79e8275bd6aabeecc6b0dd7b27307af972f2eafc3d585a63eb248ac3ef8d85a3"
+    },
+    {
+      "path": "src/Engines/HumanInteraction/Contracts/SentimentEngineInterface.php",
+      "bytes": 297,
+      "sha256": "e953f9a81cf807b42b1dd3e6462b024f18e8d8328c84198f8ee498375ff30c27"
+    },
+    {
+      "path": "src/Engines/HumanInteraction/Contracts/TrustEngineInterface.php",
+      "bytes": 304,
+      "sha256": "dc5cbe5b6808d24faae93e47bc1ac465e4c23feed468a112c321f6e1f47f6c6d"
+    },
+    {
+      "path": "src/Engines/HumanInteraction/Implementations/ClarificationEngine.php",
+      "bytes": 917,
+      "sha256": "39c64421cc5318e225ac07ea9764f41e951de19ecbd26c73fa96e66c05cc0f3c"
+    },
+    {
+      "path": "src/Engines/HumanInteraction/Implementations/ConversationEngine.php",
+      "bytes": 1046,
+      "sha256": "6e5023d67cb52eebc85cdee9993d33eda1ed5dc059154b3295ece1ad822dd110"
+    },
+    {
+      "path": "src/Engines/HumanInteraction/Implementations/DialogueEngine.php",
+      "bytes": 572,
+      "sha256": "43423161a587b294737e8b1e7c4b6e1e427106e39a694890372b14c2ad9c6326"
+    },
+    {
+      "path": "src/Engines/HumanInteraction/Implementations/EmotionEngine.php",
+      "bytes": 1972,
+      "sha256": "8c55de6bc45b56a76914503c1c66412a4e9186c1c8bf59ade38fb23780c000cc"
+    },
+    {
+      "path": "src/Engines/HumanInteraction/Implementations/EmpathyEngine.php",
+      "bytes": 1980,
+      "sha256": "6923438e186b5c678cd8b4c8cc3863dd1f79f670078fbe5ac19f1c351b48812e"
+    },
+    {
+      "path": "src/Engines/HumanInteraction/Implementations/IntentEngine.php",
+      "bytes": 1552,
+      "sha256": "76fcfbdac56b694a1f4a48e86163d6aebf2550edbd88c9f02e387de92db3d96e"
+    },
+    {
+      "path": "src/Engines/HumanInteraction/Implementations/PersonalityEngine.php",
+      "bytes": 1954,
+      "sha256": "bfd2bd675ab64fd1898ad6b4b1245bc937a22ed1bd4e9c45a4cd1dd83a847929"
+    },
+    {
+      "path": "src/Engines/HumanInteraction/Implementations/ResponseGenerationEngine.php",
+      "bytes": 1672,
+      "sha256": "8bd83037de004d6c233729836109b59de8d9586cdfdcf2e2c5f2750b251fe7f5"
+    },
+    {
+      "path": "src/Engines/HumanInteraction/Implementations/SentimentEngine.php",
+      "bytes": 2339,
+      "sha256": "f0b94a75855427ad812fd12834d2cb6edf2d6514e7785f0d4a4307a7826b2ac9"
+    },
+    {
+      "path": "src/Engines/HumanInteraction/Implementations/TrustEngine.php",
+      "bytes": 1782,
+      "sha256": "98b54aef22745b8b9f9d40f57265ed4bf6ffda741b08c962562242f7ddc98f1d"
+    },
+    {
+      "path": "src/Engines/Learning/Contracts/BehaviourLearningEngineInterface.php",
+      "bytes": 336,
+      "sha256": "0b8840feb40385c16abb665eb330f81e865a37fd736bc09615f72933e191686c"
+    },
+    {
+      "path": "src/Engines/Learning/Contracts/FeedbackEngineInterface.php",
+      "bytes": 315,
+      "sha256": "1684dd5c528945ec2af0487d8ee5f2c386f8500e7923638f63bb1024b7658244"
+    },
+    {
+      "path": "src/Engines/Learning/Contracts/GeneralizationEngineInterface.php",
+      "bytes": 349,
+      "sha256": "b0b28ee6d7d9b2eafeb4210a97b56abdda73c42d562e854dca0ff3cff397a1f2"
+    },
+    {
+      "path": "src/Engines/Learning/Contracts/LearningEngineInterface.php",
+      "bytes": 277,
+      "sha256": "0c97e5295acd537127697c01e1d3638d5839c086039cbd5c8813cac660460ec9"
+    },
+    {
+      "path": "src/Engines/Learning/Contracts/PatternRecognitionEngineInterface.php",
+      "bytes": 289,
+      "sha256": "4d3a04b17f8ad2ec1394fc1aefc05f3a572f01f4808338daab5d34e25ff2a962"
+    },
+    {
+      "path": "src/Engines/Learning/Contracts/PredictionEngineInterface.php",
+      "bytes": 309,
+      "sha256": "1a33ecaaaae32f9b4d1ee8125c5a96c47cb751ad4bf8a50ee938c3c5b26e0c4b"
+    },
+    {
+      "path": "src/Engines/Learning/Contracts/PreferenceLearningEngineInterface.php",
+      "bytes": 328,
+      "sha256": "c20a67ce67d0f7487d5a255446cb96c219b6912693b7e03b4e5c5f693a0a94b6"
+    },
+    {
+      "path": "src/Engines/Learning/Contracts/RecommendationEngineInterface.php",
+      "bytes": 295,
+      "sha256": "7e10786b93b94e83e721610a124c8b2a5ff00409c397aeee1709c9ba07c1368f"
+    },
+    {
+      "path": "src/Engines/Learning/Contracts/ReinforcementLearningEngineInterface.php",
+      "bytes": 311,
+      "sha256": "7528834c28db0397ed7e3e4744ed5344f55b2d6a50e47c813d8699461efa3d09"
+    },
+    {
+      "path": "src/Engines/Learning/Contracts/SimilarityEngineInterface.php",
+      "bytes": 331,
+      "sha256": "bbaea89eaa8175ab05658ddd2b17e83676b0a4c9199dabaae0a2cd1bc296299d"
+    },
+    {
+      "path": "src/Engines/Learning/Implementations/BehaviourLearningEngine.php",
+      "bytes": 2719,
+      "sha256": "44fcfe7adf5c8e69f9da1533f4aeebc5e89935721b6f497e296e519e82b64c1c"
+    },
+    {
+      "path": "src/Engines/Learning/Implementations/FeedbackEngine.php",
+      "bytes": 2101,
+      "sha256": "475e327bc2eed179dfbdb40e72e57ddebaf46f580373162e9b4657913f2b5ef7"
+    },
+    {
+      "path": "src/Engines/Learning/Implementations/GeneralizationEngine.php",
+      "bytes": 2515,
+      "sha256": "1f6bb34f4283e4dbfc65832dc1cf79682771c3db71dd1cc710654b0c75a38eb4"
+    },
+    {
+      "path": "src/Engines/Learning/Implementations/LearningEngine.php",
+      "bytes": 507,
+      "sha256": "e7a8b821578c8e886830736e19e1901866d9ddcc54a13c3152ed5fa701487ce1"
+    },
+    {
+      "path": "src/Engines/Learning/Implementations/PatternRecognitionEngine.php",
+      "bytes": 1780,
+      "sha256": "e7554f77f505290a6b22915632320d1764261e96dca8da198d5a56fb0319f404"
+    },
+    {
+      "path": "src/Engines/Learning/Implementations/PredictionEngine.php",
+      "bytes": 1759,
+      "sha256": "94675bf45d70234208b5467fca4b238eefd8650baf878146493d32ae74693cf6"
+    },
+    {
+      "path": "src/Engines/Learning/Implementations/PreferenceLearningEngine.php",
+      "bytes": 1102,
+      "sha256": "4143ac6b512bfda31e1a24a5355c3c67ee9d420d684ad4e9ba2f027e0362aef9"
+    },
+    {
+      "path": "src/Engines/Learning/Implementations/RecommendationEngine.php",
+      "bytes": 2938,
+      "sha256": "15cfea793668c99b0e0e15d2c3116be6e4b4098b14271a04d9d9a14ec5cf994e"
+    },
+    {
+      "path": "src/Engines/Learning/Implementations/ReinforcementLearningEngine.php",
+      "bytes": 1315,
+      "sha256": "24187af860eeba82831985f8dce205ebe4df8bf854c627ee6f235240c06f6e6a"
+    },
+    {
+      "path": "src/Engines/Learning/Implementations/SimilarityEngine.php",
+      "bytes": 2075,
+      "sha256": "2b01f13e49107d5b61593fac8554386a0b84575ea36680ca4589f4736d68a518"
+    },
+    {
+      "path": "src/Engines/Memory/Contracts/ContextEngineInterface.php",
+      "bytes": 350,
+      "sha256": "078e17492bb7eacc78f1a248a9fd63d4b782681f47392ec6073dd58b3c61246a"
+    },
+    {
+      "path": "src/Engines/Memory/Contracts/EpisodicMemoryEngineInterface.php",
+      "bytes": 315,
+      "sha256": "6e166aff15890dc34d5744531401ef9397e307f23f6bba4cd3ca8f5f2c28e1ae"
+    },
+    {
+      "path": "src/Engines/Memory/Contracts/ForgettingEngineInterface.php",
+      "bytes": 269,
+      "sha256": "16aa64bdda909ea3d5ec604b10853ef3cbe7476ca4cc9ff42ac00b6c2cb26c1a"
+    },
+    {
+      "path": "src/Engines/Memory/Contracts/KnowledgeExtractionEngineInterface.php",
+      "bytes": 293,
+      "sha256": "904517fdf6a369d5ac07969f4e9be737a5bcf1e7e0b47192536c2a3f86ab16cc"
+    },
+    {
+      "path": "src/Engines/Memory/Contracts/KnowledgeGraphEngineInterface.php",
+      "bytes": 441,
+      "sha256": "12b6a61c57d0a1a4d230f6b14321c3eba39edc45d1a7b7b706a372a82577a98c"
+    },
+    {
+      "path": "src/Engines/Memory/Contracts/MemoryConsolidationEngineInterface.php",
+      "bytes": 293,
+      "sha256": "d688221c91c01b7af8a3e8699d427f23385ce671c1b7dd0c346d5e14912ee120"
+    },
+    {
+      "path": "src/Engines/Memory/Contracts/MemoryEngineInterface.php",
+      "bytes": 342,
+      "sha256": "9863b14c22457dd2a897b5005977e6e6ae4e1e5fadcbcde0337dac70e1915c06"
+    },
+    {
+      "path": "src/Engines/Memory/Contracts/ProceduralMemoryEngineInterface.php",
+      "bytes": 356,
+      "sha256": "426034b9199126f1a384320f60cb7c48f7d2bd8219efd4533806e08e28c326a9"
+    },
+    {
+      "path": "src/Engines/Memory/Contracts/SemanticMemoryEngineInterface.php",
+      "bytes": 298,
+      "sha256": "7d6cf636b68f970092c67526a064504c1b72ec5c6d30940da9f238e35a380ca2"
+    },
+    {
+      "path": "src/Engines/Memory/Contracts/WorldModelEngineInterface.php",
+      "bytes": 333,
+      "sha256": "cba567b61e9d5807d652886a0efb4b7558960580a0bc878b34c17ba56ce8428a"
+    },
+    {
+      "path": "src/Engines/Memory/Implementations/ContextEngine.php",
+      "bytes": 968,
+      "sha256": "ffdd3a171009d016b199bcdd50b4a16990ebecc23166ce289413aeaccf2746d9"
+    },
+    {
+      "path": "src/Engines/Memory/Implementations/EpisodicMemoryEngine.php",
+      "bytes": 921,
+      "sha256": "f955050e8415710d9211b23f4161a2f398df74e2ee8b6ffaf821f34aee333e15"
+    },
+    {
+      "path": "src/Engines/Memory/Implementations/ForgettingEngine.php",
+      "bytes": 1096,
+      "sha256": "02e777d1ea6937ada8731e8daf70ca4a1960a354deedcf2ed43a8ffd92466a09"
+    },
+    {
+      "path": "src/Engines/Memory/Implementations/KnowledgeExtractionEngine.php",
+      "bytes": 2317,
+      "sha256": "12a2c49e94419e4ac787a8730eab39179287fd87d446eed8b5705c251839f854"
+    },
+    {
+      "path": "src/Engines/Memory/Implementations/KnowledgeGraphEngine.php",
+      "bytes": 3591,
+      "sha256": "f788c92393496e0253949acde3398fec5fe66bed3ba121f8fef9b525fdaca7e6"
+    },
+    {
+      "path": "src/Engines/Memory/Implementations/MemoryConsolidationEngine.php",
+      "bytes": 1656,
+      "sha256": "1a5c7630fef58a58b6b2fea97452dc7a73228a1422a91002dadf50f9402fe4c7"
+    },
+    {
+      "path": "src/Engines/Memory/Implementations/MemoryEngine.php",
+      "bytes": 1678,
+      "sha256": "70720a0edbc47ea7a27801d00b32bb2862f47e8feee014e90624e7b1a86719ea"
+    },
+    {
+      "path": "src/Engines/Memory/Implementations/ProceduralMemoryEngine.php",
+      "bytes": 1325,
+      "sha256": "afc18405e960fd4c36bf60c0f8acc77e7adfc98b2d3aa768f541f02e35bb5ea2"
+    },
+    {
+      "path": "src/Engines/Memory/Implementations/SemanticMemoryEngine.php",
+      "bytes": 848,
+      "sha256": "ca34bba56984eb5ead76d915f9586cd5203e13fe3bbea67895cb284566769b1f"
+    },
+    {
+      "path": "src/Engines/Memory/Implementations/WorldModelEngine.php",
+      "bytes": 1365,
+      "sha256": "c790d4a9cc4bee4866deeb116b12ddfe2ce3fa41f34cd96da1b3781a71598003"
+    },
+    {
+      "path": "src/Engines/Planning/Contracts/CapabilityRoutingEngineInterface.php",
+      "bytes": 328,
+      "sha256": "43d934c51c2be8357bf626af46af4591204b792715052a86ef0f4ebd75d1532b"
+    },
+    {
+      "path": "src/Engines/Planning/Contracts/ExecutionEngineInterface.php",
+      "bytes": 295,
+      "sha256": "2ee0b17bb31d9de0c2b40ab9c45c09c3f0eb37d3a63fa82518f1719b7e6d7898"
+    },
+    {
+      "path": "src/Engines/Planning/Contracts/PlanningEngineInterface.php",
+      "bytes": 344,
+      "sha256": "4f674e049c43a80c1acf2b003a4d31fd2a6d1adeb9e0ac3d66898ebec72d0773"
+    },
+    {
+      "path": "src/Engines/Planning/Contracts/RecoveryEngineInterface.php",
+      "bytes": 267,
+      "sha256": "d5fc76ef8047de28364b7be71b4cef592b0a5e913c2ac7d91965a44673df69ae"
+    },
+    {
+      "path": "src/Engines/Planning/Contracts/ResourceAllocationEngineInterface.php",
+      "bytes": 320,
+      "sha256": "16ffa633894dc95533ecae2bbbd129c75eb544231cc39231a603b7e140e8b422"
+    },
+    {
+      "path": "src/Engines/Planning/Contracts/RetryEngineInterface.php",
+      "bytes": 279,
+      "sha256": "3b86d62a85631ae2b3b10e1f0d864bcce65d9012fdaa4eaa7c0c5f175061823c"
+    },
+    {
+      "path": "src/Engines/Planning/Contracts/SchedulingEngineInterface.php",
+      "bytes": 306,
+      "sha256": "691c156e10d77a873a29ac722b98fbd76d798454799e0726403d45f27873065b"
+    },
+    {
+      "path": "src/Engines/Planning/Contracts/SynchronizationEngineInterface.php",
+      "bytes": 285,
+      "sha256": "d7753cd03556c69c1e1db9fb2aeef5fafc9e717eac9bcf63dbd0a9f43b543a24"
+    },
+    {
+      "path": "src/Engines/Planning/Contracts/TaskDecompositionEngineInterface.php",
+      "bytes": 307,
+      "sha256": "5726cf0b615a1e12ed27b28720f471a0630e1d64e92b1c9920f7fa3471386958"
+    },
+    {
+      "path": "src/Engines/Planning/Contracts/WorkflowEngineInterface.php",
+      "bytes": 364,
+      "sha256": "91afa7405dce13e4f8809078d37193d7f1d39df90633f771990db516bc04f31a"
+    },
+    {
+      "path": "src/Engines/Planning/Implementations/CapabilityRoutingEngine.php",
+      "bytes": 822,
+      "sha256": "4ebc5cb8d7d9d85ed10cfa3e0dd0e3d097d093c514f7810d0a900dfdc6d1af1b"
+    },
+    {
+      "path": "src/Engines/Planning/Implementations/ExecutionEngine.php",
+      "bytes": 819,
+      "sha256": "165802abce71a5155d303d976a64acf5cccc6401a536c889c0e7c5667bc230ca"
+    },
+    {
+      "path": "src/Engines/Planning/Implementations/PlanningEngine.php",
+      "bytes": 1785,
+      "sha256": "6e42c5d5b3e4ad12b1e1c32097642318502d5570155e2211ffea1cfeb78396b4"
+    },
+    {
+      "path": "src/Engines/Planning/Implementations/RecoveryEngine.php",
+      "bytes": 1476,
+      "sha256": "4a5dff6ced3a106afc33b0aa30642ba4a8c561bc254ae81ceb07215ae7a16067"
+    },
+    {
+      "path": "src/Engines/Planning/Implementations/ResourceAllocationEngine.php",
+      "bytes": 635,
+      "sha256": "eed81372347073e373616d316e5e59dd28777780302e9ea79d3e0a7309577c27"
+    },
+    {
+      "path": "src/Engines/Planning/Implementations/RetryEngine.php",
+      "bytes": 643,
+      "sha256": "1482f9076247cab6677bb674651800f04e95bb61a3f48286857da1680b895a2e"
+    },
+    {
+      "path": "src/Engines/Planning/Implementations/SchedulingEngine.php",
+      "bytes": 1839,
+      "sha256": "cdccd46214d4fdc2800c38f9b7f0af52610573c8cc988624caf147b659cf49a4"
+    },
+    {
+      "path": "src/Engines/Planning/Implementations/SynchronizationEngine.php",
+      "bytes": 882,
+      "sha256": "2c7fbeb3529c6adc49bb16adf4a78f7eff1dd63f1c62076c2fdb23bd1fe9e9c5"
+    },
+    {
+      "path": "src/Engines/Planning/Implementations/TaskDecompositionEngine.php",
+      "bytes": 1597,
+      "sha256": "1b86ad9d40040327a63995baa94e28bed6b86cc0237609be4f806f5f8e068b29"
+    },
+    {
+      "path": "src/Engines/Planning/Implementations/WorkflowEngine.php",
+      "bytes": 968,
+      "sha256": "d07ce3732191e37e3eb78bdc16cbb5a6cde31c0e9af448b21266c7f739408957"
+    },
+    {
+      "path": "src/Error/ErrorHandler.php",
+      "bytes": 1773,
+      "sha256": "db307a50dbc63dda0f5682fa2ab2054a8dde627f3613922c3beffdc814644337"
+    },
+    {
+      "path": "src/Event/EventRecorder.php",
+      "bytes": 903,
+      "sha256": "4135f779cceadc49aae207825035571c3bef0384c17d678566f2073145403d78"
+    },
+    {
+      "path": "src/Events/CapabilityExecuted.php",
+      "bytes": 278,
+      "sha256": "100fef0ba83e95e3544f0e3334727d11bcac7deb5bf4e23992eb7657d3f112a6"
+    },
+    {
+      "path": "src/Events/InteractionCompleted.php",
+      "bytes": 305,
+      "sha256": "4b25ec5e916ed1de15853afd3a7b68c87cf9ad5f4ca587d8f4fcd6ffa957a98c"
+    },
+    {
+      "path": "src/Events/InteractionEventRecorded.php",
+      "bytes": 228,
+      "sha256": "5c6e4f7d770119bf700e6ab7a0eeef65ad783bca22e3f9a791f304ef768dde0c"
+    },
+    {
+      "path": "src/Events/InteractionStarted.php",
+      "bytes": 315,
+      "sha256": "7c20358077a0d13fe6281191cf9e4c6889ccec8ade005cbcd0569abe721c93ed"
+    },
+    {
+      "path": "src/Events/QuestionAnswered.php",
+      "bytes": 307,
+      "sha256": "37133219dfb4797dd378138258c80ed0ef2f54391777ff0b6a8fa961367e09b9"
+    },
+    {
+      "path": "src/Events/SectionCompleted.php",
+      "bytes": 237,
+      "sha256": "86705a26396b4e3f0114f4d76706efdd902cf0899bee15d967e3ac5efbc5ae80"
+    },
+    {
+      "path": "src/Facades/Interaction.php",
+      "bytes": 251,
+      "sha256": "e0cf08db6d05d0aa66a511ed452bfc29b15558c1fc88f182bed6892d242f0f95"
+    },
+    {
+      "path": "src/Generator/GeneratorEngine.php",
+      "bytes": 6116,
+      "sha256": "40bebbb094b3de99572318f3535550b271250b1807fe549fedd5c6b0338b3325"
+    },
+    {
+      "path": "src/Goals/GoalEngine.php",
+      "bytes": 157,
+      "sha256": "db3f9a7a7ee5370a938ef523937b7f1d43a3da021fbb134abaaeb176389cd43e"
+    },
+    {
+      "path": "src/Healer/HealerEngine.php",
+      "bytes": 3292,
+      "sha256": "e8f9845bb49a5d27b4b0bdf9498747c12067b8665bd1e8c17e95daca7bf36489"
+    },
+    {
+      "path": "src/Http/Controllers/CognitiveEventController.php",
+      "bytes": 4231,
+      "sha256": "7a9a863ef1e1d23427929143ebd91410029304da2bb8d4eb3b78f577baec4fd0"
+    },
+    {
+      "path": "src/Http/Controllers/InteractionController.php",
+      "bytes": 1961,
+      "sha256": "028ddf878dfe94ab8c5216939bfe6627a74bf085f6591813f757911b586f5425"
+    },
+    {
+      "path": "src/Http/Controllers/LocalIntelligenceController.php",
+      "bytes": 970,
+      "sha256": "69ab747d609796eac501b96042dc6f7830fb9075cc8823b2cf7653dc94a72527"
+    },
+    {
+      "path": "src/Http/Controllers/OfflineCommandController.php",
+      "bytes": 3393,
+      "sha256": "1f08de747873f73e3c595ad9146ea54aa06d076ec2db24a56fccd0d97c80390f"
+    },
+    {
+      "path": "src/Http/Controllers/SyncController.php",
+      "bytes": 1162,
+      "sha256": "bbaaa5f0c5c9162076a3e9d07cdc21655a3dcfb93c3eb6eee2683ac436130d56"
+    },
+    {
+      "path": "src/Http/Controllers/TemplateController.php",
+      "bytes": 2091,
+      "sha256": "459f4a88f092dd28529fff97166ad502f183fe0c7c250be431ff9b801421e0d1"
+    },
+    {
+      "path": "src/Http/Controllers/WizardController.php",
+      "bytes": 3793,
+      "sha256": "f4a57588582b3d050f89682f22ffcab7b07c1ee7f9676b591f064ee08c412071"
+    },
+    {
+      "path": "src/Infrastructure/WorkCore/GovernedWorkCoreDispatcher.php",
+      "bytes": 1618,
+      "sha256": "5a7d8ba5e419cb874a1497c930f58b7faa2540696c9ccd040c3f3576ad9a4b74"
+    },
+    {
+      "path": "src/Knowledge/KnowledgeRegistry.php",
+      "bytes": 863,
+      "sha256": "116ad5a3f340e16eb2be72cff74df30f01623df60862ec0d938d7feb303127de"
+    },
+    {
+      "path": "src/Knowledge/Sources/CustomerKnowledgeSource.php",
+      "bytes": 821,
+      "sha256": "255c9aafb20c61bbfd03c50921691cf4f4e0d908550afc37da6c802aaa95acb9"
+    },
+    {
+      "path": "src/Knowledge/Sources/ServiceKnowledgeSource.php",
+      "bytes": 659,
+      "sha256": "2b6c6d3a6fe7cc2946dc9093a711523d48c4da985b1ee6f497d87292ade20e69"
+    },
+    {
+      "path": "src/Learner/LearnerEngine.php",
+      "bytes": 3397,
+      "sha256": "9bc574a474d002dd38dd08162de69982a5b1acd1f1c24da74f2c1e3c70609a48"
+    },
+    {
+      "path": "src/LocalIntelligence/Decision/DecisionTreeEngine.php",
+      "bytes": 3014,
+      "sha256": "ef208ff60939e934b19ef11502a78ad01d153827a4962ec1caa1e73cd22c0eb3"
+    },
+    {
+      "path": "src/LocalIntelligence/Language/LocalLanguageEngine.php",
+      "bytes": 4049,
+      "sha256": "2a9450139bcfa2003b87ad146ba43400b6d567454642b1efe0209a96dd6c93bc"
+    },
+    {
+      "path": "src/LocalIntelligence/Language/NaiveBayesIntentClassifier.php",
+      "bytes": 9322,
+      "sha256": "4ae4c121583e6c2b4a4f9cfadc61a3c1a0bac2115bb49ffc80b6d6987aa8b02a"
+    },
+    {
+      "path": "src/LocalIntelligence/Learning/AdaptiveReweightingEngine.php",
+      "bytes": 3365,
+      "sha256": "f259750568a5a0ca6927efc7bd934fd33ad8220524eecac1e553ed2a37f61caa"
+    },
+    {
+      "path": "src/LocalIntelligence/LocalBrain.php",
+      "bytes": 8549,
+      "sha256": "2a7422dada338cda84b511155618ff5805c060862dd3b9a5bcf77d62627c914b"
+    },
+    {
+      "path": "src/LocalIntelligence/Memory/BehavioralMemory.php",
+      "bytes": 4512,
+      "sha256": "0c5b41da4ac62934006c48da3ac75d96c323a9436570a6aabe7a0615df26301a"
+    },
+    {
+      "path": "src/LocalIntelligence/Persona/BehavioralDriftTracker.php",
+      "bytes": 5309,
+      "sha256": "e6e6e26deecea4e7a39c97fea922eada902042c53d4e1d6dfd49b5110a72bbbf"
+    },
+    {
+      "path": "src/LocalIntelligence/Persona/KeywordTriggerExtractor.php",
+      "bytes": 1853,
+      "sha256": "8911cfcd84e2ebca917d673da684f5ebba4c28060c08d28ba8e41ba4adec4ca4"
+    },
+    {
+      "path": "src/LocalIntelligence/Persona/PersonaSignalAnalyzer.php",
+      "bytes": 3855,
+      "sha256": "f62bf508e8bddfe8395b70c61c42ab623f03f6c0c41031eb9e8b2556f658e832"
+    },
+    {
+      "path": "src/LocalIntelligence/Prediction/PredictiveCompletionEngine.php",
+      "bytes": 5133,
+      "sha256": "7b28372d48657d17568a31b793e513b2447629e826df98894483aa0ce72d69dd"
+    },
+    {
+      "path": "src/LocalIntelligence/Reasoning/HybridReasoner.php",
+      "bytes": 2528,
+      "sha256": "cc18f4e1317c3d88ee5671cbce69038ef6330285eca6ec41989f22f3fb6d5b99"
+    },
+    {
+      "path": "src/LocalIntelligence/Reasoning/WeightedMemoryReranker.php",
+      "bytes": 4747,
+      "sha256": "605ad8bf82be57cef5fd0e6854f6f8b347ea8afc3a765d7e8bd29ce4055237f8"
+    },
+    {
+      "path": "src/LocalIntelligence/Storage/EloquentLocalIntelligenceMemoryStore.php",
+      "bytes": 3533,
+      "sha256": "53187c97a1351f7c91f8806a29509daf88a55328d63341a5426f616835d34a12"
+    },
+    {
+      "path": "src/LocalIntelligence/Storage/LocalIntelligenceMemoryStoreInterface.php",
+      "bytes": 1383,
+      "sha256": "3d00b5122398190dec07c8d696f15a25be2a3f129d9d59b36f423558e6450a45"
+    },
+    {
+      "path": "src/LocalIntelligence/Storage/NullLocalIntelligenceMemoryStore.php",
+      "bytes": 748,
+      "sha256": "25383ddf310be5f3dde59e0998ec42bc518d6e3cb432f5e0a0c9b2b4db0c2680"
+    },
+    {
+      "path": "src/LocalIntelligence/Sync/CausalSyncResolver.php",
+      "bytes": 3085,
+      "sha256": "06f9a4c781968d38c1302efd3353663030432ce395c5c64b6963b778209cbb5c"
+    },
+    {
+      "path": "src/LocalIntelligence/Sync/SyncAssistant.php",
+      "bytes": 1789,
+      "sha256": "d9ffe2e30a63078ac33ed79d1d390494f270919a5facd97c6fe0823d8597dc69"
+    },
+    {
+      "path": "src/LocalIntelligence/Sync/VectorClock.php",
+      "bytes": 2132,
+      "sha256": "89d6f2625ee9615377aabe0ef0789ded9d94035eea73c70fff0e6c208d565123"
+    },
+    {
+      "path": "src/LocalIntelligence/Temporal/TemporalIntelligence.php",
+      "bytes": 4904,
+      "sha256": "b8986f4ebcafb1686b166a89d04e28af3daa0867785a2e714d7ba7d39a8f884b"
+    },
+    {
+      "path": "src/Memory/MemoryEngine.php",
+      "bytes": 159,
+      "sha256": "033196329cdac6f379a65d80721db369d00b4688faa2fa7afc79ea5f970ca385"
+    },
+    {
+      "path": "src/Migrations/2026_08_01_000000_create_interaction_runs_table.php",
+      "bytes": 1033,
+      "sha256": "aecb7f19c8df7fbfa3f5334eda2934b72a65042328cd54819f88c9ff6380e9f9"
+    },
+    {
+      "path": "src/Migrations/2026_08_01_000001_create_interaction_answers_table.php",
+      "bytes": 1116,
+      "sha256": "8fd31b985e8138fe62c3504323fe491e0032db4423384968ccffb6b503bb54f0"
+    },
+    {
+      "path": "src/Migrations/2026_08_01_000002_create_interaction_events_table.php",
+      "bytes": 742,
+      "sha256": "370ca4f5363d7a66e9acea1fb53ba2e1dbdfb311c7a367dcfc18eeb8d140f666"
+    },
+    {
+      "path": "src/Migrations/2026_08_02_000000_create_queued_commands_table.php",
+      "bytes": 1096,
+      "sha256": "78776ca75b0a613c98390755d41f4552da8822cb06b677209268e6e2811ab2cd"
+    },
+    {
+      "path": "src/Migrations/2026_08_05_000000_create_episodic_memory_table.php",
+      "bytes": 824,
+      "sha256": "10d76eba091244a2a3809f33de3eae82d8201d13a8d8496a16f62f0a3abb5006"
+    },
+    {
+      "path": "src/Migrations/2026_08_05_000001_create_semantic_memory_table.php",
+      "bytes": 665,
+      "sha256": "ce5b916b5971703221a4ada25f8768c62163c0b926af00cb5a30b0831f68b69b"
+    },
+    {
+      "path": "src/Migrations/2026_08_05_000002_create_audit_logs_table.php",
+      "bytes": 622,
+      "sha256": "62f3102c9a190609467325cac990ccc640497d58fb82cf4079c05081aa71db97"
+    },
+    {
+      "path": "src/Migrations/2026_08_05_000003_create_governance_logs_table.php",
+      "bytes": 626,
+      "sha256": "be7befecf006558c5cec463f5266bd8e2e5b228f5f8613683fe5973084ea7c1b"
+    },
+    {
+      "path": "src/Migrations/2026_08_05_000004_create_user_actions_table.php",
+      "bytes": 767,
+      "sha256": "325795c22ed3b4a62b5baedd6552ba81e938b5fc803b912d1a21a0d585ac421b"
+    },
+    {
+      "path": "src/Migrations/2026_08_05_000005_create_user_preferences_table.php",
+      "bytes": 781,
+      "sha256": "c4535f44f4d830a21f51bdb6e33b5fa141097625ae021c7cd39ddc8b83b7ff6c"
+    },
+    {
+      "path": "src/Models/CognitiveEvent.php",
+      "bytes": 1036,
+      "sha256": "270d22aaf67321d93fd527be23b75dfeb807ea644f28a0c1f23705288ae77996"
+    },
+    {
+      "path": "src/Models/InteractionAnswer.php",
+      "bytes": 645,
+      "sha256": "bbfe3b15764f7f76e80cd9da95882fad38b827682d446177d6c51f6a7e10145d"
+    },
+    {
+      "path": "src/Models/InteractionEvent.php",
+      "bytes": 412,
+      "sha256": "f7853b00341cc9fcbcdf6d24754e9b63e30e37bc9b99449280cbb71512f5d30d"
+    },
+    {
+      "path": "src/Models/InteractionRun.php",
+      "bytes": 644,
+      "sha256": "4c7146b3305c1dd5a815eb622d7d5136d0d417c616d4a90253f2663447a30372"
+    },
+    {
+      "path": "src/Models/LocalIntelligenceMemory.php",
+      "bytes": 617,
+      "sha256": "813886bba812aa250e7902580aaecbe34db228e5cd557c00c33b124aa05d7e08"
+    },
+    {
+      "path": "src/Models/QueuedCommand.php",
+      "bytes": 670,
+      "sha256": "7ae0aa5be45898ae5613ecfb66c231976f5e5102a349c749fe14d49876e44191"
+    },
+    {
+      "path": "src/Monitoring/HealthCheck.php",
+      "bytes": 2956,
+      "sha256": "65878ad86db8dd7cc74602c530fabf12d3c090ad22bb2c29ce624d820b6aa232"
+    },
+    {
+      "path": "src/Navigation/NavigationEngine.php",
+      "bytes": 2654,
+      "sha256": "5d41b90b8270f36717629db95a117ddcb8c76765c3ebe1e78ba2579690b01aaf"
+    },
+    {
+      "path": "src/Offline/ConflictResolver.php",
+      "bytes": 2335,
+      "sha256": "45b57d5c87a750fb6c8d3f33f4b5699bb15a8b2d8848d6e8b1ae0c0c89e35b86"
+    },
+    {
+      "path": "src/Offline/OfflineDetector.php",
+      "bytes": 913,
+      "sha256": "51066be96fdaa40e764747315cb2edf09118294d1e0fee1d2efb712ce22635db"
+    },
+    {
+      "path": "src/Offline/OfflineQueue.php",
+      "bytes": 1452,
+      "sha256": "4aadaadf0a81766bca63a8640b6acd7d48f3f8dd221dcf1ae1713aabf169ab8d"
+    },
+    {
+      "path": "src/Offline/SyncEngine.php",
+      "bytes": 3212,
+      "sha256": "95569697ffb4e3aa813d81cfd4374ed7583dccbd2803458f34844d9cc235de14"
+    },
+    {
+      "path": "src/Pattern/PatternRegistry.php",
+      "bytes": 3251,
+      "sha256": "cba96c27a5e2d6d40c010951497786823ca74c3b8c44603f3a944485dcafef3b"
+    },
+    {
+      "path": "src/Planning/PlanningEngine.php",
+      "bytes": 167,
+      "sha256": "f463b323a41d89b4bda2356d7d8186180494000d265d71f71bd0ebe75377f482"
+    },
+    {
+      "path": "src/Policy/PolicyEngine.php",
+      "bytes": 5977,
+      "sha256": "4d5948e9501d21fbed046cf3d72270142906f33de8009c3e22b2846567ef9be9"
+    },
+    {
+      "path": "src/Predictor/PredictorEngine.php",
+      "bytes": 5715,
+      "sha256": "7cf1949ab5309cd588199fab3e572b10f5a0e8b9cb1b42e1dfb3de40d08df87e"
+    },
+    {
+      "path": "src/Providers/InteractionServiceProvider.php",
+      "bytes": 21120,
+      "sha256": "eb39b91b8fd11077e76dde2c2edcb3e27504963baf7e5f9c4950204e7c72a3af"
+    },
+    {
+      "path": "src/Registry/CapabilityRegistry.php",
+      "bytes": 1943,
+      "sha256": "990ac167cfe23e874a413aae69c7aba1bbdf70de6e8dd85a52d5c4f961776b4e"
+    },
+    {
+      "path": "src/Registry/InteractionRegistry.php",
+      "bytes": 1150,
+      "sha256": "eb319da68d6a1b3092a90d97df00cbf344bb87158a58efa0bea652b8ca6d1aae"
+    },
+    {
+      "path": "src/Renderer/BladeRenderer.php",
+      "bytes": 1034,
+      "sha256": "40ae3689f77184c596a1ae28f1bfa623db79535216c93a19ef265408630ef81e"
+    },
+    {
+      "path": "src/Repositories/EloquentInteractionAnswerRepository.php",
+      "bytes": 1647,
+      "sha256": "245506740d629faf786519e5408b5c58e52bdf2ac28c233c17e34da183782141"
+    },
+    {
+      "path": "src/Repositories/EloquentInteractionRunRepository.php",
+      "bytes": 1307,
+      "sha256": "c8e722c84738b2ec341dfbc74d067be9b09230b01fdf5feb968ac4a4b4afd7ed"
+    },
+    {
+      "path": "src/Repositories/InteractionAnswerRepositoryInterface.php",
+      "bytes": 276,
+      "sha256": "4e32bf54d9e31b199a50eda1d7211b42d65ff730758a6fdfe6a8385b8c3c7e5c"
+    },
+    {
+      "path": "src/Repositories/InteractionRunRepositoryInterface.php",
+      "bytes": 411,
+      "sha256": "9b851501cdd3da6f854e5c858622360e69f4b2b759921b07028956e231c60ce9"
+    },
+    {
+      "path": "src/Resolver/QuestionResolver.php",
+      "bytes": 4455,
+      "sha256": "126cda1cdec010703d9cd180c7acbf383e452002d7583eecc8ff07896c561821"
+    },
+    {
+      "path": "src/Resolver/Resolvers/AIResolver.php",
+      "bytes": 2934,
+      "sha256": "659dc1304bb30cf23814a9333379d84fbe260cfe4b4f8ec013e772852b5869f9"
+    },
+    {
+      "path": "src/Runtime/InteractionRuntime.php",
+      "bytes": 7851,
+      "sha256": "4867322fa7f400130f4c1fdb6357668288b7e5f99ab2102ed61733dfdefc7ef2"
+    },
+    {
+      "path": "src/Schema/InteractionSchema.php",
+      "bytes": 3205,
+      "sha256": "3899e074c19c586e7bafcd53a0b099c33033dbd4b50b11e96e466a8fcd7bcbcb"
+    },
+    {
+      "path": "src/Semantic/SemanticEngine.php",
+      "bytes": 168,
+      "sha256": "84ef4ec390e02319c674baa1a89f2ce372436e128d9591d202b9e784b02213b0"
+    },
+    {
+      "path": "src/State/StateManager.php",
+      "bytes": 2917,
+      "sha256": "df61cddbe5bca0ab0bdc68da3557e3d3d50257b6426751fbbfc098404824ac12"
+    },
+    {
+      "path": "src/Template/TemplateCompatibilityChecker.php",
+      "bytes": 2032,
+      "sha256": "d039faea608272e7dd9e218bdd7696be393589335ede1efc639ebaedbe8bbcec"
+    },
+    {
+      "path": "src/Template/TemplateCompatibilityReport.php",
+      "bytes": 810,
+      "sha256": "3fac5d58100d9a6238ac277a44e9d73ddd569e8d39a8afd018609eafc4ee1528"
+    },
+    {
+      "path": "src/Template/TemplateDefinition.php",
+      "bytes": 2356,
+      "sha256": "4f74a4addd550bca64c69a672784dcd7a7367f1be2eb69257b4d8a88c30d5da0"
+    },
+    {
+      "path": "src/Template/TemplateRegistry.php",
+      "bytes": 1567,
+      "sha256": "45badbff816986e39dfe1272db1fc5abd76d695e5a877d8b0406fc6660fb13b8"
+    },
+    {
+      "path": "src/Validation/ValidationEngine.php",
+      "bytes": 1766,
+      "sha256": "0515fcc02abad75f14d60e1cf357355b0f4b9b9c5dde7cfeeb6b9bc1b7898b07"
+    },
+    {
+      "path": "src/Wizard/Command/CommandMapper.php",
+      "bytes": 2858,
+      "sha256": "338a312dbd941285ece6dddefeff60664d67163dc67ad4aa9871ce6ed7ba9bf7"
+    },
+    {
+      "path": "src/Wizard/Context/WizardExecutionContextFactory.php",
+      "bytes": 3459,
+      "sha256": "dd59f55f206d06e7eae5547662762eb18127a3f9e650240eceae9465e018f1cd"
+    },
+    {
+      "path": "src/Wizard/Governance/GovernanceViolation.php",
+      "bytes": 325,
+      "sha256": "afc54f9e5a0908852015f7fc64a1ba3d6e34cad02444def5c21e25b52286730e"
+    },
+    {
+      "path": "src/Wizard/Governance/GovernedCompletionPolicy.php",
+      "bytes": 3379,
+      "sha256": "919812375945e80126f0031fad209dba128b57ef8be0af8a5970de96c640b594"
+    },
+    {
+      "path": "src/Wizard/Guidance/LocalGuidanceProvider.php",
+      "bytes": 915,
+      "sha256": "d0aa781e09fcc02f681baac521e0f26cc26b29da4f1a8c0377d0f973adbeacf8"
+    },
+    {
+      "path": "src/Wizard/Offline/LocalCommandOutbox.php",
+      "bytes": 3360,
+      "sha256": "8234c25d3fafadbec4036a0eb52c509821341142091b1ef573925477bbcc9aa8"
+    },
+    {
+      "path": "src/Wizard/Renderer/ArrayRenderer.php",
+      "bytes": 566,
+      "sha256": "984e8bbd303deec75d4ea10b87a81be0361b656c480fc2ea777872aaff5695a9"
+    },
+    {
+      "path": "src/Wizard/Renderer/ConversationalRenderer.php",
+      "bytes": 553,
+      "sha256": "6d44dd9206cfa7183feb7299e6775836d5ef6f332597eeb6aad4e0e0986ea080"
+    },
+    {
+      "path": "src/Wizard/Renderer/HybridRenderer.php",
+      "bytes": 662,
+      "sha256": "aeedacc504bba9e13ab6c3e62360012ec4a9ca80c95a54f76d838b1a0e57cbbe"
+    },
+    {
+      "path": "src/Wizard/Renderer/WizardRendererInterface.php",
+      "bytes": 236,
+      "sha256": "43fb25bb3cf2c2e446f1dc0b79d47741b6e6e97e2ca58ae31447960e2936b588"
+    },
+    {
+      "path": "src/Wizard/Security/WizardSessionAccessPolicy.php",
+      "bytes": 796,
+      "sha256": "90fad1c0b35ed4b19e3c1288975e1c0fbb6a8b4e5412430564dad5d9e7b00da4"
+    },
+    {
+      "path": "src/Wizard/Storage/CacheWizardSessionStore.php",
+      "bytes": 1355,
+      "sha256": "553dc3facf1b9cc925c00608dde127bc3e4ea34f8c3f4ef5e79280d68caaa5d6"
+    },
+    {
+      "path": "src/Wizard/Storage/InMemoryWizardSessionStore.php",
+      "bytes": 719,
+      "sha256": "efd308e05beffe794f98c1699a04f4447745ff6830fc9671df6fb127c8355503"
+    },
+    {
+      "path": "src/Wizard/Storage/WizardSessionStoreInterface.php",
+      "bytes": 343,
+      "sha256": "0bc5858bc3d688bc286295c86de97f9328a40037c2595468051ab706f2cdd6e0"
+    },
+    {
+      "path": "src/Wizard/UniversalWizardEngine.php",
+      "bytes": 7823,
+      "sha256": "902d96847f89e372688ff657594ef1d28f7f327409779b36a39e861ba06b8a74"
+    },
+    {
+      "path": "src/Wizard/Validation/WizardValidationEngine.php",
+      "bytes": 2309,
+      "sha256": "e581315fbcff27140be8e8665f247c38ba5782a282a0d2ebdefd8d7b0dca58f6"
+    },
+    {
+      "path": "src/Wizard/WizardDefinition.php",
+      "bytes": 2387,
+      "sha256": "e3d9ceb7ac7c77fd0865bca400b4b9d777e2cf101b7830eed6a953906a43aed7"
+    },
+    {
+      "path": "src/Wizard/WizardRegistry.php",
+      "bytes": 1730,
+      "sha256": "7bbad473fa71375ab8dae277693b121a98ef3e390e526935844a17fabbffef21"
+    },
+    {
+      "path": "src/Wizard/WizardResult.php",
+      "bytes": 347,
+      "sha256": "020c515b598d5be6acec7b837ad5b3181a901e9b4788195cb9a19ef61c51248f"
+    },
+    {
+      "path": "src/Wizard/WizardSession.php",
+      "bytes": 1580,
+      "sha256": "2d47c5531b7b71c6a86fe13b58a052198e6a8d4bb64787912f08519ad372bff2"
+    },
+    {
+      "path": "templates/abandoned-checkout-recovery.json",
+      "bytes": 639,
+      "sha256": "435565e79c9111f5fd646365ffee37101e651842d1ae3109a686d1cd2566c8d2"
+    },
+    {
+      "path": "templates/booking-intake.json",
+      "bytes": 626,
+      "sha256": "fd4dfb280cb48e166da8f5c0afdf86f0a6ca7d8b98435dd6808d7932904fc762"
+    },
+    {
+      "path": "templates/client-intake-consent.json",
+      "bytes": 672,
+      "sha256": "0fe4fbbc7b6251b2e446b42cbcbac2d4f11a1c676ec98cf04c981b4095f9011b"
+    },
+    {
+      "path": "templates/clinical-service-incident-escalation.json",
+      "bytes": 755,
+      "sha256": "5e3d49456fd313daa1175773e0c61af67334448748f628e565e9239a28729972"
+    },
+    {
+      "path": "templates/customer-onboarding.json",
+      "bytes": 465,
+      "sha256": "3924fd3a84ef1a91c1904a8fe2a7fa110c6b51d06a965379632ec5d503863157"
+    },
+    {
+      "path": "templates/customer-order-capture.json",
+      "bytes": 643,
+      "sha256": "9df881edb361f2cec433cbb3690b68f65650a0bcd4254e3cab20efa75dcd4dbe"
+    },
+    {
+      "path": "templates/event-function-setup.json",
+      "bytes": 646,
+      "sha256": "2ceaaffcb6145f8ddb4ec72454dadf15968752b8fef4f4a9bb842b9e418f7d58"
+    },
+    {
+      "path": "templates/field-job-handover.json",
+      "bytes": 535,
+      "sha256": "849505fb3d9cb281c859e8472e27e327f50ee442dc5c1de4d36dbb891e16cbe0"
+    },
+    {
+      "path": "templates/guest-issue-resolution.json",
+      "bytes": 655,
+      "sha256": "d48725aab01c02baa62882fa1d1079caca3577d9efe51999bbe20e8a4d9d912b"
+    },
+    {
+      "path": "templates/incident-response.json",
+      "bytes": 484,
+      "sha256": "c8bc96440d7bfc9651776c55e7a1ad6d1a7eec1e0e8716f771f810051484cb4a"
+    },
+    {
+      "path": "templates/inspection-corrective-action.json",
+      "bytes": 536,
+      "sha256": "3b8e2c465922c1a793a8c1193ab3fa632592a46532423f66f8bb8b7886b1034e"
+    },
+    {
+      "path": "templates/inventory-adjustment.json",
+      "bytes": 683,
+      "sha256": "994ef7cf4c8b9b1e53e35dfd103a5e62e374f0d699488db7bbcfbcee75af5206"
+    },
+    {
+      "path": "templates/invoice-creation.json",
+      "bytes": 465,
+      "sha256": "5787f8ec7256766bfbcd3c5f849c535069bdcfbc0b5cbccfc51ff69ac2dbabf6"
+    },
+    {
+      "path": "templates/job-completion.json",
+      "bytes": 445,
+      "sha256": "065bb7f27ac7c6f3d4c6e243e70354901eb5aa269648b28ac51481724a22cda1"
+    },
+    {
+      "path": "templates/job-creation.json",
+      "bytes": 445,
+      "sha256": "8cc519ef9dfe8cd8bf656eb4c6921d91d960c766ba6ce70efaf36ca84bf16bd9"
+    },
+    {
+      "path": "templates/job-variation-approval.json",
+      "bytes": 682,
+      "sha256": "a27c041c0a00f741ebc520ece29dd7f509942c0687dbebca5a7dce2e42592e34"
+    },
+    {
+      "path": "templates/maintenance-request.json",
+      "bytes": 656,
+      "sha256": "a1a498aa1d519282b4ad9cd90bc5736055f2087cf844ba2f7b411d83db7803f4"
+    },
+    {
+      "path": "templates/materials-request.json",
+      "bytes": 648,
+      "sha256": "2aa0bcb4c9ae7e3c98511d2848cdf1fa46e92b946c6ad9347e682b8c5099a5cd"
+    },
+    {
+      "path": "templates/order-fulfilment.json",
+      "bytes": 625,
+      "sha256": "f064e2706bd1a272a186e0f8ded4f7902595820ce40adaa3f40800e018a6ed50"
+    },
+    {
+      "path": "templates/order-issue-resolution.json",
+      "bytes": 650,
+      "sha256": "fe8cde07abefd50f239e45b4b9f06a1c86c00d5859e9992347ec4973b3d3f980"
+    },
+    {
+      "path": "templates/payment-reconciliation.json",
+      "bytes": 527,
+      "sha256": "a0fb3d5623f3a4f2de9f6574b21a150296588854c44af44ce1e7de8f041a3cea"
+    },
+    {
+      "path": "templates/practical-completion-defects.json",
+      "bytes": 669,
+      "sha256": "b4cde168e21bb9f728dd950778471d8ecc8bf8f46d47a91eb8666c21c81f3682"
+    },
+    {
+      "path": "templates/product-catalogue-item.json",
+      "bytes": 645,
+      "sha256": "24bd4615bfd8ffc86e974b7491a9b1912be4b7a3145123fc896e4f234fb25cad"
+    },
+    {
+      "path": "templates/property-onboarding.json",
+      "bytes": 651,
+      "sha256": "73cc35d3e62bdbcddd65293797ab2b1eb51e7ba827d7894893a4c6ba2b795b29"
+    },
+    {
+      "path": "templates/property-turnover-handover.json",
+      "bytes": 679,
+      "sha256": "1fcc57be3cca6e945e8bfb2fcc675dd5035e32425d71bdeb3c1c71366b3bc105"
+    },
+    {
+      "path": "templates/quote-builder.json",
+      "bytes": 446,
+      "sha256": "49a4a618aac7dd875dc82c59a314fc04cf148da11d96427e44f89e246e4b823f"
+    },
+    {
+      "path": "templates/recurring-service-agreement.json",
+      "bytes": 723,
+      "sha256": "5bea8010f492d17220ce6f1b72b4ecbb60e2566bc50e199dcf03eb9928e7c89d"
+    },
+    {
+      "path": "templates/refund-approval.json",
+      "bytes": 621,
+      "sha256": "a83c8b8951e9213176c6852ce66e2f0e58165b49d19152254d9111418663b7f4"
+    },
+    {
+      "path": "templates/return-request.json",
+      "bytes": 621,
+      "sha256": "6f9ea56aa756ac007c0e19a6efe0bfc9a1ce5ab949c65e07a2ec4662451c16c8"
+    },
+    {
+      "path": "templates/service-booking.json",
+      "bytes": 647,
+      "sha256": "8740bf9e9ee4d60e003a9773d638e4daf0334ec05b0279fa5936c51ac423f5b3"
+    },
+    {
+      "path": "templates/service-plan-review.json",
+      "bytes": 696,
+      "sha256": "79f6a00c84c5a81c82514ed8484a1c60f947faf66baec875f691ace8452e1e5d"
+    },
+    {
+      "path": "templates/site-variation.json",
+      "bytes": 619,
+      "sha256": "3b877941b23cdaad4c03edf7db19b3cdff9a119f122c38bf43a440ed288a8c68"
+    },
+    {
+      "path": "templates/staff-onboarding.json",
+      "bytes": 534,
+      "sha256": "84fc6e25478e31ae45d9491a86643b7a1f62c6d54c266fdf9aea5050da64bd38"
+    },
+    {
+      "path": "templates/stocktake-variance.json",
+      "bytes": 653,
+      "sha256": "894dd3f7dbf8403096b726d3a2763488b38341a860375bb5a9a7aae4664d0a92"
+    },
+    {
+      "path": "templates/store-stock-transfer.json",
+      "bytes": 642,
+      "sha256": "1aabd0e6c1ef9a9617f2a381dab1a32879955c0e9e7497341f70f51c59fcd1d9"
+    },
+    {
+      "path": "templates/supplier-receiving-discrepancy.json",
+      "bytes": 699,
+      "sha256": "83a91eb3d23f287b5d5d0eda393dc0a2a07890e5d9b00ff36c7cff88675fc372"
+    },
+    {
+      "path": "templates/supplier-replenishment.json",
+      "bytes": 669,
+      "sha256": "95fa6efed4c0c8bb04caf8a9626d85e32f7718cbd40abb6099c0c95330d2cbb9"
+    },
+    {
+      "path": "templates/wholesale-order.json",
+      "bytes": 641,
+      "sha256": "108d5c1e512f34b3e1111f699b9b21611c067ca2ce241a25a7edbff501976941"
+    },
+    {
+      "path": "tests/assurance_workflows_run.php",
+      "bytes": 13288,
+      "sha256": "0969f1a4280b88d9c58a2074f84302d593ac628bfc240396de17b369d8ed1e3c"
+    },
+    {
+      "path": "tests/commerce_vertical_workflows_run.php",
+      "bytes": 12662,
+      "sha256": "d772025fbbde214be81e21756ba61ee30c4c9d68650e41598c1b2cd144ad9e0d"
+    },
+    {
+      "path": "tests/localbrain_v2_run.php",
+      "bytes": 9052,
+      "sha256": "d0a4b63f3f3bf1eda78dcd64e6c1f4cfeac24ee12bdb9a0a25f141045dfd97fd"
+    },
+    {
+      "path": "tests/run.php",
+      "bytes": 28573,
+      "sha256": "99659581b164921fb244a97bcd710afdd45d9d15d1bd80daea37bc4dddfb7adc"
+    },
+    {
+      "path": "tests/template_catalogue_run.php",
+      "bytes": 11903,
+      "sha256": "22768d64e9ceb294deed6be3f7a3ed7ed2d2e885b18ce1fdab8b93ff4178de8b"
+    },
+    {
+      "path": "tests/ts/localbrain-v2.test.js",
+      "bytes": 3254,
+      "sha256": "ae5faa84fcb4d81d27de1a889838f7bae8c2bf25a2a6bf586eddd28b6920a570"
+    },
+    {
+      "path": "tests/ts/offline.test.js",
+      "bytes": 3437,
+      "sha256": "549c20cbf9091f60247293fcfb031b82729bce398f7bc07d82bf90b36d4f519f"
+    },
+    {
+      "path": "third_party/adaptive-persona-engine/LICENSE",
+      "bytes": 1056,
+      "sha256": "1126322e2cc8d165adc4c792eeb195717de2bcc7b39be1ce77959d78e87ef685"
+    },
+    {
+      "path": "third_party/adaptive-persona-engine/PROVENANCE.md",
+      "bytes": 715,
+      "sha256": "00d9a353ad9ec617af6585675ee595cf957a309f8b071ed310a0a5296d2f2a32"
+    },
+    {
+      "path": "tsconfig.json",
+      "bytes": 570,
+      "sha256": "48a3b2786d9a36fce9f8996b6c9f766f7f5eea1bf60a205e3efb9691967a74d6"
+    },
+    {
+      "path": "wizards/booking_intake.json",
+      "bytes": 3059,
+      "sha256": "0150db30ee133be7276f7f2e8262fe0901db009c1055468140b58415ccf3b902"
+    },
+    {
+      "path": "wizards/client_intake_consent.json",
+      "bytes": 3113,
+      "sha256": "38848568b64e6c2b685341508c30d09c53f2f410a3b2750b2e58c451307775d0"
+    },
+    {
+      "path": "wizards/complete_job.json",
+      "bytes": 1815,
+      "sha256": "3aa82172f10b18d4493983ddb58734140fb191d8a987e6795a97c90792eb0447"
+    },
+    {
+      "path": "wizards/create_invoice.json",
+      "bytes": 1868,
+      "sha256": "9b7b57e59a15f52741271c01097db0bbcea771d832c8875e385b5e73cd0e4313"
+    },
+    {
+      "path": "wizards/create_job.json",
+      "bytes": 1870,
+      "sha256": "0def76ad07054e59d212b7e18ef9e22c607467262c25ae222e9a5e71789df887"
+    },
+    {
+      "path": "wizards/create_quote.json",
+      "bytes": 2047,
+      "sha256": "82e2d9578b3200ca03bf7f226dcf800242946fb86a923effbdb1d685220d5b29"
+    },
+    {
+      "path": "wizards/customer_order_capture.json",
+      "bytes": 3783,
+      "sha256": "6bf0ec7bd0347cf78fa87172d26cfea17a4ae53f4f179d5d203c60e3810bf13b"
+    },
+    {
+      "path": "wizards/event_function_setup.json",
+      "bytes": 3273,
+      "sha256": "4f7e3fa82abb7663be554bd06bcc4024e9ab44f90540a3aed28922450fd07c56"
+    },
+    {
+      "path": "wizards/guest_issue_resolution.json",
+      "bytes": 3610,
+      "sha256": "b4cf5f7e93b91e589a2a1726acdbc1460d6647d39530ddcf6cf906831eed8cbd"
+    },
+    {
+      "path": "wizards/incident_response.json",
+      "bytes": 4487,
+      "sha256": "4ad96080ea6252d07962c15c39dc1ccdd3481de5faaa4ec662aa017fbb223deb"
+    },
+    {
+      "path": "wizards/inspection_corrective_action.json",
+      "bytes": 3908,
+      "sha256": "0fb713fa1f43568ec41dc5c413b975ad48aaaaefdebeaddf159fa34293542a41"
+    },
+    {
+      "path": "wizards/inventory_adjustment.json",
+      "bytes": 3951,
+      "sha256": "30de41a7941ddf4d695604b1146252a53446d4d2a52b0c72097dc4281c4575df"
+    },
+    {
+      "path": "wizards/job_variation_approval.json",
+      "bytes": 3529,
+      "sha256": "37944f465337543992ac5113ecea4d902bd45bf80fdafc342a213460745ad30d"
+    },
+    {
+      "path": "wizards/maintenance_request.json",
+      "bytes": 3277,
+      "sha256": "3be34691269a78dd6abbf99c358492b7b4b47772f17398c219bab7d2fad65450"
+    },
+    {
+      "path": "wizards/materials_request.json",
+      "bytes": 3171,
+      "sha256": "e28f10d1fd4eb5b82ce32a896a42d810ca824e5e5f8b0962334ab546bfda11ce"
+    },
+    {
+      "path": "wizards/new_customer.json",
+      "bytes": 2028,
+      "sha256": "e35649f84b802ea4761a625d91494b7073a02c838b75d7ce7f29fa027b0ba75b"
+    },
+    {
+      "path": "wizards/order_fulfilment.json",
+      "bytes": 3305,
+      "sha256": "3a7226dcc0d80ba861521a257e5744a8c7e80e764ac37ea3d9d788c20267cdae"
+    },
+    {
+      "path": "wizards/order_issue_resolution.json",
+      "bytes": 3852,
+      "sha256": "f5f238437925b513e8d5fe7a9ff10d9d80bac4fa1ac2cfa4c5205d373e58c3fa"
+    },
+    {
+      "path": "wizards/practical_completion_defects.json",
+      "bytes": 3461,
+      "sha256": "721b65986b0a48c1e88e50cddaafd475ad56a642990ea3fe168c91a3fae09375"
+    },
+    {
+      "path": "wizards/product_catalogue_item.json",
+      "bytes": 4056,
+      "sha256": "c4400b4bd9c1b56d5b198b9be82c3d656d1249bcda38222fea3fe8a6b76996ca"
+    },
+    {
+      "path": "wizards/property_onboarding.json",
+      "bytes": 3113,
+      "sha256": "27253bd2c5e55bb8a6d8e533c4dafe2a216d837d5beefe1009754f2d77efb467"
+    },
+    {
+      "path": "wizards/property_turnover_handover.json",
+      "bytes": 3511,
+      "sha256": "8731b44ab918fc51e579d70e016e9faa82981dae18082a5859fdd5f5a92fa5ea"
+    },
+    {
+      "path": "wizards/refund_approval.json",
+      "bytes": 3762,
+      "sha256": "ac6984f2c3733efdcc5e451ff5181fe3ac677e40083d4e4ddc6d5c540f278b5f"
+    },
+    {
+      "path": "wizards/return_request.json",
+      "bytes": 3016,
+      "sha256": "586c320d007c9c918c0362f6e96c852eb542b86456ad29f646dd613ed81842c3"
+    },
+    {
+      "path": "wizards/service_booking.json",
+      "bytes": 2997,
+      "sha256": "fec332fcb27f8cd7ac787588e5a0af83ba63363bef67142beba2e827f7aab0bd"
+    },
+    {
+      "path": "wizards/site_variation.json",
+      "bytes": 3460,
+      "sha256": "7b81ede4d42a0a7f4606bf24184acda5ca7bf1e1e68a2f53a0228cb374650501"
+    },
+    {
+      "path": "wizards/stocktake_variance.json",
+      "bytes": 3910,
+      "sha256": "d30c4f424444f4b012064416fce2e1f196c4fd1adc9ff94d7a0bed7a19826f9b"
+    },
+    {
+      "path": "wizards/store_stock_transfer.json",
+      "bytes": 3370,
+      "sha256": "44f63442135ffa8772176f9db1d431cb934015e2a94e61caf83fadd9375d2f5e"
+    },
+    {
+      "path": "wizards/supplier_receiving_discrepancy.json",
+      "bytes": 3461,
+      "sha256": "017e9438936aae34b7df53e5acfd668fdac30c18c1a30300a4fdf7d919f315f3"
+    }
+  ]
+}

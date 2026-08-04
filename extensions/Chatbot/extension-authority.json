@@ -1,0 +1,26 @@
+{
+    "schema_version": "1.0.0",
+    "slug": "chatbot",
+    "authoritative": true,
+    "bootable": true,
+    "root": "app/Extensions/Chatbot",
+    "provider": "App\\Extensions\\Chatbot\\System\\ChatbotServiceProvider",
+    "owns": [
+        "chatbot routes",
+        "chatbot migrations",
+        "chatbot views",
+        "chatbot assets",
+        "chatbot policies",
+        "chatbot PWA",
+        "Titan AI chatbot adapter",
+        "WorkCore chatbot bridge"
+    ],
+    "legacy_snapshots": [
+        {
+            "root": "app/Extensions/TitanZeroChatbot",
+            "bootable": false,
+            "provider": null,
+            "disposition": "retained temporarily for compatibility comparison; scheduled for removal after migration validation"
+        }
+    ]
+}

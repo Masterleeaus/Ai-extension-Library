@@ -2,22 +2,28 @@
   'use strict';
 
   const APP_PROFILES = {
-    'titan-zero': { headline: 'Business briefing', recordTypes: ['work_order','invoice','approval','lead'], actions: ['Review operations','Open approvals','Switch app'], empty: 'No urgent cross-app issues are stored on this device.' },
-    'titan-go': { headline: 'Today in the field', recordTypes: ['job_pack','work_order','job'], actions: ['Open next job','Capture evidence','Sync now'], empty: 'No assigned jobs are downloaded yet.' },
-    'titan-hub': { headline: 'Your services', recordTypes: ['booking','quote','invoice'], actions: ['Book service','Request quote','View payments'], empty: 'No bookings or account records are available offline.' },
-    'titan-dispatch': { headline: 'Live operations', recordTypes: ['work_order','appointment','worker'], actions: ['Review unassigned','Open schedule','Show exceptions'], empty: 'No dispatch records are stored locally.' },
-    'titan-money': { headline: 'Money requiring attention', recordTypes: ['invoice','payment','expense'], actions: ['Create invoice','Review overdue','Add expense'], empty: 'No finance projections are stored on this device.' },
-    'titan-teams': { headline: 'Team coverage', recordTypes: ['worker','roster','attendance'], actions: ['Open roster','Review attendance','View requests'], empty: 'No workforce projections are available offline.' },
-    'titan-analytics': { headline: 'Operational briefing', recordTypes: ['metric','report','insight'], actions: ['Open performance','Compare trends','Build report'], empty: 'Analytics are available after the first WorkCore sync.' },
-    'titan-front-desk': { headline: 'Customer waiting room', recordTypes: ['conversation','booking','follow_up'], actions: ['Open inbox','Create booking','Review follow-ups'], empty: 'No enquiries are stored locally.' },
-    'titan-marketing': { headline: 'Campaign workspace', recordTypes: ['campaign','content','audience'], actions: ['Create campaign','Open calendar','Review results'], empty: 'No campaign records are available offline.' },
-    'titan-social': { headline: 'Publishing workspace', recordTypes: ['social_post','content','engagement'], actions: ['Create post','Open calendar','Review engagement'], empty: 'No social records are stored locally.' },
-    'titan-sprout': { headline: 'Sales pipeline', recordTypes: ['lead','opportunity','activity'], actions: ['Add lead','Review hot leads','Open pipeline'], empty: 'No lead projections are stored locally.' },
-    'titan-locker': { headline: 'Stock and equipment', recordTypes: ['inventory_item','asset','maintenance'], actions: ['Scan item','Review low stock','Open maintenance'], empty: 'No inventory or asset records are downloaded.' },
-    'titan-office': { headline: 'Office work', recordTypes: ['document','time_entry','resource_booking'], actions: ['Create document','Log time','Find resources'], empty: 'No office records are available offline.' },
-    'titan-quality': { headline: 'Quality and compliance', recordTypes: ['inspection','incident','compliance_record'], actions: ['Start inspection','Report incident','Review compliance'], empty: 'No inspection or compliance records are downloaded.' }
+    'titan-zero': { headline: 'Business briefing', recordTypes: ['work_order','invoice','approval','lead'], actions: ['Review operations','Open approvals','Switch app'], empty: 'No urgent cross-application issues are stored on this device.' },
+    'titan-go': { headline: 'Today in the field', recordTypes: ['job_pack','work_order','job','appointment'], actions: ['Open next job','Review dispatch','Sync now'], empty: 'No assigned jobs or dispatch records are downloaded yet.' },
+    'titan-launch': { headline: 'Launch and growth workspace', recordTypes: ['launch_plan','vertical_blueprint','campaign','opportunity'], actions: ['Open launchpad','Build vertical','Review growth'], empty: 'No launch plans or growth records are stored on this device.' },
+    'titan-desk': { headline: 'Business communications', recordTypes: ['conversation','lead','booking_request','quote_request','follow_up'], actions: ['Open inbox','Qualify enquiry','Review follow-ups'], empty: 'No enquiries or communication records are stored locally.' },
+    'titan-hub': { headline: 'Your services', recordTypes: ['booking','quote','invoice','service_history'], actions: ['Book service','Request quote','View payments'], empty: 'No bookings or account records are available offline.' }
   };
 
+  const LEGACY_APPLICATIONS = {
+    'titan-dispatch': 'titan-go',
+    'titan-front-desk': 'titan-desk',
+    'titan-sprout': 'titan-launch',
+    'titan-marketing': 'titan-launch',
+    'titan-social': 'titan-launch',
+    'titan-money': 'titan-zero',
+    'titan-teams': 'titan-zero',
+    'titan-analytics': 'titan-zero',
+    'titan-locker': 'titan-zero',
+    'titan-office': 'titan-zero',
+    'titan-quality': 'titan-zero'
+  };
+
+  const canonicalApplication = slug => LEGACY_APPLICATIONS[slug] || slug;
   const safeText = (value, fallback = '') => {
     const text = value == null ? '' : String(value);
     return text.trim() || fallback;
@@ -43,7 +49,8 @@
     constructor(element) {
       this.element = element;
       try { this.schema = JSON.parse(element.dataset.schema || '{}'); } catch (_) { this.schema = {}; }
-      this.template = element.dataset.template || this.schema?.identity?.slug || 'generic';
+      const requestedTemplate = element.dataset.template || this.schema?.identity?.slug || 'titan-zero';
+      this.template = canonicalApplication(requestedTemplate);
       this.view = this.schema?.navigation?.default_view || 'home';
       this.profile = APP_PROFILES[this.template] || APP_PROFILES['titan-zero'];
       this.records = [];
@@ -54,7 +61,7 @@
 
     bind() {
       window.addEventListener('titan:navigate', event => {
-        if (event.detail?.template && event.detail.template !== this.template) return;
+        if (event.detail?.template && canonicalApplication(event.detail.template) !== this.template) return;
         this.view = event.detail?.view || this.view;
         this.refresh();
       });
@@ -159,20 +166,20 @@
       }
       if (action.startsWith('prompt:')) {
         const prompt = action.slice(7);
-        window.dispatchEvent(new CustomEvent('titan:prompt-requested', { detail: { prompt, template: this.template, view: this.view } }));
+        window.dispatchEvent(new CustomEvent('titan:prompt-requested', { detail: { prompt, application: this.template, template: this.template, view: this.view } }));
         const message = document.querySelector('[x-ref="message"]');
         if (message) { message.value = prompt; message.dispatchEvent(new Event('input', { bubbles: true })); message.focus(); }
         return;
       }
       if (/capture|scan|incident/i.test(action)) {
-        window.dispatchEvent(new CustomEvent('workcore:open-field-workspace', { detail: { action, template: this.template } }));
+        window.dispatchEvent(new CustomEvent('workcore:open-field-workspace', { detail: { action, application: this.template, template: this.template } }));
       }
-      window.dispatchEvent(new CustomEvent('titan:operational-action', { detail: { action, template: this.template, view: this.view, authority: 'proposal-only' } }));
+      window.dispatchEvent(new CustomEvent('titan:operational-action', { detail: { action, application: this.template, template: this.template, view: this.view, authority: 'proposal-only' } }));
     }
 
     openRecord(id) {
       const record = this.records.find(row => String(row.id ?? row.resource_id ?? row.key) === String(id));
-      window.dispatchEvent(new CustomEvent('titan:record-opened', { detail: { template: this.template, view: this.view, id, record, authority: 'local-projection' } }));
+      window.dispatchEvent(new CustomEvent('titan:record-opened', { detail: { application: this.template, template: this.template, view: this.view, id, record, authority: 'local-projection' } }));
     }
   }
 
@@ -180,5 +187,5 @@
     if (!el.__titanWorkspace) el.__titanWorkspace = new TitanOperationalWorkspace(el);
   });
   document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', boot) : boot();
-  window.TitanOperationalScreens = { APP_PROFILES, boot, escapeHtml, safeDataValue };
+  window.TitanOperationalScreens = { APP_PROFILES, LEGACY_APPLICATIONS, canonicalApplication, boot, escapeHtml, safeDataValue };
 })();
