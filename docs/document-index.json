@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-08-03",
+  "repository": "Masterleeaus/Documents",
+  "source_branch": "main",
+  "source_commit": "ca90081cb999b5cd89ff41af28aa4019c92568e3",
+  "scan_method": "full-text sequential read to end of file",
+  "document_count": 31,
+  "documents": [
+    {"path":"workcore/README.md","category":"navigation","conversation_relevance":"low","tags":["index","scope"]},
+    {"path":"workcore/business-app-idea-generation-process.md","category":"process","conversation_relevance":"supporting","tags":["research","indexing"]},
+    {"path":"workcore/workcore-business-app-ideas.md","category":"portfolio","conversation_relevance":"primary","tags":["customer-hub","communications-engine"]},
+    {"path":"workcore/titan-inspect-deep-design.md","category":"deep-design","conversation_relevance":"supporting","tags":["inspection","evidence"]},
+    {"path":"workcore/titan-pricebook-deep-design.md","category":"deep-design","conversation_relevance":"low","tags":["pricing","rules"]},
+    {"path":"workcore/titan-quotes-deep-design.md","category":"deep-design","conversation_relevance":"primary","tags":["quotes","domain-conversation"]},
+    {"path":"workcore/titan-academy-deep-design.md","category":"deep-design","conversation_relevance":"supporting","tags":["training","assessment"]},
+    {"path":"workcore/titan-configurator-deep-design.md","category":"deep-design","conversation_relevance":"supporting","tags":["visual","comments"]},
+    {"path":"workcore/ai-engine-radical-business-app-ideas-v1.md","category":"engine-catalogue","conversation_relevance":"supporting","tags":["realtime","multimodal"]},
+    {"path":"workcore/ai-engine-combinations-v2.md","category":"engine-catalogue","conversation_relevance":"supporting","tags":["agents","systems"]},
+    {"path":"workcore/ai-engine-micro-apps-v3.md","category":"engine-catalogue","conversation_relevance":"supporting","tags":["voice","guided-capture"]},
+    {"path":"workcore/ai-engine-enterprise-systems-v4.md","category":"engine-catalogue","conversation_relevance":"supporting","tags":["enterprise","governance"]},
+    {"path":"workcore/ai-engine-marketplaces-v5.md","category":"engine-catalogue","conversation_relevance":"low","tags":["marketplaces","trust"]},
+    {"path":"workcore/ai-engine-verticals-v6.md","category":"engine-catalogue","conversation_relevance":"supporting","tags":["verticals","field-service"]},
+    {"path":"workcore/reports/2026-08-02-titan-zero-base-app-system-extensions-deep-scan.md","category":"extension-scan","conversation_relevance":"supporting","tags":["realtime-voice","providers"]},
+    {"path":"workcore/reports/2026-08-02-titan-zero-creative-extensions-deep-scan.md","category":"extension-scan","conversation_relevance":"low","tags":["media","vision"]},
+    {"path":"workcore/reports/2026-08-02-titan-zero-aichatpro-chatbot-agents-deep-scan.md","category":"extension-scan","conversation_relevance":"primary","tags":["aichatpro","chatbot","agents","memory"]},
+    {"path":"workcore/2026-08-02-magicai-11-operations-hooks-and-menu-integration.md","category":"integration-reference","conversation_relevance":"primary","tags":["operations-assistant","action-cards"]},
+    {"path":"workcore/magicai-integration/01-magicai-complete-system-inventory.md","category":"integration-scan","conversation_relevance":"primary","tags":["chat","realtime","host"]},
+    {"path":"workcore/magicai-integration/02-magicai-bootstrap-and-runtime-architecture.md","category":"integration-scan","conversation_relevance":"supporting","tags":["runtime","queues"]},
+    {"path":"workcore/magicai-integration/03-magicai-extension-marketplace-runtime.md","category":"integration-scan","conversation_relevance":"low","tags":["installer","extensions"]},
+    {"path":"workcore/magicai-integration/04-magicai-menu-navigation-and-dashboard-hooks.md","category":"integration-scan","conversation_relevance":"supporting","tags":["menus","dashboard"]},
+    {"path":"workcore/magicai-integration/05-magicai-authentication-and-user-identity.md","category":"integration-scan","conversation_relevance":"foundational","tags":["identity","actors","devices"]},
+    {"path":"workcore/magicai-integration/06-magicai-teams-companies-and-tenancy.md","category":"integration-scan","conversation_relevance":"foundational","tags":["tenancy","company"]},
+    {"path":"workcore/magicai-integration/07-magicai-roles-permissions-and-access-control.md","category":"integration-scan","conversation_relevance":"foundational","tags":["permissions","approvals"]},
+    {"path":"workcore/magicai-integration/08-magicai-plans-subscriptions-credits-and-billing.md","category":"integration-scan","conversation_relevance":"supporting","tags":["plans","credits"]},
+    {"path":"workcore/magicai-integration/09-magicai-crm-host-contract.md","category":"integration-scan","conversation_relevance":"primary","tags":["crm-assistant","chat-security","typed-context"]},
+    {"path":"workcore/magicai-integration/11-magicai-sales-estimates-invoices-and-payments.md","category":"integration-scan","conversation_relevance":"supporting","tags":["sales","finance"]},
+    {"path":"workcore/magicai-integration/12-magicai-workcore-native-extension-reconciliation-rescan.md","category":"reconciliation-scan","conversation_relevance":"supporting","tags":["current-status","native-extensions"]},
+    {"path":"workcore/magicai-integration/12-magicai-customer-lifecycle-and-workcore-conversion.md","category":"integration-scan","conversation_relevance":"primary","tags":["capture","consent","correlation","lifecycle"]},
+    {"path":"workcore/magicai-integration/13-magicai-ai-providers-and-model-routing.md","category":"integration-scan","conversation_relevance":"foundational","tags":["model-routing","privacy","credentials","usage"]}
+  ],
+  "topics": {
+    "conversation_and_assistants": [
+      "workcore/reports/2026-08-02-titan-zero-aichatpro-chatbot-agents-deep-scan.md",
+      "workcore/magicai-integration/09-magicai-crm-host-contract.md",
+      "workcore/magicai-integration/12-magicai-customer-lifecycle-and-workcore-conversion.md",
+      "workcore/workcore-business-app-ideas.md",
+      "workcore/titan-quotes-deep-design.md",
+      "workcore/2026-08-02-magicai-11-operations-hooks-and-menu-integration.md",
+      "workcore/magicai-integration/01-magicai-complete-system-inventory.md"
+    ],
+    "identity_tenancy_permissions": [
+      "workcore/magicai-integration/05-magicai-authentication-and-user-identity.md",
+      "workcore/magicai-integration/06-magicai-teams-companies-and-tenancy.md",
+      "workcore/magicai-integration/07-magicai-roles-permissions-and-access-control.md",
+      "workcore/magicai-integration/12-magicai-workcore-native-extension-reconciliation-rescan.md"
+    ],
+    "model_routing_and_execution": [
+      "workcore/magicai-integration/13-magicai-ai-providers-and-model-routing.md",
+      "workcore/magicai-integration/08-magicai-plans-subscriptions-credits-and-billing.md",
+      "workcore/magicai-integration/07-magicai-roles-permissions-and-access-control.md"
+    ],
+    "crm_and_customer_lifecycle": [
+      "workcore/magicai-integration/09-magicai-crm-host-contract.md",
+      "workcore/magicai-integration/11-magicai-sales-estimates-invoices-and-payments.md",
+      "workcore/magicai-integration/12-magicai-customer-lifecycle-and-workcore-conversion.md"
+    ]
+  },
+  "conversation_engine": {
+    "standalone_complete_design_found": false,
+    "corpus_map": "workcore/conversation-engine-corpus-map.md",
+    "recommended_future_design": "workcore/titan-conversation-engine-deep-design.md",
+    "strongest_original_source": "workcore/reports/2026-08-02-titan-zero-aichatpro-chatbot-agents-deep-scan.md",
+    "chat_security_source": "workcore/magicai-integration/09-magicai-crm-host-contract.md",
+    "capture_consent_source": "workcore/magicai-integration/12-magicai-customer-lifecycle-and-workcore-conversion.md",
+    "model_policy_source": "workcore/magicai-integration/13-magicai-ai-providers-and-model-routing.md",
+    "current_status_source": "workcore/magicai-integration/12-magicai-workcore-native-extension-reconciliation-rescan.md",
+    "primary_gaps": [
+      "canonical cross-surface conversation model",
+      "ownership-aware chat resolver",
+      "AIChatPro-to-Agent bridge",
+      "typed assistant context registry",
+      "unified participant, contact-point and channel identity",
+      "source-conversation and correlation contract",
+      "purpose-specific consent and suppression",
+      "scoped memory and Connector Vault",
+      "unified handoff/case/delivery semantics",
+      "verified approval linkage",
+      "stateless policy-governed model execution",
+      "offline reconciliation, retention, correction and legal hold",
+      "first-class menus, plan projection, safe confirmation and fail-closed tenancy"
+    ]
+  },
+  "notes": [
+    "Two documents use scan number 12; repository path is the stable identifier.",
+    "Historical scans remain evidence; the reconciliation scan is authoritative for current implementation status."
+  ]
+}
