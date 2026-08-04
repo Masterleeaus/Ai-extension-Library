@@ -12,13 +12,18 @@ class ChatbotOfflineIntegration
 {
     protected LocalBrain $localBrain;
     protected OfflineMemoryOptimizer $memoryOptimizer;
+    protected OnlineOfflineSwitcher $switcher;
     protected const MEMORY_TABLE = 'local_intelligence_memories';
     protected const SYNC_QUEUE_TABLE = 'ext_chatbot_sync_operations';
 
-    public function __construct(LocalBrain $localBrain, OfflineMemoryOptimizer $memoryOptimizer)
-    {
+    public function __construct(
+        LocalBrain $localBrain,
+        OfflineMemoryOptimizer $memoryOptimizer,
+        OnlineOfflineSwitcher $switcher
+    ) {
         $this->localBrain = $localBrain;
         $this->memoryOptimizer = $memoryOptimizer;
+        $this->switcher = $switcher;
     }
 
     public function processMessageOffline(
@@ -41,17 +46,19 @@ class ChatbotOfflineIntegration
         // Get relevant memories - automatically pruned and optimized
         $relevantMemories = $this->getOptimizedMemories($tenantId, $user->getAuthIdentifier(), $conversationId);
 
-        $localBrainContext = [
+        $contextData = [
             'tenant_id' => $tenantId,
             'user_id' => $user->getAuthIdentifier(),
             'conversation_id' => $conversationId,
             'subject_id' => $context['subject_id'] ?? null,
         ];
 
-        // Process through LocalBrain
-        $result = $this->localBrain->process(
-            input: $message,
-            context: $localBrainContext
+        // Use best available AI: Cloud when online, LocalBrain when offline
+        $result = $this->switcher->processMessageIntelligent(
+            message: $message,
+            context: $contextData,
+            userId: $user->getAuthIdentifier(),
+            tenantId: $tenantId
         );
 
         // Queue for sync
