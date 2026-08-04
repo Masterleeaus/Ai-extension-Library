@@ -162,6 +162,10 @@ class PhoneCallAgentServiceProvider extends ServiceProvider implements Uninstall
 
     public static function uninstall(): void
     {
-        // TODO: Implement uninstall() method.
+        $path = public_path("vendor/phonecallagent");
+        if (is_dir($path)) {
+            array_map(static fn ($f) => @unlink($f), glob("$path/*.*"));
+            @rmdir($path);
+        }
     }
 }

@@ -253,6 +253,10 @@ class MarketingBotServiceProvider extends ServiceProvider implements UninstallEx
 
     public static function uninstall(): void
     {
-        // TODO: Implement uninstall() method.
+        $path = public_path('vendor/marketing-bot');
+        if (is_dir($path)) {
+            array_map(static fn ($f) => @unlink($f), glob("$path/*.*"));
+            @rmdir($path);
+        }
     }
 }
