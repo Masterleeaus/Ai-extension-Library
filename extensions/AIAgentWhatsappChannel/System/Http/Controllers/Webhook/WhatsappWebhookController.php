@@ -8,6 +8,8 @@ use App\Extensions\AIAgent\System\Connectors\IncomingMessageHandler;
 use App\Extensions\AIAgent\System\Connectors\ValueObjects\IncomingMessage;
 use App\Extensions\AIAgent\System\Enums\ChannelEnum;
 use App\Extensions\AIAgent\System\Models\AIAgentChannel;
+use App\Extensions\AIAgentWhatsappChannel\System\Media\Contracts\MediaQuarantineContract;
+use App\Extensions\AIAgentWhatsappChannel\System\Media\Exceptions\MediaQuarantineException;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -18,15 +20,20 @@ use Throwable;
 class WhatsappWebhookController extends Controller
 {
     private const GRAPH_API_URL = 'https://graph.facebook.com/v20.0';
+    private const WEBHOOK_SIGNATURE_HEADER = 'X-Hub-Signature-256';
+    private const MAX_MEDIA_SIZE = 50 * 1024 * 1024; // 50 MB
 
     /** Supported media types and their default MIME types */
     private const MEDIA_TYPES = [
         'image'    => 'image/jpeg',
         'sticker'  => 'image/webp',
-        'document' => 'application/octet-stream',
+        'document' => 'application/pdf',
     ];
 
-    public function __construct(private readonly IncomingMessageHandler $handler) {}
+    public function __construct(
+        private readonly IncomingMessageHandler $handler,
+        private readonly MediaQuarantineContract $quarantine,
+    ) {}
 
     /**
      * Meta webhook verification (GET).
@@ -56,16 +63,27 @@ class WhatsappWebhookController extends Controller
      * Incoming WhatsApp message (POST).
      * Meta Cloud API payload structure:
      * entry[].changes[].value.messages[].{from, type, text.body, image, document, sticker}
+     *
+     * Security: Webhook signature verification, media quarantine, and tenant isolation enforced.
      */
     public function handle(int $channel, Request $request): array
     {
         $aiAgentChannel = AIAgentChannel::query()->find($channel);
 
         if ($aiAgentChannel === null) {
+            Log::warning('[AIAgentWhatsappChannel] Channel not found', ['channel' => $channel]);
+            return ['ok' => false];
+        }
+
+        // Verify webhook signature before processing
+        $webhookSecret = $aiAgentChannel->getCredential('whatsapp_webhook_secret');
+        if ($webhookSecret && !$this->verifyWebhookSignature($request, $webhookSecret)) {
+            Log::warning('[AIAgentWhatsappChannel] Webhook signature verification failed', ['channel' => $channel]);
             return ['ok' => false];
         }
 
         $accessToken = $aiAgentChannel->getCredential('whatsapp_access_token');
+        $tenantId = $aiAgentChannel->company_id ?? 0;
         $entries = $request->input('entry', []);
 
         foreach ($entries as $entry) {
@@ -86,7 +104,12 @@ class WhatsappWebhookController extends Controller
                     } elseif (isset(self::MEDIA_TYPES[$type]) && $accessToken) {
                         $mediaData = $messageData[$type] ?? [];
                         $text = (string) ($mediaData['caption'] ?? '');
-                        $attachment = $this->downloadWhatsappMedia($accessToken, $mediaData, $type);
+                        $attachment = $this->downloadAndQuarantineMedia(
+                            accessToken: $accessToken,
+                            mediaData: $mediaData,
+                            mediaType: $type,
+                            tenantId: $tenantId,
+                        );
 
                         if ($attachment !== null) {
                             $attachments[] = $attachment;
@@ -102,7 +125,7 @@ class WhatsappWebhookController extends Controller
                         senderId: $senderId,
                         text: $text,
                         attachments: $attachments,
-                        rawPayload: $request->all(),
+                        rawPayload: [], // Don't pass raw payload to avoid leaking tokens
                     );
 
                     $this->handler->handle($incomingMessage, $aiAgentChannel);
@@ -114,16 +137,17 @@ class WhatsappWebhookController extends Controller
     }
 
     /**
-     * Download a WhatsApp media file via the Meta Graph API and return it as a base64 attachment.
-     * Step 1: GET /{media_id} → retrieve the temporary download URL.
-     * Step 2: GET that URL → download the binary content.
+     * Download WhatsApp media via Meta Graph API and quarantine it securely.
+     * Returns only attachment metadata, never base64 content.
      *
      * @param  array<string, mixed>  $mediaData
-     *
-     * @return array{type: string, mime_type: string, base64: string, filename: string}|null
      */
-    private function downloadWhatsappMedia(string $accessToken, array $mediaData, string $messageType): ?array
-    {
+    private function downloadAndQuarantineMedia(
+        string $accessToken,
+        array $mediaData,
+        string $mediaType,
+        int $tenantId,
+    ): ?array {
         $mediaId = $mediaData['id'] ?? null;
 
         if (empty($mediaId)) {
@@ -131,68 +155,100 @@ class WhatsappWebhookController extends Controller
         }
 
         try {
-            // Step 1: resolve the temporary download URL
+            // Step 1: Resolve the temporary download URL
             $metaResponse = Http::withToken($accessToken)
                 ->timeout(10)
                 ->get(self::GRAPH_API_URL . "/{$mediaId}");
 
             if ($metaResponse->failed()) {
-                Log::warning('[AIAgentWhatsappChannel] Failed to resolve media URL', ['media_id' => $mediaId]);
-
+                Log::warning('[AIAgentWhatsappChannel] Failed to resolve media URL', [
+                    'media_id' => $mediaId,
+                    'tenant_id' => $tenantId,
+                ]);
                 return null;
             }
 
             $downloadUrl = $metaResponse->json('url');
-
             if (empty($downloadUrl)) {
                 return null;
             }
 
-            // Step 2: download the file content
+            // Step 2: Download file content with size check
             $fileResponse = Http::withToken($accessToken)
                 ->timeout(30)
                 ->get($downloadUrl);
 
             if ($fileResponse->failed()) {
-                Log::warning('[AIAgentWhatsappChannel] Failed to download media', ['media_id' => $mediaId]);
-
+                Log::warning('[AIAgentWhatsappChannel] Failed to download media', [
+                    'media_id' => $mediaId,
+                    'tenant_id' => $tenantId,
+                ]);
                 return null;
             }
 
-            $mimeType = $mediaData['mime_type']
+            $mediaContent = $fileResponse->body();
+            if (strlen($mediaContent) > self::MAX_MEDIA_SIZE) {
+                Log::warning('[AIAgentWhatsappChannel] Media exceeds size limit', [
+                    'media_id' => $mediaId,
+                    'size' => strlen($mediaContent),
+                    'tenant_id' => $tenantId,
+                ]);
+                return null;
+            }
+
+            // Step 3: Determine MIME type
+            $declaredMimeType = $mediaData['mime_type']
                 ?? $metaResponse->json('mime_type')
-                ?? self::MEDIA_TYPES[$messageType]
+                ?? self::MEDIA_TYPES[$mediaType]
                 ?? 'application/octet-stream';
 
-            $filename = $mediaData['filename'] ?? ($mediaId . '.' . $this->extensionFromMime($mimeType));
+            // Step 4: Quarantine media (validates magic bytes, stores securely)
+            $quarantined = $this->quarantine->quarantine(
+                tenantId: $tenantId,
+                sourceMediaId: $mediaId,
+                mediaContent: $mediaContent,
+                declaredMimeType: $declaredMimeType,
+                filename: $mediaData['filename'] ?? null,
+            );
 
-            // Only forward images and PDFs; skip unsupported types
-            if (! str_starts_with($mimeType, 'image/') && $mimeType !== 'application/pdf') {
-                return null;
-            }
-
+            // Step 5: Return attachment metadata only (not base64!)
             return [
-                'type'      => str_starts_with($mimeType, 'image/') ? 'image' : 'document',
-                'mime_type' => $mimeType,
-                'base64'    => base64_encode($fileResponse->body()),
-                'filename'  => $filename,
+                'type'          => str_starts_with($quarantined->detectedMimeType, 'image/') ? 'image' : 'document',
+                'attachment_id' => $quarantined->attachmentId,
+                'mime_type'     => $quarantined->detectedMimeType,
+                'size'          => $quarantined->byteSize,
+                'filename'      => $quarantined->filename,
             ];
+        } catch (MediaQuarantineException $e) {
+            Log::warning('[AIAgentWhatsappChannel] Media quarantine failed', [
+                'media_id' => $mediaId,
+                'tenant_id' => $tenantId,
+                'error' => $e->getMessage(),
+            ]);
+            return null;
         } catch (Throwable $e) {
-            Log::warning('[AIAgentWhatsappChannel] Media download exception', ['media_id' => $mediaId, 'error' => $e->getMessage()]);
-
+            Log::error('[AIAgentWhatsappChannel] Media processing exception', [
+                'media_id' => $mediaId,
+                'tenant_id' => $tenantId,
+                'error' => $e->getMessage(),
+            ]);
             return null;
         }
     }
 
-    private function extensionFromMime(string $mimeType): string
+    /**
+     * Verify Meta webhook signature to prevent replay attacks.
+     */
+    private function verifyWebhookSignature(Request $request, string $webhookSecret): bool
     {
-        return match ($mimeType) {
-            'image/jpeg'      => 'jpg',
-            'image/png'       => 'png',
-            'image/gif'       => 'gif',
-            'image/webp'      => 'webp',
-            'application/pdf' => 'pdf',
-            default           => 'bin',
-        };
+        $signature = $request->header(self::WEBHOOK_SIGNATURE_HEADER);
+        if (empty($signature)) {
+            return false;
+        }
+
+        $payload = $request->getContent();
+        $expected = 'sha256=' . hash_hmac('sha256', $payload, $webhookSecret);
+
+        return hash_equals($expected, $signature);
     }
 }
