@@ -1,14 +1,14 @@
 {
-  "name": "Titan Sprout",
-  "slug": "titan-sprout",
-  "type": "lead-management",
+  "name": "Titan Nova",
+  "slug": "titan-nova",
+  "type": "hr-recruitment",
   "version": "1.0.0",
-  "description": "Lead generation, scoring, qualification, and conversion management",
-  "icon": "🌱",
-  "color": "#10b981",
+  "description": "HR and recruitment management, talent acquisition, and employee lifecycle",
+  "icon": "⭐",
+  "color": "#8b5cf6",
   "theme": {
-    "primary": "#10b981",
-    "gradient": "linear-gradient(135deg, #10b981, #059669)"
+    "primary": "#8b5cf6",
+    "gradient": "linear-gradient(135deg, #8b5cf6, #7c3aed)"
   },
   "wizard_steps": [
     "Configure",

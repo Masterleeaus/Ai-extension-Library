@@ -1,14 +1,14 @@
 {
-  "name": "Titan Quality",
-  "slug": "titan-quality",
-  "type": "quality-compliance",
-  "version": "1.0.0",
-  "description": "Quality management, compliance tracking, audits, feedback collection, and surveys",
-  "icon": "✅",
-  "color": "#f59e0b",
+  "name": "Titan Professional",
+  "slug": "titan-professional",
+  "type": "quality-compliance-analytics",
+  "version": "2.0.0",
+  "description": "Quality management, compliance tracking, advanced analytics, and performance auditing",
+  "icon": "🎖️",
+  "color": "#7c3aed",
   "theme": {
-    "primary": "#f59e0b",
-    "gradient": "linear-gradient(135deg, #f59e0b, #d97706)"
+    "primary": "#7c3aed",
+    "gradient": "linear-gradient(135deg, #7c3aed, #6d28d9)"
   },
   "wizard_steps": [
     "Configure",
@@ -36,12 +36,17 @@
     "sentiment-analysis",
     "review-management",
     "feedback-analytics",
+    "performance-analytics",
+    "kpi-dashboards",
+    "trend-analysis",
+    "predictive-insights",
+    "benchmarking",
     "chatbot"
   ],
   "chatbot": {
-    "name": "Titan Quality Assistant",
-    "role": "Quality, compliance, and customer satisfaction management",
-    "system_prompt": "You are a quality and compliance assistant. Your role is to:\n- Track regulatory compliance requirements\n- Maintain audit trails of all activities\n- Create and manage inspection checklists\n- Manage certifications and their renewal dates\n- Alert on compliance violations\n- Document incidents with full context\n- Collect customer feedback and surveys\n- Calculate NPS and satisfaction scores\n- Analyze sentiment from customer feedback\n- Manage online reviews and reputation\n- Generate quality reports\n\nPrioritize compliance, safety, and customer satisfaction.",
+    "name": "Titan Professional Excellence Assistant",
+    "role": "Quality, compliance, performance analytics, and advanced reporting",
+    "system_prompt": "You are a professional excellence assistant supporting quality, compliance, and advanced analytics. Your role is to:\n- Track regulatory compliance requirements and enforcement\n- Maintain comprehensive audit trails with analytics\n- Create and manage inspection checklists and results analysis\n- Manage certifications, renewals, and competency tracking\n- Alert on compliance violations and risk trends\n- Document incidents with predictive insights\n- Collect and analyze customer feedback with sentiment analytics\n- Calculate advanced KPIs, NPS, and satisfaction scores\n- Analyze performance trends and generate actionable insights\n- Perform data-driven audits and compliance assessments\n- Manage online reviews with reputation analytics\n- Generate advanced quality and compliance reports\n- Identify improvement opportunities through analytics\n\nPrioritize excellence, compliance, and continuous improvement through data-driven decision making.",
     "suggested_prompts": [
       "Check compliance status",
       "Create inspection",
@@ -50,7 +55,11 @@
       "Send survey",
       "Check NPS score",
       "Analyze feedback",
-      "View quality report"
+      "View quality report",
+      "Generate performance dashboard",
+      "Identify trends and patterns",
+      "Compare against benchmarks",
+      "Predict compliance risks"
     ]
   },
   "tier1_manager": "QualitySafetyManager",

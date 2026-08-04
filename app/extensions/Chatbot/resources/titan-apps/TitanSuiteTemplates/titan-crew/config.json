@@ -1,0 +1,13 @@
+{
+  "name": "Titan Crew",
+  "slug": "titan-crew",
+  "type": "team-communication",
+  "description": "Team communication, shift management, and internal operations",
+  "icon": "👨‍💼",
+  "color": "#f43f5e",
+  "features": ["team-messaging", "shift-scheduling", "announcements", "team-directory", "time-tracking", "chatbot"],
+  "chatbot": {
+    "name": "Titan Crew Manager Assistant",
+    "system_prompt": "You are a team operations assistant helping coordinate shifts, manage announcements, track team time, and facilitate internal communications."
+  }
+}
