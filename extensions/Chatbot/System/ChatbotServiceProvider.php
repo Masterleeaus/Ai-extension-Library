@@ -308,7 +308,8 @@ class ChatbotServiceProvider extends ServiceProvider implements ExtensionRegiste
                 $router->post('{builderId}/publish', 'publish')->name('publish');
                 $router->get('component/{componentType}', 'getMobilekitComponent')->name('getMobilekitComponent');
                 $router->post('{builderId}/duplicate', 'duplicate')->name('duplicate');
-                $router->post('from-template/{templateId}', 'fromTemplate')->name('fromTemplate');
+                $router->get('templates/titan', 'getTitanTemplates')->name('getTitanTemplates');
+                $router->post('from-titan-template', 'fromTitanTemplate')->name('fromTitanTemplate');
             })
             ->group([
                 'middleware' => ['api', 'throttle:60,1'],

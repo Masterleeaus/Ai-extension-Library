@@ -179,23 +179,38 @@ class ChatbotBuilderController
         }
     }
 
-    public function fromTemplate(Request $request): JsonResponse
+    public function fromTitanTemplate(Request $request): JsonResponse
     {
         $request->validate([
-            'template_id' => 'required|integer',
+            'template_slug' => 'required|string',
         ]);
 
         $tenantId = auth()->user()->tenant_id;
 
         try {
-            $builder = $this->builderService->createFromTemplate(
+            $builder = $this->builderService->createFromTitanTemplate(
                 $tenantId,
-                $request->get('template_id')
+                $request->get('template_slug')
             );
 
             return response()->json([
                 'success' => true,
                 'builder' => $builder,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
+        }
+    }
+
+    public function getTitanTemplates(Request $request): JsonResponse
+    {
+        try {
+            $templates = \App\Extensions\Chatbot\System\Titan\TitanRegistry::all();
+
+            return response()->json([
+                'success' => true,
+                'templates' => $templates->toArray(),
+                'count' => $templates->count(),
             ]);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 400);

@@ -282,16 +282,39 @@ CSS;
         ]);
     }
 
-    public function createFromTemplate(string $tenantId, int $templateId): ChatbotBuilder
+    public function createFromTitanTemplate(string $tenantId, string $templateSlug): ChatbotBuilder
     {
-        $template = ChatbotBuilderTemplate::findOrFail($templateId);
+        // Use actual Titan app templates from TitanRegistry
+        $titanTemplate = \App\Extensions\Chatbot\System\Titan\TitanRegistry::get($templateSlug);
+
+        if (!$titanTemplate) {
+            throw new \InvalidArgumentException("Titan template not found: $templateSlug");
+        }
+
+        $chatbotConfig = $titanTemplate['chatbot'] ?? [];
 
         return ChatbotBuilder::create([
             'tenant_id' => $tenantId,
             'step_current' => 'configure',
-            'config' => $template->template_config,
-            'customization' => $template->customization,
-            'theme_settings' => $template->theme_settings,
+            'config' => [
+                'title' => $chatbotConfig['name'] ?? 'Assistant',
+                'bubble_message' => 'Hey there, how can we help you?',
+                'welcome_message' => $chatbotConfig['system_prompt'] ?? 'Hi, how can I assist you today?',
+                'instructions' => $chatbotConfig['system_prompt'] ?? '',
+                'titan_template' => $templateSlug,
+                'template_features' => $titanTemplate['features'] ?? [],
+            ],
+            'theme_settings' => [
+                'colors' => [
+                    'primary' => $titanTemplate['color'] ?? '#667eea',
+                    'secondary' => '#764ba2',
+                    'accent' => '#4CAF50',
+                ],
+                'header_background' => [
+                    'type' => 'gradient',
+                    'value' => "linear-gradient(135deg, {$titanTemplate['color']} 0%, #764ba2 100%)",
+                ],
+            ],
             'publish_status' => 'draft',
         ]);
     }

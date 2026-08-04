@@ -77,22 +77,21 @@ return new class extends Migration
             $table->index(['tenant_id', 'device_type']);
         });
 
-        // Builder templates (reusable builder configurations)
-        Schema::create('ext_chatbot_builder_templates', function (Blueprint $table) {
+        // Builder template usage tracking (references TitanRegistry templates)
+        Schema::create('ext_chatbot_builder_template_usage', function (Blueprint $table) {
             $table->id();
             $table->string('tenant_id');
-            $table->string('template_name');
-            $table->string('template_category'); // support, sales, booking, shopping, custom
-            $table->json('template_config')->nullable();
-            $table->json('customization')->nullable();
-            $table->json('theme_settings')->nullable();
-            $table->text('description')->nullable();
-            $table->boolean('is_system_template')->default(false);
-            $table->integer('usage_count')->default(0);
+            $table->unsignedBigInteger('builder_config_id');
+            $table->string('titan_template_slug'); // Reference to TitanRegistry template
+            $table->integer('usage_count')->default(1);
+            $table->timestamp('last_used_at');
             $table->timestamps();
 
-            $table->index(['tenant_id', 'template_category']);
-            $table->index('is_system_template');
+            $table->foreign('builder_config_id')
+                ->references('id')
+                ->on('ext_chatbot_builder_configs')
+                ->onDelete('cascade');
+            $table->index(['tenant_id', 'titan_template_slug']);
         });
 
         // Channel configuration for publish step
@@ -137,7 +136,7 @@ return new class extends Migration
     {
         Schema::dropIfExists('ext_chatbot_builder_activity');
         Schema::dropIfExists('ext_chatbot_builder_channels');
-        Schema::dropIfExists('ext_chatbot_builder_templates');
+        Schema::dropIfExists('ext_chatbot_builder_template_usage');
         Schema::dropIfExists('ext_chatbot_builder_previews');
         Schema::dropIfExists('ext_chatbot_builder_components');
         Schema::dropIfExists('ext_chatbot_builder_steps');
