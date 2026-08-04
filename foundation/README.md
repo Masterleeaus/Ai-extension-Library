@@ -42,7 +42,7 @@ if ($context->hasTenant()) {
 Determines what actions are allowed for given resources.
 
 ```php
-$policy = new AuthorizationPolicy();
+$policy = app(AuthorizationPolicyContract::class);
 $approved = $policy->authorize(
     $context,
     'read',
@@ -50,6 +50,8 @@ $approved = $policy->authorize(
     ['customer_id' => '123']
 );
 ```
+
+**Note**: AuthorizationPolicy is an interface contract. Implement it in your application domain.
 
 **Key Features:**
 - Action-based authorization

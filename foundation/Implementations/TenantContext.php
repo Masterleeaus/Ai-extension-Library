@@ -59,11 +59,16 @@ class TenantContext implements TenantContextContract
 
     public function restore(array $snapshot): void
     {
-        $this->tenantId = $snapshot['tenant_id'] ?? null;
+        $tenantId = $snapshot['tenant_id'] ?? null;
+        if ($tenantId !== null && empty($tenantId)) {
+            throw new RuntimeException('Tenant ID cannot be empty when restoring');
+        }
+
+        $this->tenantId = $tenantId;
         $this->userId = $snapshot['user_id'] ?? null;
         $this->actorId = $snapshot['actor_id'] ?? null;
-        $this->permissions = $snapshot['permissions'] ?? [];
-        $this->policyVersion = $snapshot['policy_version'] ?? 1;
+        $this->permissions = is_array($snapshot['permissions'] ?? null) ? $snapshot['permissions'] : [];
+        $this->policyVersion = is_int($snapshot['policy_version'] ?? null) ? $snapshot['policy_version'] : 1;
     }
 
     public function snapshot(): array

@@ -11,6 +11,7 @@ use RuntimeException;
 class EventEnvelope implements EventEnvelopeContract
 {
     private string $id;
+    private string $idempotencyKey;
     private string $tenantId;
     private string $eventType;
     private int $version;
@@ -30,9 +31,11 @@ class EventEnvelope implements EventEnvelopeContract
         DateTime $timestamp,
         ?string $correlationId = null,
         ?string $causationId = null,
-        array $metadata = []
+        array $metadata = [],
+        ?string $idempotencyKey = null
     ) {
         $this->id = $id;
+        $this->idempotencyKey = $idempotencyKey ?? "{$tenantId}:{$id}";
         $this->tenantId = $tenantId;
         $this->eventType = $eventType;
         $this->version = $version;
@@ -46,6 +49,11 @@ class EventEnvelope implements EventEnvelopeContract
     public function getId(): string
     {
         return $this->id;
+    }
+
+    public function getIdempotencyKey(): string
+    {
+        return $this->idempotencyKey;
     }
 
     public function getTenantId(): string
@@ -116,11 +124,11 @@ class EventEnvelope implements EventEnvelopeContract
             'event_type' => $this->eventType,
             'version' => $this->version,
             'payload' => $this->payload,
-            'timestamp' => $this->timestamp->toIso8601String(),
+            'timestamp' => $this->timestamp->format(DATE_ATOM),
             'correlation_id' => $this->correlationId,
             'causation_id' => $this->causationId,
             'metadata' => $this->metadata,
-            'processed_at' => $this->processedAt?->toIso8601String(),
+            'processed_at' => $this->processedAt?->format(DATE_ATOM),
         ];
     }
 

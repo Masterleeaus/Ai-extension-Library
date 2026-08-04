@@ -10,6 +10,8 @@ interface EventEnvelopeContract
 {
     public function getId(): string;
 
+    public function getIdempotencyKey(): string;
+
     public function getTenantId(): string;
 
     public function getEventType(): string;

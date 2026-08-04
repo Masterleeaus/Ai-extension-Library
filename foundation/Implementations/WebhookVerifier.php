@@ -10,6 +10,8 @@ class WebhookVerifier implements WebhookVerifierContract
 {
     private array $providers = [];
     private array $processedEvents = [];
+    private int $lastCleanup = 0;
+    private const CLEANUP_INTERVAL = 3600;
 
     public function register(
         string $provider,
@@ -56,13 +58,20 @@ class WebhookVerifier implements WebhookVerifierContract
         string $eventId,
         int $maxAgeSeconds = 300
     ): bool {
+        $now = time();
         $key = "{$provider}:{$eventId}";
 
         if (isset($this->processedEvents[$key])) {
-            return false;
+            $age = $now - $this->processedEvents[$key];
+            if ($age < $maxAgeSeconds) {
+                return false;
+            }
+            unset($this->processedEvents[$key]);
         }
 
-        $this->processedEvents[$key] = time();
+        $this->processedEvents[$key] = $now;
+
+        $this->expireOldEntries($now, $maxAgeSeconds);
 
         return true;
     }
@@ -74,6 +83,22 @@ class WebhookVerifier implements WebhookVerifierContract
     ): void {
         $key = "{$provider}:{$eventId}";
         $this->processedEvents[$key] = $timestamp;
+    }
+
+    private function expireOldEntries(int $now, int $maxAgeSeconds): void
+    {
+        if ($now - $this->lastCleanup < self::CLEANUP_INTERVAL) {
+            return;
+        }
+
+        $this->lastCleanup = $now;
+        $cutoff = $now - $maxAgeSeconds;
+
+        foreach ($this->processedEvents as $key => $timestamp) {
+            if ($timestamp < $cutoff) {
+                unset($this->processedEvents[$key]);
+            }
+        }
     }
 
     public function resolveTenant(

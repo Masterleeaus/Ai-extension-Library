@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Foundation\Contracts;
 
-use DateTime;
-
 interface TenantContextContract
 {
     public function hasTenant(): bool;
