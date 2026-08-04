@@ -1,0 +1,10 @@
+{
+  "file_name": "Titan-Social-Extension-Bundle.zip",
+  "encoding": "base64-lines",
+  "line_width": 8192,
+  "lines_per_part": 500,
+  "part_prefix": "part-",
+  "part_count": 4,
+  "zip_bytes": 9563144,
+  "sha256": "12568e108bb35a2c619b44631acbd4681d215a1aca6a1126e3394fbe7f86223d"
+}
