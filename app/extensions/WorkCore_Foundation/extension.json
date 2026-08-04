@@ -1,0 +1,23 @@
+{
+  "name": "WorkCore_Foundation",
+  "title": "WorkCore Foundation",
+  "description": "Enterprise foundation layer with credential vault, event envelope, tenant context, and webhook verification",
+  "version": "1.0.0",
+  "type": "foundation",
+  "category": "infrastructure",
+  "author": "Claude",
+  "license": "MIT",
+  "requires": {
+    "php": ">=8.1",
+    "laravel": ">=10.0"
+  },
+  "keywords": [
+    "workcore",
+    "foundation",
+    "infrastructure",
+    "credentials",
+    "events",
+    "webhooks"
+  ],
+  "status": "completed"
+}

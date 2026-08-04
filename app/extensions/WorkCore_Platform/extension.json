@@ -1,0 +1,22 @@
+{
+  "name": "WorkCore_Platform",
+  "title": "WorkCore Platform",
+  "description": "Enterprise WorkCore platform with shared foundation, business network, commercial, operations, property, and workforce modules",
+  "version": "1.0.0",
+  "type": "platform",
+  "category": "enterprise",
+  "author": "Claude",
+  "license": "MIT",
+  "requires": {
+    "php": ">=8.1",
+    "laravel": ">=10.0"
+  },
+  "keywords": [
+    "workcore",
+    "platform",
+    "enterprise",
+    "modules",
+    "integration"
+  ],
+  "status": "completed"
+}

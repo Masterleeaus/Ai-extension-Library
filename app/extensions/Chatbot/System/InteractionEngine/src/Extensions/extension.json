@@ -1,0 +1,91 @@
+{
+  "id": "titan-zero-multi-vertical",
+  "name": "TitanZero Multi-Vertical Offline ERP",
+  "version": "1.0.0",
+  "description": "Universal multi-vertical ERP system supporting any domain (Real Estate, E-commerce, Healthcare, etc) with full offline capability and conflict resolution",
+  "author": "Titan Zero",
+  "license": "Proprietary",
+  "homepage": "https://titanzerosuite.com",
+  
+  "system": {
+    "provider": "App\\Extensions\\TitanZeroMultiVertical\\System\\TitanZeroMultiVerticalServiceProvider"
+  },
+
+  "requirements": {
+    "magicai": ">=11.0.0",
+    "interaction-engine": ">=Phase10",
+    "php": ">=8.2",
+    "laravel": ">=11.0"
+  },
+
+  "dependencies": [
+    "interaction-engine",
+    "workcore"
+  ],
+
+  "features": [
+    "multi-vertical-support",
+    "offline-first",
+    "automatic-sync",
+    "conflict-resolution",
+    "wizard-integration",
+    "business-rules",
+    "audit-logging",
+    "dynamic-schema"
+  ],
+
+  "capabilities": [
+    "verticals.manage",
+    "verticals.read",
+    "verticals.switch",
+    "sync.manage",
+    "conflicts.resolve"
+  ],
+
+  "database": {
+    "migrations": true,
+    "seeders": false
+  },
+
+  "configuration": {
+    "publishable": true,
+    "file": "config/titan-zero-multi-vertical.php"
+  },
+
+  "permissions": {
+    "manage_verticals": "Manage vertical configurations",
+    "sync_data": "Sync offline data",
+    "resolve_conflicts": "Resolve data conflicts"
+  },
+
+  "routes": {
+    "prefix": "api/interaction",
+    "middleware": ["api", "auth:sanctum"]
+  },
+
+  "settings": [
+    {
+      "key": "active_vertical",
+      "label": "Active Vertical",
+      "type": "select",
+      "options": "verticals",
+      "default": "workcore"
+    },
+    {
+      "key": "offline_enabled",
+      "label": "Enable Offline Mode",
+      "type": "boolean",
+      "default": true
+    },
+    {
+      "key": "conflict_handling",
+      "label": "Conflict Resolution Strategy",
+      "type": "select",
+      "options": ["manual_resolution", "server_wins", "local_wins"],
+      "default": "manual_resolution"
+    }
+  ],
+
+  "namespace": "App\\Extensions\\TitanZeroMultiVertical",
+  "path": "app/Extensions/TitanZeroMultiVertical"
+}
