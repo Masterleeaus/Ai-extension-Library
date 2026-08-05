@@ -48,7 +48,7 @@ class GoogleBusinessProfilePinterestContractTest extends TestCase
         $this->assertSame('pinterest', data_get($pinterest, 'destination.platform'));
         $this->assertTrue((bool) data_get($pinterest, 'destination.approval_required'));
         $this->assertContains('boards:read', (array) ($pinterest['scopes'] ?? []));
-        $this->assertContains('boards:write', (array) ($pinterest['scopes'] ?? []));
+        $this->assertNotContains('boards:write', (array) ($pinterest['scopes'] ?? []));
         $this->assertContains('pins:read', (array) ($pinterest['scopes'] ?? []));
         $this->assertContains('pins:write', (array) ($pinterest['scopes'] ?? []));
         $this->assertContains('user_accounts:read', (array) ($pinterest['scopes'] ?? []));
