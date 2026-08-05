@@ -13,7 +13,7 @@ class SocialMediaSettingController extends Controller
     public function index()
     {
         return view('social-media::setting.index', [
-            'platforms' => PlatformEnum::all(),
+            'platforms' => PlatformEnum::channels(),
         ]);
     }
 
@@ -39,7 +39,6 @@ class SocialMediaSettingController extends Controller
         setting($data)->save();
 
         if ($platform === PlatformEnum::tiktok && $request->hasFile('TIKTOK_VERIFICATION_FILE')) {
-
             $request->validate([
                 'TIKTOK_VERIFICATION_FILE' => 'required|file|max:2048',
             ]);

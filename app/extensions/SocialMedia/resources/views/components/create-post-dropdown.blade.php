@@ -13,6 +13,7 @@
         class="min-w-52 overflow-hidden p-2"
     >
         @foreach ($platforms as $platform)
+            @continue($platform === \App\Extensions\SocialMedia\System\Enums\PlatformEnum::ebay)
             @php
                 $image = 'vendor/social-media/icons/' . $platform->value . '.svg';
                 $image_dark_version = 'vendor/social-media/icons/' . $platform->value . '-light.svg';

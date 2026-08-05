@@ -93,15 +93,11 @@ class DistributionCapabilityService
 
     private function destinations(): array
     {
-        $configured = config('social-media.distribution.destinations');
-
-        if (is_array($configured) && $configured !== []) {
-            return $configured;
-        }
-
         $catalogue = require dirname(__DIR__, 2) . '/config/distribution.php';
+        $baseDestinations = (array) ($catalogue['destinations'] ?? []);
+        $configuredDestinations = (array) config('social-media.distribution.destinations', []);
 
-        return (array) ($catalogue['destinations'] ?? []);
+        return array_replace_recursive($baseDestinations, $configuredDestinations);
     }
 
     private function reason(
