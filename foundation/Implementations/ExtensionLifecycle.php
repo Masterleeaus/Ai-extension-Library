@@ -76,28 +76,38 @@ class ExtensionLifecycle implements ExtensionLifecycleContract
         string $version,
         array $releaseNotes
     ): bool {
-        $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}versions (extension_id, tenant_id, version, release_notes, published_at)
-             VALUES (?, ?, ?, ?, ?)"
+        return $this->transactions->executeInTransaction(
+            function (PDO $db) use ($tenantId, $extensionId, $version, $releaseNotes) {
+                // Step 1: Insert version record
+                $stmt = $db->prepare(
+                    "INSERT INTO {$this->tablePrefix}versions (extension_id, tenant_id, version, release_notes, published_at)
+                     VALUES (?, ?, ?, ?, ?)"
+                );
+
+                if (!$stmt->execute([
+                    $extensionId,
+                    $tenantId,
+                    $version,
+                    json_encode($releaseNotes),
+                    date('c'),
+                ])) {
+                    throw new \Exception('Failed to insert version record');
+                }
+
+                // Step 2: Update extension status
+                $updateStmt = $db->prepare(
+                    "UPDATE {$this->tablePrefix}extensions SET status = ?, published_version = ?, updated_at = ? WHERE id = ? AND tenant_id = ?"
+                );
+
+                if (!$updateStmt->execute(['published', $version, date('c'), $extensionId, $tenantId])) {
+                    throw new \Exception('Failed to update extension status');
+                }
+
+                return true;
+            },
+            'publishExtensionVersion',
+            ['extension_id' => $extensionId, 'version' => $version]
         );
-
-        $result = $stmt->execute([
-            $extensionId,
-            $tenantId,
-            $version,
-            json_encode($releaseNotes),
-            date('c'),
-        ]);
-
-        if ($result) {
-            $updateStmt = $this->db->prepare(
-                "UPDATE {$this->tablePrefix}extensions SET status = ?, published_version = ?, updated_at = ? WHERE id = ? AND tenant_id = ?"
-            );
-
-            $updateStmt->execute(['published', $version, date('c'), $extensionId, $tenantId]);
-        }
-
-        return $result;
     }
 
     public function enableExtension(
