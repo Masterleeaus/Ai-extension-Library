@@ -490,7 +490,7 @@
                                 hover-variant="primary"
                                 href="{{ route('login') }}"
                             >
-                                {!! __($fSetting->sign_in) !!}
+                                {{ $fSetting->sign_in }}
                             </x-button>
                             <x-button
                                 class="h-[38px] rounded-lg outline"
@@ -498,7 +498,7 @@
                                 hover-variant="primary"
                                 href="{{ route('register') }}"
                             >
-                                {!! __($fSetting->join_hub) !!}
+                                {{ $fSetting->join_hub }}
                             </x-button>
                         @endauth
                     </div>

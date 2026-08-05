@@ -26,8 +26,8 @@
             {!! __(
                 'By continuing, you agree to our <a href=":privacy_policy_link" target="_blank" class="underline underline-offset-2">Privacy Policy</a> and <a href=":terms_of_service_link" target="_blank" class="underline underline-offset-2">Terms of Use</a> to help us enhance our services.',
                 [
-                    'privacy_policy_link' => $chatbot['privacy_policy_link'] ?? '#',
-                    'terms_of_service_link' => $chatbot['terms_of_service_link'] ?? '#',
+                    'privacy_policy_link' => e($chatbot['privacy_policy_link'] ?? '#'),
+                    'terms_of_service_link' => e($chatbot['terms_of_service_link'] ?? '#'),
                 ],
             ) !!}
         </span>

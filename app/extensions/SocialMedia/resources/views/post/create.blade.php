@@ -113,7 +113,7 @@
                             type="button"
                             variant="outline"
                             ::class="{ active: currentPlatform === '{{ $platform->value }}' && {{ $is_connected ? 1 : 0 }} }"
-                            @click.prevent="currentPlatform = '{{ $platform->value }}'; platformUsername = '{{ $name }}'; platformPicture = '{!! $profileImage !!}';socialMediaPlatformId = '{{ $platform->platform()?->id }}';"
+                            @click.prevent="currentPlatform = '{{ $platform->value }}'; platformUsername = '{{ $name }}'; platformPicture = '{{ $profileImage }}';socialMediaPlatformId = '{{ $platform->platform()?->id }}';"
                             :disabled="!$is_connected"
                         >
                             @php
@@ -483,7 +483,7 @@
                                                             class="m-0 rounded-input border border-input-border p-4"
                                                             x-show="selectedCampaign == '{{ $campaign['id'] }}'"
                                                         >
-                                                            {!! $campaign['target_audience'] !!}
+                                                            {{ $campaign['target_audience'] }}
                                                         </p>
                                                     @endforeach
                                                 </div>
@@ -1014,7 +1014,7 @@
                     userPlatforms: @json($userPlatforms),
                     selectedUserPlatforms: [],
                     platformUsername: "{{ $platformUsername ?: 'Jhon Doe' }}",
-                    platformPicture: "{!! $platformPicture ?: custom_theme_url('/assets/img/avatars/avatar-1.jpg') !!}",
+                    platformPicture: "{{ $platformPicture ?: custom_theme_url('/assets/img/avatars/avatar-1.jpg') }}",
                     currentPlatform: '{{ $current_platform }}',
                     personalizedContent: '{{ $is_personalized_content }}',
                     selectedCompany: '{{ $company_id }}',
@@ -1025,7 +1025,7 @@
                     repeatPeriod: '{{ $repeat_period }}',
                     repeatStartDate: '{{ $repeat_start_date }}',
                     repeatTime: null,
-                    content: `{!! $content !!}`,
+                    content: {{ json_encode($content) }},
                     image: '{{ $postImage }}',
                     images: [],
                     video: '{{ $video }}',

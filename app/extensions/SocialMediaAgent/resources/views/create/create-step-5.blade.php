@@ -99,7 +99,7 @@
             <x-forms.input
                 class:label="flex-row-reverse justify-between text-heading-foreground text-xs font-medium select-none"
                 type="checkbox"
-                label="{!! __('Include Hashtags & Emoji') !!}"
+                label="{{ __('Include Hashtags & Emoji') }}"
                 size="sm"
                 switcher
                 switcherFill
