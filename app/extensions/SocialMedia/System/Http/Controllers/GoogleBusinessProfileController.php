@@ -39,25 +39,28 @@ class GoogleBusinessProfileController extends Controller
         $this->assertOwnedItem($item);
         $validated = $this->validateMutation($request);
         $account = $this->account((int) $validated['account_id']);
-        $payload = (array) $validated['payload'];
-        $resources = $this->resources->resolveLocation(
-            $account,
-            (string) $payload['account_name'],
-            (string) $payload['location_name'],
-            true
-        );
-        $payload['location_name'] = $resources['account_location_name'];
 
-        return $this->respond(fn () => $this->locked(
-            $item,
-            fn () => $this->service->publish(
-                $request->user(),
-                $item,
+        return $this->respond(function () use ($request, $item, $account, $validated) {
+            $payload = (array) $validated['payload'];
+            $resources = $this->resources->resolveLocation(
                 $account,
-                $payload,
-                (string) $validated['idempotency_key']
-            )
-        ));
+                (string) $payload['account_name'],
+                (string) $payload['location_name'],
+                true
+            );
+            $payload['location_name'] = $resources['account_location_name'];
+
+            return $this->locked(
+                $item,
+                fn () => $this->service->publish(
+                    $request->user(),
+                    $item,
+                    $account,
+                    $payload,
+                    (string) $validated['idempotency_key']
+                )
+            );
+        });
     }
 
     public function uploadPhoto(Request $request, DistributionItem $item): JsonResponse
@@ -65,24 +68,27 @@ class GoogleBusinessProfileController extends Controller
         $this->assertOwnedItem($item);
         $validated = $this->validateMutation($request);
         $account = $this->account((int) $validated['account_id']);
-        $payload = (array) $validated['payload'];
-        $resources = $this->resources->resolveLocation(
-            $account,
-            (string) $payload['account_name'],
-            (string) $payload['location_name']
-        );
-        $payload['location_name'] = $resources['account_location_name'];
 
-        return $this->respond(fn () => $this->locked(
-            $item,
-            fn () => $this->service->uploadPhoto(
-                $request->user(),
-                $item,
+        return $this->respond(function () use ($request, $item, $account, $validated) {
+            $payload = (array) $validated['payload'];
+            $resources = $this->resources->resolveLocation(
                 $account,
-                $payload,
-                (string) $validated['idempotency_key']
-            )
-        ));
+                (string) $payload['account_name'],
+                (string) $payload['location_name']
+            );
+            $payload['location_name'] = $resources['account_location_name'];
+
+            return $this->locked(
+                $item,
+                fn () => $this->service->uploadPhoto(
+                    $request->user(),
+                    $item,
+                    $account,
+                    $payload,
+                    (string) $validated['idempotency_key']
+                )
+            );
+        });
     }
 
     public function reconcile(Request $request, DistributionItem $item): JsonResponse
@@ -94,24 +100,27 @@ class GoogleBusinessProfileController extends Controller
             'location_name' => 'required|string|max:500',
         ]);
         $account = $this->account((int) $validated['account_id']);
-        $resources = $this->resources->resolveLocation(
-            $account,
-            (string) $validated['account_name'],
-            (string) $validated['location_name']
-        );
-        $this->resources->assertLocalPostName(
-            $resources,
-            (string) data_get($item->payload, 'google_business_profile.local_post_name', '')
-        );
 
-        return $this->respond(fn () => $this->locked(
-            $item,
-            fn () => $this->service->reconcile(
-                $request->user(),
+        return $this->respond(function () use ($request, $item, $account, $validated) {
+            $resources = $this->resources->resolveLocation(
+                $account,
+                (string) $validated['account_name'],
+                (string) $validated['location_name']
+            );
+            $this->resources->assertLocalPostName(
+                $resources,
+                (string) data_get($item->payload, 'google_business_profile.local_post_name', '')
+            );
+
+            return $this->locked(
                 $item,
-                $account
-            )
-        ));
+                fn () => $this->service->reconcile(
+                    $request->user(),
+                    $item,
+                    $account
+                )
+            );
+        });
     }
 
     public function reviews(Request $request): JsonResponse
@@ -123,18 +132,21 @@ class GoogleBusinessProfileController extends Controller
             'page_token' => 'nullable|string|max:2048',
         ]);
         $account = $this->account((int) $validated['account_id']);
-        $resources = $this->resources->resolveLocation(
-            $account,
-            (string) $validated['account_name'],
-            (string) $validated['location_name']
-        );
 
-        return $this->respond(fn () => $this->service->reviews(
-            $request->user(),
-            $account,
-            (string) $resources['account_location_name'],
-            $validated['page_token'] ?? null
-        ));
+        return $this->respond(function () use ($request, $account, $validated) {
+            $resources = $this->resources->resolveLocation(
+                $account,
+                (string) $validated['account_name'],
+                (string) $validated['location_name']
+            );
+
+            return $this->service->reviews(
+                $request->user(),
+                $account,
+                (string) $resources['account_location_name'],
+                $validated['page_token'] ?? null
+            );
+        });
     }
 
     public function replyToReview(Request $request, DistributionItem $item): JsonResponse
@@ -150,28 +162,31 @@ class GoogleBusinessProfileController extends Controller
             'reply_approved' => 'required|boolean',
         ]);
         $account = $this->account((int) $validated['account_id']);
-        $resources = $this->resources->resolveLocation(
-            $account,
-            (string) $validated['account_name'],
-            (string) $validated['location_name']
-        );
-        $reviewName = $this->resources->assertReviewName(
-            $resources,
-            (string) $validated['review_name']
-        );
 
-        return $this->respond(fn () => $this->locked(
-            $item,
-            fn () => $this->service->replyToReview(
-                $request->user(),
-                $item,
+        return $this->respond(function () use ($request, $item, $account, $validated) {
+            $resources = $this->resources->resolveLocation(
                 $account,
-                $reviewName,
-                (string) $validated['comment'],
-                (bool) $validated['reply_approved'],
-                (string) $validated['idempotency_key']
-            )
-        ));
+                (string) $validated['account_name'],
+                (string) $validated['location_name']
+            );
+            $reviewName = $this->resources->assertReviewName(
+                $resources,
+                (string) $validated['review_name']
+            );
+
+            return $this->locked(
+                $item,
+                fn () => $this->service->replyToReview(
+                    $request->user(),
+                    $item,
+                    $account,
+                    $reviewName,
+                    (string) $validated['comment'],
+                    (bool) $validated['reply_approved'],
+                    (string) $validated['idempotency_key']
+                )
+            );
+        });
     }
 
     public function reviewHandoff(Request $request, DistributionItem $item): JsonResponse
@@ -188,26 +203,29 @@ class GoogleBusinessProfileController extends Controller
             'review.received_at' => 'nullable|date',
         ]);
         $account = $this->account((int) $validated['account_id']);
-        $resources = $this->resources->resolveLocation(
-            $account,
-            (string) $validated['account_name'],
-            (string) $validated['location_name']
-        );
-        $review = (array) $validated['review'];
-        $review['review_name'] = $this->resources->assertReviewName(
-            $resources,
-            (string) $review['review_name']
-        );
 
-        return $this->respond(fn () => $this->locked(
-            $item,
-            fn () => $this->service->reviewHandoff(
-                $request->user(),
-                $item,
+        return $this->respond(function () use ($request, $item, $account, $validated) {
+            $resources = $this->resources->resolveLocation(
                 $account,
-                $review
-            )
-        ));
+                (string) $validated['account_name'],
+                (string) $validated['location_name']
+            );
+            $review = (array) $validated['review'];
+            $review['review_name'] = $this->resources->assertReviewName(
+                $resources,
+                (string) $review['review_name']
+            );
+
+            return $this->locked(
+                $item,
+                fn () => $this->service->reviewHandoff(
+                    $request->user(),
+                    $item,
+                    $account,
+                    $review
+                )
+            );
+        });
     }
 
     public function performance(Request $request): JsonResponse
@@ -222,20 +240,23 @@ class GoogleBusinessProfileController extends Controller
             'metrics.*' => 'required|string|max:100',
         ]);
         $account = $this->account((int) $validated['account_id']);
-        $resources = $this->resources->resolveLocation(
-            $account,
-            (string) $validated['account_name'],
-            (string) $validated['location_name']
-        );
 
-        return $this->respond(fn () => $this->service->performance(
-            $request->user(),
-            $account,
-            (string) $resources['performance_location_name'],
-            (string) $validated['start_date'],
-            (string) $validated['end_date'],
-            (array) $validated['metrics']
-        ));
+        return $this->respond(function () use ($request, $account, $validated) {
+            $resources = $this->resources->resolveLocation(
+                $account,
+                (string) $validated['account_name'],
+                (string) $validated['location_name']
+            );
+
+            return $this->service->performance(
+                $request->user(),
+                $account,
+                (string) $resources['performance_location_name'],
+                (string) $validated['start_date'],
+                (string) $validated['end_date'],
+                (array) $validated['metrics']
+            );
+        });
     }
 
     private function validateMutation(Request $request): array
