@@ -47,7 +47,7 @@ final class WizardVerticalContextAdapter
             $question = $questions[$questionKey] ?? ['key' => $questionKey, 'section_key' => null];
             $answerValues[$questionKey] = $answer['value'];
 
-            if ($this->isSecureQuestion($question)) {
+            if ($this->isSecureAnswer($question, $answer['value'] ?? null, $questionKey)) {
                 $layers[] = $this->secureConnectionLayer($answer, $question, $answerRevision);
                 continue;
             }
@@ -209,7 +209,7 @@ final class WizardVerticalContextAdapter
         return $unanswered;
     }
 
-    private function isSecureQuestion(array $question): bool
+    private function isSecureAnswer(array $question, mixed $value, string $questionKey): bool
     {
         $handling = strtolower((string) ($question['handling'] ?? ''));
         $responseType = strtolower((string) ($question['response_type'] ?? ''));
@@ -219,7 +219,32 @@ final class WizardVerticalContextAdapter
             || in_array($responseType, ['secret_connection', 'secure_form', 'connection_task'], true)
             || str_contains($owner, 'vault')
             || str_contains($owner, 'credential')
-            || str_contains($owner, 'secret');
+            || str_contains($owner, 'secret')
+            || preg_match('/(?:credential|password|passphrase|api[_-]?key|token|private[_-]?key|client[_-]?secret)/i', $questionKey) === 1
+            || $this->containsSensitiveKey($value);
+    }
+
+    private function containsSensitiveKey(mixed $value): bool
+    {
+        if (!is_array($value)) {
+            return false;
+        }
+
+        foreach ($value as $key => $nested) {
+            $normalized = strtolower(str_replace(['-', ' '], '_', (string) $key));
+            if (in_array($normalized, [
+                'password', 'passphrase', 'secret', 'api_key', 'apikey', 'api_token',
+                'access_token', 'refresh_token', 'private_key', 'client_secret',
+                'service_account', 'service_account_json', 'bank_account', 'account_number',
+            ], true)) {
+                return true;
+            }
+            if ($this->containsSensitiveKey($nested)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private function sourceType(string $source): string
