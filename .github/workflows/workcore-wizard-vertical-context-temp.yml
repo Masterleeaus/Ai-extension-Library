@@ -12,7 +12,7 @@ permissions:
 jobs:
   verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -37,10 +37,19 @@ jobs:
           WORKCORE_TEST_VENDOR_AUTOLOAD: /tmp/workcore-context-test/vendor/autoload.php
         run: php app/extensions/WorkCore_Platform/tests/vertical_wizard_context.php
 
+      - name: Run Interaction Engine context and regression suites
+        run: |
+          php packages/titan-interaction-engine/tests/vertical_context.php
+          php packages/titan-interaction-engine/tests/run.php
+          php packages/titan-interaction-engine/bin/verify.php
+
+      - name: Run WorkCore Platform contract suite
+        run: python -m unittest discover app/extensions/WorkCore_Platform/tests -p 'test_*.py' -v
+
       - name: Lint focused test and implementation
         run: |
           php -l app/extensions/WorkCore_Platform/tests/vertical_wizard_context.php
-          if [ -d app/extensions/WorkCore_Platform/packages/workcore-business-network/src/Domains/WorkCore/System/Modules/Wizards ]; then
-            find app/extensions/WorkCore_Platform/packages/workcore-business-network/src/Domains/WorkCore/System/Modules/Wizards \
-              -name '*VerticalContext*.php' -print0 | xargs -0 -r -n1 php -l
-          fi
+          php -l app/extensions/WorkCore_Platform/packages/workcore-business-network/src/Domains/WorkCore/System/Modules/Wizards/Services/WizardDefinitionRegistry.php
+          php -l app/extensions/WorkCore_Platform/packages/workcore-business-network/src/Domains/WorkCore/System/Modules/Wizards/Providers/WorkWizardsServiceProvider.php
+          find app/extensions/WorkCore_Platform/packages/workcore-business-network/src/Domains/WorkCore/System/Modules/Wizards \
+            -name '*VerticalContext*.php' -print0 | xargs -0 -r -n1 php -l
