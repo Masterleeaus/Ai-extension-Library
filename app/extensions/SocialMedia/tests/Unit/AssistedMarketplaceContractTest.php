@@ -8,16 +8,17 @@ class AssistedMarketplaceContractTest extends TestCase
 {
     public function test_marketplaces_are_assisted_and_never_direct_publishers(): void
     {
-        $config = file_get_contents(__DIR__ . '/../../config/distribution.php');
+        $capabilities = file_get_contents(__DIR__ . '/../../config/distribution.php');
+        $operations = file_get_contents(__DIR__ . '/../../config/assisted-marketplaces.php');
         $service = file_get_contents(__DIR__ . '/../../System/Services/AssistedMarketplaceService.php');
 
-        $this->assertStringContainsString("'facebook-marketplace'", $config);
-        $this->assertStringContainsString("'gumtree'", $config);
-        $this->assertStringContainsString("'mode'              => 'assisted'", $config);
-        $this->assertStringContainsString("'publish' => false", $config);
-        $this->assertStringContainsString("'manual_confirmation' => true", $config);
-        $this->assertStringContainsString('official_posting_url', $config);
-        $this->assertStringContainsString('allowed_external_hosts', $config);
+        $this->assertStringContainsString("'facebook-marketplace'", $capabilities);
+        $this->assertStringContainsString("'gumtree'", $capabilities);
+        $this->assertStringContainsString("'mode'              => 'assisted'", $capabilities);
+        $this->assertStringContainsString("'publish' => false", $capabilities);
+        $this->assertStringContainsString("'manual_confirmation' => true", $capabilities);
+        $this->assertStringContainsString('official_posting_url', $operations);
+        $this->assertStringContainsString('allowed_external_hosts', $operations);
         $this->assertStringNotContainsString('BrowserKit', $service);
         $this->assertStringNotContainsString('Panther', $service);
         $this->assertStringNotContainsString('Selenium', $service);
@@ -46,7 +47,7 @@ class AssistedMarketplaceContractTest extends TestCase
     public function test_listing_package_contains_copy_media_price_location_and_official_destination(): void
     {
         $service = file_get_contents(__DIR__ . '/../../System/Services/AssistedMarketplaceService.php');
-        $config = file_get_contents(__DIR__ . '/../../config/distribution.php');
+        $config = file_get_contents(__DIR__ . '/../../config/assisted-marketplaces.php');
 
         $this->assertStringContainsString('preparePackage', $service);
         $this->assertStringContainsString('title', $service);
@@ -84,6 +85,8 @@ class AssistedMarketplaceContractTest extends TestCase
         $this->assertStringContainsString('$item->user_id', $service);
         $this->assertStringContainsString("approval_status !== 'approved'", $service);
         $this->assertStringContainsString('idempotency_key', $service);
+        $this->assertStringContainsString('request_hash', $service);
+        $this->assertStringContainsString('idempotency_key_conflict', $service);
         $this->assertStringContainsString("DB::table('ext_social_media_distribution_audits')", $service);
         $this->assertStringContainsString('Cache::lock', $controller);
         $this->assertStringContainsString('$item->refresh()', $controller);
