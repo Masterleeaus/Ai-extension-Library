@@ -8,7 +8,7 @@ class EbayListingIntegrationContractTest extends TestCase
 {
     public function test_ebay_uses_official_sandbox_oauth_and_sell_scopes(): void
     {
-        $config = file_get_contents(__DIR__ . '/../../config/social-media.php');
+        $config = file_get_contents(__DIR__ . '/../../config/ebay.php');
         $helper = file_get_contents(__DIR__ . '/../../System/Helpers/Ebay.php');
         $controller = file_get_contents(__DIR__ . '/../../System/Http/Controllers/Oauth/EbayController.php');
 
@@ -54,12 +54,12 @@ class EbayListingIntegrationContractTest extends TestCase
     public function test_ebay_is_exposed_as_a_real_channel_only_after_adapter_registration(): void
     {
         $platform = file_get_contents(__DIR__ . '/../../System/Enums/PlatformEnum.php');
-        $distribution = file_get_contents(__DIR__ . '/../../config/distribution.php');
+        $config = file_get_contents(__DIR__ . '/../../config/ebay.php');
         $provider = file_get_contents(__DIR__ . '/../../System/SocialMediaServiceProvider.php');
 
         $this->assertStringContainsString("case ebay = 'ebay'", $platform);
-        $this->assertStringContainsString("'platform'          => 'ebay'", $distribution);
-        $this->assertStringContainsString("'adapter_available' => true", $distribution);
+        $this->assertStringContainsString("'platform'          => 'ebay'", $config);
+        $this->assertStringContainsString("'adapter_available' => true", $config);
         $this->assertStringContainsString('social-media.oauth.connect.ebay', $provider);
         $this->assertStringContainsString('ebay.publish', $provider);
         $this->assertStringContainsString('ebay.withdraw', $provider);
