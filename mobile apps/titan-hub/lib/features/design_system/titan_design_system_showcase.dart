@@ -16,6 +16,7 @@ import '../../shared/design_system/foundations/titan_colors.dart';
 import '../../shared/design_system/foundations/titan_radius.dart';
 import '../../shared/design_system/foundations/titan_spacing.dart';
 
+/// Internal component catalogue; it is deliberately absent from customer nav.
 class TitanDesignSystemShowcase extends StatefulWidget {
   const TitanDesignSystemShowcase({super.key});
 
@@ -230,8 +231,8 @@ class _TitanDesignSystemShowcaseState
     );
   }
 
-  Future<void> _showActions(BuildContext context) {
-    return showTitanActionSheet<String>(
+  Future<void> _showActions(BuildContext context) async {
+    await showTitanActionSheet<String>(
       context,
       title: 'Showcase actions',
       message: 'These rows are native Flutter controls.',
