@@ -6,14 +6,16 @@ namespace App\Domains\WorkCore\System\Modules\Wizards\Jobs;
 
 use App\Domains\WorkCore\System\Modules\Wizards\Events\WizardAnswerChanged;
 use App\Domains\WorkCore\System\Modules\Wizards\Services\WizardAnswerRecompositionService;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use TitanZero\Interaction\Vertical\AI\VerticalAIProposalBridge;
 
-final class EnrichWizardAnswerProposal implements ShouldQueue
+final class EnrichWizardAnswerProposal implements ShouldQueue, ShouldBeUnique
 {
     public bool $afterCommit = true;
     public int $tries = 3;
     public int $timeout = 120;
+    public int $uniqueFor = 3600;
 
     /** @param array<string,mixed> $event */
     public function __construct(public readonly array $event) {}
