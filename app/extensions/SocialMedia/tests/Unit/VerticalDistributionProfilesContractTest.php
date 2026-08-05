@@ -6,10 +6,14 @@ use PHPUnit\Framework\TestCase;
 
 class VerticalDistributionProfilesContractTest extends TestCase
 {
+    private function catalogue(): array
+    {
+        return require __DIR__ . '/../../config/vertical-distribution.php';
+    }
+
     public function test_catalogue_exposes_exactly_nine_canonical_vertical_families(): void
     {
-        $catalogue = require __DIR__ . '/../../config/distribution.php';
-        $verticals = (array) ($catalogue['verticals'] ?? []);
+        $verticals = (array) ($this->catalogue()['verticals'] ?? []);
 
         $this->assertSame([
             'field-home-services',
@@ -32,8 +36,7 @@ class VerticalDistributionProfilesContractTest extends TestCase
 
     public function test_catalogue_supports_vertical_specific_distribution_content_types(): void
     {
-        $catalogue = require __DIR__ . '/../../config/distribution.php';
-        $contentTypes = (array) ($catalogue['content_types'] ?? []);
+        $contentTypes = (array) ($this->catalogue()['content_types'] ?? []);
         $model = file_get_contents(__DIR__ . '/../../System/Models/DistributionItem.php');
 
         foreach ([
@@ -50,9 +53,7 @@ class VerticalDistributionProfilesContractTest extends TestCase
 
     public function test_every_vertical_declares_content_destinations_handoffs_and_guidance(): void
     {
-        $catalogue = require __DIR__ . '/../../config/distribution.php';
-
-        foreach ((array) $catalogue['verticals'] as $slug => $profile) {
+        foreach ((array) $this->catalogue()['verticals'] as $slug => $profile) {
             $this->assertNotEmpty($profile['label'] ?? null, $slug);
             $this->assertNotEmpty($profile['content_types'] ?? [], $slug);
             $this->assertNotEmpty($profile['destination_suitability'] ?? [], $slug);
@@ -65,8 +66,7 @@ class VerticalDistributionProfilesContractTest extends TestCase
 
     public function test_generic_fallback_and_suitability_levels_are_explicit(): void
     {
-        $catalogue = require __DIR__ . '/../../config/distribution.php';
-        $generic = (array) ($catalogue['generic_profile'] ?? []);
+        $generic = (array) ($this->catalogue()['generic_profile'] ?? []);
         $service = file_get_contents(__DIR__ . '/../../System/Services/DistributionCapabilityService.php');
 
         $this->assertSame('generic-business', $generic['slug'] ?? null);
@@ -85,7 +85,7 @@ class VerticalDistributionProfilesContractTest extends TestCase
 
     public function test_vertical_profiles_preserve_provider_and_source_authority_boundaries(): void
     {
-        $catalogue = require __DIR__ . '/../../config/distribution.php';
+        $catalogue = $this->catalogue();
         $service = file_get_contents(__DIR__ . '/../../System/Services/DistributionCapabilityService.php');
 
         $this->assertSame(
