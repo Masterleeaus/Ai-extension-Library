@@ -10,6 +10,7 @@ use App\Extensions\SocialMedia\System\Http\Controllers\Common\SocialMediaCampaig
 use App\Extensions\SocialMedia\System\Http\Controllers\Common\SocialMediaCompanyCommonController;
 use App\Extensions\SocialMedia\System\Http\Controllers\EbayListingController;
 use App\Extensions\SocialMedia\System\Http\Controllers\ImageStatusController;
+use App\Extensions\SocialMedia\System\Http\Controllers\MetaAdsController;
 use App\Extensions\SocialMedia\System\Http\Controllers\Oauth\EbayController;
 use App\Extensions\SocialMedia\System\Http\Controllers\Oauth\FacebookController;
 use App\Extensions\SocialMedia\System\Http\Controllers\Oauth\InstagramController;
@@ -94,7 +95,9 @@ class SocialMediaServiceProvider extends ServiceProvider implements UninstallExt
     {
         $this->mergeConfigFrom(__DIR__ . '/../config/social-media.php', 'social-media');
         $this->mergeConfigFrom(__DIR__ . '/../config/ebay.php', 'social-media.ebay');
+        $this->mergeConfigFrom(__DIR__ . '/../config/meta-ads.php', 'social-media.meta_ads');
         config()->set('social-media.distribution.destinations.ebay', config('social-media.ebay.destination'));
+        config()->set('social-media.distribution.destinations.meta-ads', config('social-media.meta_ads.destination'));
 
         return $this;
     }
@@ -195,6 +198,16 @@ class SocialMediaServiceProvider extends ServiceProvider implements UninstallExt
                         $router->post('distribution/{item}/ebay/withdraw', [EbayListingController::class, 'withdraw'])->name('ebay.withdraw');
                         $router->post('distribution/{item}/ebay/reconcile', [EbayListingController::class, 'reconcile'])->name('ebay.reconcile');
                         $router->post('distribution/{item}/ebay/buyer-question-handoff', [EbayListingController::class, 'buyerQuestionHandoff'])->name('ebay.buyer-question-handoff');
+
+                        $router->post('distribution/{item}/meta-ads/draft', [MetaAdsController::class, 'createDraft'])->name('meta-ads.draft.create');
+                        $router->put('paid-media/{campaign}/draft', [MetaAdsController::class, 'updateDraft'])->name('meta-ads.draft.update');
+                        $router->get('paid-media/{campaign}/recommendations', [MetaAdsController::class, 'recommendations'])->name('meta-ads.recommendations');
+                        $router->post('paid-media/{campaign}/approve-budget', [MetaAdsController::class, 'approveBudget'])->name('meta-ads.approve-budget');
+                        $router->post('paid-media/{campaign}/sync-paused', [MetaAdsController::class, 'syncPaused'])->name('meta-ads.sync-paused');
+                        $router->post('paid-media/{campaign}/preview', [MetaAdsController::class, 'preview'])->name('meta-ads.preview');
+                        $router->post('paid-media/{campaign}/activate', [MetaAdsController::class, 'activate'])->name('meta-ads.activate');
+                        $router->post('paid-media/{campaign}/pause', [MetaAdsController::class, 'pause'])->name('meta-ads.pause');
+                        $router->post('paid-media/{campaign}/insights', [MetaAdsController::class, 'insights'])->name('meta-ads.insights');
                     });
 
                 $router
