@@ -89,6 +89,22 @@ test('an owner can poll their completed annotation task', function (): void {
         ->assertJsonPath('data.user_id', $owner->getKey());
 });
 
+test('the queued job captures the authenticated owner without changing existing call sites', function (): void {
+    $owner = User::factory()->create();
+    $this->actingAs($owner);
+
+    $job = new ProcessAnnotationEditJob(
+        123,
+        'prompt',
+        'gpt-image-2',
+        '',
+        null,
+        0,
+    );
+
+    expect($job->userId)->toBe((int) $owner->getKey());
+});
+
 test('a mismatched queued owner cannot fail another users annotation task', function (): void {
     $owner = User::factory()->create();
     $attacker = User::factory()->create();
@@ -97,12 +113,12 @@ test('a mismatched queued owner cannot fail another users annotation task', func
 
     $job = new ProcessAnnotationEditJob(
         $taskId,
-        (int) $attacker->getKey(),
         'prompt',
         'gpt-image-2',
         '',
         null,
         0,
+        (int) $attacker->getKey(),
     );
 
     $job->failed(new RuntimeException('forged failure'));
@@ -123,12 +139,12 @@ test('the matching queued owner can mark their annotation task failed', function
 
     $job = new ProcessAnnotationEditJob(
         $taskId,
-        (int) $owner->getKey(),
         'prompt',
         'gpt-image-2',
         '',
         null,
         0,
+        (int) $owner->getKey(),
     );
 
     $job->failed(new RuntimeException('provider failed'));
