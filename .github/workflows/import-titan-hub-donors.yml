@@ -8,6 +8,7 @@ on:
       - .github/workflows/import-titan-hub-donors.yml
       - transport/titan-hub-import/**
       - scripts/import_titan_hub_donors.py
+      - scripts/import_titan_hub_donors_v2.py
       - scripts/recover_titan_hub_import_key.sh
 
 permissions:
@@ -66,7 +67,7 @@ jobs:
           EXPECTED_PLAINTEXT_BYTES: '54103032'
           EXPECTED_NONCE_B64: YYcLe1CmBQBUzr0A
           EXPECTED_CHUNKS: '104'
-        run: python scripts/import_titan_hub_donors.py
+        run: python scripts/import_titan_hub_donors_v2.py
 
       - name: PHP lint QRPay Laravel donor
         run: |
