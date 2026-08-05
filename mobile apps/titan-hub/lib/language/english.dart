@@ -1,5 +1,5 @@
 class Strings {
-  static String appName = "";
+  static String appName = "Titan Hub";
   static const String appVersion = 'appVersion';
   static const String pleaseFillOutTheField = 'pleaseFillOutTheField';
   static const String signIn = 'signIn';
