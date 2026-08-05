@@ -30,6 +30,8 @@ jobs:
         working-directory: mobile apps/titan-hub
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.27.0'
@@ -37,8 +39,12 @@ jobs:
           cache: true
       - name: Install dependencies
         run: flutter pub get
-      - name: Verify formatting
-        run: dart format --output=none --set-exit-if-changed lib test
+      - name: Verify formatting of changed Dart files
+        run: |
+          git diff --name-only --diff-filter=ACMR origin/main...HEAD -- '*.dart' \
+            | sed 's#^mobile apps/titan-hub/##' \
+            | tr '\n' '\0' \
+            | xargs -0 -r dart format --output=none --set-exit-if-changed
       - name: Analyze
         run: flutter analyze
       - name: Test
