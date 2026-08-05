@@ -82,9 +82,9 @@
             @if (filled($post->content))
                 <div
                     class="mb-3 text-2xs/[1.4em] opacity-65"
-                    x-html="excerpt"
+                    x-text="excerpt"
                 >
-                    {!! Str::limit(strip_tags($post->content), 200) !!}
+                    {{ Str::limit(strip_tags($post->content), 200) }}
                 </div>
             @endif
 
