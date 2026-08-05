@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../foundations/titan_spacing.dart';
+
 enum TitanTextFieldVariant { boxed, basic }
 
 class TitanTextField extends StatefulWidget {
@@ -106,8 +108,8 @@ class _TitanTextFieldState extends State<TitanTextField> {
     final border = widget.variant == TitanTextFieldVariant.basic
         ? const UnderlineInputBorder()
         : const OutlineInputBorder();
-
-    return TextField(
+    final preserveHelper = widget.helperText != null && widget.errorText != null;
+    final field = TextField(
       controller: widget.controller,
       enabled: widget.enabled,
       obscureText: _isObscured,
@@ -118,7 +120,7 @@ class _TitanTextFieldState extends State<TitanTextField> {
       decoration: InputDecoration(
         labelText: widget.label,
         hintText: widget.hint,
-        helperText: widget.helperText,
+        helperText: preserveHelper ? null : widget.helperText,
         errorText: widget.errorText,
         prefixIcon: widget.prefix,
         suffixIcon: suffixes.isEmpty
@@ -127,6 +129,26 @@ class _TitanTextFieldState extends State<TitanTextField> {
         border: border,
         enabledBorder: border,
       ),
+    );
+
+    if (!preserveHelper) return field;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        field,
+        const SizedBox(height: TitanSpacing.xs),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: TitanSpacing.md),
+          child: Text(
+            widget.helperText!,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+          ),
+        ),
+      ],
     );
   }
 }
