@@ -1,5 +1,5 @@
 {
-  "file_count": 128,
+  "file_count": 132,
   "files": [
     {
       "bytes": 225,
@@ -85,6 +85,21 @@
       "bytes": 2252,
       "path": "src/Domains/WorkCore/System/Modules/Dispatch/Providers/WorkDispatchServiceProvider.php",
       "sha256": "af4805b67c0b552b0666cc34ebabb30dd396a1b93d7285927774079cac413d41"
+    },
+    {
+      "bytes": 3527,
+      "path": "src/Domains/WorkCore/System/Modules/Dispatch/Queries/DispatchQueryBuilder.php",
+      "sha256": "3736c0b2721853383414f30822aa0534adec92b96be624cc01225739a63bcce0"
+    },
+    {
+      "bytes": 4271,
+      "path": "src/Domains/WorkCore/System/Modules/Dispatch/Queries/JobQueryBuilder.php",
+      "sha256": "fc9094ca33d2f0bf89b97c1a23d35476012ecc3d088fea2f83a36b2443f2edec"
+    },
+    {
+      "bytes": 4405,
+      "path": "src/Domains/WorkCore/System/Modules/Dispatch/Queries/TechnicianQueryBuilder.php",
+      "sha256": "e472f716a0c0350ef47bf54775f9c6959519b2dc804a12a695ed57596b3e079c"
     },
     {
       "bytes": 23121,
@@ -640,6 +655,11 @@
       "bytes": 855,
       "path": "src/Domains/WorkCore/System/Modules/Scheduling/routes/api.php",
       "sha256": "7e28cc8355f5230392a230d602a941d0b4c74a39aa3b8ed47e5c7c55a540b44f"
+    },
+    {
+      "bytes": 16296,
+      "path": "tests/Unit/Conformance/WorkOperationsConformanceTest.php",
+      "sha256": "551ce14f270fa39f8acc98069a60c83bbee7c622db9553e05426efe13fbc5084"
     }
   ]
 }
