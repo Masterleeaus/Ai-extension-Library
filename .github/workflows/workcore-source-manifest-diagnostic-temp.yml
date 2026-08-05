@@ -12,49 +12,32 @@ permissions:
 jobs:
   collect:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 10
     steps:
       - name: Checkout feature branch
         uses: actions/checkout@v4
         with:
           ref: feature/workcore-wizard-vertical-context
 
-      - name: Trace contract materialization stage
+      - name: Inspect test and contract symlinks
+        working-directory: app/extensions/WorkCore_Platform
         shell: bash
         run: |
           set -euo pipefail
-
-          probe() {
-            stage="$1"
-            echo "===== PROBE: ${stage} ====="
-            find app/extensions/WorkCore_Platform/tests -maxdepth 1 -type f -printf '%f\n' 2>/dev/null | sort | grep -E 'contract|manifest|repository' || true
-            find app/extensions/WorkCore_Platform -type f \( -name 'source-files.json' -o -iname '*source*manifest*.py' \) -print 2>/dev/null || true
-            if [ -f app/extensions/WorkCore_Platform/tests/test_contract_source_manifest.py ]; then
-              echo '===== TEST SOURCE ====='
-              sed -n '1,260p' app/extensions/WorkCore_Platform/tests/test_contract_source_manifest.py
-            fi
-            while IFS= read -r manifest; do
-              echo "===== MANIFEST: ${manifest} ====="
-              sed -n '1,180p' "$manifest"
-            done < <(find app/extensions/WorkCore_Platform -type f -name 'source-files.json' -print 2>/dev/null)
-          }
-
-          probe checkout
-          php packages/titan-interaction-engine/tests/vertical_context.php
-          probe vertical-context-test
-          php packages/titan-interaction-engine/tests/run.php
-          probe interaction-tests
-          php packages/titan-interaction-engine/bin/verify.php
-          probe interaction-verifier
-
-          rm -rf /tmp/workcore-checksum-trace
-          (
-            cd app/extensions/WorkCore_Platform
-            python tools/refresh_package_checksums.py --repo . --output-dir /tmp/workcore-checksum-trace
-          )
-          probe checksum-refresher
-
-          echo '===== GENERATED CHECKSUM OUTPUT ====='
-          find /tmp/workcore-checksum-trace -type f -maxdepth 2 -print | sort
-          echo '===== GIT STATUS AFTER TRACE ====='
-          git status --short
+          echo '===== TEST DIRECTORY ====='
+          ls -la tests | grep -E 'contract|manifest|repository|^l' || true
+          echo '===== TEST SYMLINKS ====='
+          find tests -maxdepth 2 -type l -printf '%p -> %l\n' | sort
+          echo '===== CONTRACT SYMLINKS ====='
+          find . -path './.git' -prune -o -type l -printf '%p -> %l\n' | grep -E 'contract|manifest|source|test' | sort || true
+          echo '===== RESOLVED CONTRACT TEST ====='
+          if [ -e tests/test_contract_source_manifest.py ] || [ -L tests/test_contract_source_manifest.py ]; then
+            readlink -f tests/test_contract_source_manifest.py || true
+            sed -n '1,260p' tests/test_contract_source_manifest.py
+          fi
+          echo '===== RESOLVED SOURCE MANIFESTS ====='
+          find -L . -type f -name 'source-files.json' -print | while read -r file; do
+            echo "--- ${file} ---"
+            readlink -f "$file" || true
+            sed -n '1,180p' "$file"
+          done
