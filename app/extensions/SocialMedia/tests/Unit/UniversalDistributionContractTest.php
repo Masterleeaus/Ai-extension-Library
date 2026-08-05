@@ -27,7 +27,7 @@ class UniversalDistributionContractTest extends TestCase
     public function test_destination_modes_and_unsupported_capabilities_are_explicit(): void
     {
         $model = file_get_contents(__DIR__ . '/../../System/Models/DistributionItem.php');
-        $config = file_get_contents(__DIR__ . '/../../config/social-media.php');
+        $config = file_get_contents(__DIR__ . '/../../config/distribution.php');
         $service = file_get_contents(__DIR__ . '/../../System/Services/DistributionCapabilityService.php');
 
         $this->assertStringContainsString("MODE_DIRECT = 'direct'", $model);
@@ -46,8 +46,8 @@ class UniversalDistributionContractTest extends TestCase
         $service = file_get_contents(__DIR__ . '/../../System/Services/DistributionCapabilityService.php');
         $migration = file_get_contents(__DIR__ . '/../../database/migrations/2026_08_05_000001_create_ext_social_media_distribution_items_table.php');
 
-        $this->assertStringContainsString('\$account->user_id', $service);
-        $this->assertStringContainsString('\$user->getKey()', $service);
+        $this->assertStringContainsString('$account->user_id', $service);
+        $this->assertStringContainsString('$user->getKey()', $service);
         $this->assertStringContainsString('SocialMediaChannelEntitlementService', $service);
         $this->assertStringContainsString("DB::table('ext_social_media_distribution_audits')", $service);
         $this->assertStringContainsString("Schema::create('ext_social_media_distribution_audits'", $migration);
