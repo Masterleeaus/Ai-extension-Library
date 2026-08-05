@@ -41,6 +41,7 @@ class EbayListingIntegrationContractTest extends TestCase
     {
         $service = file_get_contents(__DIR__ . '/../../System/Services/EbayListingService.php');
         $controller = file_get_contents(__DIR__ . '/../../System/Http/Controllers/EbayListingController.php');
+        $platformController = file_get_contents(__DIR__ . '/../../System/Http/Controllers/SocialMediaPlatformController.php');
 
         $this->assertStringContainsString('$item->user_id', $service);
         $this->assertStringContainsString('$account->user_id', $service);
@@ -50,6 +51,8 @@ class EbayListingIntegrationContractTest extends TestCase
         $this->assertStringContainsString('Cache::lock', $controller);
         $this->assertStringContainsString('hash(\'sha256\', $idempotencyKey)', $controller);
         $this->assertStringContainsString('buyerQuestionHandoff', $controller);
+        $this->assertStringContainsString('$platform->user_id', $platformController);
+        $this->assertStringContainsString('not authorized to disconnect', $platformController);
     }
 
     public function test_ebay_is_a_channel_but_not_a_social_post_platform(): void
