@@ -79,7 +79,8 @@ class SessionTokenStore {
 
       final accessToken = decoded['access_token']?.toString();
       final refreshToken = decoded['refresh_token']?.toString();
-      final expiresAt = DateTime.tryParse(decoded['expires_at']?.toString() ?? '');
+      final expiresAt =
+          DateTime.tryParse(decoded['expires_at']?.toString() ?? '');
       if (accessToken == null || accessToken.isEmpty) return null;
       if (refreshToken == null || refreshToken.isEmpty) return null;
       if (expiresAt == null) return null;
