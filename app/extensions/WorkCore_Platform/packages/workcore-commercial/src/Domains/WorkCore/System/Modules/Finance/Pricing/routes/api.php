@@ -14,6 +14,7 @@ Route::prefix((string) config('workcore.pricing.route_prefix', 'api/v1/workcore/
         Route::post('preview', [PricingController::class, 'preview'])->name('preview');
         Route::post('apply', [PricingController::class, 'apply'])->name('apply');
         Route::put('rules', [PricingController::class, 'upsertRule'])->name('rules.upsert');
+        Route::put('seasonal-rates', [PricingController::class, 'upsertSeasonalRate'])->name('seasonal-rates.upsert');
         Route::post('signals', [PricingController::class, 'recordSignal'])->name('signals.record');
         Route::get('analytics', [PricingController::class, 'analytics'])->name('analytics');
     });

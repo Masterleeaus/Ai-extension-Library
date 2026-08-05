@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Domains\WorkCore\System\Modules\Finance\Pricing\Infrastructure;
 
 use App\Domains\WorkCore\System\Modules\Finance\Pricing\Contracts\PricingRepositoryContract;
+use App\Domains\WorkCore\System\Modules\Finance\Pricing\Domain\PricingInputValidator;
 use App\Domains\WorkCore\System\Modules\Finance\Pricing\DTO\PricingDecision;
 use DateTimeInterface;
 use Illuminate\Database\ConnectionInterface;
@@ -13,7 +14,10 @@ use InvalidArgumentException;
 
 final class DatabasePricingRepository implements PricingRepositoryContract
 {
-    public function __construct(private ConnectionInterface $db) {}
+    public function __construct(
+        private ConnectionInterface $db,
+        private PricingInputValidator $validator,
+    ) {}
 
     public function context(int $companyId, array $input, DateTimeInterface $at): array
     {
@@ -81,27 +85,29 @@ final class DatabasePricingRepository implements PricingRepositoryContract
             'rules' => $rules,
             'seasonal_multiplier' => round($seasonalMultiplier, 4),
             'demand_score' => $demandScore === null ? 50.0 : round((float) $demandScore, 2),
-            'occupancy_percentage' => $occupancy === null ? 0.0 : (float) $occupancy->occupancy_percentage,
+            'occupancy_percentage' => $occupancy === null ? null : (float) $occupancy->occupancy_percentage,
         ];
     }
 
     public function upsertRule(int $companyId, int $actorId, array $payload): array
     {
         $this->assertCompanyId($companyId);
+        $this->assertActorId($actorId);
+        $this->validator->validateRule($payload);
         $publicId = trim((string) ($payload['public_id'] ?? '')) ?: (string) Str::ulid();
-        $type = trim((string) ($payload['adjustment_type'] ?? ''));
+        $type = trim((string) $payload['adjustment_type']);
         if (! in_array($type, ['fixed_minor', 'percentage', 'multiplier'], true)) {
             throw new InvalidArgumentException('Unsupported pricing adjustment type.');
         }
         $record = [
             'company_id' => $companyId,
             'public_id' => $publicId,
-            'name' => trim((string) ($payload['name'] ?? 'Pricing rule')),
+            'name' => trim((string) $payload['name']),
             'target_type' => $this->nullableString($payload['target_type'] ?? null),
             'target_reference' => $this->nullableString($payload['target_reference'] ?? null),
             'priority' => max(0, min(10000, (int) ($payload['priority'] ?? 100))),
             'adjustment_type' => $type,
-            'adjustment_value' => (float) ($payload['adjustment_value'] ?? 0),
+            'adjustment_value' => (float) $payload['adjustment_value'],
             'conditions' => json_encode(is_array($payload['conditions'] ?? null) ? $payload['conditions'] : [], JSON_THROW_ON_ERROR),
             'starts_at' => $payload['starts_at'] ?? null,
             'ends_at' => $payload['ends_at'] ?? null,
@@ -120,16 +126,52 @@ final class DatabasePricingRepository implements PricingRepositoryContract
         return $this->ruleByPublicId($companyId, $publicId);
     }
 
+    public function upsertSeasonalRate(int $companyId, int $actorId, array $payload): array
+    {
+        $this->assertCompanyId($companyId);
+        $this->assertActorId($actorId);
+        $this->validator->validateSeasonalRate($payload);
+        $publicId = trim((string) ($payload['public_id'] ?? '')) ?: (string) Str::ulid();
+        $record = [
+            'company_id' => $companyId,
+            'public_id' => $publicId,
+            'name' => trim((string) $payload['name']),
+            'target_type' => $this->nullableString($payload['target_type'] ?? null),
+            'target_reference' => $this->nullableString($payload['target_reference'] ?? null),
+            'starts_on' => (string) $payload['starts_on'],
+            'ends_on' => (string) $payload['ends_on'],
+            'multiplier' => round((float) $payload['multiplier'], 4),
+            'priority' => max(0, min(10000, (int) ($payload['priority'] ?? 100))),
+            'is_active' => (bool) ($payload['is_active'] ?? true),
+            'updated_by' => $actorId,
+            'updated_at' => now(),
+        ];
+        $query = $this->db->table('tz_seasonal_rates')
+            ->where('company_id', $companyId)
+            ->where('public_id', $publicId);
+        if ((clone $query)->exists()) {
+            $query->update($record);
+        } else {
+            $record['created_by'] = $actorId;
+            $record['created_at'] = now();
+            $this->db->table('tz_seasonal_rates')->insert($record);
+        }
+
+        return $this->seasonalRateByPublicId($companyId, $publicId);
+    }
+
     public function recordSignal(int $companyId, int $actorId, array $payload): array
     {
         $this->assertCompanyId($companyId);
-        $type = trim((string) ($payload['signal_type'] ?? ''));
+        $this->assertActorId($actorId);
+        $this->validator->validateSignal($payload);
+        $type = trim((string) $payload['signal_type']);
         $publicId = (string) Str::ulid();
         $common = [
             'company_id' => $companyId,
             'public_id' => $publicId,
-            'target_type' => trim((string) ($payload['target_type'] ?? 'generic')),
-            'target_reference' => trim((string) ($payload['target_reference'] ?? 'default')),
+            'target_type' => trim((string) $payload['target_type']),
+            'target_reference' => trim((string) $payload['target_reference']),
             'source' => trim((string) ($payload['source'] ?? 'manual')),
             'recorded_by' => $actorId,
             'recorded_at' => $payload['recorded_at'] ?? now(),
@@ -146,14 +188,14 @@ final class DatabasePricingRepository implements PricingRepositoryContract
         $specific = match ($type) {
             'demand' => [
                 'indicator_type' => trim((string) ($payload['indicator_type'] ?? 'composite')),
-                'score' => max(0, min(100, (float) ($payload['score'] ?? 0))),
+                'score' => round((float) $payload['score'], 2),
                 'quantity' => max(0, (int) ($payload['quantity'] ?? 0)),
             ],
             'occupancy' => $this->occupancyPayload($payload),
             'competitor' => [
-                'competitor_name' => trim((string) ($payload['competitor_name'] ?? 'Competitor')),
-                'observed_price_minor' => max(0, (int) ($payload['observed_price_minor'] ?? 0)),
-                'currency' => strtoupper(trim((string) ($payload['currency'] ?? 'AUD'))),
+                'competitor_name' => trim((string) $payload['competitor_name']),
+                'observed_price_minor' => (int) $payload['observed_price_minor'],
+                'currency' => strtoupper(trim((string) $payload['currency'])),
                 'source_url' => $this->nullableString($payload['source_url'] ?? null),
             ],
         };
@@ -164,12 +206,14 @@ final class DatabasePricingRepository implements PricingRepositoryContract
     public function recordDecision(int $companyId, int $actorId, array $input, PricingDecision $decision): array
     {
         $this->assertCompanyId($companyId);
+        $this->assertActorId($actorId);
+        $this->validator->validatePriceInput($input);
         $publicId = (string) Str::ulid();
         $record = [
             'company_id' => $companyId,
             'public_id' => $publicId,
-            'target_type' => trim((string) ($input['target_type'] ?? 'generic')),
-            'target_reference' => trim((string) ($input['target_reference'] ?? 'default')),
+            'target_type' => trim((string) $input['target_type']),
+            'target_reference' => trim((string) $input['target_reference']),
             'base_price_minor' => $decision->basePriceMinor,
             'final_price_minor' => $decision->finalPriceMinor,
             'currency' => $decision->currency,
@@ -203,6 +247,12 @@ final class DatabasePricingRepository implements PricingRepositoryContract
 
         $competitors = $this->db->table('tz_competitor_price_snapshots')->where('company_id', $companyId)
             ->where('recorded_at', '>=', now()->subDays($days));
+        if (! empty($filters['target_type'])) {
+            $competitors->where('target_type', (string) $filters['target_type']);
+        }
+        if (! empty($filters['target_reference'])) {
+            $competitors->where('target_reference', (string) $filters['target_reference']);
+        }
         $competitorAverage = (float) ((clone $competitors)->avg('observed_price_minor') ?? 0);
         $ownAverage = $count > 0 ? $finalTotal / $count : 0.0;
         $marketIndex = $ownAverage > 0 && $competitorAverage > 0 ? $competitorAverage / $ownAverage : 1.0;
@@ -235,6 +285,13 @@ final class DatabasePricingRepository implements PricingRepositoryContract
         }
     }
 
+    private function assertActorId(int $actorId): void
+    {
+        if ($actorId < 1) {
+            throw new InvalidArgumentException('A valid WorkCore actor is required.');
+        }
+    }
+
     /** @return array<string,mixed> */
     private function ruleByPublicId(int $companyId, string $publicId): array
     {
@@ -248,6 +305,30 @@ final class DatabasePricingRepository implements PricingRepositoryContract
             'priority' => (int) $row->priority,
             'adjustment_type' => (string) $row->adjustment_type,
             'adjustment_value' => (float) $row->adjustment_value,
+            'is_active' => (bool) $row->is_active,
+        ];
+    }
+
+    /** @return array<string,mixed> */
+    private function seasonalRateByPublicId(int $companyId, string $publicId): array
+    {
+        $row = $this->db->table('tz_seasonal_rates')
+            ->where('company_id', $companyId)
+            ->where('public_id', $publicId)
+            ->first();
+        if (! $row) {
+            throw new InvalidArgumentException('Seasonal rate was not persisted.');
+        }
+
+        return [
+            'public_id' => (string) $row->public_id,
+            'name' => (string) $row->name,
+            'target_type' => $row->target_type === null ? null : (string) $row->target_type,
+            'target_reference' => $row->target_reference === null ? null : (string) $row->target_reference,
+            'starts_on' => (string) $row->starts_on,
+            'ends_on' => (string) $row->ends_on,
+            'multiplier' => (float) $row->multiplier,
+            'priority' => (int) $row->priority,
             'is_active' => (bool) $row->is_active,
         ];
     }

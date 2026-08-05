@@ -21,7 +21,7 @@ return new class extends Migration
         Schema::create('tz_seasonal_rates', function (Blueprint $table): void {
             $table->id(); $table->unsignedBigInteger('company_id')->index(); $table->string('public_id', 26); $table->string('name', 160);
             $table->string('target_type', 80)->nullable()->index(); $table->string('target_reference', 160)->nullable()->index(); $table->date('starts_on'); $table->date('ends_on');
-            $table->decimal('multiplier', 8, 4); $table->unsignedInteger('priority')->default(100); $table->boolean('is_active')->default(true)->index(); $table->unsignedBigInteger('created_by'); $table->timestamps();
+            $table->decimal('multiplier', 8, 4); $table->unsignedInteger('priority')->default(100); $table->boolean('is_active')->default(true)->index(); $table->unsignedBigInteger('created_by'); $table->unsignedBigInteger('updated_by'); $table->timestamps();
             $table->unique(['company_id','public_id']); $table->index(['company_id','starts_on','ends_on','is_active'], 'tz_seasonal_rates_dates_idx');
         });
         Schema::create('tz_demand_indicators', function (Blueprint $table): void {

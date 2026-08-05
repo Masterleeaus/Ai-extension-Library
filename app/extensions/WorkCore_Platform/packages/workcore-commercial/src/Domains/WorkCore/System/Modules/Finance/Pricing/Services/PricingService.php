@@ -6,6 +6,7 @@ namespace App\Domains\WorkCore\System\Modules\Finance\Pricing\Services;
 
 use App\Domains\WorkCore\System\Modules\Finance\Pricing\Contracts\PricingRepositoryContract;
 use App\Domains\WorkCore\System\Modules\Finance\Pricing\Domain\DynamicPriceCalculator;
+use App\Domains\WorkCore\System\Modules\Finance\Pricing\Domain\PricingInputValidator;
 use App\Domains\WorkCore\System\Modules\Finance\Pricing\DTO\PricingDecision;
 use DateTimeImmutable;
 
@@ -15,16 +16,18 @@ final class PricingService
         private PricingRepositoryContract $repository,
         private DynamicPriceCalculator $calculator,
         private DemandAnalysisService $demand,
+        private PricingInputValidator $validator,
     ) {}
 
     /** @param array<string,mixed> $input */
     public function preview(int $companyId, array $input): PricingDecision
     {
+        $this->validator->validatePriceInput($input);
         $context = $this->repository->context($companyId, $input, new DateTimeImmutable());
         if (isset($input['demand_signals']) && is_array($input['demand_signals'])) {
             $context['demand_score'] = $this->demand->score($input['demand_signals']);
         }
-        return $this->calculator->calculate($input + $context);
+        return $this->calculator->calculate(array_replace($input, $context));
     }
 
     /** @param array<string,mixed> $input @return array<string,mixed> */

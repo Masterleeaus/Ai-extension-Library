@@ -61,8 +61,11 @@ final class DynamicPriceCalculator
         $seasonalMultiplier = $this->boundedMultiplier((float) ($input['seasonal_multiplier'] ?? 1.0), 'seasonal_multiplier');
         $price = (int) round($price * $seasonalMultiplier);
 
-        $occupancyPercentage = $this->boundedScore((float) ($input['occupancy_percentage'] ?? 0));
-        $occupancyMultiplier = $this->occupancyMultiplier($occupancyPercentage);
+        $occupancyValue = $input['occupancy_percentage'] ?? null;
+        $occupancyPercentage = $occupancyValue === null || $occupancyValue === ''
+            ? null
+            : $this->boundedScore((float) $occupancyValue);
+        $occupancyMultiplier = $occupancyPercentage === null ? 1.0 : $this->occupancyMultiplier($occupancyPercentage);
         $price = (int) round($price * $occupancyMultiplier);
 
         $demandScore = $this->boundedScore((float) ($input['demand_score'] ?? 50));
@@ -127,7 +130,7 @@ final class DynamicPriceCalculator
             return true;
         }
         $values = $context + [
-            'occupancy_percentage' => (float) ($input['occupancy_percentage'] ?? 0),
+            'occupancy_percentage' => array_key_exists('occupancy_percentage', $input) ? $input['occupancy_percentage'] : null,
             'demand_score' => (float) ($input['demand_score'] ?? 50),
             'target_type' => (string) ($input['target_type'] ?? ''),
             'target_reference' => (string) ($input['target_reference'] ?? ''),
@@ -137,14 +140,20 @@ final class DynamicPriceCalculator
             $key = (string) $key;
             if (str_ends_with($key, '_min')) {
                 $actualKey = substr($key, 0, -4);
-                if ((float) ($values[$actualKey] ?? 0) < (float) $expected) {
+                if (! array_key_exists($actualKey, $values) || $values[$actualKey] === null || $values[$actualKey] === '') {
+                    return false;
+                }
+                if ((float) $values[$actualKey] < (float) $expected) {
                     return false;
                 }
                 continue;
             }
             if (str_ends_with($key, '_max')) {
                 $actualKey = substr($key, 0, -4);
-                if ((float) ($values[$actualKey] ?? 0) > (float) $expected) {
+                if (! array_key_exists($actualKey, $values) || $values[$actualKey] === null || $values[$actualKey] === '') {
+                    return false;
+                }
+                if ((float) $values[$actualKey] > (float) $expected) {
                     return false;
                 }
                 continue;

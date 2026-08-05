@@ -16,6 +16,9 @@ interface PricingRepositoryContract
     public function upsertRule(int $companyId, int $actorId, array $payload): array;
 
     /** @param array<string,mixed> $payload @return array<string,mixed> */
+    public function upsertSeasonalRate(int $companyId, int $actorId, array $payload): array;
+
+    /** @param array<string,mixed> $payload @return array<string,mixed> */
     public function recordSignal(int $companyId, int $actorId, array $payload): array;
 
     /** @param array<string,mixed> $input @return array<string,mixed> */
