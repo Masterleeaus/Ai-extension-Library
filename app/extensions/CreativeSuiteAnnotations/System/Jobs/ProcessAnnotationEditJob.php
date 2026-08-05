@@ -31,6 +31,7 @@ class ProcessAnnotationEditJob implements ShouldQueue
 
     public function __construct(
         public int $userOpenaiId,
+        public int $userId,
         public string $prompt,
         public string $modelSlug,
         public string $imageDiskPath,
@@ -40,7 +41,9 @@ class ProcessAnnotationEditJob implements ShouldQueue
 
     public function handle(): void
     {
-        $userOpenai = UserOpenai::query()->find($this->userOpenaiId);
+        $userOpenai = UserOpenai::query()
+            ->where('user_id', $this->userId)
+            ->find($this->userOpenaiId);
 
         if (! $userOpenai) {
             $this->cleanupInputs();
@@ -111,7 +114,9 @@ class ProcessAnnotationEditJob implements ShouldQueue
             'error'          => $exception?->getMessage(),
         ]);
 
-        $userOpenai = UserOpenai::query()->find($this->userOpenaiId);
+        $userOpenai = UserOpenai::query()
+            ->where('user_id', $this->userId)
+            ->find($this->userOpenaiId);
 
         if ($userOpenai) {
             $userOpenai->update([
