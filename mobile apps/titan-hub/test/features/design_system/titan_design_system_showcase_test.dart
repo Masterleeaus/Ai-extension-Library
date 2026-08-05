@@ -6,6 +6,7 @@ import 'package:qrpay/features/design_system/titan_design_system_showcase.dart';
 import 'package:qrpay/routes/routes.dart';
 import 'package:qrpay/shared/design_system/foundations/titan_theme.dart';
 
+// The showcase is internal tooling and must never become primary navigation.
 Future<void> _pumpShowcase(
   WidgetTester tester, {
   required Size size,
