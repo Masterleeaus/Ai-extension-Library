@@ -1,0 +1,50 @@
+name: Layered Wizard Composer Boundary Diagnostic
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/layered-wizard-question-composer
+
+      - name: Inspect wizard definition and run snapshot boundaries
+        shell: bash
+        run: |
+          set -euo pipefail
+          root='app/extensions/WorkCore_Platform/packages/workcore-business-network/src/Domains/WorkCore/System/Modules/Wizards'
+
+          echo '===== DEFINITION REGISTRY AND RUNTIME ====='
+          for file in \
+            "$root/Services/WizardDefinitionRegistry.php" \
+            "$root/Services/WizardRuntime.php" \
+            "$root/Repositories/EloquentWizardRepository.php" \
+            "$root/Services/WizardBranchEvaluator.php" \
+            "$root/Services/WizardAnswerValidator.php"; do
+            echo "--- ${file} ---"
+            sed -n '1,420p' "$file"
+          done
+
+          echo '===== WIZARD RESOURCES ====='
+          find "$root" app/extensions/WorkCore_Platform/packages/workcore-business-network/resources packages/titan-interaction-engine/resources \
+            -type f \( -name '*.json' -o -name '*.php' -o -name '*.yaml' -o -name '*.yml' \) 2>/dev/null \
+            | grep -E 'wizard|definition|question|onboard|vertical' | sort | head -180
+
+          echo '===== QUESTION SCHEMA PATTERNS ====='
+          grep -RIn --exclude-dir=.git -E 'response_type|mandatory|extension_slot|depends_on|affects|question_key|definition_version|definition_snapshot|snapshot' \
+            "$root" app/extensions/WorkCore_Platform/packages/workcore-business-network/resources packages/titan-interaction-engine 2>/dev/null | head -420 || true
+
+          echo '===== CONFIGURED DEFINITIONS ====='
+          find "$root" -type f -name '*.json' -print | while read -r file; do
+            echo "--- ${file} ---"
+            sed -n '1,520p' "$file"
+          done
