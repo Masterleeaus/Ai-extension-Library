@@ -15,9 +15,7 @@ class BusinessBranding {
 
     return BusinessBranding(
       appName: appName == null || appName.isEmpty ? 'Titan Hub' : appName,
-      accentHex: accentHex == null || accentHex.isEmpty
-          ? '#1F6BFF'
-          : accentHex,
+      accentHex: accentHex == null || accentHex.isEmpty ? '#1F6BFF' : accentHex,
       logoUrl: logoUrl == null || logoUrl.isEmpty ? null : logoUrl,
     );
   }
