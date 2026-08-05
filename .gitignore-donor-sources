@@ -1,0 +1,323 @@
+# Donor Sources Security Filters
+# This file contains comprehensive .gitignore rules for imported donor sources
+# covering Flutter, Android, iOS, Laravel, Composer, IDE, build, secret, and generated files
+
+# ========== SECRETS AND CREDENTIALS ==========
+.env
+.env.local
+.env.*.local
+.env.*.php
+.env.*.blade.php
+!.env.example
+.envrc
+secrets.json
+secrets.local.json
+credentials.json
+credentials.local.json
+config/secrets/
+.secrets/
+*.pem
+*.key
+*.p12
+*.pfx
+id_rsa
+id_rsa.pub
+
+# ========== FLUTTER & DART ==========
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+build/
+flutter_gen/
+*.iml
+.idea/
+.vscode/
+.packages
+pubspec.lock
+
+# ========== FLUTTER iOS ==========
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
+ios/Flutter/Generated.xcconfig
+ios/Flutter/flutter_export_environment.sh
+ios/Runner.xcworkspace/
+ios/Pods/
+ios/Podfile.lock
+ios/Flutter/ephemeral/
+ios/Runner/GeneratedPluginRegistrant.*
+ios/Pods/**/*
+.symlinks/
+Flutter/Flutter.framework
+Flutter/Flutter.podspec
+
+# ========== FLUTTER Android ==========
+android/.gradle
+android/build/
+android/local.properties
+android/gradle.properties
+android/app/debug/
+android/app/release/
+android/app/profile/
+android/key.properties
+android/*.jks
+android/*.keystore
+android/*.p12
+android/app/google-services.json
+android/app/src/main/google-services.json
+local.properties
+.gradle/
+*.apk
+*.aab
+
+# ========== iOS CERTIFICATES & CREDENTIALS ==========
+*.p8
+*.cer
+*.crt
+*.certSigningRequest
+*.mobileprovision
+*.provisionprofile
+*.pbxuser
+*.perspectivev3
+xcode.xcworkspace/xcshareddata/
+xcshareddata/
+*.xcworkspace
+DerivedData/
+build/
+*.xcarchive
+*.ipa
+*.dSYM
+
+# ========== FIREBASE CREDENTIALS ==========
+google-services.json
+GoogleService-Info.plist
+serviceAccountKey.json
+firebase-config.json
+
+# ========== LARAVEL FRAMEWORK ==========
+app/Http/Controllers/Auth/
+bootstrap/cache/
+storage/logs/
+storage/cache/
+storage/app/
+storage/framework/
+.env
+.env.*.php
+.env.backup
+config/database.php
+config/auth.php
+routes/web.php
+routes/api.php
+database/factories/
+database/seeders/
+database/migrations/
+app/Models/
+resources/views/
+public/storage
+
+# ========== LARAVEL COMPOSER ==========
+vendor/
+composer.lock
+composer.json (vendorified versions only)
+
+# ========== NPM & NODE ==========
+node_modules/
+package-lock.json
+npm-debug.log
+npm-debug.log.*
+yarn.lock
+.yarn/
+.yarnrc.yml
+
+# ========== LARAVEL ARTISAN ==========
+artisan
+bootstrap/cache/app.php
+bootstrap/cache/config.php
+bootstrap/cache/services.php
+
+# ========== LARAVEL GENERATED FILES ==========
+public/js/
+public/css/
+public/mix-manifest.json
+public/hot
+public/storage/
+storage/app/public/
+
+# ========== IDE AND EDITOR CONFIGURATIONS ==========
+.vscode/
+.vscode/settings.json
+.vscode/launch.json
+.vscode/extensions.json
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+*.sublime-workspace
+*.sublime-project
+.atom/
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/dictionaries/
+.idea/vcs.xml
+.idea/jsLibraryMappings.xml
+.idea/misc.xml
+
+# ========== ANDROID STUDIO SPECIFIC ==========
+.gradle/
+.idea/
+local.properties
+gradlew
+gradlew.bat
+.idea/gradle.xml
+.idea/libraries
+.idea/modules.xml
+.idea/workspace.xml
+.idea/vcs.xml
+build/
+android/app/debug
+android/app/release
+
+# ========== XCODE SPECIFIC ==========
+build/
+*.pbxuser
+*.mode1v3
+*.mode2v3
+*.perspectivev3
+*.xcworkspace/
+xcuserdata/
+*.xcworkspace/xcshareddata/WorkspaceSettings.xcsettings
+
+# ========== BUILD ARTIFACTS ==========
+*.o
+*.a
+*.so
+*.dylib
+*.dll
+*.exe
+*.out
+*.app
+build/
+dist/
+*.apk
+*.aab
+*.ipa
+*.dmg
+
+# ========== LOGS AND TEMPORARY FILES ==========
+*.log
+*.logs/
+logs/
+log/
+tmp/
+temp/
+*.tmp
+*.swp
+*.bak
+*.backup
+*~
+
+# ========== OS SPECIFIC FILES ==========
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# ========== VSCODE SPECIFIC ==========
+.vscode/settings.json
+.vscode/launch.json
+.vscode/extensions.json
+.vscode-test/
+.vscode/tasks.json
+
+# ========== JETBRAINS SPECIFIC ==========
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# ========== VISUAL STUDIO CODE SPECIFIC ==========
+.history/
+.ionide/
+
+# ========== SECURITY SCAN REPORTS ==========
+security-report.json
+scan-results/
+vulnerability-report/
+
+# ========== GENERATED DOCUMENTATION ==========
+docs/generated/
+api-docs/
+javadoc/
+
+# ========== CACHES ==========
+.cache/
+*.cache
+cache/
+.thumbnails/
+.eslintcache
+
+# ========== BUNDLE/DEPENDENCY CACHES ==========
+Gemfile.lock
+.bundle/
+vendor/bundle/
+.gradle/
+.maven/
+.m2/
+
+# ========== LARAVEL SPECIFIC DIRECTORIES ==========
+bootstrap/cache/
+storage/app/
+storage/framework/cache/
+storage/framework/sessions/
+storage/framework/testing/
+storage/logs/
+storage/oauth-private.key
+storage/oauth-public.key
+
+# ========== CUSTOM APPLICATION LOGS ==========
+application-*.log
+system-*.log
+
+# ========== DEPLOYMENT CONFIGURATIONS ==========
+.deploy/
+deployment/
+ansible/inventory/group_vars/*/
+ansible/host_vars/*/
+
+# ========== KUBERNETES CONFIGS ==========
+k8s/secrets/
+.kube/config
+
+# ========== AWS CREDENTIALS ==========
+.aws/credentials
+.aws/config
+aws-credentials.json
+
+# ========== GCP CREDENTIALS ==========
+google-cloud-key.json
+gcp-credentials.json
+.gcloud/
+
+# ========== AZURE CREDENTIALS ==========
+.azure/
+azure-credentials.json
+
+# ========== CI/CD CONFIGURATIONS ==========
+.github/workflows/secrets/
+.gitlab-ci.yml.local
+.travis.yml.local
+
+# ========== DONE - NO MORE ENTRIES BELOW ==========
+# End of comprehensive .gitignore for donor sources
