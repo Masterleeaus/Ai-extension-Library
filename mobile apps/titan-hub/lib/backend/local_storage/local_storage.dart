@@ -39,12 +39,14 @@ class LocalStorages {
 
   static Future<void> initializeSecureSession() async {
     final session = await _sessionTokens.readSession();
-    _cachedToken =
-        session?.accessToken ?? await _secureStorage.read(_secureAccessTokenKey);
+    _cachedToken = session?.accessToken ??
+        await _secureStorage.read(_secureAccessTokenKey);
 
     final box = GetStorage();
     final legacyToken = box.read(tokenKey);
-    if (_cachedToken == null && legacyToken is String && legacyToken.isNotEmpty) {
+    if (_cachedToken == null &&
+        legacyToken is String &&
+        legacyToken.isNotEmpty) {
       _cachedToken = legacyToken;
       await _secureStorage.write(_secureAccessTokenKey, legacyToken);
     }
