@@ -32,9 +32,9 @@ class PinterestController extends Controller
             ]);
         }
 
-        if (! setting('PINTEREST_CLIENT_ID')
-            || ! setting('PINTEREST_CLIENT_SECRET')
-            || ! setting('PINTEREST_REDIRECT_URI')) {
+        if (! (setting('PINTEREST_CLIENT_ID') ?: config('social-media.pinterest.client_id'))
+            || ! (setting('PINTEREST_CLIENT_SECRET') ?: config('social-media.pinterest.client_secret'))
+            || ! (setting('PINTEREST_REDIRECT_URI') ?: config('social-media.pinterest.redirect_uri'))) {
             return back()->with([
                 'type' => 'error',
                 'message' => trans('Pinterest OAuth settings must be configured.'),
@@ -130,7 +130,11 @@ class PinterestController extends Controller
 
             $userData = (array) $userResponse->json();
             $boards = $boardsResponse->successful()
-                ? array_slice(array_values((array) $boardsResponse->json('items', [])), 0, 100)
+                ? array_slice(array_values(array_filter(
+                    (array) $boardsResponse->json('items', []),
+                    static fn ($board): bool => is_array($board)
+                        && strtoupper((string) ($board['privacy'] ?? 'PUBLIC')) !== 'SECRET'
+                )), 0, 100)
                 : [];
             $scope = static fn (string $required): bool => in_array(
                 $required,
