@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:qrpay/backend/services/api_endpoint.dart';
+import 'package:qrpay/features/design_system/titan_design_system_showcase.dart';
 import 'package:qrpay/routes/routes.dart';
 import 'package:qrpay/views/auth/kyc_from/wait_for_approval_screen.dart';
 import 'package:qrpay/views/auth/login/otp_verification_screen.dart';
@@ -138,6 +139,10 @@ class RoutePageList {
       name: Routes.bottomNavBarScreen,
       page: () => const BottomNavBarScreen(),
       binding: InitialScreenBindings(),
+    ),
+    GetPage(
+      name: Routes.designSystemShowcase,
+      page: () => const TitanDesignSystemShowcase(),
     ),
     GetPage(
       name: Routes.dashboardScreen,
