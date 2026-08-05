@@ -42,12 +42,14 @@ jobs:
         run: |
           set -euo pipefail
           patch="$RUNNER_TEMP/workcore-353-patch.tar.gz"
+          listing="$RUNNER_TEMP/workcore-353-patch-files.txt"
           curl --fail --location --retry 3 \
             'https://titan-create-phase-0-1.miniup.app/downloads/workcore-353-patch.tar.gz' \
             --output "$patch"
           echo '446ff7006c1227fd39eeafbe0d015580cb92b34b9b87a09e5b36af657d8a4451  '"$patch" | sha256sum --check --strict
-          tar -tzf "$patch" | grep -q '^packages/workcore-commercial/src/Domains/WorkCore/System/Modules/Finance/Pricing/Domain/DynamicPriceCalculator.php$'
-          tar -tzf "$patch" | grep -q '^packages/workcore-shared-foundation/src/Domains/WorkCore/Database/Migrations/2026_08_05_180000_create_workcore_dynamic_pricing_tables.php$'
+          tar -tzf "$patch" > "$listing"
+          grep -Fxq 'packages/workcore-commercial/src/Domains/WorkCore/System/Modules/Finance/Pricing/Domain/DynamicPriceCalculator.php' "$listing"
+          grep -Fxq 'packages/workcore-shared-foundation/src/Domains/WorkCore/Database/Migrations/2026_08_05_180000_create_workcore_dynamic_pricing_tables.php' "$listing"
 
       - name: Apply patch to canonical WorkCore platform
         shell: bash
