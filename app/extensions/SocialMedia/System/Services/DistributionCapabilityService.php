@@ -19,12 +19,7 @@ class DistributionCapabilityService
         ?SocialMediaPlatform $account = null,
         bool $audit = true
     ): array {
-        $definition = config("social-media.distribution.destinations.{$destination}");
-
-        if (! is_array($definition)) {
-            $definition = $this->unsupportedDefinition();
-        }
-
+        $definition = $this->destinations()[$destination] ?? $this->unsupportedDefinition();
         $mode = (string) ($definition['mode'] ?? DistributionItem::MODE_EXPORT_ONLY);
         $declaredCapabilities = (array) ($definition['capabilities'] ?? []);
         $tenantAllowed = ! $account || (int) $account->user_id === (int) $user->getKey();
@@ -72,9 +67,7 @@ class DistributionCapabilityService
 
     public function matrixForUser(User $user, bool $audit = false): array
     {
-        $destinations = (array) config('social-media.distribution.destinations', []);
-
-        return collect($destinations)
+        return collect($this->destinations())
             ->mapWithKeys(function (array $definition, string $destination) use ($user, $audit) {
                 $platform = $definition['platform'] ?? null;
                 $account = $platform
@@ -90,6 +83,19 @@ class DistributionCapabilityService
                 ];
             })
             ->all();
+    }
+
+    private function destinations(): array
+    {
+        $configured = config('social-media.distribution.destinations');
+
+        if (is_array($configured) && $configured !== []) {
+            return $configured;
+        }
+
+        $catalogue = require dirname(__DIR__, 2) . '/config/distribution.php';
+
+        return (array) ($catalogue['destinations'] ?? []);
     }
 
     private function reason(
@@ -145,14 +151,14 @@ class DistributionCapabilityService
             'required_fields'   => [],
             'media_rules'       => [],
             'capabilities'      => [
-                'publish'  => false,
-                'schedule' => false,
-                'edit'     => false,
-                'delete'   => false,
-                'analytics'=> false,
-                'inbox'    => false,
-                'pricing'  => false,
-                'inventory'=> false,
+                'publish'   => false,
+                'schedule'  => false,
+                'edit'      => false,
+                'delete'    => false,
+                'analytics' => false,
+                'inbox'     => false,
+                'pricing'   => false,
+                'inventory' => false,
             ],
             'approval_required' => false,
         ];
