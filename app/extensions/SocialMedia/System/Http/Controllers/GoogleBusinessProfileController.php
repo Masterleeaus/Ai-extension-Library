@@ -5,6 +5,7 @@ namespace App\Extensions\SocialMedia\System\Http\Controllers;
 use App\Extensions\SocialMedia\System\Enums\PlatformEnum;
 use App\Extensions\SocialMedia\System\Models\DistributionItem;
 use App\Extensions\SocialMedia\System\Models\SocialMediaPlatform;
+use App\Extensions\SocialMedia\System\Services\GoogleBusinessProfileResourceGuard;
 use App\Extensions\SocialMedia\System\Services\GoogleBusinessProfileService;
 use App\Http\Controllers\Controller;
 use Illuminate\Contracts\Cache\LockTimeoutException;
@@ -18,7 +19,10 @@ use Throwable;
 
 class GoogleBusinessProfileController extends Controller
 {
-    public function __construct(private readonly GoogleBusinessProfileService $service) {}
+    public function __construct(
+        private readonly GoogleBusinessProfileService $service,
+        private readonly GoogleBusinessProfileResourceGuard $resources
+    ) {}
 
     public function readiness(Request $request): JsonResponse
     {
@@ -32,16 +36,24 @@ class GoogleBusinessProfileController extends Controller
 
     public function publish(Request $request, DistributionItem $item): JsonResponse
     {
-        $this->assertItemOwner($item);
+        $this->assertOwnedItem($item);
         $validated = $this->validateMutation($request);
+        $account = $this->account((int) $validated['account_id']);
+        $payload = (array) $validated['payload'];
+        $resources = $this->resources->resolveLocation(
+            $account,
+            (string) $payload['account_name'],
+            (string) $payload['location_name']
+        );
+        $payload['location_name'] = $resources['account_location_name'];
 
         return $this->respond(fn () => $this->locked(
             $item,
             fn () => $this->service->publish(
                 $request->user(),
                 $item,
-                $this->account((int) $validated['account_id']),
-                (array) $validated['payload'],
+                $account,
+                $payload,
                 (string) $validated['idempotency_key']
             )
         ));
@@ -49,16 +61,24 @@ class GoogleBusinessProfileController extends Controller
 
     public function uploadPhoto(Request $request, DistributionItem $item): JsonResponse
     {
-        $this->assertItemOwner($item);
+        $this->assertOwnedItem($item);
         $validated = $this->validateMutation($request);
+        $account = $this->account((int) $validated['account_id']);
+        $payload = (array) $validated['payload'];
+        $resources = $this->resources->resolveLocation(
+            $account,
+            (string) $payload['account_name'],
+            (string) $payload['location_name']
+        );
+        $payload['location_name'] = $resources['account_location_name'];
 
         return $this->respond(fn () => $this->locked(
             $item,
             fn () => $this->service->uploadPhoto(
                 $request->user(),
                 $item,
-                $this->account((int) $validated['account_id']),
-                (array) $validated['payload'],
+                $account,
+                $payload,
                 (string) $validated['idempotency_key']
             )
         ));
@@ -66,15 +86,16 @@ class GoogleBusinessProfileController extends Controller
 
     public function reconcile(Request $request, DistributionItem $item): JsonResponse
     {
-        $this->assertItemOwner($item);
+        $this->assertOwnedItem($item);
         $validated = $request->validate(['account_id' => 'required|integer']);
+        $account = $this->account((int) $validated['account_id']);
 
         return $this->respond(fn () => $this->locked(
             $item,
             fn () => $this->service->reconcile(
                 $request->user(),
                 $item,
-                $this->account((int) $validated['account_id'])
+                $account
             )
         ));
     }
@@ -83,36 +104,55 @@ class GoogleBusinessProfileController extends Controller
     {
         $validated = $request->validate([
             'account_id' => 'required|integer',
-            'location_name' => 'required|string|max:255',
+            'account_name' => 'required|string|max:255',
+            'location_name' => 'required|string|max:500',
             'page_token' => 'nullable|string|max:2048',
         ]);
+        $account = $this->account((int) $validated['account_id']);
+        $resources = $this->resources->resolveLocation(
+            $account,
+            (string) $validated['account_name'],
+            (string) $validated['location_name']
+        );
 
         return $this->respond(fn () => $this->service->reviews(
             $request->user(),
-            $this->account((int) $validated['account_id']),
-            (string) $validated['location_name'],
+            $account,
+            (string) $resources['account_location_name'],
             $validated['page_token'] ?? null
         ));
     }
 
     public function replyToReview(Request $request, DistributionItem $item): JsonResponse
     {
-        $this->assertItemOwner($item);
+        $this->assertOwnedItem($item);
         $validated = $request->validate([
             'account_id' => 'required|integer',
+            'account_name' => 'required|string|max:255',
+            'location_name' => 'required|string|max:500',
             'idempotency_key' => 'required|string|max:128',
             'review_name' => 'required|string|max:500',
             'comment' => 'required|string|max:4096',
             'reply_approved' => 'required|boolean',
         ]);
+        $account = $this->account((int) $validated['account_id']);
+        $resources = $this->resources->resolveLocation(
+            $account,
+            (string) $validated['account_name'],
+            (string) $validated['location_name']
+        );
+        $reviewName = $this->resources->assertReviewName(
+            $resources,
+            (string) $validated['review_name']
+        );
 
         return $this->respond(fn () => $this->locked(
             $item,
             fn () => $this->service->replyToReview(
                 $request->user(),
                 $item,
-                $this->account((int) $validated['account_id']),
-                (string) $validated['review_name'],
+                $account,
+                $reviewName,
                 (string) $validated['comment'],
                 (bool) $validated['reply_approved'],
                 (string) $validated['idempotency_key']
@@ -122,23 +162,36 @@ class GoogleBusinessProfileController extends Controller
 
     public function reviewHandoff(Request $request, DistributionItem $item): JsonResponse
     {
-        $this->assertItemOwner($item);
+        $this->assertOwnedItem($item);
         $validated = $request->validate([
             'account_id' => 'required|integer',
+            'account_name' => 'required|string|max:255',
+            'location_name' => 'required|string|max:500',
             'review.review_name' => 'required|string|max:500',
             'review.reviewer_name' => 'nullable|string|max:255',
             'review.star_rating' => 'nullable|string|max:50',
             'review.comment' => 'required|string|max:10000',
             'review.received_at' => 'nullable|date',
         ]);
+        $account = $this->account((int) $validated['account_id']);
+        $resources = $this->resources->resolveLocation(
+            $account,
+            (string) $validated['account_name'],
+            (string) $validated['location_name']
+        );
+        $review = (array) $validated['review'];
+        $review['review_name'] = $this->resources->assertReviewName(
+            $resources,
+            (string) $review['review_name']
+        );
 
         return $this->respond(fn () => $this->locked(
             $item,
             fn () => $this->service->reviewHandoff(
                 $request->user(),
                 $item,
-                $this->account((int) $validated['account_id']),
-                (array) $validated['review']
+                $account,
+                $review
             )
         ));
     }
@@ -147,17 +200,24 @@ class GoogleBusinessProfileController extends Controller
     {
         $validated = $request->validate([
             'account_id' => 'required|integer',
-            'location_name' => 'required|string|max:255',
+            'account_name' => 'required|string|max:255',
+            'location_name' => 'required|string|max:500',
             'start_date' => 'required|date_format:Y-m-d',
             'end_date' => 'required|date_format:Y-m-d',
             'metrics' => 'required|array|min:1|max:20',
             'metrics.*' => 'required|string|max:100',
         ]);
+        $account = $this->account((int) $validated['account_id']);
+        $resources = $this->resources->resolveLocation(
+            $account,
+            (string) $validated['account_name'],
+            (string) $validated['location_name']
+        );
 
         return $this->respond(fn () => $this->service->performance(
             $request->user(),
-            $this->account((int) $validated['account_id']),
-            (string) $validated['location_name'],
+            $account,
+            (string) $resources['performance_location_name'],
             (string) $validated['start_date'],
             (string) $validated['end_date'],
             (array) $validated['metrics']
@@ -170,14 +230,9 @@ class GoogleBusinessProfileController extends Controller
             'account_id' => 'required|integer',
             'idempotency_key' => 'required|string|max:128',
             'payload' => 'required|array',
+            'payload.account_name' => 'required|string|max:255',
+            'payload.location_name' => 'required|string|max:500',
         ]);
-    }
-
-    private function assertItemOwner(DistributionItem $item): void
-    {
-        if ((int) $item->user_id !== (int) Auth::id()) {
-            abort(404);
-        }
     }
 
     private function account(int $accountId): SocialMediaPlatform
@@ -187,6 +242,11 @@ class GoogleBusinessProfileController extends Controller
             ->where('user_id', Auth::id())
             ->where('platform', PlatformEnum::google_business_profile->value)
             ->firstOrFail();
+    }
+
+    private function assertOwnedItem(DistributionItem $item): void
+    {
+        abort_if((int) $item->user_id !== (int) Auth::id(), 404);
     }
 
     private function locked(DistributionItem $item, callable $callback): mixed
@@ -201,6 +261,7 @@ class GoogleBusinessProfileController extends Controller
         try {
             return Cache::lock($lockName, 120)->block(5, function () use ($item, $callback) {
                 $item->refresh();
+                $this->assertOwnedItem($item);
 
                 return $callback();
             });
