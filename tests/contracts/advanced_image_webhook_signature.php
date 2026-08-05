@@ -3,91 +3,78 @@
 declare(strict_types=1);
 
 $root = dirname(__DIR__, 2);
-$providerPath = $root . '/app/extensions/AdvancedImage/System/AdvancedImageServiceProvider.php';
-$controllerPath = $root . '/app/extensions/AdvancedImage/System/Http/Controllers/AdvancedImageController.php';
-$webhookControllerPath = $root . '/app/extensions/AdvancedImage/System/Http/Controllers/AdvancedImageWebhookController.php';
-$freepikPath = $root . '/app/extensions/AdvancedImage/System/Services/AdvancedFreepikService.php';
-$novitaPath = $root . '/app/extensions/AdvancedImage/System/Services/AdvancedNovitaService.php';
+$controllerPath = $root . '/app/extensions/AdvancedImage/System/Http/Controllers/AdvancedImageWebhookController.php';
 
 function failAdvancedImageWebhookSignatureContract(string $message): never
 {
-    fwrite(STDERR, "AdvancedImage webhook signature contract failed: {$message}\n");
+    fwrite(STDERR, "AdvancedImage webhook authentication contract failed: {$message}\n");
     exit(1);
 }
 
-$provider = file_get_contents($providerPath);
 $controller = file_get_contents($controllerPath);
-$webhookController = file_get_contents($webhookControllerPath);
-$freepik = file_get_contents($freepikPath);
-$novita = file_get_contents($novitaPath);
+if ($controller === false) {
+    failAdvancedImageWebhookSignatureContract('unable to read AdvancedImageWebhookController.php');
+}
 
-foreach (
-    [
-        'AdvancedImageServiceProvider.php' => $provider,
-        'AdvancedImageController.php' => $controller,
-        'AdvancedImageWebhookController.php' => $webhookController,
-        'AdvancedFreepikService.php' => $freepik,
-        'AdvancedNovitaService.php' => $novita,
-    ] as $file => $contents
-) {
-    if ($contents === false) {
-        failAdvancedImageWebhookSignatureContract("unable to read {$file}");
+foreach (['webhook-id', 'webhook-timestamp', 'webhook-signature'] as $header) {
+    if (! str_contains($controller, $header)) {
+        failAdvancedImageWebhookSignatureContract("Freepik {$header} is not required");
     }
 }
 
-if (! str_contains($provider, "->middleware(['api', 'signed'])")) {
-    failAdvancedImageWebhookSignatureContract('webhook route does not enforce API and signed middleware');
+if (! str_contains($controller, "hash_hmac('sha256'")) {
+    failAdvancedImageWebhookSignatureContract('Freepik signature is not generated with HMAC-SHA256');
 }
 
-if (! str_contains($controller, "'advanced_image_webhook_token'")) {
-    failAdvancedImageWebhookSignatureContract('generation flow does not create a task-specific webhook token');
+if (! str_contains($controller, 'base64_encode(')) {
+    failAdvancedImageWebhookSignatureContract('Freepik signature is not Base64 encoded');
 }
 
-if (! str_contains($controller, 'Str::random(64)')) {
-    failAdvancedImageWebhookSignatureContract('webhook token is not generated with sufficient entropy');
+if (! str_contains($controller, 'hash_equals(')) {
+    failAdvancedImageWebhookSignatureContract('Freepik signature comparison is not timing safe');
 }
 
-if (! str_contains($controller, "'webhookToken'")) {
-    failAdvancedImageWebhookSignatureContract('task payload does not retain the webhook token');
+if (! str_contains($controller, 'MAX_WEBHOOK_AGE_SECONDS')) {
+    failAdvancedImageWebhookSignatureContract('webhook timestamp freshness is not enforced');
 }
 
-if (! str_contains($freepik, "URL::signedRoute('webhook.advanced-image'")) {
-    failAdvancedImageWebhookSignatureContract('Freepik submissions do not receive a signed callback URL');
+if (! str_contains($controller, 'Cache::add(')) {
+    failAdvancedImageWebhookSignatureContract('webhook IDs are not atomically reserved against replay');
 }
 
-if (! str_contains($freepik, "'model' => 'freepik'")) {
-    failAdvancedImageWebhookSignatureContract('Freepik signed callback is not bound to the provider model');
+if (! str_contains($controller, "config('services.freepik.webhook_secret')")) {
+    failAdvancedImageWebhookSignatureContract('Freepik webhook secret is not read from configuration');
 }
 
-if (! str_contains($novita, "URL::signedRoute('webhook.advanced-image'")) {
-    failAdvancedImageWebhookSignatureContract('Novita submissions do not receive a signed callback URL');
+if (! str_contains($controller, "setting('freepik_webhook_secret')")) {
+    failAdvancedImageWebhookSignatureContract('Freepik webhook secret cannot use the existing settings store');
 }
 
-if (! str_contains($novita, "'model' => 'novita'")) {
-    failAdvancedImageWebhookSignatureContract('Novita signed callback is not bound to the provider model');
+if (! str_contains($controller, "where('is_advanced_image', true)")) {
+    failAdvancedImageWebhookSignatureContract('callback task lookup is not restricted to AdvancedImage tasks');
 }
 
-if (str_contains($freepik, "config('app.url') . '/api/webhook/advanced-image/")) {
-    failAdvancedImageWebhookSignatureContract('Freepik still emits an unsigned callback URL');
+if (! str_contains($controller, "where('payload->model', 'freepik')")) {
+    failAdvancedImageWebhookSignatureContract('callback task lookup is not restricted to Freepik tasks');
 }
 
-if (str_contains($novita, "config('app.url') . '/api/webhook/advanced-image/")) {
-    failAdvancedImageWebhookSignatureContract('Novita still emits an unsigned callback URL');
+if (! str_contains($controller, "get('request_id')") || ! str_contains($controller, "get('task_id')")) {
+    failAdvancedImageWebhookSignatureContract('Freepik request_id and task_id payload compatibility is incomplete');
 }
 
-if (! str_contains($webhookController, "query('token')")) {
-    failAdvancedImageWebhookSignatureContract('webhook controller does not require the signed task token');
+$authenticationPosition = strpos($controller, 'assertValidFreepikWebhook($request)');
+$taskLookupPosition = strpos($controller, 'UserOpenai::query()');
+
+if ($authenticationPosition === false || $taskLookupPosition === false || $authenticationPosition > $taskLookupPosition) {
+    failAdvancedImageWebhookSignatureContract('Freepik authentication is not completed before task lookup');
 }
 
-if (! str_contains($webhookController, "where('payload->webhookToken', \$token)")) {
-    failAdvancedImageWebhookSignatureContract('task lookup is not bound to the signed task token');
+if (! str_contains($controller, "if ($model === 'novita')")) {
+    failAdvancedImageWebhookSignatureContract('Novita callbacks do not have an explicit fail-closed branch');
 }
 
-$tokenPosition = strpos($webhookController, "query('token')");
-$taskLookupPosition = strpos($webhookController, 'UserOpenai::query()');
-
-if ($tokenPosition === false || $taskLookupPosition === false || $tokenPosition > $taskLookupPosition) {
-    failAdvancedImageWebhookSignatureContract('task token is not validated before task lookup');
+if (! str_contains($controller, 'abort(403')) {
+    failAdvancedImageWebhookSignatureContract('unauthenticated provider callbacks are not rejected');
 }
 
-echo "AdvancedImage webhook signature contract passed.\n";
+echo "AdvancedImage webhook authentication contract passed.\n";
