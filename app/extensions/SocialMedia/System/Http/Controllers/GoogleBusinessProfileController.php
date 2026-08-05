@@ -5,6 +5,7 @@ namespace App\Extensions\SocialMedia\System\Http\Controllers;
 use App\Extensions\SocialMedia\System\Enums\PlatformEnum;
 use App\Extensions\SocialMedia\System\Models\DistributionItem;
 use App\Extensions\SocialMedia\System\Models\SocialMediaPlatform;
+use App\Extensions\SocialMedia\System\Services\GoogleBusinessProfileReadinessService;
 use App\Extensions\SocialMedia\System\Services\GoogleBusinessProfileResourceGuard;
 use App\Extensions\SocialMedia\System\Services\GoogleBusinessProfileService;
 use App\Http\Controllers\Controller;
@@ -21,6 +22,7 @@ class GoogleBusinessProfileController extends Controller
 {
     public function __construct(
         private readonly GoogleBusinessProfileService $service,
+        private readonly GoogleBusinessProfileReadinessService $readiness,
         private readonly GoogleBusinessProfileResourceGuard $resources
     ) {}
 
@@ -28,7 +30,7 @@ class GoogleBusinessProfileController extends Controller
     {
         $validated = $request->validate(['account_id' => 'required|integer']);
 
-        return $this->respond(fn () => $this->service->readiness(
+        return $this->respond(fn () => $this->readiness->readiness(
             $request->user(),
             $this->account((int) $validated['account_id'])
         ));
