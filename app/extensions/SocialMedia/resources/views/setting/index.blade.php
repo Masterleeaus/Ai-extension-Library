@@ -1,5 +1,5 @@
 @extends('panel.layout.settings')
-@section('title', __('AI Social Media Suite Settings'))
+@section('title', __('Titan Reach Settings'))
 
 @section('settings')
     <div class="space-y-4">
@@ -12,7 +12,7 @@
                     action="{{ route('dashboard.admin.social-media.setting.update', $platform->value) }}"
                 >
                     <h4 class="mb-4 border-b pb-2.5 text-xl">
-                        {{ $platform->label() . ' ' . __('settings') }}
+                        {{ $platform->label() . ' ' . __('channel settings') }}
                     </h4>
 
                     @foreach ($platform->credentials() as $key => $value)
