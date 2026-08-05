@@ -119,6 +119,7 @@ class AssistedMarketplaceService
         );
 
         if ($this->stateExpired($state)) {
+            $this->persistExpiredState($item, $destination, $state);
             throw new RuntimeException('The prepared marketplace package has expired and must be reviewed again.');
         }
 
@@ -191,10 +192,6 @@ class AssistedMarketplaceService
             throw new RuntimeException('Explicit human confirmation is required after posting on the marketplace.');
         }
 
-        if ($this->stateExpired($state)) {
-            throw new RuntimeException('The prepared marketplace package has expired and must be reviewed again.');
-        }
-
         $externalUrl = $this->validatedExternalUrl($definition, $externalUrl);
         $externalListingId = $this->stringOrNull($externalListingId);
         $requestHash = $this->requestHash([
@@ -213,6 +210,11 @@ class AssistedMarketplaceService
             $requestHash
         )) {
             return $cached;
+        }
+
+        if ($this->stateExpired($state)) {
+            $this->persistExpiredState($item, $destination, $state);
+            throw new RuntimeException('The prepared marketplace package has expired and must be reviewed again.');
         }
 
         $result = [
@@ -264,14 +266,6 @@ class AssistedMarketplaceService
             $state['business_subtype'] ?? null,
             true
         );
-
-        if (! in_array((string) ($state['status'] ?? ''), [
-            'manually_published',
-            'expired',
-        ], true)) {
-            throw new RuntimeException('The assisted listing must be manually published or expired before renewal preparation.');
-        }
-
         $requestHash = $this->requestHash([
             'destination' => $destination,
             'package_hash' => $state['package_hash'],
@@ -286,6 +280,18 @@ class AssistedMarketplaceService
             $requestHash
         )) {
             return $cached;
+        }
+
+        if ($this->stateExpired($state)
+            && (string) ($state['status'] ?? '') !== 'manually_published') {
+            $state = $this->persistExpiredState($item, $destination, $state);
+        }
+
+        if (! in_array((string) ($state['status'] ?? ''), [
+            'manually_published',
+            'expired',
+        ], true)) {
+            throw new RuntimeException('The assisted listing must be manually published or expired before renewal preparation.');
         }
 
         $renewalCount = max(0, (int) ($state['renewal_count'] ?? 0)) + 1;
@@ -403,7 +409,7 @@ class AssistedMarketplaceService
 
         if ($this->stateExpired($state)
             && ! in_array((string) ($state['status'] ?? ''), ['manually_published', 'expired'], true)) {
-            $state['status'] = 'expired';
+            $state = $this->persistExpiredState($item, $destination, $state);
         }
 
         return $state;
@@ -550,7 +556,7 @@ class AssistedMarketplaceService
             ];
         }
 
-        return [
+        $package = [
             'content_type' => $item->content_type,
             'title' => trim((string) data_get($input, 'title')),
             'description' => trim((string) data_get($input, 'description')),
@@ -590,6 +596,10 @@ class AssistedMarketplaceService
                 'source_id' => $item->source_id,
             ],
         ];
+
+        $this->assertPackageSize($package);
+
+        return $package;
     }
 
     private function exportManifest(array $package, array $definition): array
@@ -659,6 +669,16 @@ class AssistedMarketplaceService
         return max(1, (int) ($this->operationalConfig()['max_images'] ?? 20));
     }
 
+    private function maxPackageBytes(): int
+    {
+        return max(1024, (int) ($this->operationalConfig()['max_package_bytes'] ?? 262144));
+    }
+
+    private function idempotencyHistoryLimit(): int
+    {
+        return min(50, max(1, (int) ($this->operationalConfig()['idempotency_history_limit'] ?? 10)));
+    }
+
     private function verticalFrom(DistributionItem $item, array $input): ?string
     {
         return $this->stringOrNull(data_get($item->payload, 'vertical'))
@@ -720,6 +740,20 @@ class AssistedMarketplaceService
         }
     }
 
+    private function persistExpiredState(
+        DistributionItem $item,
+        string $destination,
+        array $state
+    ): array {
+        if ((string) ($state['status'] ?? '') !== 'expired') {
+            $state['status'] = 'expired';
+            $state['expired_at'] = now()->toIso8601String();
+            $this->persistState($item, $destination, $state);
+        }
+
+        return $state;
+    }
+
     private function validatedExternalUrl(array $definition, string $externalUrl): string
     {
         $externalUrl = trim($externalUrl);
@@ -739,11 +773,19 @@ class AssistedMarketplaceService
             throw new InvalidArgumentException('The external URL does not belong to the selected marketplace.');
         }
 
-        if (rtrim($externalUrl, '/') === rtrim((string) $definition['official_posting_url'], '/')) {
+        if ($this->normalisedPath($externalUrl)
+            === $this->normalisedPath((string) $definition['official_posting_url'])) {
             throw new InvalidArgumentException('Provide the completed external listing URL, not the posting form URL.');
         }
 
         return $externalUrl;
+    }
+
+    private function normalisedPath(string $url): string
+    {
+        $path = '/' . ltrim((string) parse_url($url, PHP_URL_PATH), '/');
+
+        return rtrim($path, '/') ?: '/';
     }
 
     private function cachedOperation(
@@ -805,7 +847,12 @@ class AssistedMarketplaceService
             'result' => $result,
             'completed_at' => now()->toIso8601String(),
         ];
-        $operations = array_slice($operations, -50, null, true);
+        $operations = array_slice(
+            $operations,
+            -$this->idempotencyHistoryLimit(),
+            null,
+            true
+        );
         data_set($payload, $path, $operations);
         $item->update(['payload' => $payload]);
         $item->refresh();
@@ -814,6 +861,15 @@ class AssistedMarketplaceService
     private function idempotencySlot(string $idempotencyKey): string
     {
         return hash('sha256', $idempotencyKey);
+    }
+
+    private function assertPackageSize(array $package): void
+    {
+        $encoded = json_encode($package, JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES);
+
+        if (strlen($encoded) > $this->maxPackageBytes()) {
+            throw new InvalidArgumentException('The assisted marketplace package exceeds the configured size limit.');
+        }
     }
 
     private function audit(
@@ -876,309 +932,4 @@ class AssistedMarketplaceService
 
         return $value;
     }
-+}
-diff --git a/app/extensions/SocialMedia/System/SocialMediaServiceProvider.php b/app/extensions/SocialMedia/System/SocialMediaServiceProvider.php
-index fd4a85230..9ecddef4f 100644
---- a/app/extensions/SocialMedia/System/SocialMediaServiceProvider.php
-+++ b/app/extensions/SocialMedia/System/SocialMediaServiceProvider.php
-@@ -5,6 +5,7 @@
- namespace App\Extensions\SocialMedia\System;
- 
- use App\Domains\Marketplace\Contracts\UninstallExtensionServiceProviderInterface;
-+use App\Extensions\SocialMedia\System\Http\Controllers\AssistedMarketplaceController;
- use App\Extensions\SocialMedia\System\Http\Controllers\Common\DemoDataController;
- use App\Extensions\SocialMedia\System\Http\Controllers\Common\SocialMediaCampaignCommonController;
- use App\Extensions\SocialMedia\System\Http\Controllers\Common\SocialMediaCompanyCommonController;
-@@ -94,6 +95,10 @@ public function registerConfig(): static
-     {
-         $this->mergeConfigFrom(__DIR__ . '/../config/social-media.php', 'social-media');
-         $this->mergeConfigFrom(__DIR__ . '/../config/ebay.php', 'social-media.ebay');
-+        $this->mergeConfigFrom(
-+            __DIR__ . '/../config/assisted-marketplaces.php',
-+            'social-media.assisted_marketplaces'
-+        );
-         config()->set('social-media.distribution.destinations.ebay', config('social-media.ebay.destination'));
- 
-         return $this;
-@@ -195,6 +200,13 @@ private function registerRoutes(): static
-                         $router->post('distribution/{item}/ebay/withdraw', [EbayListingController::class, 'withdraw'])->name('ebay.withdraw');
-                         $router->post('distribution/{item}/ebay/reconcile', [EbayListingController::class, 'reconcile'])->name('ebay.reconcile');
-                         $router->post('distribution/{item}/ebay/buyer-question-handoff', [EbayListingController::class, 'buyerQuestionHandoff'])->name('ebay.buyer-question-handoff');
-+
-+                        $router->post('distribution/{item}/assisted/{destination}/prepare', [AssistedMarketplaceController::class, 'prepare'])->name('assisted.prepare');
-+                        $router->post('distribution/{item}/assisted/{destination}/open', [AssistedMarketplaceController::class, 'open'])->name('assisted.open');
-+                        $router->post('distribution/{item}/assisted/{destination}/complete', [AssistedMarketplaceController::class, 'complete'])->name('assisted.complete');
-+                        $router->post('distribution/{item}/assisted/{destination}/renew', [AssistedMarketplaceController::class, 'renew'])->name('assisted.renew');
-+                        $router->post('distribution/{item}/assisted/{destination}/enquiry-handoff', [AssistedMarketplaceController::class, 'enquiryHandoff'])->name('assisted.enquiry-handoff');
-+                        $router->get('distribution/{item}/assisted/{destination}/status', [AssistedMarketplaceController::class, 'status'])->name('assisted.status');
-                     });
- 
-                 $router
-diff --git a/app/extensions/SocialMedia/config/assisted-marketplaces.php b/app/extensions/SocialMedia/config/assisted-marketplaces.php
-new file mode 100644
-index 000000000..229932f70
---- /dev/null
-+++ b/app/extensions/SocialMedia/config/assisted-marketplaces.php
-@@ -0,0 +1,43 @@
-+<?php
-+
-+return [
-+    'default_expiry_days' => 30,
-+    'max_images' => 20,
-+    'destinations' => [
-+        'facebook-marketplace' => [
-+            'label' => 'Facebook Marketplace',
-+            'official_posting_url' => 'https://www.facebook.com/marketplace/create/item',
-+            'allowed_external_hosts' => [
-+                'facebook.com',
-+                'www.facebook.com',
-+                'm.facebook.com',
-+            ],
-+            'completion_states' => [
-+                'ready_for_manual_post',
-+                'opened_official_destination',
-+                'manually_published',
-+                'renewal_ready_for_manual_post',
-+            ],
-+        ],
-+        'gumtree' => [
-+            'label' => 'Gumtree Australia',
-+            'official_posting_url' => 'https://www.gumtree.com.au/p-post-ad.html',
-+            'allowed_external_hosts' => [
-+                'gumtree.com.au',
-+                'www.gumtree.com.au',
-+            ],
-+            'completion_states' => [
-+                'ready_for_manual_post',
-+                'opened_official_destination',
-+                'manually_published',
-+                'renewal_ready_for_manual_post',
-+            ],
-+            'posting_guidance' => [
-+                'Use the correct category and physical location for the product or service.',
-+                'Prepare a unique advertisement rather than reposting duplicate copy.',
-+                'Business service advertisements may require the Services for Hire category.',
-+                'Keep buyer conversations and payment activity within Gumtree where available.',
-+            ],
-+        ],
-+    ],
-+];
-diff --git a/app/extensions/SocialMedia/docs/TITAN-REACH-ASSISTED-MARKETPLACE-FILE-MAP.md b/app/extensions/SocialMedia/docs/TITAN-REACH-ASSISTED-MARKETPLACE-FILE-MAP.md
-new file mode 100644
-index 000000000..81f842fac
---- /dev/null
-+++ b/app/extensions/SocialMedia/docs/TITAN-REACH-ASSISTED-MARKETPLACE-FILE-MAP.md
-@@ -0,0 +1,79 @@
-+# Titan Reach assisted marketplace file map
-+
-+Issue: #271
-+
-+Depends on: #337
-+
-+## Destinations
-+
-+- Facebook Marketplace
-+- Gumtree Australia
-+
-+Both destinations are implemented as `assisted` workflows. Titan Reach prepares and tracks the package; the authenticated business user submits the listing on the marketplace.
-+
-+## Existing-file-first implementation
-+
-+| New file | Existing source/template | Why it is necessary |
-+|---|---|---|
-+| `config/assisted-marketplaces.php` | `config/distribution.php` | Holds operational metadata not represented by provider capabilities: official handoff URLs, allowed completion hosts, expiry/image limits and destination-specific manual posting guidance. It does not duplicate publishing modes or provider capabilities. |
-+| `System/Services/AssistedMarketplaceService.php` | `System/Services/EbayListingService.php` and `System/Services/DistributionCapabilityService.php` | A provider-neutral application service is required for package preparation, manual handoff, completion confirmation, renewal and enquiry handoff. |
-+| `System/Http/Controllers/AssistedMarketplaceController.php` | `System/Http/Controllers/EbayListingController.php` | Governed HTTP actions are required for the future native Listings UI and other approved clients. |
-+| `tests/Unit/AssistedMarketplaceContractTest.php` | `tests/Unit/VerticalDistributionProfilesContractTest.php` and `tests/Unit/EbayListingIntegrationContractTest.php` | Prevents regression into simulated publishing, browser automation, non-vertical packages, unsafe URL completion or ungoverned actions. |
-+
-+## Existing file edited
-+
-+`System/SocialMediaServiceProvider.php` is edited in place to:
-+
-+- merge the assisted operational config;
-+- register the existing controller with the current authenticated SocialMedia route group;
-+- expose prepare, open, complete, renew, enquiry-handoff and status actions.
-+
-+No new route provider is introduced.
-+
-+## Nine-vertical behaviour
-+
-+Every prepared package calls `DistributionCapabilityService::forVerticalDestination()` and receives the canonical profile from #337 or the generic-business fallback.
-+
-+The package records:
-+
-+- canonical vertical and label;
-+- business subtype and whether it is recognised;
-+- destination suitability;
-+- vertical/provider required fields;
-+- media guidance;
-+- calls to action;
-+- authoritative handoff targets;
-+- compliance warnings;
-+- profile version and provenance;
-+- shared vertical context ID and hash where available.
-+
-+Facilities maintenance resolves to the `field-home-services` family and `facilities-maintenance` subtype.
-+
-+## Manual-only safety boundary
-+
-+- No API publication is claimed.
-+- No browser automation, scraping, form simulation or credential collection is used.
-+- `open` returns the official destination URL; it does not operate the marketplace account.
-+- Completion requires explicit human confirmation and a valid HTTPS listing URL on an allowed marketplace host.
-+- The posting form URL itself is not accepted as proof of completion.
-+- Titan Reach records `manually_published`; it does not change the canonical `DistributionItem` status to provider-published.
-+- Renewals create a reviewed manual package and never repost automatically.
-+- Enquiries are deduplicated and handed to a human/authoritative workflow; no automated reply is sent.
-+
-+## Governance and data authority
-+
-+- Tenant ownership and `DistributionItem` approval are required before preparation or external handoff.
-+- Destination suitability and provider capability fail closed.
-+- A per-tenant/item/destination lock serialises mutations.
-+- Every idempotent action stores a request hash; reuse of a key with different input fails with `idempotency_key_conflict`.
-+- Distribution audits record package, completion, renewal and enquiry events.
-+- Titan Commerce, WorkCore, Bookings, Property, Automotive, Hire and CRM remain authoritative for source records.
-+- Titan Reach stores the approved listing snapshot and external URL only.
-+
-+## UI boundary
-+
-+**No new Blade page** is introduced by #271. The native customer-facing Listings and assisted-posting interface remains issue #274 and must be duplicated from the closest existing SocialMedia/MagicAI Blade page.
-+
-+## Live validation boundary
-+
-+The service is source-contract ready. Final browser validation requires authenticated marketplace accounts and current marketplace posting forms. Titan Reach must continue to rely on human submission unless an approved official provider or partner API is later obtained.
-diff --git a/app/extensions/SocialMedia/tests/Unit/AssistedMarketplaceContractTest.php b/app/extensions/SocialMedia/tests/Unit/AssistedMarketplaceContractTest.php
-new file mode 100644
-index 000000000..0bf75924b
---- /dev/null
-+++ b/app/extensions/SocialMedia/tests/Unit/AssistedMarketplaceContractTest.php
-@@ -0,0 +1,128 @@
-+<?php
-+
-+namespace Tests\Unit;
-+
-+use PHPUnit\Framework\TestCase;
-+
-+class AssistedMarketplaceContractTest extends TestCase
-+{
-+    public function test_marketplaces_are_assisted_and_never_direct_publishers(): void
-+    {
-+        $capabilities = file_get_contents(__DIR__ . '/../../config/distribution.php');
-+        $operations = file_get_contents(__DIR__ . '/../../config/assisted-marketplaces.php');
-+        $service = file_get_contents(__DIR__ . '/../../System/Services/AssistedMarketplaceService.php');
-+
-+        $this->assertStringContainsString("'facebook-marketplace'", $capabilities);
-+        $this->assertStringContainsString("'gumtree'", $capabilities);
-+        $this->assertStringContainsString("'mode'              => 'assisted'", $capabilities);
-+        $this->assertStringContainsString("'publish' => false", $capabilities);
-+        $this->assertStringContainsString("'manual_confirmation' => true", $capabilities);
-+        $this->assertStringContainsString('official_posting_url', $operations);
-+        $this->assertStringContainsString('allowed_external_hosts', $operations);
-+        $this->assertStringNotContainsString('BrowserKit', $service);
-+        $this->assertStringNotContainsString('Panther', $service);
-+        $this->assertStringNotContainsString('Selenium', $service);
-+        $this->assertStringNotContainsString('puppeteer', strtolower($service));
-+    }
-+
-+    public function test_listing_packages_consume_the_canonical_nine_vertical_profiles(): void
-+    {
-+        $verticals = require __DIR__ . '/../../config/vertical-distribution.php';
-+        $service = file_get_contents(__DIR__ . '/../../System/Services/AssistedMarketplaceService.php');
-+
-+        $this->assertCount(9, (array) ($verticals['verticals'] ?? []));
-+        $this->assertStringContainsString('forVerticalDestination', $service);
-+        $this->assertStringContainsString('content_type', $service);
-+        $this->assertStringContainsString('vertical', $service);
-+        $this->assertStringContainsString('business_subtype', $service);
-+        $this->assertStringContainsString('profile_version', $service);
-+        $this->assertStringContainsString('profile_provenance', $service);
-+        $this->assertStringContainsString('media_guidance', $service);
-+        $this->assertStringContainsString('calls_to_action', $service);
-+        $this->assertStringContainsString('handoff_targets', $service);
-+        $this->assertStringContainsString('compliance_warnings', $service);
-+        $this->assertStringContainsString('destination_not_applicable_to_vertical', $service);
-+    }
-+
-+    public function test_listing_package_contains_copy_media_price_location_and_official_destination(): void
-+    {
-+        $service = file_get_contents(__DIR__ . '/../../System/Services/AssistedMarketplaceService.php');
-+        $config = file_get_contents(__DIR__ . '/../../config/assisted-marketplaces.php');
-+
-+        $this->assertStringContainsString('preparePackage', $service);
-+        $this->assertStringContainsString('title', $service);
-+        $this->assertStringContainsString('description', $service);
-+        $this->assertStringContainsString('price_minor', $service);
-+        $this->assertStringContainsString('currency', $service);
-+        $this->assertStringContainsString('location', $service);
-+        $this->assertStringContainsString('image_urls', $service);
-+        $this->assertStringContainsString('response_templates', $service);
-+        $this->assertStringContainsString('official_posting_url', $service);
-+        $this->assertStringContainsString('facebook.com/marketplace/create', $config);
-+        $this->assertStringContainsString('gumtree.com.au', $config);
-+    }
-+
-+    public function test_manual_completion_requires_human_confirmation_and_valid_external_url(): void
-+    {
-+        $service = file_get_contents(__DIR__ . '/../../System/Services/AssistedMarketplaceService.php');
-+        $controller = file_get_contents(__DIR__ . '/../../System/Http/Controllers/AssistedMarketplaceController.php');
-+
-+        $this->assertStringContainsString('markCompleted', $service);
-+        $this->assertStringContainsString('human_confirmed', $controller);
-+        $this->assertStringContainsString('external_url', $controller);
-+        $this->assertStringContainsString('FILTER_VALIDATE_URL', $service);
-+        $this->assertStringContainsString('allowed_external_hosts', $service);
-+        $this->assertStringContainsString('manually_published', $service);
-+        $this->assertStringNotContainsString("\$item->update(['status' => 'published'])", $service);
-+        $this->assertStringContainsString('direct_publish_performed', $service);
-+    }
-+
-+    public function test_actions_are_tenant_scoped_approved_locked_idempotent_and_audited(): void
-+    {
-+        $service = file_get_contents(__DIR__ . '/../../System/Services/AssistedMarketplaceService.php');
-+        $controller = file_get_contents(__DIR__ . '/../../System/Http/Controllers/AssistedMarketplaceController.php');
-+
-+        $this->assertStringContainsString('$item->user_id', $service);
-+        $this->assertStringContainsString("approval_status !== 'approved'", $service);
-+        $this->assertStringContainsString('abort(404)', $controller);
-+        $this->assertStringContainsString('idempotency_key', $service);
-+        $this->assertStringContainsString('request_hash', $service);
-+        $this->assertStringContainsString('idempotency_key_conflict', $service);
-+        $this->assertStringContainsString('idempotencySlot', $service);
-+        $this->assertStringContainsString('array_slice($operations, -50', $service);
-+        $this->assertStringContainsString("DB::table('ext_social_media_distribution_audits')", $service);
-+        $this->assertStringContainsString('Cache::lock', $controller);
-+        $this->assertStringContainsString('$item->refresh()', $controller);
-+        $this->assertStringContainsString('ready_for_manual_post', $service);
-+        $this->assertStringContainsString('package_hash', $service);
-+    }
-+
-+    public function test_renewals_and_enquiries_are_tracked_without_automated_reposting_or_replies(): void
-+    {
-+        $service = file_get_contents(__DIR__ . '/../../System/Services/AssistedMarketplaceService.php');
-+
-+        $this->assertStringContainsString('prepareRenewal', $service);
-+        $this->assertStringContainsString("'operation' => 'renew'", $service);
-+        $this->assertStringContainsString('renewal_due_at', $service);
-+        $this->assertStringContainsString('enquiryHandoff', $service);
-+        $this->assertStringContainsString('human_handoff_required', $service);
-+        $this->assertStringContainsString('enquiry_id', $service);
-+        $this->assertStringNotContainsString('sendMessage', $service);
-+        $this->assertStringNotContainsString('auto_reply', $service);
-+        $this->assertStringContainsString('automated_reply_sent', $service);
-+    }
-+
-+    public function test_routes_are_state_changing_posts_and_no_new_blade_page_is_added(): void
-+    {
-+        $provider = file_get_contents(__DIR__ . '/../../System/SocialMediaServiceProvider.php');
-+        $docs = file_get_contents(__DIR__ . '/../../docs/TITAN-REACH-ASSISTED-MARKETPLACE-FILE-MAP.md');
-+
-+        $this->assertStringContainsString("assisted/{destination}/prepare", $provider);
-+        $this->assertStringContainsString("assisted/{destination}/open", $provider);
-+        $this->assertStringContainsString("assisted/{destination}/complete", $provider);
-+        $this->assertStringContainsString("assisted/{destination}/renew", $provider);
-+        $this->assertStringContainsString("assisted/{destination}/enquiry-handoff", $provider);
-+        $this->assertStringContainsString('No new Blade page', $docs);
-+        $this->assertStringContainsString('issue #274', strtolower($docs));
-+    }
-+}
+}
