@@ -12,7 +12,7 @@ permissions:
 jobs:
   verify-and-clean:
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    timeout-minutes: 45
     steps:
       - name: Checkout feature branch
         uses: actions/checkout@v4
@@ -42,14 +42,28 @@ jobs:
           printf '%s\n' '{"require":{"php":"^8.2","illuminate/database":"^10.0","illuminate/events":"^10.0"}}' > composer.json
           composer install --no-interaction --no-progress --prefer-dist
 
-      - name: Generate canonical business-network checksum manifest
+      - name: Generate all canonical WorkCore integrity manifests
         working-directory: app/extensions/WorkCore_Platform
         run: |
           rm -rf /tmp/workcore-checksums
           python tools/refresh_package_checksums.py --repo . --output-dir /tmp/workcore-checksums
-          cp /tmp/workcore-checksums/workcore-business-network.files.sha256.json packages/workcore-business-network/files.sha256.json
-          changed="$(git -C ../../.. diff --name-only -- app/extensions/WorkCore_Platform/packages)"
-          test "$changed" = "app/extensions/WorkCore_Platform/packages/workcore-business-network/files.sha256.json"
+          cp /tmp/workcore-checksums/WorkCore.extension.manifest.json native-extensions/WorkCore/extension.manifest.json
+          for generated in /tmp/workcore-checksums/*.files.sha256.json; do
+            package="$(basename "$generated" .files.sha256.json)"
+            cp "$generated" "packages/${package}/files.sha256.json"
+          done
+          actual="$(git -C ../../.. diff --name-only -- app/extensions/WorkCore_Platform/native-extensions/WorkCore/extension.manifest.json app/extensions/WorkCore_Platform/packages | sort)"
+          expected="$(cat <<'EOF'
+          app/extensions/WorkCore_Platform/native-extensions/WorkCore/extension.manifest.json
+          app/extensions/WorkCore_Platform/packages/workcore-business-network/files.sha256.json
+          app/extensions/WorkCore_Platform/packages/workcore-commercial/files.sha256.json
+          app/extensions/WorkCore_Platform/packages/workcore-property-operations/files.sha256.json
+          app/extensions/WorkCore_Platform/packages/workcore-shared-foundation/files.sha256.json
+          app/extensions/WorkCore_Platform/packages/workcore-work-operations/files.sha256.json
+          app/extensions/WorkCore_Platform/packages/workcore-workforce-assurance/files.sha256.json
+          EOF
+          )"
+          test "$actual" = "$expected"
 
       - name: Run WorkCore wizard vertical context contract
         env:
@@ -83,6 +97,6 @@ jobs:
           git commit -m "feat(workcore): finalize wizard vertical context bridge [skip ci]"
           files="$(git diff --name-only origin/main...HEAD | sort)"
           printf '%s\n' "$files"
-          test "$(printf '%s\n' "$files" | grep -c '^')" -eq 7
+          test "$(printf '%s\n' "$files" | grep -c '^')" -eq 13
           ! printf '%s\n' "$files" | grep -q '^\.github/workflows/'
           git push origin HEAD:feature/workcore-wizard-vertical-context
