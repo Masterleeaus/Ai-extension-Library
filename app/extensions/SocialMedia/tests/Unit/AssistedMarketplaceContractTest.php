@@ -84,9 +84,12 @@ class AssistedMarketplaceContractTest extends TestCase
 
         $this->assertStringContainsString('$item->user_id', $service);
         $this->assertStringContainsString("approval_status !== 'approved'", $service);
+        $this->assertStringContainsString('abort(404)', $controller);
         $this->assertStringContainsString('idempotency_key', $service);
         $this->assertStringContainsString('request_hash', $service);
         $this->assertStringContainsString('idempotency_key_conflict', $service);
+        $this->assertStringContainsString('idempotencySlot', $service);
+        $this->assertStringContainsString('array_slice($operations, -50', $service);
         $this->assertStringContainsString("DB::table('ext_social_media_distribution_audits')", $service);
         $this->assertStringContainsString('Cache::lock', $controller);
         $this->assertStringContainsString('$item->refresh()', $controller);
@@ -99,6 +102,7 @@ class AssistedMarketplaceContractTest extends TestCase
         $service = file_get_contents(__DIR__ . '/../../System/Services/AssistedMarketplaceService.php');
 
         $this->assertStringContainsString('prepareRenewal', $service);
+        $this->assertStringContainsString("'operation' => 'renew'", $service);
         $this->assertStringContainsString('renewal_due_at', $service);
         $this->assertStringContainsString('enquiryHandoff', $service);
         $this->assertStringContainsString('human_handoff_required', $service);
