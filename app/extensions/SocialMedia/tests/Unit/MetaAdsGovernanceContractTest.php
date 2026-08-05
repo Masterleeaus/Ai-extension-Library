@@ -27,13 +27,13 @@ class MetaAdsGovernanceContractTest extends TestCase
     public function test_provider_objects_are_created_paused_and_activation_is_separate(): void
     {
         $service = file_get_contents(__DIR__ . '/../../System/Services/MetaAdsService.php');
-        $config = file_get_contents(__DIR__ . '/../../config/distribution.php');
+        $config = file_get_contents(__DIR__ . '/../../config/meta-ads.php');
 
         $this->assertStringContainsString("'status' => 'PAUSED'", $service);
         $this->assertStringContainsString('syncPaused', $service);
         $this->assertStringContainsString('activate', $service);
         $this->assertStringContainsString('pause', $service);
-        $this->assertStringContainsString('activation_confirmation', $service);
+        $this->assertStringContainsString('activation_confirmation', file_get_contents(__DIR__ . '/../../System/Http/Controllers/MetaAdsController.php'));
         $this->assertStringContainsString("'adapter_available' => true", $config);
         $this->assertStringContainsString("'platform'          => 'facebook'", $config);
         $this->assertStringContainsString("'approval_required' => true", $config);
@@ -59,12 +59,13 @@ class MetaAdsGovernanceContractTest extends TestCase
     {
         $service = file_get_contents(__DIR__ . '/../../System/Services/MetaAdsService.php');
         $controller = file_get_contents(__DIR__ . '/../../System/Http/Controllers/MetaAdsController.php');
+        $config = file_get_contents(__DIR__ . '/../../config/meta-ads.php');
 
         $this->assertStringContainsString('$campaign->user_id', $service);
         $this->assertStringContainsString('$account->user_id', $service);
         $this->assertStringContainsString('Gate::allows', $service);
-        $this->assertStringContainsString('paid_media.approve', $service);
-        $this->assertStringContainsString('paid_media.activate', $service);
+        $this->assertStringContainsString('titan-reach.paid_media.approve', $config);
+        $this->assertStringContainsString('titan-reach.paid_media.activate', $config);
         $this->assertStringContainsString('idempotency_key', $service);
         $this->assertStringContainsString('Cache::lock', $controller);
         $this->assertStringContainsString('explicit_activation_required', $service);
