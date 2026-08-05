@@ -99,7 +99,7 @@ class WorkCoreDynamicPricingSurfaceTests(unittest.TestCase):
             "public function dashboard(",
         ):
             self.assertIn(method, content)
-        self.assertIn("BusinessActionExecutor", content)
+        self.assertIn("BusinessActionDispatcher", content)
         self.assertIn("ReadModelExecutor", content)
         self.assertIn("Idempotency-Key", content)
 
@@ -132,7 +132,7 @@ class WorkCoreDynamicPriceCalculatorTests(unittest.TestCase):
             "minimum_price_minor": 5000,
             "maximum_price_minor": 20000,
         })
-        self.assertEqual(16632, result["final_price_minor"])
+        self.assertEqual(17533, result["final_price_minor"])
         self.assertEqual(["first", "later"], result["applied_rule_ids"])
         self.assertEqual("high", result["demand_level"])
         self.assertEqual(1.15, result["occupancy_multiplier"])

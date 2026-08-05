@@ -1,5 +1,5 @@
 {
-  "file_count": 471,
+  "file_count": 472,
   "files": [
     {
       "bytes": 227,
@@ -640,6 +640,11 @@
       "bytes": 2560,
       "path": "src/Domains/WorkCore/Database/Migrations/2026_08_03_010000_create_tz_company_entitlement_projection_tables.php",
       "sha256": "183703ba4d9130c36cc698126991b38066d69e565f15ad49c8791b7a18417354"
+    },
+    {
+      "bytes": 5480,
+      "path": "src/Domains/WorkCore/Database/Migrations/2026_08_05_180000_create_workcore_dynamic_pricing_tables.php",
+      "sha256": "1b1dc5814f7e7f1166082cd1f51a326f34d78bd48c55e5f8267c5ed4a063a4af"
     },
     {
       "bytes": 450,

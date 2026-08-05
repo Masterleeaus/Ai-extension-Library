@@ -1,5 +1,5 @@
 {
-  "file_count": 438,
+  "file_count": 456,
   "files": [
     {
       "bytes": 220,
@@ -1652,6 +1652,96 @@
       "sha256": "192933526a1671ba6c7e85c19ed90c280aa68719713f496846a46900eb3bdaab"
     },
     {
+      "bytes": 1026,
+      "path": "src/Domains/WorkCore/System/Modules/Finance/Pricing/Actions/ApplyDynamicPrice.php",
+      "sha256": "555f4b73e11e385cee2149f38c659e7fed242a804d5aa6ab2ff9bc0020936472"
+    },
+    {
+      "bytes": 817,
+      "path": "src/Domains/WorkCore/System/Modules/Finance/Pricing/Actions/GetPricingAnalytics.php",
+      "sha256": "a83b2df939b2b72abbffe4436bcb31c156cb01a44ec936e80997b7151e07d346"
+    },
+    {
+      "bytes": 539,
+      "path": "src/Domains/WorkCore/System/Modules/Finance/Pricing/Actions/PreviewDynamicPrice.php",
+      "sha256": "59390811b959d90afd6e31ae7da5941ce385ba0678843f334cc8770fa5f2bfe1"
+    },
+    {
+      "bytes": 1074,
+      "path": "src/Domains/WorkCore/System/Modules/Finance/Pricing/Actions/RecordPricingSignal.php",
+      "sha256": "4383f484d3e116f20742e7f9ca013374454ec5722b00342d52b2e36ef96d4b63"
+    },
+    {
+      "bytes": 1056,
+      "path": "src/Domains/WorkCore/System/Modules/Finance/Pricing/Actions/UpsertPricingRule.php",
+      "sha256": "88a93a58d0a842e17608c798a0ee04d266d7ac76a223d76d331656d429e827be"
+    },
+    {
+      "bytes": 1068,
+      "path": "src/Domains/WorkCore/System/Modules/Finance/Pricing/Contracts/PricingRepositoryContract.php",
+      "sha256": "6889006d6654657cdba75e15a392b337eb1eee063ae4e397ea86ad910dbf4742"
+    },
+    {
+      "bytes": 1908,
+      "path": "src/Domains/WorkCore/System/Modules/Finance/Pricing/DTO/PricingDecision.php",
+      "sha256": "a622cfcc4cc52925e129e71fe0d8eb69c362f04fd4f841fc7ab8247dad75721a"
+    },
+    {
+      "bytes": 9566,
+      "path": "src/Domains/WorkCore/System/Modules/Finance/Pricing/Domain/DynamicPriceCalculator.php",
+      "sha256": "53d35e6296c02ec676675cfa4aa0a50ff9311856d7fbb5d4feb18bcd72a9ecdd"
+    },
+    {
+      "bytes": 5211,
+      "path": "src/Domains/WorkCore/System/Modules/Finance/Pricing/Http/PricingController.php",
+      "sha256": "129567a4eb18b4c3f5d8d2d47bb0e6ab41115212cf8ab8b314946ba1537bd06b"
+    },
+    {
+      "bytes": 13417,
+      "path": "src/Domains/WorkCore/System/Modules/Finance/Pricing/Infrastructure/DatabasePricingRepository.php",
+      "sha256": "216df170f56a062e10fd2d2659ea182cc0e7d1b0a8caa99c05c42d4e450b4b1d"
+    },
+    {
+      "bytes": 796,
+      "path": "src/Domains/WorkCore/System/Modules/Finance/Pricing/Services/DemandAnalysisService.php",
+      "sha256": "d3fd2efd86409372c8fb44b19cb0df47490c22c2c25cabbaec89dce3329403dc"
+    },
+    {
+      "bytes": 1395,
+      "path": "src/Domains/WorkCore/System/Modules/Finance/Pricing/Services/PricingService.php",
+      "sha256": "763860dde2532e041f588ba2d85df8e6805176b8c1b682828a04ee9a8ffce735"
+    },
+    {
+      "bytes": 1155,
+      "path": "src/Domains/WorkCore/System/Modules/Finance/Pricing/Services/RevenueOptimizationService.php",
+      "sha256": "dec6d42857c1064fa9a17259542b0ec6f328a8fc58251a92936fa1e9a621cd7f"
+    },
+    {
+      "bytes": 3158,
+      "path": "src/Domains/WorkCore/System/Modules/Finance/Pricing/WorkPricingServiceProvider.php",
+      "sha256": "23bfe13f5f47ec8a3ab67acd89af89dc7bbd8e9b16bc931f684a7c211e62ed3f"
+    },
+    {
+      "bytes": 807,
+      "path": "src/Domains/WorkCore/System/Modules/Finance/Pricing/config/pricing.php",
+      "sha256": "05714e16f10b06299e60926f47f5795a023d53dba83d5154a0a788b06ffcc51e"
+    },
+    {
+      "bytes": 2537,
+      "path": "src/Domains/WorkCore/System/Modules/Finance/Pricing/resources/views/dashboard.blade.php",
+      "sha256": "180499d1398f8803fd947d2b96f9f35874ab128e59e1a4beebabf2431d5d4f7d"
+    },
+    {
+      "bytes": 1006,
+      "path": "src/Domains/WorkCore/System/Modules/Finance/Pricing/routes/api.php",
+      "sha256": "ab8cfd8f22f95a3004a91a64bfe3249f88e4cf9c922ad97dec39f39be78b3f5f"
+    },
+    {
+      "bytes": 481,
+      "path": "src/Domains/WorkCore/System/Modules/Finance/Pricing/routes/user.php",
+      "sha256": "897b365b0545db10f29bcfa213e9b27b991f27ef701e961864500e1458ca7c36"
+    },
+    {
       "bytes": 32482,
       "path": "src/Domains/WorkCore/System/Modules/Finance/Repositories/EloquentFinanceRepository.php",
       "sha256": "87d4e4fc7895f5d0cc25667e47670587fd083b2de127d0560434840d6c3810ce"
@@ -1717,9 +1807,9 @@
       "sha256": "f37b03be51c1958d67a8fa5387bf4e115a05f62ae22e3bedce3bace47d58d003"
     },
     {
-      "bytes": 39645,
+      "bytes": 39794,
       "path": "src/Domains/WorkCore/System/Modules/Finance/WorkCoreFinanceServiceProvider.php",
-      "sha256": "f14fafdea6ff5507da77f8a661d0491e326fa0d58e8a037a1f692780b139f740"
+      "sha256": "6d4095f0508e620e0591b621d191b70b50b3c4e96fb00e7c89324d007f829ed4"
     },
     {
       "bytes": 696,
