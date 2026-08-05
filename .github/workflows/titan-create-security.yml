@@ -10,7 +10,9 @@ on:
       - app/Services/Security/RemoteImageFetcher.php
       - app/extensions/CreativeSuite/System/Http/Controllers/CreativeSuiteDocumentController.php
       - app/extensions/CreativeSuite/System/Http/Controllers/CreativeSuiteAIController.php
+      - app/extensions/CreativeSuiteAnnotations/System/CreativeSuiteAnnotationsServiceProvider.php
       - app/extensions/CreativeSuiteAnnotations/System/Http/Controllers/CreativeSuiteAnnotationsAIController.php
+      - app/extensions/CreativeSuiteAnnotations/System/Http/Controllers/CreativeSuiteAnnotationsSecureAIController.php
       - app/extensions/CreativeSuiteAnnotations/System/Jobs/ProcessAnnotationEditJob.php
       - app/extensions/AdvancedImage/System/Http/Controllers/AdvancedImageStatusController.php
       - app/extensions/AdvancedImage/System/Http/Controllers/AdvancedImageWebhookController.php
@@ -58,7 +60,9 @@ jobs:
           php -l app/Services/Security/RemoteImageFetcher.php
           php -l app/extensions/CreativeSuite/System/Http/Controllers/CreativeSuiteDocumentController.php
           php -l app/extensions/CreativeSuite/System/Http/Controllers/CreativeSuiteAIController.php
+          php -l app/extensions/CreativeSuiteAnnotations/System/CreativeSuiteAnnotationsServiceProvider.php
           php -l app/extensions/CreativeSuiteAnnotations/System/Http/Controllers/CreativeSuiteAnnotationsAIController.php
+          php -l app/extensions/CreativeSuiteAnnotations/System/Http/Controllers/CreativeSuiteAnnotationsSecureAIController.php
           php -l app/extensions/CreativeSuiteAnnotations/System/Jobs/ProcessAnnotationEditJob.php
           php -l app/extensions/AdvancedImage/System/Http/Controllers/AdvancedImageStatusController.php
           php -l app/extensions/AdvancedImage/System/Http/Controllers/AdvancedImageWebhookController.php
