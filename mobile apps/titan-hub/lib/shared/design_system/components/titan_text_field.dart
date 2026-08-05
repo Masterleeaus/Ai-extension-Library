@@ -94,7 +94,9 @@ class _TitanTextFieldState extends State<TitanTextField> {
               ? () => setState(() => _isObscured = !_isObscured)
               : null,
           icon: Icon(
-            _isObscured ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+            _isObscured
+                ? Icons.visibility_outlined
+                : Icons.visibility_off_outlined,
           ),
         ),
       );
