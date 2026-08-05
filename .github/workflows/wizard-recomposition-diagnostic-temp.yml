@@ -11,30 +11,41 @@ permissions:
 jobs:
   inspect:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
         with:
           ref: feature/wizard-answer-recomposition
 
-      - name: Inspect canonical wizard answer lifecycle
+      - name: Inspect action, event and wizard schema contracts
         shell: bash
         run: |
           set -euo pipefail
-          root='app/extensions/WorkCore_Platform/packages/workcore-business-network/src/Domains/WorkCore/System/Modules/Wizards'
-          echo '===== WIZARD FILES ====='
-          find "$root" -type f -name '*.php' | sort
-
-          echo '===== ANSWER PERSISTENCE MATCHES ====='
-          grep -RIn -E 'answer|answers|upsert|insert|updateOrCreate|revision|approved|dispatch\(' "$root" | head -260 || true
-
-          echo '===== LIKELY WRITE SERVICES ====='
+          echo '===== ACTION REQUEST AND DOMAIN EVENT CONTRACTS ====='
           while IFS= read -r file; do
             echo "--- ${file} ---"
             sed -n '1,320p' "$file"
           done < <(
-            grep -RIl -E 'updateOrCreate|upsert|insertGetId|workcore_wizard_answers|wizard_answers' "$root" | sort | head -25
+            grep -RIl --exclude-dir=.git -E 'class ActionRequest|readonly class ActionRequest|class PendingDomainEvent|readonly class PendingDomainEvent|class BusinessActionDispatcher' app/extensions/WorkCore_Platform/packages | sort | head -30
           )
 
-          echo '===== DEPENDENCY METADATA ====='
-          grep -RIn -E 'depends_on|dependencies|affects|sections|question' "$root" app/extensions/WorkCore_Platform/packages/workcore-business-network/resources 2>/dev/null | head -260 || true
+          echo '===== WIZARD TABLE MIGRATIONS ====='
+          while IFS= read -r file; do
+            echo "--- ${file} ---"
+            sed -n '1,360p' "$file"
+          done < <(
+            grep -RIl --exclude-dir=.git -E "tz_wizard_(runs|answers|events|section_approvals)" app/extensions/WorkCore_Platform/packages/*/database app/extensions/WorkCore_Platform/native-extensions 2>/dev/null | sort | head -30
+          )
+
+          echo '===== EVENT LISTENER REGISTRATION PATTERNS ====='
+          grep -RIn --exclude-dir=.git -E 'ShouldQueue|listen\(|Event::listen|PendingDomainEvent' app/extensions/WorkCore_Platform/packages/workcore-business-network/src app/extensions/WorkCore_Platform/packages/workcore-shared-foundation/src | head -260 || true
+
+          echo '===== WIZARD DEFINITION SAMPLE ====='
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('app/extensions/WorkCore_Platform/packages/workcore-business-network/src/Domains/WorkCore/System/Modules/Wizards/config/definitions.json')
+          data=json.loads(p.read_text())
+          for definition in data[:2]:
+              print(json.dumps(definition, indent=2)[:12000])
+          PY
