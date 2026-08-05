@@ -30,6 +30,7 @@ class EbayListingIntegrationContractTest extends TestCase
         $this->assertStringContainsString('/sell/inventory/v1/offer', $helper);
         $this->assertStringContainsString('/publish', $helper);
         $this->assertStringContainsString('/withdraw', $helper);
+        $this->assertStringContainsString("['GET', 'PUT']", $helper);
         $this->assertStringContainsString('createOrReplaceInventoryItem', $service);
         $this->assertStringContainsString('createOffer', $service);
         $this->assertStringContainsString('publishOffer', $service);
@@ -48,8 +49,11 @@ class EbayListingIntegrationContractTest extends TestCase
         $this->assertStringContainsString("approval_status !== 'approved'", $service);
         $this->assertStringContainsString('idempotency_key', $service);
         $this->assertStringContainsString("DB::table('ext_social_media_distribution_audits')", $service);
+        $this->assertStringContainsString("'listing' => $listing", $service);
+        $this->assertStringContainsString('At least one valid eBay image URL is required.', $service);
         $this->assertStringContainsString('Cache::lock', $controller);
-        $this->assertStringContainsString('hash(\'sha256\', $idempotencyKey)', $controller);
+        $this->assertStringContainsString('$item->refresh()', $controller);
+        $this->assertStringNotContainsString("hash('sha256', $idempotencyKey)", $controller);
         $this->assertStringContainsString('buyerQuestionHandoff', $controller);
         $this->assertStringContainsString('$platform->user_id', $platformController);
         $this->assertStringContainsString('not authorized to disconnect', $platformController);
@@ -67,7 +71,10 @@ class EbayListingIntegrationContractTest extends TestCase
         $this->assertStringContainsString('function channels()', $platform);
         $this->assertStringContainsString("'platform'          => 'ebay'", $config);
         $this->assertStringContainsString("'adapter_available' => true", $config);
+        $this->assertStringContainsString("'end_listing' => true", $config);
         $this->assertStringContainsString('social-media.oauth.connect.ebay', $provider);
+        $this->assertStringContainsString("$router->post('ebay/readiness'", $provider);
+        $this->assertStringContainsString("$router->post('distribution/{item}/ebay/reconcile'", $provider);
         $this->assertStringContainsString('ebay.publish', $provider);
         $this->assertStringContainsString('ebay.withdraw', $provider);
         $this->assertStringContainsString('array_replace_recursive', $capabilities);
