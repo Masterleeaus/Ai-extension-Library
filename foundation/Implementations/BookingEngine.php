@@ -6,6 +6,7 @@ namespace Foundation\Implementations;
 
 use Foundation\Contracts\BookingEngineContract;
 use PDO;
+use Foundation\Support\JsonHelper;
 
 class BookingEngine implements BookingEngineContract
 {
@@ -50,7 +51,7 @@ class BookingEngine implements BookingEngineContract
 
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
         if ($result) {
-            $result['data'] = json_decode($result['data'], true);
+            $result['data'] = JsonHelper::decode($result['data']);
         }
 
         return $result ?: null;

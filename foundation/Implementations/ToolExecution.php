@@ -7,6 +7,7 @@ namespace Foundation\Implementations;
 use Foundation\Contracts\ToolExecutionContract;
 use Foundation\Contracts\TenantContextContract;
 use PDO;
+use Foundation\Support\JsonHelper;
 
 class ToolExecution implements ToolExecutionContract
 {
@@ -123,7 +124,7 @@ class ToolExecution implements ToolExecutionContract
 
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
         if ($result) {
-            $result['schema'] = json_decode($result['schema'], true);
+            $result['schema'] = JsonHelper::decode($result['schema']);
         }
 
         return $result ?: null;

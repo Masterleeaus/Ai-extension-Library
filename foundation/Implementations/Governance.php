@@ -6,6 +6,7 @@ namespace Foundation\Implementations;
 
 use Foundation\Contracts\GovernanceContract;
 use PDO;
+use Foundation\Support\JsonHelper;
 
 class Governance implements GovernanceContract
 {
@@ -53,7 +54,7 @@ class Governance implements GovernanceContract
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($result) {
-            $result['rules'] = json_decode($result['rules'], true);
+            $result['rules'] = JsonHelper::decode($result['rules']);
         }
 
         return $result ?: null;
@@ -159,7 +160,7 @@ class Governance implements GovernanceContract
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         foreach ($results as &$result) {
-            $result['violations'] = json_decode($result['violations'], true);
+            $result['violations'] = JsonHelper::decode($result['violations']);
         }
 
         return $results;
@@ -185,7 +186,7 @@ class Governance implements GovernanceContract
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         foreach ($results as &$result) {
-            $result['rules'] = json_decode($result['rules'], true);
+            $result['rules'] = JsonHelper::decode($result['rules']);
         }
 
         return $results;
@@ -205,7 +206,7 @@ class Governance implements GovernanceContract
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($result) {
-            $result['rules'] = json_decode($result['rules'], true);
+            $result['rules'] = JsonHelper::decode($result['rules']);
         }
 
         return $result ?: null;

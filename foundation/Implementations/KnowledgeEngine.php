@@ -6,6 +6,7 @@ namespace Foundation\Implementations;
 
 use Foundation\Contracts\KnowledgeEngineContract;
 use PDO;
+use Foundation\Support\JsonHelper;
 
 class KnowledgeEngine implements KnowledgeEngineContract
 {
@@ -113,7 +114,7 @@ class KnowledgeEngine implements KnowledgeEngineContract
         return [
             'document_id' => $doc['id'],
             'content' => substr($doc['content'], 0, $contextWindow),
-            'metadata' => json_decode($doc['metadata'], true),
+            'metadata' => JsonHelper::decode($doc['metadata']),
         ];
     }
 

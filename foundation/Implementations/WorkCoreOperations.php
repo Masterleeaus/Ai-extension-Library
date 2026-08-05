@@ -6,6 +6,7 @@ namespace Foundation\Implementations;
 
 use Foundation\Contracts\WorkCoreOperationsContract;
 use PDO;
+use Foundation\Support\JsonHelper;
 
 class WorkCoreOperations implements WorkCoreOperationsContract
 {
@@ -51,7 +52,7 @@ class WorkCoreOperations implements WorkCoreOperationsContract
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($result) {
-            $result['data'] = json_decode($result['data'], true);
+            $result['data'] = JsonHelper::decode($result['data']);
         }
 
         return $result ?: null;
@@ -123,7 +124,7 @@ class WorkCoreOperations implements WorkCoreOperationsContract
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($result) {
-            $result['status_data'] = json_decode($result['status_data'], true);
+            $result['status_data'] = JsonHelper::decode($result['status_data']);
         }
 
         return $result ?: null;

@@ -6,6 +6,7 @@ namespace Foundation\Implementations;
 
 use Foundation\Contracts\WorkCoreBusinessNetworkContract;
 use PDO;
+use Foundation\Support\JsonHelper;
 
 class WorkCoreBusinessNetwork implements WorkCoreBusinessNetworkContract
 {
@@ -50,7 +51,7 @@ class WorkCoreBusinessNetwork implements WorkCoreBusinessNetworkContract
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($result) {
-            $result['data'] = json_decode($result['data'], true);
+            $result['data'] = JsonHelper::decode($result['data']);
         }
 
         return $result ?: null;
@@ -120,7 +121,7 @@ class WorkCoreBusinessNetwork implements WorkCoreBusinessNetworkContract
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         foreach ($results as &$result) {
-            $result['data'] = json_decode($result['data'], true);
+            $result['data'] = JsonHelper::decode($result['data']);
         }
 
         return $results;
@@ -162,7 +163,7 @@ class WorkCoreBusinessNetwork implements WorkCoreBusinessNetworkContract
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         foreach ($results as &$result) {
-            $result['content'] = json_decode($result['content'], true);
+            $result['content'] = JsonHelper::decode($result['content']);
         }
 
         return $results;

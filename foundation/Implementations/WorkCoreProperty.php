@@ -6,6 +6,7 @@ namespace Foundation\Implementations;
 
 use Foundation\Contracts\WorkCorePropertyContract;
 use PDO;
+use Foundation\Support\JsonHelper;
 
 class WorkCoreProperty implements WorkCorePropertyContract
 {
@@ -50,7 +51,7 @@ class WorkCoreProperty implements WorkCorePropertyContract
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($result) {
-            $result['data'] = json_decode($result['data'], true);
+            $result['data'] = JsonHelper::decode($result['data']);
         }
 
         return $result ?: null;
@@ -152,7 +153,7 @@ class WorkCoreProperty implements WorkCorePropertyContract
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($result) {
-            $result['data'] = json_decode($result['data'], true);
+            $result['data'] = JsonHelper::decode($result['data']);
         }
 
         return $result ?: null;
