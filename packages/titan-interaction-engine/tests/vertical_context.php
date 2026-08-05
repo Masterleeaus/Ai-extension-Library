@@ -99,6 +99,36 @@ $test('equivalent associative input produces the same context hash', function ()
     $assert($one->toArray()['context_id'] === $two->toArray()['context_id']);
 });
 
+$test('replacing value shapes removes stale provenance pointers', function () use ($assert): void {
+    $snapshot = (new VerticalContextComposer())->compose([
+        VerticalContextLayer::fromArray([
+            'id' => 'vertical.shape-base',
+            'kind' => 'subtype',
+            'version' => '1.0.0',
+            'values' => ['terminology' => [
+                'object_to_scalar' => ['first' => 'One', 'second' => 'Two'],
+                'scalar_to_object' => 'Old',
+            ]],
+        ]),
+        VerticalContextLayer::fromArray([
+            'id' => 'tenant.shape-change',
+            'kind' => 'tenant',
+            'version' => '1.0.0',
+            'values' => ['terminology' => [
+                'object_to_scalar' => 'Replacement',
+                'scalar_to_object' => ['label' => 'New'],
+            ]],
+        ]),
+    ], ['company_id' => 42]);
+
+    $sources = $snapshot->toArray()['sources'];
+    $assert(isset($sources['/resolved/terminology/object_to_scalar']));
+    $assert(!isset($sources['/resolved/terminology/object_to_scalar/first']));
+    $assert(!isset($sources['/resolved/terminology/object_to_scalar/second']));
+    $assert(!isset($sources['/resolved/terminology/scalar_to_object']));
+    $assert(isset($sources['/resolved/terminology/scalar_to_object/label']));
+});
+
 $test('duplicate layer IDs are rejected', function () use ($assert): void {
     $layer = VerticalContextLayer::fromArray([
         'id' => 'vertical.cleaning',
