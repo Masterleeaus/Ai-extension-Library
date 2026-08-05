@@ -27,7 +27,7 @@ jobs:
           rm -rf /tmp/workcore-recomposition-test
           mkdir -p /tmp/workcore-recomposition-test
           cd /tmp/workcore-recomposition-test
-          printf '%s\n' '{"require":{"php":"^8.2","illuminate/database":"^10.0","illuminate/events":"^10.0","illuminate/support":"^10.0"}}' > composer.json
+          printf '%s\n' '{"require":{"php":"^8.2","illuminate/database":"^10.0","illuminate/events":"^10.0","illuminate/support":"^10.0","symfony/uid":"^6.0"}}' > composer.json
           composer install --no-interaction --no-progress --prefer-dist
 
       - name: Run focused wizard recomposition contract
