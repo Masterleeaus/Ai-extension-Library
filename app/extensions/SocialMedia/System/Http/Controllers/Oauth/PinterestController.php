@@ -95,7 +95,7 @@ class PinterestController extends Controller
             $accessExpiresAt = now()->addSeconds((int) $tokenResponse->json('expires_in', 2592000));
             $authorizedScopes = $this->normaliseScopes(
                 (string) $tokenResponse->json('scope', ''),
-                (array) config('social-media.pinterest.scopes', [])
+                (array) ($existingCredentials['authorized_scopes'] ?? [])
             );
 
             $temporaryCredentials = [
@@ -245,12 +245,12 @@ class PinterestController extends Controller
             ->first();
     }
 
-    private function normaliseScopes(string $returned, array $fallback): array
+    private function normaliseScopes(string $returned, array $verifiedFallback): array
     {
         $scopes = preg_split('/[\s,]+/', trim($returned)) ?: [];
 
         return array_values(array_unique(array_filter(
-            $scopes !== [] ? $scopes : $fallback,
+            $scopes !== [] ? $scopes : $verifiedFallback,
             static fn ($scope): bool => is_string($scope) && trim($scope) !== ''
         )));
     }
