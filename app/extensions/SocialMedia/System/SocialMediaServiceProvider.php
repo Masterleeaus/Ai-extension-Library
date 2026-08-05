@@ -10,14 +10,18 @@ use App\Extensions\SocialMedia\System\Http\Controllers\Common\DemoDataController
 use App\Extensions\SocialMedia\System\Http\Controllers\Common\SocialMediaCampaignCommonController;
 use App\Extensions\SocialMedia\System\Http\Controllers\Common\SocialMediaCompanyCommonController;
 use App\Extensions\SocialMedia\System\Http\Controllers\EbayListingController;
+use App\Extensions\SocialMedia\System\Http\Controllers\GoogleBusinessProfileController;
 use App\Extensions\SocialMedia\System\Http\Controllers\ImageStatusController;
 use App\Extensions\SocialMedia\System\Http\Controllers\Oauth\EbayController;
 use App\Extensions\SocialMedia\System\Http\Controllers\Oauth\FacebookController;
+use App\Extensions\SocialMedia\System\Http\Controllers\Oauth\GoogleBusinessProfileController as GoogleBusinessProfileOauthController;
 use App\Extensions\SocialMedia\System\Http\Controllers\Oauth\InstagramController;
 use App\Extensions\SocialMedia\System\Http\Controllers\Oauth\LinkedinController;
+use App\Extensions\SocialMedia\System\Http\Controllers\Oauth\PinterestController as PinterestOauthController;
 use App\Extensions\SocialMedia\System\Http\Controllers\Oauth\TiktokController;
 use App\Extensions\SocialMedia\System\Http\Controllers\Oauth\XController;
 use App\Extensions\SocialMedia\System\Http\Controllers\Oauth\YoutubeController;
+use App\Extensions\SocialMedia\System\Http\Controllers\PinterestController;
 use App\Extensions\SocialMedia\System\Http\Controllers\SocialMediaCalendarController;
 use App\Extensions\SocialMedia\System\Http\Controllers\SocialMediaCampaignController;
 use App\Extensions\SocialMedia\System\Http\Controllers\SocialMediaController;
@@ -99,7 +103,23 @@ class SocialMediaServiceProvider extends ServiceProvider implements UninstallExt
             __DIR__ . '/../config/assisted-marketplaces.php',
             'social-media.assisted_marketplaces'
         );
+        $this->mergeConfigFrom(
+            __DIR__ . '/../config/google-business-profile.php',
+            'social-media.google_business_profile'
+        );
+        $this->mergeConfigFrom(
+            __DIR__ . '/../config/pinterest.php',
+            'social-media.pinterest'
+        );
         config()->set('social-media.distribution.destinations.ebay', config('social-media.ebay.destination'));
+        config()->set(
+            'social-media.distribution.destinations.google-business-profile',
+            config('social-media.google_business_profile.destination')
+        );
+        config()->set(
+            'social-media.distribution.destinations.pinterest',
+            config('social-media.pinterest.destination')
+        );
 
         return $this;
     }
@@ -163,6 +183,12 @@ class SocialMediaServiceProvider extends ServiceProvider implements UninstallExt
 
                     $router->get('redirect/ebay', [EbayController::class, 'redirect'])->name('social-media.oauth.connect.ebay');
                     $router->get('callback/ebay', [EbayController::class, 'callback'])->name('social-media.oauth.callback.ebay');
+
+                    $router->get('redirect/google-business-profile', [GoogleBusinessProfileOauthController::class, 'redirect'])->name('social-media.oauth.connect.google-business-profile');
+                    $router->get('callback/google-business-profile', [GoogleBusinessProfileOauthController::class, 'callback'])->name('social-media.oauth.callback.google-business-profile');
+
+                    $router->get('redirect/pinterest', [PinterestOauthController::class, 'redirect'])->name('social-media.oauth.connect.pinterest');
+                    $router->get('callback/pinterest', [PinterestOauthController::class, 'callback'])->name('social-media.oauth.callback.pinterest');
                 });
 
                 $router
@@ -207,6 +233,22 @@ class SocialMediaServiceProvider extends ServiceProvider implements UninstallExt
                         $router->post('distribution/{item}/assisted/{destination}/renew', [AssistedMarketplaceController::class, 'renew'])->name('assisted.renew');
                         $router->post('distribution/{item}/assisted/{destination}/enquiry-handoff', [AssistedMarketplaceController::class, 'enquiryHandoff'])->name('assisted.enquiry-handoff');
                         $router->get('distribution/{item}/assisted/{destination}/status', [AssistedMarketplaceController::class, 'status'])->name('assisted.status');
+
+                        $router->post('google-business-profile/readiness', [GoogleBusinessProfileController::class, 'readiness'])->name('google-business-profile.readiness');
+                        $router->post('distribution/{item}/google-business-profile/publish', [GoogleBusinessProfileController::class, 'publish'])->name('google-business-profile.publish');
+                        $router->post('distribution/{item}/google-business-profile/photo', [GoogleBusinessProfileController::class, 'uploadPhoto'])->name('google-business-profile.photo');
+                        $router->post('distribution/{item}/google-business-profile/reconcile', [GoogleBusinessProfileController::class, 'reconcile'])->name('google-business-profile.reconcile');
+                        $router->post('google-business-profile/reviews', [GoogleBusinessProfileController::class, 'reviews'])->name('google-business-profile.reviews');
+                        $router->post('distribution/{item}/google-business-profile/review-reply', [GoogleBusinessProfileController::class, 'replyToReview'])->name('google-business-profile.review-reply');
+                        $router->post('distribution/{item}/google-business-profile/review-handoff', [GoogleBusinessProfileController::class, 'reviewHandoff'])->name('google-business-profile.review-handoff');
+                        $router->post('google-business-profile/performance', [GoogleBusinessProfileController::class, 'performance'])->name('google-business-profile.performance');
+
+                        $router->post('pinterest/readiness', [PinterestController::class, 'readiness'])->name('pinterest.readiness');
+                        $router->post('pinterest/boards', [PinterestController::class, 'boards'])->name('pinterest.boards');
+                        $router->post('distribution/{item}/pinterest/publish', [PinterestController::class, 'publish'])->name('pinterest.publish');
+                        $router->post('distribution/{item}/pinterest/reconcile', [PinterestController::class, 'reconcile'])->name('pinterest.reconcile');
+                        $router->post('distribution/{item}/pinterest/analytics', [PinterestController::class, 'analytics'])->name('pinterest.analytics');
+                        $router->post('distribution/{item}/pinterest/engagement-handoff', [PinterestController::class, 'engagementHandoff'])->name('pinterest.engagement-handoff');
                     });
 
                 $router
