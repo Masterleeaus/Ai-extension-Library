@@ -36,7 +36,7 @@ class AccessControl implements AccessControlContract
             $resourceType,
             $resourceId,
             $permission,
-            date('c'),
+            DateTimeHelper::now(),
         ]);
     }
 
@@ -129,7 +129,7 @@ class AccessControl implements AccessControlContract
              VALUES (?, ?, ?, ?)"
         );
 
-        return $stmt->execute([$tenantId, $userId, $role, date('c')]);
+        return $stmt->execute([$tenantId, $userId, $role, DateTimeHelper::now()]);
     }
 
     public function revokeRole(
