@@ -20,9 +20,11 @@ Add official Google Business Profile and Pinterest adapters to the existing Tita
 | `System/Http/Controllers/Oauth/PinterestController.php` | `System/Http/Controllers/Oauth/EbayController.php` | Adds single-use OAuth state, encrypted token persistence and bounded user/board capability discovery. |
 | `System/Services/GoogleBusinessProfileService.php` | `System/Services/EbayListingService.php` | Applies tenant ownership, live provider capability, vertical suitability, approval, idempotency, receipts, audits, reconciliation and review handoffs. |
 | `System/Services/PinterestService.php` | `System/Services/EbayListingService.php` | Applies the same governance to board discovery, image Pins, product links, analytics, reconciliation and engagement handoffs. |
-| `System/Http/Controllers/GoogleBusinessProfileController.php` | `System/Http/Controllers/EbayListingController.php` | Exposes thin tenant-scoped, validated and locked Google operations. |
-| `System/Http/Controllers/PinterestController.php` | `System/Http/Controllers/EbayListingController.php` | Exposes thin tenant-scoped, validated and locked Pinterest operations. |
-| `tests/Unit/GoogleBusinessProfilePinterestContractTest.php` | `tests/Unit/EbayListingIntegrationContractTest.php` and `tests/Unit/VerticalDistributionProfilesContractTest.php` | Prevents regression in security, account capability discovery, nine-vertical behaviour, provider receipts and UI boundaries. |
+| `System/Services/GoogleBusinessProfileResourceGuard.php` | Google account/location discovery in `GoogleBusinessProfileService.php` | Verifies the selected Google account and location as a live provider-owned pair and produces the correct Business Information, v4 post/review and Performance resource names. |
+| `System/Services/PinterestBoardGuard.php` | Pinterest board discovery in `PinterestService.php` | Removes secret boards, merges visible paginated board discovery and prevents publishing to a board outside the connected account snapshot. |
+| `System/Http/Controllers/GoogleBusinessProfileController.php` | `System/Http/Controllers/EbayListingController.php` | Exposes thin tenant-scoped, validated and locked Google operations and applies the live resource guard before provider access. |
+| `System/Http/Controllers/PinterestController.php` | `System/Http/Controllers/EbayListingController.php` | Exposes thin tenant-scoped, validated and locked Pinterest operations and applies the board guard before publication. |
+| `tests/Unit/GoogleBusinessProfilePinterestContractTest.php` | `tests/Unit/EbayListingIntegrationContractTest.php` and `tests/Unit/VerticalDistributionProfilesContractTest.php` | Prevents regression in security, resource ownership, secret-board filtering, account capability discovery, nine-vertical behaviour, provider receipts and UI boundaries. |
 
 ## Existing files edited
 
@@ -96,7 +98,15 @@ Not claimed:
 - Google Ads;
 - provider access without Business Profile API approval.
 
-Business Information location resources are preserved as `locations/{id}` for discovery. Local-post, photo and review operations preserve the corresponding v4 resource `accounts/{account}/locations/{id}`.
+Business Information location resources are preserved as `locations/{id}` for discovery and Performance API calls. Local-post, photo and review operations use the corresponding v4 resource `accounts/{account}/locations/{id}`.
+
+Before any location-specific operation, the resource guard:
+
+1. verifies that `accounts/{account}` was discovered for the connected account;
+2. refreshes that account's accessible locations from Google;
+3. confirms that `locations/{id}` belongs to the selected account;
+4. checks local-post operability before publication;
+5. validates stored local-post and review resource prefixes before reconciliation or reply.
 
 ## Pinterest boundary
 
@@ -118,7 +128,7 @@ Not claimed:
 - secret-board operations;
 - publication without the required Pinterest scopes or app access.
 
-A publish request must select a board discovered for that connected account and explicitly confirm that the supplied image is approved original content.
+A publish request must select a visible board discovered for that connected account and explicitly confirm that the supplied image is approved original content. Secret boards are removed from readiness and board-list responses. Visible paginated board results are merged by provider board ID so a later page does not erase previously discovered boards.
 
 ## Nine-vertical behaviour
 
@@ -148,9 +158,12 @@ Receipts preserve:
 
 ## Governance and authority
 
-- Tenant ownership is checked at both controller account lookup and application-service boundaries.
+- Route-bound distribution items return 404 before request validation or locking when they belong to another tenant.
+- Tenant ownership is checked again after acquiring the provider/item lock and inside the application service.
+- Account lookup is tenant- and provider-scoped.
 - External changes require an approved `DistributionItem`.
 - Item mutations are serialized by a per-user/item/provider cache lock.
+- Provider resource and board validation failures remain inside the governed JSON error boundary.
 - Idempotency keys map to canonical request hashes and conflict on changed input.
 - Operation history is bounded to ten records per operation.
 - Provider events are written to `ext_social_media_distribution_audits` when that table exists.
