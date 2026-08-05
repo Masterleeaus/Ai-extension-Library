@@ -50,7 +50,8 @@
     "laravel": {
       "providers": [
         "TitanZero\\Interaction\\Providers\\InteractionServiceProvider",
-        "TitanZero\\Interaction\\Vertical\\VerticalInteractionServiceProvider"
+        "TitanZero\\Interaction\\Vertical\\VerticalInteractionServiceProvider",
+        "TitanZero\\Interaction\\Vertical\\AI\\VerticalAIProposalServiceProvider"
       ],
       "aliases": {
         "Interaction": "TitanZero\\Interaction\\Facades\\Interaction"
