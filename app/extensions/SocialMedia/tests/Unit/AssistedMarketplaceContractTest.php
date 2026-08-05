@@ -97,6 +97,18 @@ class AssistedMarketplaceContractTest extends TestCase
         $this->assertStringContainsString('package_hash', $service);
     }
 
+    public function test_package_expiry_and_renewal_lifecycle_fail_closed(): void
+    {
+        $service = file_get_contents(__DIR__ . '/../../System/Services/AssistedMarketplaceService.php');
+
+        $this->assertStringContainsString('stateExpired', $service);
+        $this->assertStringContainsString('The prepared marketplace package has expired', $service);
+        $this->assertStringContainsString("'expires_at' => \$renewalDueAt->toIso8601String()", $service);
+        $this->assertStringContainsString("'status' => 'renewal_ready_for_manual_post'", $service);
+        $this->assertStringContainsString("'requires_copy_review' => true", $service);
+        $this->assertStringContainsString("'previous_external_url'", $service);
+    }
+
     public function test_renewals_and_enquiries_are_tracked_without_automated_reposting_or_replies(): void
     {
         $service = file_get_contents(__DIR__ . '/../../System/Services/AssistedMarketplaceService.php');
