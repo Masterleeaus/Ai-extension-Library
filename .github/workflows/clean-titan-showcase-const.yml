@@ -1,0 +1,42 @@
+name: Clean Titan showcase const once
+
+on:
+  push:
+    branches:
+      - issue/256-titan-native-design-system
+    paths:
+      - '.github/workflows/clean-titan-showcase-const.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: issue/256-titan-native-design-system
+
+      - name: Remove redundant nested const and self-remove
+        run: |
+          python <<'PY'
+          from pathlib import Path
+
+          path = Path('mobile apps/titan-hub/lib/features/design_system/titan_design_system_showcase.dart')
+          text = path.read_text()
+          marker = "      const _ShowcaseSection(\n        title: 'Foundations',\n        child: Wrap(\n          spacing: TitanSpacing.sm,\n          runSpacing: TitanSpacing.sm,\n          children: const ["
+          replacement = "      const _ShowcaseSection(\n        title: 'Foundations',\n        child: Wrap(\n          spacing: TitanSpacing.sm,\n          runSpacing: TitanSpacing.sm,\n          children: ["
+          if text.count(marker) != 1:
+              raise SystemExit('Expected one exact const foundations block')
+          path.write_text(text.replace(marker, replacement, 1))
+          PY
+          rm .github/workflows/clean-titan-showcase-const.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- \
+            'mobile apps/titan-hub/lib/features/design_system/titan_design_system_showcase.dart' \
+            .github/workflows/clean-titan-showcase-const.yml
+          git commit -m "fix(titan-hub): remove redundant showcase const"
+          git push origin HEAD:issue/256-titan-native-design-system
