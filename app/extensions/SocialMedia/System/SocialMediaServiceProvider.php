@@ -8,7 +8,9 @@ use App\Domains\Marketplace\Contracts\UninstallExtensionServiceProviderInterface
 use App\Extensions\SocialMedia\System\Http\Controllers\Common\DemoDataController;
 use App\Extensions\SocialMedia\System\Http\Controllers\Common\SocialMediaCampaignCommonController;
 use App\Extensions\SocialMedia\System\Http\Controllers\Common\SocialMediaCompanyCommonController;
+use App\Extensions\SocialMedia\System\Http\Controllers\EbayListingController;
 use App\Extensions\SocialMedia\System\Http\Controllers\ImageStatusController;
+use App\Extensions\SocialMedia\System\Http\Controllers\Oauth\EbayController;
 use App\Extensions\SocialMedia\System\Http\Controllers\Oauth\FacebookController;
 use App\Extensions\SocialMedia\System\Http\Controllers\Oauth\InstagramController;
 use App\Extensions\SocialMedia\System\Http\Controllers\Oauth\LinkedinController;
@@ -33,7 +35,6 @@ class SocialMediaServiceProvider extends ServiceProvider implements UninstallExt
 {
     public function register(): void
     {
-
         $this->registerConfig();
     }
 
@@ -46,7 +47,6 @@ class SocialMediaServiceProvider extends ServiceProvider implements UninstallExt
             ->publishAssets()
             ->registerComponents()
             ->registerCommand();
-
     }
 
     public function registerCommand(): static
@@ -78,8 +78,6 @@ class SocialMediaServiceProvider extends ServiceProvider implements UninstallExt
 
     public function registerComponents(): static
     {
-        //        $this->loadViewComponentsAs('example', []);
-
         return $this;
     }
 
@@ -95,6 +93,8 @@ class SocialMediaServiceProvider extends ServiceProvider implements UninstallExt
     public function registerConfig(): static
     {
         $this->mergeConfigFrom(__DIR__ . '/../config/social-media.php', 'social-media');
+        $this->mergeConfigFrom(__DIR__ . '/../config/ebay.php', 'social-media.ebay');
+        config()->set('social-media.distribution.destinations.ebay', config('social-media.ebay.destination'));
 
         return $this;
     }
@@ -125,18 +125,15 @@ class SocialMediaServiceProvider extends ServiceProvider implements UninstallExt
         $this->router()
             ->group([
                 'middleware' => ['web', 'auth'],
-
             ], function (Router $router) {
-
                 $router->get('tiktok/verify', [TiktokController::class, 'verify'])->name('tiktok.verify');
-
                 $router->get('social-media-demo-data', DemoDataController::class)->name('demo-data');
 
                 $router->any('social-media/webhook/instagram', [InstagramController::class, 'webhook'])->name('social-media.oauth.webhook.facebook')->withoutMiddleware('auth');
                 $router->any('social-media/webhook/facebook', [FacebookController::class, 'webhook'])->name('social-media.oauth.webhook.facebook')->withoutMiddleware('auth');
 
                 $router->group([
-                    'prefix'     => 'social-media/oauth',
+                    'prefix' => 'social-media/oauth',
                 ], function (Router $router) {
                     $router->get('redirect/tiktok', [TiktokController::class, 'redirect'])->name('social-media.oauth.connect.tiktok');
                     $router->get('callback/tiktok', [TiktokController::class, 'callback'])->name('social-media.oauth.callback.tiktok');
@@ -158,13 +155,15 @@ class SocialMediaServiceProvider extends ServiceProvider implements UninstallExt
 
                     $router->get('redirect/youtube-shorts', [YoutubeController::class, 'redirectYoutubeShorts'])->name('social-media.oauth.connect.youtube-shorts');
                     $router->get('callback/youtube-shorts', [YoutubeController::class, 'callbackYoutubeShorts'])->name('social-media.oauth.callback.youtube-shorts');
+
+                    $router->get('redirect/ebay', [EbayController::class, 'redirect'])->name('social-media.oauth.connect.ebay');
+                    $router->get('callback/ebay', [EbayController::class, 'callback'])->name('social-media.oauth.callback.ebay');
                 });
 
                 $router
                     ->name('dashboard.user.social-media.')
                     ->prefix('dashboard/user/social-media')
                     ->group(function (Router $router) {
-
                         $router->get('post', [SocialMediaPostController::class, 'index'])->name('post.index');
                         $router->get('post/create', [SocialMediaPostController::class, 'create'])->name('post.create');
                         $router->get('post/{post}/edit', [SocialMediaPostController::class, 'edit'])->name('post.edit');
@@ -186,10 +185,16 @@ class SocialMediaServiceProvider extends ServiceProvider implements UninstallExt
                         $router->resource('campaign', SocialMediaCampaignController::class)->only('index', 'store');
 
                         $router->get('calendar', SocialMediaCalendarController::class)->name('calendar');
-
                         $router->post('video/generate', SocialMediaVideoController::class)->name('video.generate');
-
                         $router->get('video/status', [SocialMediaVideoController::class, 'status'])->name('video.status');
+
+                        $router->get('ebay/readiness', [EbayListingController::class, 'readiness'])->name('ebay.readiness');
+                        $router->post('distribution/{item}/ebay/draft', [EbayListingController::class, 'draft'])->name('ebay.draft');
+                        $router->post('distribution/{item}/ebay/publish', [EbayListingController::class, 'publish'])->name('ebay.publish');
+                        $router->put('distribution/{item}/ebay/revise', [EbayListingController::class, 'revise'])->name('ebay.revise');
+                        $router->post('distribution/{item}/ebay/withdraw', [EbayListingController::class, 'withdraw'])->name('ebay.withdraw');
+                        $router->get('distribution/{item}/ebay/reconcile', [EbayListingController::class, 'reconcile'])->name('ebay.reconcile');
+                        $router->post('distribution/{item}/ebay/buyer-question-handoff', [EbayListingController::class, 'buyerQuestionHandoff'])->name('ebay.buyer-question-handoff');
                     });
 
                 $router
@@ -216,7 +221,6 @@ class SocialMediaServiceProvider extends ServiceProvider implements UninstallExt
                         Route::get('', 'index')->name('index');
                         Route::post('{platform}/update', 'update')->name('update');
                     });
-
             });
 
         return $this;
@@ -229,7 +233,7 @@ class SocialMediaServiceProvider extends ServiceProvider implements UninstallExt
 
     public static function uninstall(): void
     {
-        $path = public_path("vendor/socialmedia");
+        $path = public_path('vendor/socialmedia');
         if (is_dir($path)) {
             array_map(static fn ($f) => @unlink($f), glob("$path/*.*"));
             @rmdir($path);
