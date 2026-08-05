@@ -51,7 +51,12 @@ void main() {
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
     expect(
       tester.getSemantics(find.text('Saving')),
-      matchesSemantics(label: 'Saving', isButton: true, isEnabled: false),
+      matchesSemantics(
+        label: 'Saving',
+        isButton: true,
+        hasEnabledState: true,
+        isEnabled: false,
+      ),
     );
   });
 
@@ -100,6 +105,7 @@ void main() {
       matchesSemantics(
         label: 'Invoice ready\n\$240.00\nDue Friday',
         isButton: true,
+        hasEnabledState: true,
         isEnabled: true,
       ),
     );
@@ -159,6 +165,7 @@ void main() {
         label:
             'Locked capability\nThis capability is not included in the current plan.',
         isButton: true,
+        hasEnabledState: true,
         isEnabled: false,
       ),
     );
