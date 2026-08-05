@@ -3,15 +3,15 @@
 @endphp
 
 @extends('panel.layout.app', ['disable_tblr' => true])
-@section('title', __('AI Social Media Suite'))
-@section('subtitle', __('AI Social Media Suite'))
+@section('title', __('Titan Reach'))
+@section('subtitle', __('Create once. Reach everywhere.'))
 
 @section('titlebar_actions')
     <x-button
         href="{{ route('dashboard.user.social-media.platforms') }}"
         variant="ghost-shadow"
     >
-        @lang('Connect Accounts')
+        @lang('Connect Channels')
     </x-button>
 
     @include('social-media::components.create-post-dropdown', ['platforms' => $platforms])
