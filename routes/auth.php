@@ -12,18 +12,29 @@ Route::middleware('guest')->group(function () {
     Route::get('register', [AuthenticationController::class, 'registerCreate'])
         ->name('register');
 
-    Route::post('register', [AuthenticationController::class, 'registerStore']);
+    // Rate limit: 3 registration attempts per minute to prevent mass account creation
+    Route::post('register', [AuthenticationController::class, 'registerStore'])
+        ->middleware('throttle:3,1');
 
     Route::get('login', [AuthenticatedSessionController::class, 'create'])->name('login');
 
-    Route::post('login', [AuthenticatedSessionController::class, 'store']);
+    // Rate limit: 5 login attempts per minute to prevent brute force attacks
+    Route::post('login', [AuthenticatedSessionController::class, 'store'])
+        ->middleware('throttle:5,1');
 
     Route::get('verify-otp', [AuthenticatedSessionController::class, 'verifyOtpCode'])->name('verify-otp');
-    Route::post('verify-otp', [AuthenticatedSessionController::class, 'verifyOtp'])->name('verify-otp');
+
+    // Rate limit: 6 OTP verification attempts per minute
+    Route::post('verify-otp', [AuthenticatedSessionController::class, 'verifyOtp'])
+        ->name('verify-otp')
+        ->middleware('throttle:6,1');
 
     Route::get('forgot-password', [AuthenticationController::class, 'PasswordResetCreate'])
         ->name('forgot_password');
-    Route::post('forgot-password', [MailController::class, 'sendPasswordResetMail']);
+
+    // Rate limit: 3 password reset requests per minute to prevent email flooding
+    Route::post('forgot-password', [MailController::class, 'sendPasswordResetMail'])
+        ->middleware('throttle:3,1');
 
     Route::get('forgot-password/retrieve/{password_reset_code}', [MailController::class, 'passwordResetCallback']);
     Route::post('forgot-password/save', [MailController::class, 'passwordResetCallbackSave']);

@@ -6,7 +6,9 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rules\Password;
 
 class AuthController extends Controller
 {
@@ -26,14 +28,14 @@ class AuthController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|min:6|confirmed',
+            'password' => ['required', 'confirmed', Password::min(12)->mixedCase()->numbers()->symbols()],
         ]);
 
         $user = DB::transaction(function () use ($validated): User {
             $user = User::create([
                 'name' => $validated['name'],
                 'email' => $validated['email'],
-                'password' => bcrypt($validated['password']),
+                'password' => Hash::make($validated['password']),
             ]);
 
             $companyId = DB::table('tz_companies')->insertGetId([
@@ -74,7 +76,7 @@ class AuthController extends Controller
     {
         $credentials = $request->validate([
             'email' => 'required|email',
-            'password' => 'required|min:6',
+            'password' => 'required',
         ]);
 
         if (auth()->attempt($credentials, $request->filled('remember'))) {

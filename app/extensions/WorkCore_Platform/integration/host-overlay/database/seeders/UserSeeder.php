@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class UserSeeder extends Seeder
 {
@@ -17,49 +18,49 @@ class UserSeeder extends Seeder
                 [
                     'name' => 'John Doe',
                     'email' => 'john@example.com',
-                    'password' => bcrypt('password'),
+                    'password' => Hash::make('password'),
                     'email_verified_at' => now(),
                 ],
                 [
                     'name' => 'Jane Smith',
                     'email' => 'jane@example.com',
-                    'password' => bcrypt('password'),
+                    'password' => Hash::make('password'),
                     'email_verified_at' => now(),
                 ],
                 [
                     'name' => 'Bob Johnson',
                     'email' => 'bob@example.com',
-                    'password' => bcrypt('password'),
+                    'password' => Hash::make('password'),
                     'email_verified_at' => now(),
                 ],
                 [
                     'name' => 'Alice Williams',
                     'email' => 'alice@example.com',
-                    'password' => bcrypt('password'),
+                    'password' => Hash::make('password'),
                     'email_verified_at' => now(),
                 ],
                 [
                     'name' => 'Charlie Brown',
                     'email' => 'charlie@example.com',
-                    'password' => bcrypt('password'),
+                    'password' => Hash::make('password'),
                     'email_verified_at' => now(),
                 ],
                 [
                     'name' => 'Diana Prince',
                     'email' => 'diana@example.com',
-                    'password' => bcrypt('password'),
+                    'password' => Hash::make('password'),
                     'email_verified_at' => now(),
                 ],
                 [
                     'name' => 'Eve Davis',
                     'email' => 'eve@example.com',
-                    'password' => bcrypt('password'),
+                    'password' => Hash::make('password'),
                     'email_verified_at' => now(),
                 ],
                 [
                     'name' => 'Frank Miller',
                     'email' => 'frank@example.com',
-                    'password' => bcrypt('password'),
+                    'password' => Hash::make('password'),
                     'email_verified_at' => now(),
                 ],
             ];
@@ -68,7 +69,7 @@ class UserSeeder extends Seeder
                 [
                     'name' => 'John Doe',
                     'email' => 'john@example.com',
-                    'password' => bcrypt('password'),
+                    'password' => Hash::make('password'),
                     'email_verified_at' => now(),
                 ],
             ];
