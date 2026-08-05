@@ -29,7 +29,8 @@ Future<void> _pumpShowcase(
 }
 
 void main() {
-  test('showcase route is internal and primary navigation remains five items', () {
+  test('showcase route is internal and primary navigation remains five items',
+      () {
     final showcaseRoutes = Routes.list
         .where((page) => page.name == Routes.designSystemShowcase)
         .toList(growable: false);
