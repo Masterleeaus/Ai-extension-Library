@@ -145,7 +145,7 @@ class GoogleBusinessProfileController extends Controller
 
                 if ($locationsResponse->successful()) {
                     foreach ((array) $locationsResponse->json('locations', []) as $location) {
-                        $locations[] = $this->locationSummary((array) $location);
+                        $locations[] = $this->locationSummary($accountName, (array) $location);
 
                         if (count($locations) >= 100) {
                             break;
@@ -188,7 +188,7 @@ class GoogleBusinessProfileController extends Controller
                     $accounts
                 ))),
                 'locations' => $locations,
-                'selected_location_name' => $firstLocation['name'] ?? null,
+                'selected_location_name' => $firstLocation['v4_name'] ?? null,
                 'authorized_scopes' => $authorizedScopes,
                 'provider_capabilities' => $capabilities,
                 'token_type' => (string) $tokenResponse->json('token_type', 'Bearer'),
@@ -261,10 +261,19 @@ class GoogleBusinessProfileController extends Controller
         )));
     }
 
-    private function locationSummary(array $location): array
+    private function locationSummary(string $accountName, array $location): array
     {
+        $locationName = trim((string) ($location['name'] ?? ''), '/');
+        $locationId = str_starts_with($locationName, 'locations/')
+            ? substr($locationName, strlen('locations/'))
+            : '';
+
         return [
-            'name' => $location['name'] ?? null,
+            'name' => $locationName !== '' ? $locationName : null,
+            'account_name' => $accountName,
+            'v4_name' => $locationId !== ''
+                ? trim($accountName, '/') . '/locations/' . $locationId
+                : null,
             'title' => $location['title'] ?? null,
             'store_code' => $location['storeCode'] ?? null,
             'website_uri' => $location['websiteUri'] ?? null,
