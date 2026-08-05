@@ -20,8 +20,8 @@ class ChannelEntitlementContractTest extends TestCase
         $service = file_get_contents(__DIR__ . '/../../System/Services/SocialMediaChannelEntitlementService.php');
         $driver = file_get_contents(__DIR__ . '/../../System/Services/Publisher/PublisherDriver.php');
 
-        $this->assertStringContainsString("$platform->user_id", $service);
-        $this->assertStringContainsString("$user->getKey()", $service);
+        $this->assertStringContainsString(chr(36) . 'platform->user_id', $service);
+        $this->assertStringContainsString(chr(36) . 'user->getKey()', $service);
         $this->assertStringContainsString('SocialMediaChannelEntitlementService::class', $driver);
         $this->assertStringContainsString('outside your Titan Reach channel allowance', $driver);
     }
@@ -30,8 +30,8 @@ class ChannelEntitlementContractTest extends TestCase
     {
         $view = file_get_contents(__DIR__ . '/../../resources/views/platforms.blade.php');
 
-        $this->assertStringContainsString("$channelUsage['included']", $view);
-        $this->assertStringContainsString("$channelUsage['projected_monthly_add_on']", $view);
+        $this->assertStringContainsString(chr(36) . "channelUsage['included']", $view);
+        $this->assertStringContainsString(chr(36) . "channelUsage['projected_monthly_add_on']", $view);
         $this->assertStringContainsString("@include('social-media::platforms.platform-table'", $view);
     }
 }
