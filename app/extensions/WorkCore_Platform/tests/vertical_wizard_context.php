@@ -120,13 +120,14 @@ $definitionV2 = [
             ['key' => 'company.currency_code', 'response_type' => 'currency', 'handling' => 'infer_then_confirm', 'target_owner' => 'Company/Finance', 'risk' => 'low'],
             ['key' => 'business.verticals', 'response_type' => 'multi_select', 'handling' => 'ask', 'target_owner' => 'Capability/vertical registry', 'risk' => 'medium'],
             ['key' => 'ai.credentials', 'response_type' => 'secret_connection', 'handling' => 'secure_task', 'target_owner' => 'Host AI registry/Vault', 'risk' => 'high'],
+            ['key' => 'integration.settings', 'response_type' => 'compound', 'handling' => 'ask', 'target_owner' => 'Optional integrations', 'risk' => 'high'],
         ],
     ]],
 ];
 $definitionV3 = [...$definitionV2, 'version' => 3, 'title' => 'Tenant onboarding v3'];
 
 $db->table('tz_wizard_definitions')->insert([
-    ['public_id' => 'def-v2', 'company_id' => 10, 'definition_key' => 'tenant-onboarding', 'version' => 2, 'status' => 'published', 'definition' => json_encode($definitionV2, JSON_THROW_ON_ERROR)],
+    ['public_id' => 'def-v2', 'company_id' => 10, 'definition_key' => 'tenant-onboarding', 'version' => 2, 'status' => 'archived', 'definition' => json_encode($definitionV2, JSON_THROW_ON_ERROR)],
     ['public_id' => 'def-v3', 'company_id' => 10, 'definition_key' => 'tenant-onboarding', 'version' => 3, 'status' => 'published', 'definition' => json_encode($definitionV3, JSON_THROW_ON_ERROR)],
 ]);
 $db->table('tz_wizard_runs')->insert([
@@ -161,6 +162,7 @@ $answerRows = [
     ['company.currency_code', 'AUD', 'user_entered', 1.0, 1],
     ['business.verticals', ['field-home-services'], 'user_entered', 1.0, 1],
     ['ai.credentials', ['status' => 'connected', 'provider_reference' => 'openai-company-10', 'verified_at' => '2026-08-05T10:10:00+10:00', 'api_key' => 'sk-must-not-leak'], 'user_entered', 1.0, 1],
+    ['integration.settings', ['status' => 'connected', 'provider_reference' => 'legacy-map-provider', 'api_token' => 'token-must-not-leak'], 'imported', 0.8, 0],
 ];
 foreach ($answerRows as $index => [$key, $value, $source, $confidence, $confirmed]) {
     $db->table('tz_wizard_answers')->insert([
@@ -203,6 +205,18 @@ $test('repository resolves the exact run definition version rather than latest',
     $assert($snapshot['answer_revision'] === 12, 'Metadata answer revision was not preserved.');
 });
 
+$test('repository fails closed when the pinned definition version is unavailable', function () use ($repository, $db, $assert): void {
+    $db->table('tz_wizard_runs')->where('id', 100)->update(['definition_version' => 1]);
+    try {
+        $repository->snapshot('run-tenant-10', 10);
+        $assert(false, 'Repository substituted a different definition version.');
+    } catch (\InvalidArgumentException) {
+        $assert(true);
+    } finally {
+        $db->table('tz_wizard_runs')->where('id', 100)->update(['definition_version' => 2]);
+    }
+});
+
 $test('repository denies cross-company run access', function () use ($repository, $assert): void {
     try {
         $repository->snapshot('run-tenant-10', 11);
@@ -242,6 +256,13 @@ $test('adapter excludes secret values and exposes connection status only', funct
     $assert($connection['provider_reference'] === 'openai-company-10');
     $assert($connection['verified_at'] === '2026-08-05T10:10:00+10:00');
     $assert(!array_key_exists('api_key', $connection));
+
+    $assert(!str_contains($encoded, 'token-must-not-leak'), 'Legacy credential-shaped value leaked into context.');
+    $assert(!isset($context['resolved']['questions']['answers']['integration.settings']));
+    $legacyConnection = $context['resolved']['activation']['secure_connections']['integration.settings'];
+    $assert($legacyConnection['status'] === 'connected');
+    $assert($legacyConnection['provider_reference'] === 'legacy-map-provider');
+    $assert(!array_key_exists('api_token', $legacyConnection));
 });
 
 $failed = 0;
