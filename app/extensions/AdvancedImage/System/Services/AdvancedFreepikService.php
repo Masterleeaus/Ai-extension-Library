@@ -4,13 +4,14 @@ namespace App\Extensions\AdvancedImage\System\Services;
 
 use App\Extensions\AdvancedImage\System\Services\Traits\UseImage;
 use App\Models\UserOpenai;
+use App\Services\Security\RemoteImageFetcher;
 use GuzzleHttp\Promise\PromiseInterface;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use RuntimeException;
+use Throwable;
 
 class AdvancedFreepikService
 {
@@ -21,7 +22,7 @@ class AdvancedFreepikService
         'style_transfer'    => 'https://api.freepik.com/v1/ai/image-style-transfer',
         //        'remove_background' => 'https://api.freepik.com/v1/ai/beta/remove-background',
         'upscale'           => 'ai/image-upscaler',
-        'image-relight'		   => 'ai/image-relight',
+        'image-relight'     => 'ai/image-relight',
     ];
 
     public function webhook(UserOpenai $task, array $data): void
@@ -170,16 +171,16 @@ class AdvancedFreepikService
         $image = $this->encodeFile($params['uploaded_image']);
 
         $data = [
-            'image'        => $image,
-            'webhook_url'  => config('app.url') . '/api/webhook/advanced-image/freepik',
-            'scale_factor' => '2x',
-            'optimized_for'=> 'standard',
-            'prompt'       => $params['description'] ?? 'enhance clarity sharp details',
-            'creativity'   => 2,
-            'hdr'          => 1,
-            'resemblance'  => 0,
-            'fractality'   => -1,
-            'engine'       => 'magnific_sparkle',
+            'image'         => $image,
+            'webhook_url'   => config('app.url') . '/api/webhook/advanced-image/freepik',
+            'scale_factor'  => '2x',
+            'optimized_for' => 'standard',
+            'prompt'        => $params['description'] ?? 'enhance clarity sharp details',
+            'creativity'    => 2,
+            'hdr'           => 1,
+            'resemblance'   => 0,
+            'fractality'    => -1,
+            'engine'        => 'magnific_sparkle',
         ];
 
         $response = $this->requestPost(self::ENDPOINTS['upscale'], $data);
@@ -254,27 +255,17 @@ class AdvancedFreepikService
 
     public function downloadAndSaveImageFromUrl($url): ?string
     {
-        // Resmin içeriğini çek
-        $response = Http::get($url);
+        try {
+            $path = app(RemoteImageFetcher::class)->store(
+                (string) $url,
+                'public',
+                'image-editor'
+            );
 
-        if ($response->successful()) {
-            // Dosya uzantısını tahmin et
-            $extension = pathinfo(parse_url($url, PHP_URL_PATH), PATHINFO_EXTENSION) ?: 'jpg';
-
-            // Benzersiz bir dosya adı oluştur
-            $fileName = Str::uuid() . '.' . $extension;
-
-            // Storage path (örnek: storage/app/public/images)
-            $path = 'image-editor/' . $fileName;
-
-            // Dosyayı kaydet
-            Storage::disk('public')->put($path, $response->body());
-
-            // İsteğe bağlı: URL'yi döndür (örnek: http://.../storage/images/abc.jpg)
             return $this->imagePath($path);
+        } catch (Throwable) {
+            return null;
         }
-
-        return null;
     }
 
     private function encodeFile($file): string
