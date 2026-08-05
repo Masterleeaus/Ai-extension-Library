@@ -12,51 +12,40 @@ permissions:
 jobs:
   collect:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
     steps:
       - name: Checkout feature branch
         uses: actions/checkout@v4
         with:
           ref: feature/workcore-wizard-vertical-context
 
-      - name: Introspect manifest contract source
-        working-directory: app/extensions/WorkCore_Platform
+      - name: Trace contract materialization stage
+        shell: bash
         run: |
-          rm -rf /tmp/workcore-source-manifest-diagnostics
-          mkdir -p /tmp/workcore-source-manifest-diagnostics
-          python - <<'PY'
-          import importlib
-          import inspect
-          import shutil
-          import sys
-          from pathlib import Path
+          set -euo pipefail
 
-          tests = Path('tests').resolve()
-          sys.path.insert(0, str(tests))
-          module = importlib.import_module('test_contract_source_manifest')
-          source_path = Path(module.__file__).resolve()
-          print('MODULE_FILE', source_path)
-          print(source_path.read_text(encoding='utf-8'))
-          target = Path('/tmp/workcore-source-manifest-diagnostics/tests') / source_path.name
-          target.parent.mkdir(parents=True, exist_ok=True)
-          shutil.copy2(source_path, target)
+          probe() {
+            stage="$1"
+            echo "===== PROBE: ${stage} ====="
+            find app/extensions/WorkCore_Platform/tests -maxdepth 1 -type f -printf '%f\n' 2>/dev/null | sort | grep -E 'contract|manifest|repository' || true
+            find app/extensions/WorkCore_Platform -type f \( -name 'source-files.json' -o -iname '*source*manifest*.py' \) -print 2>/dev/null || true
+            if [ -f app/extensions/WorkCore_Platform/tests/test_contract_source_manifest.py ]; then
+              echo '===== TEST SOURCE ====='
+              sed -n '1,240p' app/extensions/WorkCore_Platform/tests/test_contract_source_manifest.py
+            fi
+            while IFS= read -r manifest; do
+              echo "===== MANIFEST: ${manifest} ====="
+              sed -n '1,120p' "$manifest"
+            done < <(find app/extensions/WorkCore_Platform -type f -name 'source-files.json' -print 2>/dev/null)
+          }
 
-          for candidate in Path('.').rglob('*'):
-              if not candidate.is_file():
-                  continue
-              name = candidate.name.lower()
-              if ('source' in name and 'manifest' in name) or name == 'source-files.json':
-                  print('CANDIDATE', candidate)
-                  output = Path('/tmp/workcore-source-manifest-diagnostics/repository') / candidate
-                  output.parent.mkdir(parents=True, exist_ok=True)
-                  shutil.copy2(candidate, output)
-          PY
-          find /tmp/workcore-source-manifest-diagnostics -type f -print
+          probe checkout
+          php packages/titan-interaction-engine/tests/vertical_context.php
+          probe vertical-context-test
+          php packages/titan-interaction-engine/tests/run.php
+          probe interaction-tests
+          php packages/titan-interaction-engine/bin/verify.php
+          probe interaction-verifier
 
-      - name: Upload diagnostics
-        uses: actions/upload-artifact@v4
-        with:
-          name: workcore-source-manifest-diagnostics
-          path: /tmp/workcore-source-manifest-diagnostics
-          if-no-files-found: error
-          retention-days: 1
+          echo '===== GIT STATUS AFTER TRACE ====='
+          git status --short
