@@ -1,0 +1,240 @@
+name: Harden and verify WorkCore issue 353
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+concurrency:
+  group: workcore-353-hardening
+  cancel-in-progress: true
+
+jobs:
+  harden-and-verify:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out pricing branch
+        uses: actions/checkout@v4
+        with:
+          ref: feature/workcore-dynamic-pricing-353
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Set up PHP and Composer
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          tools: composer:v2
+          coverage: none
+
+      - name: Merge current main
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git fetch origin main
+          git merge --no-edit origin/main
+
+      - name: Download and verify hardening delta
+        shell: bash
+        run: |
+          set -euo pipefail
+          patch="$RUNNER_TEMP/workcore-353-hardening-patch.tar.gz"
+          listing="$RUNNER_TEMP/workcore-353-hardening-files.txt"
+          curl --fail --location --retry 3 \
+            'https://titan-create-phase-0-1.miniup.app/downloads/workcore-353-hardening-patch.tar.gz' \
+            --output "$patch"
+          echo '5fa6d3a4af0f6b5efe308b55b9f0e66e2c3b51457c3ac1d5d163f4b6dbb18be9  '"$patch" | sha256sum --check --strict
+          tar -tzf "$patch" > "$listing"
+          grep -Fxq 'app/extensions/WorkCore_Platform/packages/workcore-commercial/src/Domains/WorkCore/System/Modules/Finance/Pricing/Actions/UpsertSeasonalRate.php' "$listing"
+          grep -Fxq 'app/extensions/WorkCore_Platform/native-extensions/WorkCore/System/Navigation/workspaces.php' "$listing"
+          tar -xzf "$patch"
+          rm -f \
+            app/extensions/WorkCore_Platform/packages/workcore-commercial/src/Domains/WorkCore/System/Modules/Finance/Pricing/routes/user.php \
+            .github/workflows/workcore-353-hardening.yml
+
+      - name: Run focused and integrity suites
+        working-directory: app/extensions/WorkCore_Platform
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m unittest \
+            tests/test_workcore_dynamic_pricing.py \
+            tests/test_workcore_workspace_navigation.py \
+            tests/test_repository_integrity.py -v
+          python tools/refresh_package_checksums.py --repo . --check
+          python tools/validate_repository.py --repo .
+
+      - name: Lint complete package PHP inventory
+        working-directory: app/extensions/WorkCore_Platform
+        shell: bash
+        run: |
+          set -euo pipefail
+          expected_php_files="$(python - <<'PY'
+          import json
+          from pathlib import Path
+          print(sum(
+              1
+              for manifest_path in Path('packages').glob('*/files.sha256.json')
+              for entry in json.loads(manifest_path.read_text(encoding='utf-8')).get('files', [])
+              if isinstance(entry, dict) and entry.get('path', '').endswith('.php')
+          ))
+          PY
+          )"
+          actual_php_files="$(find packages -type f -name '*.php' | wc -l | tr -d ' ')"
+          test "$actual_php_files" -eq "$expected_php_files"
+          find packages -type f -name '*.php' -print0 | xargs -0 -n1 -P4 php -l > /tmp/workcore-353-hardening-package-lint.txt
+          echo "Linted $actual_php_files package PHP files."
+
+      - name: Build and validate six installers
+        working-directory: app/extensions/WorkCore_Platform
+        shell: bash
+        run: |
+          set -euo pipefail
+          python tools/build_magicai_extensions.py --repo . --output "$RUNNER_TEMP/workcore-353-build"
+          python tools/validate_magicai_extensions.py \
+            "$RUNNER_TEMP/workcore-353-build/WorkCore" \
+            "$RUNNER_TEMP/workcore-353-build/WorkCoreBusinessNetwork" \
+            "$RUNNER_TEMP/workcore-353-build/WorkCoreCommercial" \
+            "$RUNNER_TEMP/workcore-353-build/WorkCoreWorkOperations" \
+            "$RUNNER_TEMP/workcore-353-build/WorkCorePropertyOperations" \
+            "$RUNNER_TEMP/workcore-353-build/WorkCoreWorkforceAssurance"
+          find "$RUNNER_TEMP/workcore-353-build" -type f -name '*.php' -print0 | xargs -0 -n1 -P4 php -l > /tmp/workcore-353-hardening-generated-lint.txt
+
+      - name: Create real Laravel 10 host
+        run: composer create-project laravel/laravel:^10.0 /tmp/magicai-host --no-interaction --prefer-dist --no-blocking
+
+      - name: Install full WorkCore profile
+        working-directory: app/extensions/WorkCore_Platform
+        run: |
+          python tools/prepare_magicai_10_fixture.py \
+            --repo . \
+            --build "$RUNNER_TEMP/workcore-353-build" \
+            --host /tmp/magicai-host \
+            --profile full
+
+      - name: Boot and migrate real Laravel host
+        working-directory: app/extensions/WorkCore_Platform
+        run: |
+          php /tmp/magicai-host/artisan about --no-ansi
+          php tools/verify_magicai_native_host.php \
+            --host=/tmp/magicai-host \
+            --profiles=integration/magicai-10-fixture/profiles.json \
+            --profile=full
+          php /tmp/magicai-host/artisan migrate:fresh --force --no-interaction --no-ansi
+          php tools/verify_workcore_entitlement_projection.php --host=/tmp/magicai-host
+          php tools/verify_workcore_workspace_navigation.php --host=/tmp/magicai-host
+
+      - name: Exercise pricing repository in real Laravel database
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > "$RUNNER_TEMP/verify-workcore-pricing.php" <<'PHP'
+          <?php
+          declare(strict_types=1);
+          use App\Domains\WorkCore\System\Actions\BusinessActionRegistry;
+          use App\Domains\WorkCore\System\Modules\Finance\Pricing\Contracts\PricingRepositoryContract;
+          use App\Domains\WorkCore\System\Modules\Finance\Pricing\Domain\DynamicPriceCalculator;
+          use Illuminate\Contracts\Console\Kernel;
+          use Illuminate\Support\Facades\DB;
+          $host = '/tmp/magicai-host';
+          require $host . '/vendor/autoload.php';
+          $app = require $host . '/bootstrap/app.php';
+          $app->make(Kernel::class)->bootstrap();
+          $assert = static function (bool $condition, string $message): void {
+              if (! $condition) { throw new RuntimeException($message); }
+          };
+          $companyId = (int) DB::table('tz_companies')->value('id');
+          $actorId = (int) DB::table('users')->value('id');
+          $assert($companyId > 0 && $actorId > 0, 'Fixture company and actor are required.');
+          $calculator = $app->make(DynamicPriceCalculator::class);
+          $neutral = $calculator->calculate([
+              'base_price_minor' => 10000,
+              'currency' => 'AUD',
+              'rules' => [],
+              'seasonal_multiplier' => 1.0,
+              'occupancy_percentage' => null,
+              'demand_score' => 50,
+          ]);
+          $assert($neutral->finalPriceMinor === 10000, 'Missing occupancy must be neutral.');
+          $assert($neutral->occupancyMultiplier === 1.0, 'Missing occupancy multiplier must be 1.0.');
+          $registry = $app->make(BusinessActionRegistry::class);
+          $assert($registry->has('workcore.pricing.seasonal.upsert'), 'Seasonal action is not registered.');
+          $repository = $app->make(PricingRepositoryContract::class);
+          $repository->upsertSeasonalRate($companyId, $actorId, [
+              'name' => 'Fixture season',
+              'target_type' => 'service',
+              'target_reference' => 'alpha',
+              'starts_on' => now()->subDay()->toDateString(),
+              'ends_on' => now()->addDay()->toDateString(),
+              'multiplier' => 1.2,
+              'priority' => 10,
+          ]);
+          $context = $repository->context($companyId, [
+              'target_type' => 'service',
+              'target_reference' => 'alpha',
+          ], new DateTimeImmutable());
+          $assert((float) $context['seasonal_multiplier'] === 1.2, 'Seasonal rate was not applied.');
+          $assert($context['occupancy_percentage'] === null, 'Absent occupancy must remain null.');
+          foreach ([['alpha', 12000], ['beta', 30000]] as [$target, $price]) {
+              $repository->recordSignal($companyId, $actorId, [
+                  'signal_type' => 'competitor',
+                  'target_type' => 'service',
+                  'target_reference' => $target,
+                  'competitor_name' => 'Fixture competitor',
+                  'observed_price_minor' => $price,
+                  'currency' => 'AUD',
+              ]);
+              $decision = $calculator->calculate([
+                  'base_price_minor' => 10000,
+                  'currency' => 'AUD',
+                  'rules' => [],
+                  'seasonal_multiplier' => 1.0,
+                  'occupancy_percentage' => null,
+                  'demand_score' => 50,
+              ]);
+              $repository->recordDecision($companyId, $actorId, [
+                  'target_type' => 'service',
+                  'target_reference' => $target,
+              ], $decision);
+          }
+          $analytics = $repository->analytics($companyId, [
+              'target_type' => 'service',
+              'target_reference' => 'alpha',
+              'days' => 30,
+          ]);
+          $assert($analytics['competitor_average_price_minor'] === 12000, 'Competitor analytics leaked across targets.');
+          $routeCount = 0;
+          foreach ($app['router']->getRoutes() as $route) {
+              if ($route->getName() === 'dashboard.user.workcore.commercial.pricing') { $routeCount++; }
+          }
+          $assert($routeCount === 1, 'Dynamic Pricing dashboard route must exist exactly once.');
+          echo json_encode([
+              'company_id' => $companyId,
+              'neutral_price_minor' => $neutral->finalPriceMinor,
+              'seasonal_multiplier' => $context['seasonal_multiplier'],
+              'competitor_average_price_minor' => $analytics['competitor_average_price_minor'],
+              'pricing_route_count' => $routeCount,
+          ], JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR) . PHP_EOL;
+          PHP
+          php "$RUNNER_TEMP/verify-workcore-pricing.php"
+
+      - name: Commit verified hardening
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add -A
+          test ! -e .github/workflows/workcore-353-hardening.yml
+          test ! -e app/extensions/WorkCore_Platform/packages/workcore-commercial/src/Domains/WorkCore/System/Modules/Finance/Pricing/routes/user.php
+          git diff --cached --quiet && { echo 'No hardening changes to commit'; exit 1; }
+          git commit -m 'fix(workcore): harden dynamic pricing runtime (#353)'
+          git push origin HEAD:feature/workcore-dynamic-pricing-353
