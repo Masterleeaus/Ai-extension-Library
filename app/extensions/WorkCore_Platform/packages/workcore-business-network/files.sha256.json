@@ -1,5 +1,5 @@
 {
-  "file_count": 463,
+  "file_count": 466,
   "files": [
     {
       "bytes": 226,
@@ -2197,9 +2197,9 @@
       "sha256": "96341102a71eabc5620afd7ab3b0e4af5a0b551065ff759bf36c5da7b2acea3f"
     },
     {
-      "bytes": 6766,
+      "bytes": 7345,
       "path": "src/Domains/WorkCore/System/Modules/Wizards/Providers/WorkWizardsServiceProvider.php",
-      "sha256": "4afdf57da93e4f69c37be750f73f4d1fd89f6683a44245667d8fe89a40cf8760"
+      "sha256": "b408ff602bd490c18025bbddcc53e7ba8638615d1dd092dbfc748230fb927684"
     },
     {
       "bytes": 395,
@@ -2237,6 +2237,16 @@
       "sha256": "8a5315de78c275fb89c49aacd13a00834117a3dc5176e9d30b454bb3f874d346"
     },
     {
+      "bytes": 22824,
+      "path": "src/Domains/WorkCore/System/Modules/Wizards/Services/LayeredWizardQuestionCatalogue.php",
+      "sha256": "1704e76ac12cc772d61e7ee24a1bcdbddd54d5ee801e86c8c84cd6f9b9713ff4"
+    },
+    {
+      "bytes": 22853,
+      "path": "src/Domains/WorkCore/System/Modules/Wizards/Services/LayeredWizardQuestionComposer.php",
+      "sha256": "84118bcfe425fbf4cb627de5e0c37a42e9e6b329e80d8257321e74bb25d1d5e8"
+    },
+    {
       "bytes": 2771,
       "path": "src/Domains/WorkCore/System/Modules/Wizards/Services/WizardAnswerRecompositionService.php",
       "sha256": "19053d3c33ec28fce741809095e8517077c33bda177f68fa6897b5b55c9ff3b0"
@@ -2262,14 +2272,19 @@
       "sha256": "c999b140393d06e850382906605549a88e22b8cfcf3d0ba011292ca25d7a9f31"
     },
     {
+      "bytes": 2028,
+      "path": "src/Domains/WorkCore/System/Modules/Wizards/Services/WizardQuestionPlanner.php",
+      "sha256": "89695b4918b07cf7c6c1466954a3fb6299d9cca08b0046393082a1d1d36ec361"
+    },
+    {
       "bytes": 809,
       "path": "src/Domains/WorkCore/System/Modules/Wizards/Services/WizardRiskPolicy.php",
       "sha256": "2094976bc9327f900af55777e48155eb29ddcd373f21cb106ae524c24bfe3304"
     },
     {
-      "bytes": 6021,
+      "bytes": 13151,
       "path": "src/Domains/WorkCore/System/Modules/Wizards/Services/WizardRuntime.php",
-      "sha256": "90a6a926e23896c027a2ec2ae08078526358c47123c3d086bc739ede8f6e04e6"
+      "sha256": "1a273ddf3e0c18bb07808dbd90557b4eb265dfb08e45805288615c1a3772df3a"
     },
     {
       "bytes": 11899,
