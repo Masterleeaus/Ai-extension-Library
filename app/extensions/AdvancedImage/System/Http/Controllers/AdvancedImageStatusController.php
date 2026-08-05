@@ -23,7 +23,9 @@ class AdvancedImageStatusController extends Controller
 
     public function __invoke(int $id): JsonResponse
     {
-        $task = UserOpenai::findOrFail($id);
+        $task = UserOpenai::query()
+            ->where('user_id', auth()->id())
+            ->findOrFail($id);
 
         if ($this->shouldCheckStatus($task)) {
             $task = match (data_get($task->payload, 'model')) {
