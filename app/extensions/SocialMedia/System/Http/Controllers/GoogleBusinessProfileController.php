@@ -32,6 +32,7 @@ class GoogleBusinessProfileController extends Controller
 
     public function publish(Request $request, DistributionItem $item): JsonResponse
     {
+        $this->assertItemOwner($item);
         $validated = $this->validateMutation($request);
 
         return $this->respond(fn () => $this->locked(
@@ -48,6 +49,7 @@ class GoogleBusinessProfileController extends Controller
 
     public function uploadPhoto(Request $request, DistributionItem $item): JsonResponse
     {
+        $this->assertItemOwner($item);
         $validated = $this->validateMutation($request);
 
         return $this->respond(fn () => $this->locked(
@@ -64,6 +66,7 @@ class GoogleBusinessProfileController extends Controller
 
     public function reconcile(Request $request, DistributionItem $item): JsonResponse
     {
+        $this->assertItemOwner($item);
         $validated = $request->validate(['account_id' => 'required|integer']);
 
         return $this->respond(fn () => $this->locked(
@@ -94,6 +97,7 @@ class GoogleBusinessProfileController extends Controller
 
     public function replyToReview(Request $request, DistributionItem $item): JsonResponse
     {
+        $this->assertItemOwner($item);
         $validated = $request->validate([
             'account_id' => 'required|integer',
             'idempotency_key' => 'required|string|max:128',
@@ -118,6 +122,7 @@ class GoogleBusinessProfileController extends Controller
 
     public function reviewHandoff(Request $request, DistributionItem $item): JsonResponse
     {
+        $this->assertItemOwner($item);
         $validated = $request->validate([
             'account_id' => 'required|integer',
             'review.review_name' => 'required|string|max:500',
@@ -166,6 +171,13 @@ class GoogleBusinessProfileController extends Controller
             'idempotency_key' => 'required|string|max:128',
             'payload' => 'required|array',
         ]);
+    }
+
+    private function assertItemOwner(DistributionItem $item): void
+    {
+        if ((int) $item->user_id !== (int) Auth::id()) {
+            abort(404);
+        }
     }
 
     private function account(int $accountId): SocialMediaPlatform
