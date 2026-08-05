@@ -4,6 +4,7 @@ namespace App\Extensions\SocialMedia\System\Models;
 
 use App\Models\Company;
 use App\Models\User;
+use BackedEnum;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -90,6 +91,10 @@ class DistributionItem extends Model
 
     public static function fromSocialMediaPost(SocialMediaPost $post): self
     {
+        $status = $post->status instanceof BackedEnum
+            ? (string) $post->status->value
+            : (string) $post->status;
+
         return self::query()->firstOrCreate(
             ['social_media_post_id' => $post->getKey()],
             [
@@ -97,7 +102,7 @@ class DistributionItem extends Model
                 'company_id'      => $post->company_id,
                 'campaign_id'     => $post->campaign_id,
                 'content_type'    => self::TYPE_SOCIAL_POST,
-                'status'          => $post->status?->value ?? (string) $post->status,
+                'status'          => $status,
                 'approval_status' => 'not_required',
                 'source_type'     => self::TYPE_SOCIAL_POST,
                 'source_id'       => (string) $post->getKey(),
