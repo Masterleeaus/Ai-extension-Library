@@ -19,7 +19,7 @@
                 name="name"
                 label="{{ __('name') }}"
                 placeholder="{{ __('Name') }}"
-                value="{!! $item?->name !!}"
+                value="{{ $item?->name }}"
             />
             <x-forms.input
                 id="email"
@@ -27,7 +27,7 @@
                 name="email"
                 label="{{ __('Email') }}"
                 placeholder="{{ __('Email') }}"
-                value="{!! $item?->email !!}"
+                value="{{ $item?->email }}"
             />
 
             <x-forms.input
@@ -36,7 +36,7 @@
                 name="phone"
                 label="{{ __('Phone') }}"
                 placeholder="{{ __('Phone') }}"
-                value="{!! $item?->phone !!}"
+                value="{{ $item?->phone }}"
             />
 
 

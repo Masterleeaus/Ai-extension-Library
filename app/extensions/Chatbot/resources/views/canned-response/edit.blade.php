@@ -19,7 +19,7 @@
                 name="title"
                 label="{{ __('Title') }}"
                 placeholder="{{ __('Response Title') }}"
-                value="{!! $item?->title !!}"
+                value="{{ $item?->title }}"
             />
 
             <x-forms.input

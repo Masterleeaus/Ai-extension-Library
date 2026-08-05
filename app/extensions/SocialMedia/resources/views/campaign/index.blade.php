@@ -173,7 +173,7 @@
         });
     </script>
     <script>
-        const stream_type = '{!! $settings_two->openai_default_stream_server !!}';
+        const stream_type = '{{ $settings_two->openai_default_stream_server }}';
         const openai_model = '{{ $setting->openai_default_model }}';
 
         const guest_id = document.getElementById("guest_id")?.value;

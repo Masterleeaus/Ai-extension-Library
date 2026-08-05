@@ -447,7 +447,7 @@
                                                             class="m-0 rounded-input border border-input-border p-4"
                                                             x-show="selectedCampaign == '{{ $campaign['id'] }}'"
                                                         >
-                                                            {!! $campaign['target_audience'] !!}
+                                                            {{ $campaign['target_audience'] }}
                                                         </p>
                                                     @endforeach
                                                 </div>
@@ -976,7 +976,7 @@
                 Alpine.data('socialMediaPostCreate', () => ({
                     userPlatforms: @json($userPlatforms),
                     platformUsername: "{{ $platformUsername ?: 'Jhon Doe' }}",
-                    platformPicture: "{!! $platformPicture ?: custom_theme_url('/assets/img/avatars/avatar-1.jpg') !!}",
+                    platformPicture: "{{ $platformPicture ?: custom_theme_url('/assets/img/avatars/avatar-1.jpg') }}",
                     currentPlatform: '{{ $current_platform }}',
                     personalizedContent: '{{ $is_personalized_content }}',
                     selectedCompany: '{{ $company_id }}',
@@ -987,7 +987,7 @@
                     repeatPeriod: '{{ $repeat_period }}',
                     repeatStartDate: '{{ $repeat_start_date }}',
                     repeatTime: null,
-                    content: `{!! $content !!}`,
+                    content: {{ json_encode($content) }},
                     image: '{{ $postImage }}',
                     images: @json($editingPost->images ?? ($postImage ? [$postImage] : [])),
                     video: '{{ $video }}',
