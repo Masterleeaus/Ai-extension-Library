@@ -69,7 +69,7 @@ if ($authenticationPosition === false || $taskLookupPosition === false || $authe
     failAdvancedImageWebhookSignatureContract('Freepik authentication is not completed before task lookup');
 }
 
-if (! str_contains($controller, "if ($model === 'novita')")) {
+if (! str_contains($controller, "if (\$model === 'novita')")) {
     failAdvancedImageWebhookSignatureContract('Novita callbacks do not have an explicit fail-closed branch');
 }
 
