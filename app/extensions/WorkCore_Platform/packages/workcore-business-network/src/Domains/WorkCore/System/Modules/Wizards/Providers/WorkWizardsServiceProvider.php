@@ -25,11 +25,14 @@ use App\Domains\WorkCore\System\Modules\Wizards\Repositories\DatabaseWizardRecom
 use App\Domains\WorkCore\System\Modules\Wizards\Repositories\DatabaseWizardVerticalContextRepository;
 use App\Domains\WorkCore\System\Modules\Wizards\Repositories\EloquentWizardRepository;
 use App\Domains\WorkCore\System\Modules\Wizards\Services\LaravelWizardAIEnrichmentDispatcher;
+use App\Domains\WorkCore\System\Modules\Wizards\Services\LayeredWizardQuestionCatalogue;
+use App\Domains\WorkCore\System\Modules\Wizards\Services\LayeredWizardQuestionComposer;
 use App\Domains\WorkCore\System\Modules\Wizards\Services\WizardAnswerRecompositionService;
 use App\Domains\WorkCore\System\Modules\Wizards\Services\WizardAnswerValidator;
 use App\Domains\WorkCore\System\Modules\Wizards\Services\WizardBranchEvaluator;
 use App\Domains\WorkCore\System\Modules\Wizards\Services\WizardDefinitionRegistry;
 use App\Domains\WorkCore\System\Modules\Wizards\Services\WizardDependencyResolver;
+use App\Domains\WorkCore\System\Modules\Wizards\Services\WizardQuestionPlanner;
 use App\Domains\WorkCore\System\Modules\Wizards\Services\WizardRiskPolicy;
 use App\Domains\WorkCore\System\Modules\Wizards\Services\WizardRuntime;
 use App\Domains\WorkCore\System\Modules\Wizards\Services\WizardVerticalContextAdapter;
@@ -48,6 +51,13 @@ final class WorkWizardsServiceProvider extends ServiceProvider
         $this->app->singleton(WizardRiskPolicy::class);
         $this->app->singleton(WizardAnswerValidator::class);
         $this->app->singleton(WizardDependencyResolver::class);
+        $this->app->singleton(
+            LayeredWizardQuestionComposer::class,
+            static fn (): LayeredWizardQuestionComposer => new LayeredWizardQuestionComposer(
+                LayeredWizardQuestionCatalogue::defaults(),
+            ),
+        );
+        $this->app->singleton(WizardQuestionPlanner::class);
         $this->app->bind(WizardRepositoryContract::class, EloquentWizardRepository::class);
         $this->app->scoped(WizardRuntime::class);
 
