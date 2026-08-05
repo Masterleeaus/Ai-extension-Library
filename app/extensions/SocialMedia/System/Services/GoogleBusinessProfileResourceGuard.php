@@ -14,7 +14,8 @@ class GoogleBusinessProfileResourceGuard
     public function resolveLocation(
         SocialMediaPlatform $account,
         string $accountName,
-        string $locationName
+        string $locationName,
+        bool $requireLocalPost = false
     ): array {
         $accountName = $this->normaliseAccountName($accountName);
         $performanceLocationName = $this->normaliseLocationName($locationName, $accountName);
@@ -41,6 +42,11 @@ class GoogleBusinessProfileResourceGuard
             throw new InvalidArgumentException('location_not_authorized_for_account');
         }
 
+        if ($requireLocalPost
+            && data_get($location, 'metadata.canOperateLocalPost') === false) {
+            throw new RuntimeException('location_cannot_publish_local_posts');
+        }
+
         $locationId = basename($performanceLocationName);
 
         if ($locationId === '' || str_contains($locationId, '/')) {
@@ -54,6 +60,22 @@ class GoogleBusinessProfileResourceGuard
             'location' => $location,
             'rate_limit' => $this->google->rateLimit($response),
         ];
+    }
+
+    public function assertLocalPostName(array $resources, string $localPostName): string
+    {
+        $localPostName = trim($localPostName);
+        $prefix = rtrim((string) ($resources['account_location_name'] ?? ''), '/')
+            . '/localPosts/';
+
+        if ($localPostName === ''
+            || $prefix === '/localPosts/'
+            || ! str_starts_with($localPostName, $prefix)
+            || trim(substr($localPostName, strlen($prefix))) === '') {
+            throw new InvalidArgumentException('local_post_not_authorized_for_location');
+        }
+
+        return $localPostName;
     }
 
     public function assertReviewName(array $resources, string $reviewName): string
