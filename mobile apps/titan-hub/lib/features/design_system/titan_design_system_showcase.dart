@@ -41,7 +41,7 @@ class _TitanDesignSystemShowcaseState extends State<TitanDesignSystemShowcase> {
   @override
   Widget build(BuildContext context) {
     final sections = <Widget>[
-      _ShowcaseSection(
+      const _ShowcaseSection(
         title: 'Foundations',
         child: Wrap(
           spacing: TitanSpacing.sm,
@@ -60,10 +60,10 @@ class _TitanDesignSystemShowcaseState extends State<TitanDesignSystemShowcase> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Wrap(
+            const Wrap(
               spacing: TitanSpacing.sm,
               runSpacing: TitanSpacing.sm,
-              children: const [
+              children: [
                 TitanBadge(label: 'Primary', tone: TitanTone.primary),
                 TitanBadge(label: 'Ready', tone: TitanTone.success),
                 TitanBadge(label: 'Review', tone: TitanTone.warning),
