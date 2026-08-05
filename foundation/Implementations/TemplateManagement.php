@@ -11,7 +11,9 @@ use Foundation\Support\JsonHelper;
 class TemplateManagement implements TemplateManagementContract
 {
     private PDO $db;
-    private string $tablePrefix = 'template_management_';
+    private const TABLE_PREFIX = 'template_management_';
+    private const TABLE_TEMPLATES = self::TABLE_PREFIX . 'templates';
+    private string $tablePrefix = self::TABLE_PREFIX;
 
     public function __construct(PDO $db)
     {
@@ -28,7 +30,7 @@ class TemplateManagement implements TemplateManagementContract
         $templateId = bin2hex(random_bytes(16));
 
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}templates (id, tenant_id, name, type, content, metadata, created_at)
+            "INSERT INTO " . self::TABLE_TEMPLATES . " (id, tenant_id, name, type, content, metadata, created_at)
              VALUES (?, ?, ?, ?, ?, ?, ?)"
         );
 
@@ -39,7 +41,7 @@ class TemplateManagement implements TemplateManagementContract
             $templateType,
             $content,
             json_encode($metadata),
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return $templateId;
@@ -50,7 +52,7 @@ class TemplateManagement implements TemplateManagementContract
         string $templateId
     ): ?array {
         $stmt = $this->db->prepare(
-            "SELECT * FROM {$this->tablePrefix}templates WHERE id = ? AND tenant_id = ?"
+            "SELECT * FROM " . self::TABLE_TEMPLATES . " WHERE id = ? AND tenant_id = ?"
         );
 
         $stmt->execute([$templateId, $tenantId]);
@@ -69,10 +71,10 @@ class TemplateManagement implements TemplateManagementContract
         string $content
     ): bool {
         $stmt = $this->db->prepare(
-            "UPDATE {$this->tablePrefix}templates SET content = ?, updated_at = ? WHERE id = ? AND tenant_id = ?"
+            "UPDATE " . self::TABLE_TEMPLATES . " SET content = ?, updated_at = ? WHERE id = ? AND tenant_id = ?"
         );
 
-        return $stmt->execute([$content, date('c'), $templateId, $tenantId]);
+        return $stmt->execute([$content, DateTimeHelper::now(), $templateId, $tenantId]);
     }
 
     public function renderTemplate(
@@ -100,7 +102,7 @@ class TemplateManagement implements TemplateManagementContract
         string $templateType
     ): array {
         $stmt = $this->db->prepare(
-            "SELECT id, name, type, created_at FROM {$this->tablePrefix}templates WHERE tenant_id = ? AND type = ? ORDER BY created_at DESC"
+            "SELECT id, name, type, created_at FROM " . self::TABLE_TEMPLATES . " WHERE tenant_id = ? AND type = ? ORDER BY created_at DESC"
         );
 
         $stmt->execute([$tenantId, $templateType]);
@@ -140,7 +142,7 @@ class TemplateManagement implements TemplateManagementContract
         string $templateId
     ): bool {
         $stmt = $this->db->prepare(
-            "DELETE FROM {$this->tablePrefix}templates WHERE id = ? AND tenant_id = ?"
+            "DELETE FROM " . self::TABLE_TEMPLATES . " WHERE id = ? AND tenant_id = ?"
         );
 
         return $stmt->execute([$templateId, $tenantId]);

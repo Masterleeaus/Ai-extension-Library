@@ -11,7 +11,11 @@ use Foundation\Support\JsonHelper;
 class KnowledgeEngine implements KnowledgeEngineContract
 {
     private PDO $db;
-    private string $tablePrefix = 'knowledge_';
+    private const TABLE_PREFIX = 'knowledge_';
+    private const TABLE_CONVERSATIONS = self::TABLE_PREFIX . 'conversations';
+    private const TABLE_DOCUMENTS = self::TABLE_PREFIX . 'documents';
+    private const TABLE_INGESTIONS = self::TABLE_PREFIX . 'ingestions';
+    private string $tablePrefix = self::TABLE_PREFIX;
 
     public function __construct(PDO $db)
     {
@@ -28,7 +32,7 @@ class KnowledgeEngine implements KnowledgeEngineContract
         $createdAt = date('c');
 
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}ingestions (id, tenant_id, document_id, content, metadata, created_at)
+            "INSERT INTO " . self::TABLE_INGESTIONS . " (id, tenant_id, document_id, content, metadata, created_at)
              VALUES (?, ?, ?, ?, ?, ?)"
         );
 
@@ -49,7 +53,7 @@ class KnowledgeEngine implements KnowledgeEngineContract
         string $documentId
     ): ?array {
         $stmt = $this->db->prepare(
-            "SELECT * FROM {$this->tablePrefix}documents WHERE tenant_id = ? AND id = ? LIMIT 1"
+            "SELECT * FROM " . self::TABLE_DOCUMENTS . " WHERE tenant_id = ? AND id = ? LIMIT 1"
         );
         $stmt->execute([$tenantId, $documentId]);
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -62,7 +66,7 @@ class KnowledgeEngine implements KnowledgeEngineContract
         string $documentId
     ): bool {
         $stmt = $this->db->prepare(
-            "DELETE FROM {$this->tablePrefix}documents WHERE tenant_id = ? AND id = ?"
+            "DELETE FROM " . self::TABLE_DOCUMENTS . " WHERE tenant_id = ? AND id = ?"
         );
         return $stmt->execute([$tenantId, $documentId]);
     }
@@ -74,7 +78,7 @@ class KnowledgeEngine implements KnowledgeEngineContract
     ): array {
         $limit = $limit ?? 10;
         $stmt = $this->db->prepare(
-            "SELECT * FROM {$this->tablePrefix}documents
+            "SELECT * FROM " . self::TABLE_DOCUMENTS . "
              WHERE tenant_id = ? AND (content LIKE ? OR metadata LIKE ?)
              LIMIT ?"
         );
@@ -124,7 +128,7 @@ class KnowledgeEngine implements KnowledgeEngineContract
         array $messages
     ): bool {
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}conversations (tenant_id, id, messages, created_at)
+            "INSERT INTO " . self::TABLE_CONVERSATIONS . " (tenant_id, id, messages, created_at)
              VALUES (?, ?, ?, ?)
              ON DUPLICATE KEY UPDATE messages = ?"
         );

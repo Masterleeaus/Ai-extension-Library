@@ -11,7 +11,10 @@ use Foundation\Support\JsonHelper;
 class BookingEngine implements BookingEngineContract
 {
     private PDO $db;
-    private string $tablePrefix = 'bookings_';
+    private const TABLE_PREFIX = 'bookings_';
+    private const TABLE_BOOKINGS = self::TABLE_PREFIX . 'bookings';
+    private const TABLE_PROVIDERS = self::TABLE_PREFIX . 'providers';
+    private string $tablePrefix = self::TABLE_PREFIX;
 
     public function __construct(PDO $db)
     {
@@ -25,7 +28,7 @@ class BookingEngine implements BookingEngineContract
         $bookingId = bin2hex(random_bytes(16));
 
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}bookings (id, tenant_id, data, status, created_at)
+            "INSERT INTO " . self::TABLE_BOOKINGS . " (id, tenant_id, data, status, created_at)
              VALUES (?, ?, ?, ?, ?)"
         );
 
@@ -45,7 +48,7 @@ class BookingEngine implements BookingEngineContract
         string $bookingId
     ): ?array {
         $stmt = $this->db->prepare(
-            "SELECT * FROM {$this->tablePrefix}bookings WHERE id = ? AND tenant_id = ?"
+            "SELECT * FROM " . self::TABLE_BOOKINGS . " WHERE id = ? AND tenant_id = ?"
         );
         $stmt->execute([$bookingId, $tenantId]);
 
@@ -63,7 +66,7 @@ class BookingEngine implements BookingEngineContract
         array $updates
     ): bool {
         $stmt = $this->db->prepare(
-            "UPDATE {$this->tablePrefix}bookings SET data = ?, updated_at = ?
+            "UPDATE " . self::TABLE_BOOKINGS . " SET data = ?, updated_at = ?
              WHERE id = ? AND tenant_id = ?"
         );
 
@@ -81,7 +84,7 @@ class BookingEngine implements BookingEngineContract
         string $reason = ''
     ): bool {
         $stmt = $this->db->prepare(
-            "UPDATE {$this->tablePrefix}bookings
+            "UPDATE " . self::TABLE_BOOKINGS . "
              SET status = ?, cancellation_reason = ?, cancelled_at = ?
              WHERE id = ? AND tenant_id = ?"
         );
@@ -99,7 +102,7 @@ class BookingEngine implements BookingEngineContract
         string $tenantId,
         array $filters = []
     ): array {
-        $query = "SELECT * FROM {$this->tablePrefix}bookings WHERE tenant_id = ?";
+        $query = "SELECT * FROM " . self::TABLE_BOOKINGS . " WHERE tenant_id = ?";
         $params = [$tenantId];
 
         if (isset($filters['status'])) {
@@ -125,7 +128,7 @@ class BookingEngine implements BookingEngineContract
         int $endTime
     ): bool {
         $stmt = $this->db->prepare(
-            "SELECT COUNT(*) as count FROM {$this->tablePrefix}bookings
+            "SELECT COUNT(*) as count FROM " . self::TABLE_BOOKINGS . "
              WHERE tenant_id = ? AND resource_id = ? AND status = 'confirmed'
              AND start_time < ? AND end_time > ?"
         );
@@ -140,7 +143,7 @@ class BookingEngine implements BookingEngineContract
         string $tenantId
     ): array {
         $stmt = $this->db->prepare(
-            "SELECT * FROM {$this->tablePrefix}providers WHERE tenant_id = ?"
+            "SELECT * FROM " . self::TABLE_PROVIDERS . " WHERE tenant_id = ?"
         );
         $stmt->execute([$tenantId]);
 

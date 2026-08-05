@@ -11,7 +11,12 @@ use Foundation\Support\JsonHelper;
 class WorkCoreOperations implements WorkCoreOperationsContract
 {
     private PDO $db;
-    private string $tablePrefix = 'workcore_operations_';
+    private const TABLE_PREFIX = 'workcore_operations_';
+    private const TABLE_DISPATCH_ROUTES = self::TABLE_PREFIX . 'dispatch_routes';
+    private const TABLE_FLEET_VEHICLES = self::TABLE_PREFIX . 'fleet_vehicles';
+    private const TABLE_JOBS = self::TABLE_PREFIX . 'jobs';
+    private const TABLE_ROUTE_OPTIMIZATIONS = self::TABLE_PREFIX . 'route_optimizations';
+    private string $tablePrefix = self::TABLE_PREFIX;
 
     public function __construct(PDO $db)
     {
@@ -25,7 +30,7 @@ class WorkCoreOperations implements WorkCoreOperationsContract
         $jobId = bin2hex(random_bytes(16));
 
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}jobs (id, tenant_id, data, status, scheduled_at)
+            "INSERT INTO " . self::TABLE_JOBS . " (id, tenant_id, data, status, scheduled_at)
              VALUES (?, ?, ?, ?, ?)"
         );
 
@@ -34,7 +39,7 @@ class WorkCoreOperations implements WorkCoreOperationsContract
             $tenantId,
             json_encode($jobData),
             'scheduled',
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return $jobId;
@@ -45,7 +50,7 @@ class WorkCoreOperations implements WorkCoreOperationsContract
         string $jobId
     ): ?array {
         $stmt = $this->db->prepare(
-            "SELECT * FROM {$this->tablePrefix}jobs WHERE id = ? AND tenant_id = ?"
+            "SELECT * FROM " . self::TABLE_JOBS . " WHERE id = ? AND tenant_id = ?"
         );
 
         $stmt->execute([$jobId, $tenantId]);
@@ -65,7 +70,7 @@ class WorkCoreOperations implements WorkCoreOperationsContract
         $routeId = bin2hex(random_bytes(16));
 
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}dispatch_routes (id, tenant_id, data, created_at)
+            "INSERT INTO " . self::TABLE_DISPATCH_ROUTES . " (id, tenant_id, data, created_at)
              VALUES (?, ?, ?, ?)"
         );
 
@@ -73,7 +78,7 @@ class WorkCoreOperations implements WorkCoreOperationsContract
             $routeId,
             $tenantId,
             json_encode($routeData),
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return $routeId;
@@ -91,7 +96,7 @@ class WorkCoreOperations implements WorkCoreOperationsContract
 
         $optimizationId = bin2hex(random_bytes(16));
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}route_optimizations (id, route_id, tenant_id, optimization_details, optimized_at)
+            "INSERT INTO " . self::TABLE_ROUTE_OPTIMIZATIONS . " (id, route_id, tenant_id, optimization_details, optimized_at)
              VALUES (?, ?, ?, ?, ?)"
         );
 
@@ -100,7 +105,7 @@ class WorkCoreOperations implements WorkCoreOperationsContract
             $routeId,
             $tenantId,
             json_encode(['algorithm' => 'tsp', 'improvement_percentage' => 15]),
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return [
@@ -117,7 +122,7 @@ class WorkCoreOperations implements WorkCoreOperationsContract
         string $vehicleId
     ): ?array {
         $stmt = $this->db->prepare(
-            "SELECT * FROM {$this->tablePrefix}fleet_vehicles WHERE id = ? AND tenant_id = ?"
+            "SELECT * FROM " . self::TABLE_FLEET_VEHICLES . " WHERE id = ? AND tenant_id = ?"
         );
 
         $stmt->execute([$vehicleId, $tenantId]);
@@ -136,12 +141,12 @@ class WorkCoreOperations implements WorkCoreOperationsContract
         array $statusData
     ): bool {
         $stmt = $this->db->prepare(
-            "UPDATE {$this->tablePrefix}fleet_vehicles SET status_data = ?, updated_at = ? WHERE id = ? AND tenant_id = ?"
+            "UPDATE " . self::TABLE_FLEET_VEHICLES . " SET status_data = ?, updated_at = ? WHERE id = ? AND tenant_id = ?"
         );
 
         return $stmt->execute([
             json_encode($statusData),
-            date('c'),
+            DateTimeHelper::now(),
             $vehicleId,
             $tenantId,
         ]);
@@ -153,10 +158,10 @@ class WorkCoreOperations implements WorkCoreOperationsContract
         string $driverId
     ): bool {
         $stmt = $this->db->prepare(
-            "UPDATE {$this->tablePrefix}fleet_vehicles SET driver_id = ?, assigned_at = ? WHERE id = ? AND tenant_id = ?"
+            "UPDATE " . self::TABLE_FLEET_VEHICLES . " SET driver_id = ?, assigned_at = ? WHERE id = ? AND tenant_id = ?"
         );
 
-        return $stmt->execute([$driverId, date('c'), $vehicleId, $tenantId]);
+        return $stmt->execute([$driverId, DateTimeHelper::now(), $vehicleId, $tenantId]);
     }
 
     public function getOperationalMetrics(
@@ -164,7 +169,7 @@ class WorkCoreOperations implements WorkCoreOperationsContract
         array $filters = []
     ): array {
         $query = "SELECT COUNT(*) as total_jobs, SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) as completed_jobs
-                  FROM {$this->tablePrefix}jobs WHERE tenant_id = ?";
+                  FROM " . self::TABLE_JOBS . " WHERE tenant_id = ?";
         $params = [$tenantId];
 
         $stmt = $this->db->prepare($query);
@@ -180,7 +185,7 @@ class WorkCoreOperations implements WorkCoreOperationsContract
 
     private function getRoute(string $tenantId, string $routeId): ?array {
         $stmt = $this->db->prepare(
-            "SELECT * FROM {$this->tablePrefix}dispatch_routes WHERE id = ? AND tenant_id = ?"
+            "SELECT * FROM " . self::TABLE_DISPATCH_ROUTES . " WHERE id = ? AND tenant_id = ?"
         );
 
         $stmt->execute([$routeId, $tenantId]);

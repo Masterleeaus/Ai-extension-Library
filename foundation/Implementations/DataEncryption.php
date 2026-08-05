@@ -10,7 +10,9 @@ use PDO;
 class DataEncryption implements DataEncryptionContract
 {
     private PDO $db;
-    private string $tablePrefix = 'data_encryption_';
+    private const TABLE_PREFIX = 'data_encryption_';
+    private const TABLE_KEYS = self::TABLE_PREFIX . 'keys';
+    private string $tablePrefix = self::TABLE_PREFIX;
 
     public function __construct(PDO $db)
     {
@@ -65,7 +67,7 @@ class DataEncryption implements DataEncryptionContract
         $keyMaterial = random_bytes($keySize);
 
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}keys (id, tenant_id, algorithm, key_size, material, status, created_at)
+            "INSERT INTO " . self::TABLE_KEYS . " (id, tenant_id, algorithm, key_size, material, status, created_at)
              VALUES (?, ?, ?, ?, ?, ?, ?)"
         );
 
@@ -76,7 +78,7 @@ class DataEncryption implements DataEncryptionContract
             $keySize,
             base64_encode($keyMaterial),
             'active',
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return $keyId;
@@ -87,7 +89,7 @@ class DataEncryption implements DataEncryptionContract
         string $keyId
     ): bool {
         $stmt = $this->db->prepare(
-            "SELECT algorithm, key_size FROM {$this->tablePrefix}keys WHERE id = ? AND tenant_id = ?"
+            "SELECT algorithm, key_size FROM " . self::TABLE_KEYS . " WHERE id = ? AND tenant_id = ?"
         );
 
         $stmt->execute([$keyId, $tenantId]);
@@ -100,10 +102,10 @@ class DataEncryption implements DataEncryptionContract
         $newKeyId = $this->createKey($tenantId, $oldKey['algorithm'], $oldKey['key_size']);
 
         $updateOldStmt = $this->db->prepare(
-            "UPDATE {$this->tablePrefix}keys SET status = 'rotated', rotated_at = ? WHERE id = ?"
+            "UPDATE " . self::TABLE_KEYS . " SET status = 'rotated', rotated_at = ? WHERE id = ?"
         );
 
-        $updateOldStmt->execute([date('c'), $keyId]);
+        $updateOldStmt->execute([DateTimeHelper::now(), $keyId]);
 
         return true;
     }
@@ -114,7 +116,7 @@ class DataEncryption implements DataEncryptionContract
     ): ?array {
         $stmt = $this->db->prepare(
             "SELECT id, tenant_id, algorithm, key_size, status, created_at, rotated_at
-             FROM {$this->tablePrefix}keys WHERE id = ? AND tenant_id = ?"
+             FROM " . self::TABLE_KEYS . " WHERE id = ? AND tenant_id = ?"
         );
 
         $stmt->execute([$keyId, $tenantId]);
@@ -124,7 +126,7 @@ class DataEncryption implements DataEncryptionContract
     public function listKeys(string $tenantId): array {
         $stmt = $this->db->prepare(
             "SELECT id, tenant_id, algorithm, key_size, status, created_at, rotated_at
-             FROM {$this->tablePrefix}keys WHERE tenant_id = ? ORDER BY created_at DESC"
+             FROM " . self::TABLE_KEYS . " WHERE tenant_id = ? ORDER BY created_at DESC"
         );
 
         $stmt->execute([$tenantId]);
@@ -136,7 +138,7 @@ class DataEncryption implements DataEncryptionContract
         string $keyId
     ): bool {
         $stmt = $this->db->prepare(
-            "DELETE FROM {$this->tablePrefix}keys WHERE id = ? AND tenant_id = ?"
+            "DELETE FROM " . self::TABLE_KEYS . " WHERE id = ? AND tenant_id = ?"
         );
 
         return $stmt->execute([$keyId, $tenantId]);
@@ -176,7 +178,7 @@ class DataEncryption implements DataEncryptionContract
 
     private function getKeyForEncryption(string $tenantId, string $keyId): ?array {
         $stmt = $this->db->prepare(
-            "SELECT * FROM {$this->tablePrefix}keys WHERE id = ? AND tenant_id = ? AND status = 'active'"
+            "SELECT * FROM " . self::TABLE_KEYS . " WHERE id = ? AND tenant_id = ? AND status = 'active'"
         );
 
         $stmt->execute([$keyId, $tenantId]);
@@ -191,7 +193,7 @@ class DataEncryption implements DataEncryptionContract
 
     private function getKeyForDecryption(string $tenantId, string $keyId): ?array {
         $stmt = $this->db->prepare(
-            "SELECT * FROM {$this->tablePrefix}keys WHERE id = ? AND tenant_id = ? AND (status = 'active' OR status = 'rotated')"
+            "SELECT * FROM " . self::TABLE_KEYS . " WHERE id = ? AND tenant_id = ? AND (status = 'active' OR status = 'rotated')"
         );
 
         $stmt->execute([$keyId, $tenantId]);

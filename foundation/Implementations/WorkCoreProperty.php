@@ -11,7 +11,13 @@ use Foundation\Support\JsonHelper;
 class WorkCoreProperty implements WorkCorePropertyContract
 {
     private PDO $db;
-    private string $tablePrefix = 'workcore_property_';
+    private const TABLE_PREFIX = 'workcore_property_';
+    private const TABLE_ASSET_MAINTENANCE = self::TABLE_PREFIX . 'asset_maintenance';
+    private const TABLE_ASSETS = self::TABLE_PREFIX . 'assets';
+    private const TABLE_DOCUMENTS = self::TABLE_PREFIX . 'documents';
+    private const TABLE_PROPERTIES = self::TABLE_PREFIX . 'properties';
+    private const TABLE_PROPERTY_AUDIT = self::TABLE_PREFIX . 'property_audit';
+    private string $tablePrefix = self::TABLE_PREFIX;
 
     public function __construct(PDO $db)
     {
@@ -25,7 +31,7 @@ class WorkCoreProperty implements WorkCorePropertyContract
         $propertyId = bin2hex(random_bytes(16));
 
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}properties (id, tenant_id, data, registered_at)
+            "INSERT INTO " . self::TABLE_PROPERTIES . " (id, tenant_id, data, registered_at)
              VALUES (?, ?, ?, ?)"
         );
 
@@ -33,7 +39,7 @@ class WorkCoreProperty implements WorkCorePropertyContract
             $propertyId,
             $tenantId,
             json_encode($propertyData),
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return $propertyId;
@@ -44,7 +50,7 @@ class WorkCoreProperty implements WorkCorePropertyContract
         string $propertyId
     ): ?array {
         $stmt = $this->db->prepare(
-            "SELECT * FROM {$this->tablePrefix}properties WHERE id = ? AND tenant_id = ?"
+            "SELECT * FROM " . self::TABLE_PROPERTIES . " WHERE id = ? AND tenant_id = ?"
         );
 
         $stmt->execute([$propertyId, $tenantId]);
@@ -71,10 +77,10 @@ class WorkCoreProperty implements WorkCorePropertyContract
         $mergedData = array_merge($property['data'], $updates);
 
         $stmt = $this->db->prepare(
-            "UPDATE {$this->tablePrefix}properties SET data = ?, updated_at = ? WHERE id = ? AND tenant_id = ?"
+            "UPDATE " . self::TABLE_PROPERTIES . " SET data = ?, updated_at = ? WHERE id = ? AND tenant_id = ?"
         );
 
-        return $stmt->execute([json_encode($mergedData), date('c'), $propertyId, $tenantId]);
+        return $stmt->execute([json_encode($mergedData), DateTimeHelper::now(), $propertyId, $tenantId]);
     }
 
     public function registerAsset(
@@ -85,7 +91,7 @@ class WorkCoreProperty implements WorkCorePropertyContract
         $assetId = bin2hex(random_bytes(16));
 
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}assets (id, tenant_id, property_id, data, registered_at)
+            "INSERT INTO " . self::TABLE_ASSETS . " (id, tenant_id, property_id, data, registered_at)
              VALUES (?, ?, ?, ?, ?)"
         );
 
@@ -94,7 +100,7 @@ class WorkCoreProperty implements WorkCorePropertyContract
             $tenantId,
             $propertyId,
             json_encode($assetData),
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return $assetId;
@@ -106,7 +112,7 @@ class WorkCoreProperty implements WorkCorePropertyContract
         array $maintenanceData
     ): bool {
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}asset_maintenance (asset_id, tenant_id, data, recorded_at)
+            "INSERT INTO " . self::TABLE_ASSET_MAINTENANCE . " (asset_id, tenant_id, data, recorded_at)
              VALUES (?, ?, ?, ?)"
         );
 
@@ -114,7 +120,7 @@ class WorkCoreProperty implements WorkCorePropertyContract
             $assetId,
             $tenantId,
             json_encode($maintenanceData),
-            date('c'),
+            DateTimeHelper::now(),
         ]);
     }
 
@@ -126,7 +132,7 @@ class WorkCoreProperty implements WorkCorePropertyContract
         $documentId = bin2hex(random_bytes(16));
 
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}documents (id, tenant_id, property_id, data, stored_at)
+            "INSERT INTO " . self::TABLE_DOCUMENTS . " (id, tenant_id, property_id, data, stored_at)
              VALUES (?, ?, ?, ?, ?)"
         );
 
@@ -135,7 +141,7 @@ class WorkCoreProperty implements WorkCorePropertyContract
             $tenantId,
             $propertyId,
             json_encode($documentData),
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return $documentId;
@@ -146,7 +152,7 @@ class WorkCoreProperty implements WorkCorePropertyContract
         string $documentId
     ): ?array {
         $stmt = $this->db->prepare(
-            "SELECT * FROM {$this->tablePrefix}documents WHERE id = ? AND tenant_id = ?"
+            "SELECT * FROM " . self::TABLE_DOCUMENTS . " WHERE id = ? AND tenant_id = ?"
         );
 
         $stmt->execute([$documentId, $tenantId]);
@@ -164,7 +170,7 @@ class WorkCoreProperty implements WorkCorePropertyContract
         string $propertyId
     ): array {
         $stmt = $this->db->prepare(
-            "SELECT * FROM {$this->tablePrefix}property_audit WHERE tenant_id = ? AND property_id = ? ORDER BY created_at DESC"
+            "SELECT * FROM " . self::TABLE_PROPERTY_AUDIT . " WHERE tenant_id = ? AND property_id = ? ORDER BY created_at DESC"
         );
 
         $stmt->execute([$tenantId, $propertyId]);

@@ -11,7 +11,11 @@ use Foundation\Support\JsonHelper;
 class Governance implements GovernanceContract
 {
     private PDO $db;
-    private string $tablePrefix = 'governance_';
+    private const TABLE_PREFIX = 'governance_';
+    private const TABLE_ENFORCEMENT_LOG = self::TABLE_PREFIX . 'enforcement_log';
+    private const TABLE_POLICIES = self::TABLE_PREFIX . 'policies';
+    private const TABLE_POLICY_HISTORY = self::TABLE_PREFIX . 'policy_history';
+    private string $tablePrefix = self::TABLE_PREFIX;
 
     public function __construct(PDO $db)
     {
@@ -26,7 +30,7 @@ class Governance implements GovernanceContract
         $policyId = bin2hex(random_bytes(16));
 
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}policies (id, tenant_id, name, rules, version, created_at)
+            "INSERT INTO " . self::TABLE_POLICIES . " (id, tenant_id, name, rules, version, created_at)
              VALUES (?, ?, ?, ?, ?, ?)"
         );
 
@@ -47,7 +51,7 @@ class Governance implements GovernanceContract
         string $policyId
     ): ?array {
         $stmt = $this->db->prepare(
-            "SELECT * FROM {$this->tablePrefix}policies WHERE id = ? AND tenant_id = ?"
+            "SELECT * FROM " . self::TABLE_POLICIES . " WHERE id = ? AND tenant_id = ?"
         );
 
         $stmt->execute([$policyId, $tenantId]);
@@ -66,7 +70,7 @@ class Governance implements GovernanceContract
         array $rules
     ): bool {
         $stmt = $this->db->prepare(
-            "SELECT version FROM {$this->tablePrefix}policies WHERE id = ? AND tenant_id = ?"
+            "SELECT version FROM " . self::TABLE_POLICIES . " WHERE id = ? AND tenant_id = ?"
         );
 
         $stmt->execute([$policyId, $tenantId]);
@@ -79,7 +83,7 @@ class Governance implements GovernanceContract
         $newVersion = $current['version'] + 1;
 
         $updateStmt = $this->db->prepare(
-            "UPDATE {$this->tablePrefix}policies SET rules = ?, version = ?, updated_at = ?
+            "UPDATE " . self::TABLE_POLICIES . " SET rules = ?, version = ?, updated_at = ?
              WHERE id = ? AND tenant_id = ?"
         );
 
@@ -97,7 +101,7 @@ class Governance implements GovernanceContract
         string $policyId
     ): bool {
         $stmt = $this->db->prepare(
-            "DELETE FROM {$this->tablePrefix}policies WHERE id = ? AND tenant_id = ?"
+            "DELETE FROM " . self::TABLE_POLICIES . " WHERE id = ? AND tenant_id = ?"
         );
 
         return $stmt->execute([$policyId, $tenantId]);
@@ -126,7 +130,7 @@ class Governance implements GovernanceContract
 
         $enforcementId = bin2hex(random_bytes(16));
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}enforcement_log (id, tenant_id, policy_id, resource_type, violations, enforced_at)
+            "INSERT INTO " . self::TABLE_ENFORCEMENT_LOG . " (id, tenant_id, policy_id, resource_type, violations, enforced_at)
              VALUES (?, ?, ?, ?, ?, ?)"
         );
 
@@ -151,7 +155,7 @@ class Governance implements GovernanceContract
         string $policyId
     ): array {
         $stmt = $this->db->prepare(
-            "SELECT * FROM {$this->tablePrefix}enforcement_log
+            "SELECT * FROM " . self::TABLE_ENFORCEMENT_LOG . "
              WHERE tenant_id = ? AND policy_id = ?
              ORDER BY enforced_at DESC"
         );
@@ -170,7 +174,7 @@ class Governance implements GovernanceContract
         string $tenantId,
         ?string $category = null
     ): array {
-        $query = "SELECT * FROM {$this->tablePrefix}policies WHERE tenant_id = ?";
+        $query = "SELECT * FROM " . self::TABLE_POLICIES . " WHERE tenant_id = ?";
         $params = [$tenantId];
 
         if ($category) {
@@ -198,7 +202,7 @@ class Governance implements GovernanceContract
         int $version
     ): ?array {
         $stmt = $this->db->prepare(
-            "SELECT * FROM {$this->tablePrefix}policy_history
+            "SELECT * FROM " . self::TABLE_POLICY_HISTORY . "
              WHERE tenant_id = ? AND policy_id = ? AND version = ?"
         );
 

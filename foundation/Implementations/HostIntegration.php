@@ -11,7 +11,11 @@ use Foundation\Support\JsonHelper;
 class HostIntegration implements HostIntegrationContract
 {
     private PDO $db;
-    private string $tablePrefix = 'host_integration_';
+    private const TABLE_PREFIX = 'host_integration_';
+    private const TABLE_DEPLOYMENT_TARGETS = self::TABLE_PREFIX . 'deployment_targets';
+    private const TABLE_DEPLOYMENTS = self::TABLE_PREFIX . 'deployments';
+    private const TABLE_PILOT_GATES = self::TABLE_PREFIX . 'pilot_gates';
+    private string $tablePrefix = self::TABLE_PREFIX;
 
     public function __construct(PDO $db)
     {
@@ -26,7 +30,7 @@ class HostIntegration implements HostIntegrationContract
         $deploymentId = bin2hex(random_bytes(16));
 
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}deployment_targets (id, tenant_id, environment, config, status, registered_at)
+            "INSERT INTO " . self::TABLE_DEPLOYMENT_TARGETS . " (id, tenant_id, environment, config, status, registered_at)
              VALUES (?, ?, ?, ?, ?, ?)"
         );
 
@@ -50,7 +54,7 @@ class HostIntegration implements HostIntegrationContract
         $releaseId = bin2hex(random_bytes(16));
 
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}deployments (id, tenant_id, deployment_target_id, config, status, deployed_at)
+            "INSERT INTO " . self::TABLE_DEPLOYMENTS . " (id, tenant_id, deployment_target_id, config, status, deployed_at)
              VALUES (?, ?, ?, ?, ?, ?)"
         );
 
@@ -71,7 +75,7 @@ class HostIntegration implements HostIntegrationContract
         string $deploymentId
     ): ?array {
         $stmt = $this->db->prepare(
-            "SELECT * FROM {$this->tablePrefix}deployments WHERE id = ? AND tenant_id = ?"
+            "SELECT * FROM " . self::TABLE_DEPLOYMENTS . " WHERE id = ? AND tenant_id = ?"
         );
 
         $stmt->execute([$deploymentId, $tenantId]);
@@ -92,7 +96,7 @@ class HostIntegration implements HostIntegrationContract
         $gateId = bin2hex(random_bytes(16));
 
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}pilot_gates (id, tenant_id, deployment_id, config, status, created_at)
+            "INSERT INTO " . self::TABLE_PILOT_GATES . " (id, tenant_id, deployment_id, config, status, created_at)
              VALUES (?, ?, ?, ?, ?, ?)"
         );
 
@@ -113,7 +117,7 @@ class HostIntegration implements HostIntegrationContract
         string $gateId
     ): array {
         $stmt = $this->db->prepare(
-            "SELECT * FROM {$this->tablePrefix}pilot_gates WHERE id = ? AND tenant_id = ?"
+            "SELECT * FROM " . self::TABLE_PILOT_GATES . " WHERE id = ? AND tenant_id = ?"
         );
 
         $stmt->execute([$gateId, $tenantId]);
@@ -143,7 +147,7 @@ class HostIntegration implements HostIntegrationContract
         string $approver
     ): bool {
         $stmt = $this->db->prepare(
-            "UPDATE {$this->tablePrefix}pilot_gates SET status = ?, approver_id = ?, approved_at = ? WHERE id = ? AND tenant_id = ?"
+            "UPDATE " . self::TABLE_PILOT_GATES . " SET status = ?, approver_id = ?, approved_at = ? WHERE id = ? AND tenant_id = ?"
         );
 
         return $stmt->execute(['approved', $approver, date('c'), $gateId, $tenantId]);
@@ -154,7 +158,7 @@ class HostIntegration implements HostIntegrationContract
         string $deploymentId
     ): bool {
         $stmt = $this->db->prepare(
-            "UPDATE {$this->tablePrefix}deployments SET status = ?, rolled_out_at = ? WHERE id = ? AND tenant_id = ?"
+            "UPDATE " . self::TABLE_DEPLOYMENTS . " SET status = ?, rolled_out_at = ? WHERE id = ? AND tenant_id = ?"
         );
 
         return $stmt->execute(['rolled_out', date('c'), $deploymentId, $tenantId]);
@@ -165,7 +169,7 @@ class HostIntegration implements HostIntegrationContract
         string $deploymentId
     ): bool {
         $stmt = $this->db->prepare(
-            "UPDATE {$this->tablePrefix}deployments SET status = ?, rolled_back_at = ? WHERE id = ? AND tenant_id = ?"
+            "UPDATE " . self::TABLE_DEPLOYMENTS . " SET status = ?, rolled_back_at = ? WHERE id = ? AND tenant_id = ?"
         );
 
         return $stmt->execute(['rolled_back', date('c'), $deploymentId, $tenantId]);

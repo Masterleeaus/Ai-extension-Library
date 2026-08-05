@@ -11,7 +11,10 @@ use Foundation\Support\JsonHelper;
 class Localization implements LocalizationContract
 {
     private PDO $db;
-    private string $tablePrefix = 'localization_';
+    private const TABLE_PREFIX = 'localization_';
+    private const TABLE_STRINGS = self::TABLE_PREFIX . 'strings';
+    private const TABLE_TENANT_LOCALES = self::TABLE_PREFIX . 'tenant_locales';
+    private string $tablePrefix = self::TABLE_PREFIX;
 
     public function __construct(PDO $db)
     {
@@ -23,7 +26,7 @@ class Localization implements LocalizationContract
         string $locale
     ): bool {
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}tenant_locales (tenant_id, locale, set_at)
+            "INSERT INTO " . self::TABLE_TENANT_LOCALES . " (tenant_id, locale, set_at)
              VALUES (?, ?, ?)
              ON DUPLICATE KEY UPDATE locale = ?, updated_at = ?"
         );
@@ -37,7 +40,7 @@ class Localization implements LocalizationContract
         string $tenantId
     ): string {
         $stmt = $this->db->prepare(
-            "SELECT locale FROM {$this->tablePrefix}tenant_locales WHERE tenant_id = ?"
+            "SELECT locale FROM " . self::TABLE_TENANT_LOCALES . " WHERE tenant_id = ?"
         );
 
         $stmt->execute([$tenantId]);
@@ -54,7 +57,7 @@ class Localization implements LocalizationContract
         $locale = $this->getLocale($tenantId);
 
         $stmt = $this->db->prepare(
-            "SELECT translation FROM {$this->tablePrefix}strings WHERE tenant_id = ? AND locale = ? AND key = ?"
+            "SELECT translation FROM " . self::TABLE_STRINGS . " WHERE tenant_id = ? AND locale = ? AND key = ?"
         );
 
         $stmt->execute([$tenantId, $locale, $key]);
@@ -74,7 +77,7 @@ class Localization implements LocalizationContract
         string $locale
     ): array {
         $stmt = $this->db->prepare(
-            "SELECT key, translation FROM {$this->tablePrefix}strings WHERE tenant_id = ? AND locale = ?"
+            "SELECT key, translation FROM " . self::TABLE_STRINGS . " WHERE tenant_id = ? AND locale = ?"
         );
 
         $stmt->execute([$tenantId, $locale]);
@@ -96,7 +99,7 @@ class Localization implements LocalizationContract
         string $translation
     ): bool {
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}strings (tenant_id, locale, key, translation, set_at)
+            "INSERT INTO " . self::TABLE_STRINGS . " (tenant_id, locale, key, translation, set_at)
              VALUES (?, ?, ?, ?, ?)
              ON DUPLICATE KEY UPDATE translation = ?, updated_at = ?"
         );
@@ -118,7 +121,7 @@ class Localization implements LocalizationContract
         string $tenantId
     ): array {
         $stmt = $this->db->prepare(
-            "SELECT DISTINCT locale FROM {$this->tablePrefix}strings WHERE tenant_id = ? ORDER BY locale"
+            "SELECT DISTINCT locale FROM " . self::TABLE_STRINGS . " WHERE tenant_id = ? ORDER BY locale"
         );
 
         $stmt->execute([$tenantId]);

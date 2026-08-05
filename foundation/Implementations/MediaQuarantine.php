@@ -11,7 +11,9 @@ use Foundation\Support\JsonHelper;
 class MediaQuarantine implements MediaQuarantineContract
 {
     private PDO $db;
-    private string $tablePrefix = 'media_quarantine_';
+    private const TABLE_PREFIX = 'media_quarantine_';
+    private const TABLE_RECORDS = self::TABLE_PREFIX . 'records';
+    private string $tablePrefix = self::TABLE_PREFIX;
     private string $quarantineDir;
 
     public function __construct(PDO $db, string $quarantineDir)
@@ -35,7 +37,7 @@ class MediaQuarantine implements MediaQuarantineContract
         }
 
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}records (id, tenant_id, media_id, media_type, source_path, quarantine_path, metadata, status, created_at)
+            "INSERT INTO " . self::TABLE_RECORDS . " (id, tenant_id, media_id, media_type, source_path, quarantine_path, metadata, status, created_at)
              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
         );
 
@@ -48,7 +50,7 @@ class MediaQuarantine implements MediaQuarantineContract
             $destinationPath,
             json_encode($metadata),
             'quarantined',
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return $quarantineId;
@@ -59,7 +61,7 @@ class MediaQuarantine implements MediaQuarantineContract
         string $quarantineId
     ): array {
         $stmt = $this->db->prepare(
-            "SELECT * FROM {$this->tablePrefix}records WHERE id = ? AND tenant_id = ?"
+            "SELECT * FROM " . self::TABLE_RECORDS . " WHERE id = ? AND tenant_id = ?"
         );
 
         $stmt->execute([$quarantineId, $tenantId]);
@@ -83,7 +85,7 @@ class MediaQuarantine implements MediaQuarantineContract
         string $destination
     ): bool {
         $stmt = $this->db->prepare(
-            "SELECT quarantine_path FROM {$this->tablePrefix}records WHERE id = ? AND tenant_id = ?"
+            "SELECT quarantine_path FROM " . self::TABLE_RECORDS . " WHERE id = ? AND tenant_id = ?"
         );
 
         $stmt->execute([$quarantineId, $tenantId]);
@@ -94,10 +96,10 @@ class MediaQuarantine implements MediaQuarantineContract
         }
 
         $updateStmt = $this->db->prepare(
-            "UPDATE {$this->tablePrefix}records SET status = ?, released_at = ? WHERE id = ? AND tenant_id = ?"
+            "UPDATE " . self::TABLE_RECORDS . " SET status = ?, released_at = ? WHERE id = ? AND tenant_id = ?"
         );
 
-        return $updateStmt->execute(['released', date('c'), $quarantineId, $tenantId]);
+        return $updateStmt->execute(['released', DateTimeHelper::now(), $quarantineId, $tenantId]);
     }
 
     public function reject(
@@ -106,12 +108,12 @@ class MediaQuarantine implements MediaQuarantineContract
         string $reason
     ): bool {
         $stmt = $this->db->prepare(
-            "UPDATE {$this->tablePrefix}records
+            "UPDATE " . self::TABLE_RECORDS . "
              SET status = ?, rejection_reason = ?, rejected_at = ?
              WHERE id = ? AND tenant_id = ?"
         );
 
-        return $stmt->execute(['rejected', $reason, date('c'), $quarantineId, $tenantId]);
+        return $stmt->execute(['rejected', $reason, DateTimeHelper::now(), $quarantineId, $tenantId]);
     }
 
     public function getStatus(
@@ -119,7 +121,7 @@ class MediaQuarantine implements MediaQuarantineContract
         string $quarantineId
     ): ?array {
         $stmt = $this->db->prepare(
-            "SELECT * FROM {$this->tablePrefix}records WHERE id = ? AND tenant_id = ?"
+            "SELECT * FROM " . self::TABLE_RECORDS . " WHERE id = ? AND tenant_id = ?"
         );
 
         $stmt->execute([$quarantineId, $tenantId]);
@@ -130,7 +132,7 @@ class MediaQuarantine implements MediaQuarantineContract
         string $tenantId,
         array $filters = []
     ): array {
-        $query = "SELECT * FROM {$this->tablePrefix}records WHERE tenant_id = ?";
+        $query = "SELECT * FROM " . self::TABLE_RECORDS . " WHERE tenant_id = ?";
         $params = [$tenantId];
 
         if (isset($filters['status'])) {
@@ -151,7 +153,7 @@ class MediaQuarantine implements MediaQuarantineContract
 
     public function purgeExpired(string $tenantId): int {
         $stmt = $this->db->prepare(
-            "DELETE FROM {$this->tablePrefix}records
+            "DELETE FROM " . self::TABLE_RECORDS . "
              WHERE tenant_id = ? AND created_at < DATE_SUB(NOW(), INTERVAL 30 DAY)"
         );
 

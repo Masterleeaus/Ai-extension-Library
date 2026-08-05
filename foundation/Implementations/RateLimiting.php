@@ -11,7 +11,10 @@ use Foundation\Support\JsonHelper;
 class RateLimiting implements RateLimitingContract
 {
     private PDO $db;
-    private string $tablePrefix = 'rate_limiting_';
+    private const TABLE_PREFIX = 'rate_limiting_';
+    private const TABLE_POLICIES = self::TABLE_PREFIX . 'policies';
+    private const TABLE_REQUESTS = self::TABLE_PREFIX . 'requests';
+    private string $tablePrefix = self::TABLE_PREFIX;
 
     public function __construct(PDO $db)
     {
@@ -28,7 +31,7 @@ class RateLimiting implements RateLimitingContract
         $windowStart = date('c', time() - $windowSeconds);
 
         $stmt = $this->db->prepare(
-            "SELECT COUNT(*) as count FROM {$this->tablePrefix}requests
+            "SELECT COUNT(*) as count FROM " . self::TABLE_REQUESTS . "
              WHERE tenant_id = ? AND identifier = ? AND bucket = ? AND recorded_at >= ?"
         );
 
@@ -44,11 +47,11 @@ class RateLimiting implements RateLimitingContract
         string $bucket
     ): int {
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}requests (tenant_id, identifier, bucket, recorded_at)
+            "INSERT INTO " . self::TABLE_REQUESTS . " (tenant_id, identifier, bucket, recorded_at)
              VALUES (?, ?, ?, ?)"
         );
 
-        $stmt->execute([$tenantId, $identifier, $bucket, date('c')]);
+        $stmt->execute([$tenantId, $identifier, $bucket, DateTimeHelper::now()]);
 
         return $this->getCurrentRequestCount($tenantId, $identifier, $bucket);
     }
@@ -79,7 +82,7 @@ class RateLimiting implements RateLimitingContract
         string $bucket
     ): bool {
         $stmt = $this->db->prepare(
-            "DELETE FROM {$this->tablePrefix}requests
+            "DELETE FROM " . self::TABLE_REQUESTS . "
              WHERE tenant_id = ? AND identifier = ? AND bucket = ?"
         );
 
@@ -92,13 +95,13 @@ class RateLimiting implements RateLimitingContract
         array $limits
     ): bool {
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}policies (tenant_id, name, limits, created_at)
+            "INSERT INTO " . self::TABLE_POLICIES . " (tenant_id, name, limits, created_at)
              VALUES (?, ?, ?, ?)
              ON DUPLICATE KEY UPDATE limits = ?, updated_at = ?"
         );
 
         $limitsJson = json_encode($limits);
-        $now = date('c');
+        $now = DateTimeHelper::now();
 
         return $stmt->execute([
             $tenantId,
@@ -115,7 +118,7 @@ class RateLimiting implements RateLimitingContract
         string $policyName
     ): ?array {
         $stmt = $this->db->prepare(
-            "SELECT * FROM {$this->tablePrefix}policies WHERE tenant_id = ? AND name = ?"
+            "SELECT * FROM " . self::TABLE_POLICIES . " WHERE tenant_id = ? AND name = ?"
         );
 
         $stmt->execute([$tenantId, $policyName]);
@@ -167,7 +170,7 @@ class RateLimiting implements RateLimitingContract
         ?string $bucket = null
     ): array {
         $query = "SELECT bucket, COUNT(*) as total_requests, MAX(recorded_at) as last_request
-                  FROM {$this->tablePrefix}requests WHERE tenant_id = ?";
+                  FROM " . self::TABLE_REQUESTS . " WHERE tenant_id = ?";
         $params = [$tenantId];
 
         if ($bucket) {
@@ -192,7 +195,7 @@ class RateLimiting implements RateLimitingContract
         $windowStart = date('c', time() - $windowSeconds);
 
         $stmt = $this->db->prepare(
-            "SELECT COUNT(*) as count FROM {$this->tablePrefix}requests
+            "SELECT COUNT(*) as count FROM " . self::TABLE_REQUESTS . "
              WHERE tenant_id = ? AND identifier = ? AND bucket = ? AND recorded_at >= ?"
         );
 

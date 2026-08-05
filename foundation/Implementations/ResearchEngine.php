@@ -11,7 +11,11 @@ use Foundation\Support\JsonHelper;
 class ResearchEngine implements ResearchEngineContract
 {
     private PDO $db;
-    private string $tablePrefix = 'research_';
+    private const TABLE_PREFIX = 'research_';
+    private const TABLE_CITATIONS = self::TABLE_PREFIX . 'citations';
+    private const TABLE_FINDINGS = self::TABLE_PREFIX . 'findings';
+    private const TABLE_SESSIONS = self::TABLE_PREFIX . 'sessions';
+    private string $tablePrefix = self::TABLE_PREFIX;
 
     public function __construct(PDO $db)
     {
@@ -26,7 +30,7 @@ class ResearchEngine implements ResearchEngineContract
         $researchId = bin2hex(random_bytes(16));
 
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}sessions (id, tenant_id, topic, parameters, status, started_at)
+            "INSERT INTO " . self::TABLE_SESSIONS . " (id, tenant_id, topic, parameters, status, started_at)
              VALUES (?, ?, ?, ?, ?, ?)"
         );
 
@@ -36,7 +40,7 @@ class ResearchEngine implements ResearchEngineContract
             $topic,
             json_encode($parameters),
             'active',
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return $researchId;
@@ -47,7 +51,7 @@ class ResearchEngine implements ResearchEngineContract
         string $researchId
     ): ?array {
         $stmt = $this->db->prepare(
-            "SELECT * FROM {$this->tablePrefix}sessions WHERE id = ? AND tenant_id = ?"
+            "SELECT * FROM " . self::TABLE_SESSIONS . " WHERE id = ? AND tenant_id = ?"
         );
 
         $stmt->execute([$researchId, $tenantId]);
@@ -65,7 +69,7 @@ class ResearchEngine implements ResearchEngineContract
         string $researchId
     ): array {
         $stmt = $this->db->prepare(
-            "SELECT * FROM {$this->tablePrefix}findings WHERE tenant_id = ? AND research_id = ? ORDER BY created_at DESC"
+            "SELECT * FROM " . self::TABLE_FINDINGS . " WHERE tenant_id = ? AND research_id = ? ORDER BY created_at DESC"
         );
 
         $stmt->execute([$tenantId, $researchId]);
@@ -83,7 +87,7 @@ class ResearchEngine implements ResearchEngineContract
         string $researchId,
         ?string $findingId = null
     ): array {
-        $query = "SELECT * FROM {$this->tablePrefix}citations WHERE tenant_id = ? AND research_id = ?";
+        $query = "SELECT * FROM " . self::TABLE_CITATIONS . " WHERE tenant_id = ? AND research_id = ?";
         $params = [$tenantId, $researchId];
 
         if ($findingId) {
@@ -104,10 +108,10 @@ class ResearchEngine implements ResearchEngineContract
         string $researchId
     ): bool {
         $stmt = $this->db->prepare(
-            "UPDATE {$this->tablePrefix}sessions SET status = ?, paused_at = ? WHERE id = ? AND tenant_id = ?"
+            "UPDATE " . self::TABLE_SESSIONS . " SET status = ?, paused_at = ? WHERE id = ? AND tenant_id = ?"
         );
 
-        return $stmt->execute(['paused', date('c'), $researchId, $tenantId]);
+        return $stmt->execute(['paused', DateTimeHelper::now(), $researchId, $tenantId]);
     }
 
     public function resumeResearch(
@@ -115,10 +119,10 @@ class ResearchEngine implements ResearchEngineContract
         string $researchId
     ): bool {
         $stmt = $this->db->prepare(
-            "UPDATE {$this->tablePrefix}sessions SET status = ?, resumed_at = ? WHERE id = ? AND tenant_id = ?"
+            "UPDATE " . self::TABLE_SESSIONS . " SET status = ?, resumed_at = ? WHERE id = ? AND tenant_id = ?"
         );
 
-        return $stmt->execute(['active', date('c'), $researchId, $tenantId]);
+        return $stmt->execute(['active', DateTimeHelper::now(), $researchId, $tenantId]);
     }
 
     public function cancelResearch(
@@ -126,10 +130,10 @@ class ResearchEngine implements ResearchEngineContract
         string $researchId
     ): bool {
         $stmt = $this->db->prepare(
-            "UPDATE {$this->tablePrefix}sessions SET status = ?, cancelled_at = ? WHERE id = ? AND tenant_id = ?"
+            "UPDATE " . self::TABLE_SESSIONS . " SET status = ?, cancelled_at = ? WHERE id = ? AND tenant_id = ?"
         );
 
-        return $stmt->execute(['cancelled', date('c'), $researchId, $tenantId]);
+        return $stmt->execute(['cancelled', DateTimeHelper::now(), $researchId, $tenantId]);
     }
 
     public function exportFindings(
@@ -155,12 +159,12 @@ class ResearchEngine implements ResearchEngineContract
         array $evidence
     ): bool {
         $stmt = $this->db->prepare(
-            "UPDATE {$this->tablePrefix}findings SET verified = 1, verification_evidence = ?, verified_at = ? WHERE id = ? AND tenant_id = ? AND research_id = ?"
+            "UPDATE " . self::TABLE_FINDINGS . " SET verified = 1, verification_evidence = ?, verified_at = ? WHERE id = ? AND tenant_id = ? AND research_id = ?"
         );
 
         return $stmt->execute([
             json_encode($evidence),
-            date('c'),
+            DateTimeHelper::now(),
             $findingId,
             $tenantId,
             $researchId,

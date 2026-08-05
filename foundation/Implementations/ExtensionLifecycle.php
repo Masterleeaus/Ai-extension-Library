@@ -17,7 +17,11 @@ class ExtensionLifecycle implements ExtensionLifecycleContract
 {
     private DatabaseRepositoryContract $repository;
     private DatabaseHelper $helper;
-    private string $tablePrefix = 'extension_lifecycle_';
+    private const TABLE_PREFIX = 'extension_lifecycle_';
+    private const TABLE_EXTENSIONS = self::TABLE_PREFIX . 'extensions';
+    private const TABLE_PASSES = self::TABLE_PREFIX . 'passes';
+    private const TABLE_VERSIONS = self::TABLE_PREFIX . 'versions';
+    private string $tablePrefix = self::TABLE_PREFIX;
     private TransactionHelper $transactions;
 
     public function __construct(PDO $db, ?TransactionHelper $transactions = null)
@@ -39,7 +43,7 @@ class ExtensionLifecycle implements ExtensionLifecycleContract
         $extensionId = bin2hex(random_bytes(16));
 
         $stmt = $this->helper->safePrepare(
-            "INSERT INTO {$this->tablePrefix}extensions (id, tenant_id, name, metadata, status, registered_at)
+            "INSERT INTO " . self::TABLE_EXTENSIONS . " (id, tenant_id, name, metadata, status, registered_at)
              VALUES (?, ?, ?, ?, ?, ?)"
         );
 
@@ -65,7 +69,7 @@ class ExtensionLifecycle implements ExtensionLifecycleContract
         string $extensionId
     ): ?array {
         $stmt = $this->helper->safePrepare(
-            "SELECT * FROM {$this->tablePrefix}extensions WHERE id = ? AND tenant_id = ?"
+            "SELECT * FROM " . self::TABLE_EXTENSIONS . " WHERE id = ? AND tenant_id = ?"
         );
 
         try {
@@ -93,7 +97,7 @@ class ExtensionLifecycle implements ExtensionLifecycleContract
             function (PDO $db) use ($tenantId, $extensionId, $version, $releaseNotes) {
                 // Step 1: Insert version record
                 $stmt = $db->prepare(
-                    "INSERT INTO {$this->tablePrefix}versions (extension_id, tenant_id, version, release_notes, published_at)
+                    "INSERT INTO " . self::TABLE_VERSIONS . " (extension_id, tenant_id, version, release_notes, published_at)
                      VALUES (?, ?, ?, ?, ?)"
                 );
 
@@ -109,7 +113,7 @@ class ExtensionLifecycle implements ExtensionLifecycleContract
 
                 // Step 2: Update extension status
                 $updateStmt = $db->prepare(
-                    "UPDATE {$this->tablePrefix}extensions SET status = ?, published_version = ?, updated_at = ? WHERE id = ? AND tenant_id = ?"
+                    "UPDATE " . self::TABLE_EXTENSIONS . " SET status = ?, published_version = ?, updated_at = ? WHERE id = ? AND tenant_id = ?"
                 );
 
                 if (!$updateStmt->execute(['published', $version, date('c'), $extensionId, $tenantId])) {
@@ -128,7 +132,7 @@ class ExtensionLifecycle implements ExtensionLifecycleContract
         string $extensionId
     ): bool {
         $stmt = $this->helper->safePrepare(
-            "UPDATE {$this->tablePrefix}extensions SET status = ?, enabled_at = ? WHERE id = ? AND tenant_id = ?"
+            "UPDATE " . self::TABLE_EXTENSIONS . " SET status = ?, enabled_at = ? WHERE id = ? AND tenant_id = ?"
         );
 
         try {
@@ -145,7 +149,7 @@ class ExtensionLifecycle implements ExtensionLifecycleContract
         string $reason
     ): bool {
         $stmt = $this->helper->safePrepare(
-            "UPDATE {$this->tablePrefix}extensions SET status = ?, disabled_reason = ?, disabled_at = ? WHERE id = ? AND tenant_id = ?"
+            "UPDATE " . self::TABLE_EXTENSIONS . " SET status = ?, disabled_reason = ?, disabled_at = ? WHERE id = ? AND tenant_id = ?"
         );
 
         try {
@@ -167,7 +171,7 @@ class ExtensionLifecycle implements ExtensionLifecycleContract
         $expiresAt = date('c', strtotime("+{$durationDays} days"));
 
         $stmt = $this->helper->safePrepare(
-            "INSERT INTO {$this->tablePrefix}passes (id, extension_id, tenant_id, type, expires_at, granted_at)
+            "INSERT INTO " . self::TABLE_PASSES . " (id, extension_id, tenant_id, type, expires_at, granted_at)
              VALUES (?, ?, ?, ?, ?, ?)"
         );
 
@@ -193,7 +197,7 @@ class ExtensionLifecycle implements ExtensionLifecycleContract
         string $passId
     ): bool {
         $stmt = $this->helper->safePrepare(
-            "SELECT expires_at FROM {$this->tablePrefix}passes WHERE id = ? AND tenant_id = ?"
+            "SELECT expires_at FROM " . self::TABLE_PASSES . " WHERE id = ? AND tenant_id = ?"
         );
 
         try {
@@ -215,7 +219,7 @@ class ExtensionLifecycle implements ExtensionLifecycleContract
         string $tenantId,
         ?string $status = null
     ): array {
-        $query = "SELECT id, name, status, registered_at FROM {$this->tablePrefix}extensions WHERE tenant_id = ?";
+        $query = "SELECT id, name, status, registered_at FROM " . self::TABLE_EXTENSIONS . " WHERE tenant_id = ?";
         $params = [$tenantId];
 
         if ($status) {
