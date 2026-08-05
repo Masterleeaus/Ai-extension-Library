@@ -141,10 +141,16 @@ XML;
             ->where('call_sid', $callSid)
             ->first();
 
-        if ($call && $call->agent && ! $this->verifyTwilioSignature($request, $call->agent)) {
-            Log::warning('[Twilio] Invalid status signature', ['callSid' => $callSid]);
-
-            return response('', 403);
+        // SECURITY: Must verify signature regardless of whether call exists
+        if ($call && $call->agent) {
+            if (! $this->verifyTwilioSignature($request, $call->agent)) {
+                Log::warning('[Twilio] Invalid status signature', ['callSid' => $callSid]);
+                return response('', 403);
+            }
+        } else {
+            // SECURITY: Still log the orphaned status event, but reject unverified requests
+            Log::warning('[Twilio] Status webhook for unknown call', ['callSid' => $callSid]);
+            return response('', 204);
         }
 
         if ($call) {
