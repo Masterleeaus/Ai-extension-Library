@@ -6,6 +6,7 @@ namespace Foundation\Implementations;
 
 use Foundation\Contracts\VoiceEngineContract;
 use PDO;
+use Foundation\Support\DateTimeHelper;
 
 class VoiceEngine implements VoiceEngineContract
 {
@@ -38,13 +39,13 @@ class VoiceEngine implements VoiceEngineContract
             $voice,
             $language,
             'processing',
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return [
             'synthesis_id' => $synthesisId,
             'status' => 'processing',
-            'created_at' => date('c'),
+            'created_at' => DateTimeHelper::now(),
         ];
     }
 
@@ -67,7 +68,7 @@ class VoiceEngine implements VoiceEngineContract
             $audioPath,
             $language,
             'processing',
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return [
@@ -92,7 +93,7 @@ class VoiceEngine implements VoiceEngineContract
             $tenantId,
             json_encode($sessionConfig),
             'active',
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return $sessionId;
@@ -107,7 +108,7 @@ class VoiceEngine implements VoiceEngineContract
              WHERE id = ? AND tenant_id = ?"
         );
 
-        return $stmt->execute(['closed', date('c'), $sessionId, $tenantId]);
+        return $stmt->execute(['closed', DateTimeHelper::now(), $sessionId, $tenantId]);
     }
 
     public function getSessionState(
@@ -137,7 +138,7 @@ class VoiceEngine implements VoiceEngineContract
             $profileId,
             $tenantId,
             json_encode($profileData),
-            date('c'),
+            DateTimeHelper::now(),
         ]);
     }
 }

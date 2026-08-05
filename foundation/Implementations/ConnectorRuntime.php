@@ -7,6 +7,7 @@ namespace Foundation\Implementations;
 use Foundation\Contracts\ConnectorRuntimeContract;
 use PDO;
 use Foundation\Support\JsonHelper;
+use Foundation\Support\DateTimeHelper;
 
 class ConnectorRuntime implements ConnectorRuntimeContract
 {
@@ -37,7 +38,7 @@ class ConnectorRuntime implements ConnectorRuntimeContract
             $connectorName,
             $connectorType,
             json_encode($config),
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return $connectorId;
@@ -57,7 +58,7 @@ class ConnectorRuntime implements ConnectorRuntimeContract
         return $stmt->execute([
             'connected',
             json_encode($credentials),
-            date('c'),
+            DateTimeHelper::now(),
             $connectorId,
             $tenantId,
         ]);
@@ -75,7 +76,7 @@ class ConnectorRuntime implements ConnectorRuntimeContract
 
         return $stmt->execute([
             'disconnected',
-            date('c'),
+            DateTimeHelper::now(),
             $connectorId,
             $tenantId,
         ]);
@@ -101,7 +102,7 @@ class ConnectorRuntime implements ConnectorRuntimeContract
             $operation,
             json_encode($params),
             'running',
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return [

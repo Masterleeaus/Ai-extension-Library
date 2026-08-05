@@ -7,6 +7,7 @@ namespace Foundation\Implementations;
 use Foundation\Contracts\SkillRuntimeContract;
 use PDO;
 use Foundation\Support\JsonHelper;
+use Foundation\Support\DateTimeHelper;
 
 class SkillRuntime implements SkillRuntimeContract
 {
@@ -35,7 +36,7 @@ class SkillRuntime implements SkillRuntimeContract
             $skillId,
             $className,
             $metadataJson,
-            date('c'),
+            DateTimeHelper::now(),
             $metadataJson,
         ]);
     }
@@ -60,7 +61,7 @@ class SkillRuntime implements SkillRuntimeContract
             json_encode($input),
             json_encode($context),
             'running',
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return [
@@ -136,7 +137,7 @@ class SkillRuntime implements SkillRuntimeContract
             $skillId,
             $version,
             json_encode($metadata),
-            date('c'),
+            DateTimeHelper::now(),
         ]);
     }
 }

@@ -7,6 +7,7 @@ namespace Foundation\Implementations;
 use Foundation\Contracts\WorkCorePropertyContract;
 use PDO;
 use Foundation\Support\JsonHelper;
+use Foundation\Support\DateTimeHelper;
 
 class WorkCoreProperty implements WorkCorePropertyContract
 {
@@ -33,7 +34,7 @@ class WorkCoreProperty implements WorkCorePropertyContract
             $propertyId,
             $tenantId,
             json_encode($propertyData),
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return $propertyId;
@@ -74,7 +75,7 @@ class WorkCoreProperty implements WorkCorePropertyContract
             "UPDATE {$this->tablePrefix}properties SET data = ?, updated_at = ? WHERE id = ? AND tenant_id = ?"
         );
 
-        return $stmt->execute([json_encode($mergedData), date('c'), $propertyId, $tenantId]);
+        return $stmt->execute([json_encode($mergedData), DateTimeHelper::now(), $propertyId, $tenantId]);
     }
 
     public function registerAsset(
@@ -94,7 +95,7 @@ class WorkCoreProperty implements WorkCorePropertyContract
             $tenantId,
             $propertyId,
             json_encode($assetData),
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return $assetId;
@@ -114,7 +115,7 @@ class WorkCoreProperty implements WorkCorePropertyContract
             $assetId,
             $tenantId,
             json_encode($maintenanceData),
-            date('c'),
+            DateTimeHelper::now(),
         ]);
     }
 
@@ -135,7 +136,7 @@ class WorkCoreProperty implements WorkCorePropertyContract
             $tenantId,
             $propertyId,
             json_encode($documentData),
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return $documentId;

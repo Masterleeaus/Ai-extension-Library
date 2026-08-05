@@ -7,6 +7,7 @@ namespace Foundation\Implementations;
 use Foundation\Contracts\WorkflowEngineContract;
 use PDO;
 use Foundation\Support\JsonHelper;
+use Foundation\Support\DateTimeHelper;
 
 class WorkflowEngine implements WorkflowEngineContract
 {
@@ -37,7 +38,7 @@ class WorkflowEngine implements WorkflowEngineContract
             $workflowName,
             json_encode($steps),
             json_encode($metadata),
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return $workflowId;
@@ -61,7 +62,7 @@ class WorkflowEngine implements WorkflowEngineContract
             $workflowId,
             json_encode($input),
             'running',
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return $executionId;
@@ -105,7 +106,7 @@ class WorkflowEngine implements WorkflowEngineContract
             "UPDATE {$this->tablePrefix}executions SET status = ?, paused_at = ? WHERE id = ? AND tenant_id = ?"
         );
 
-        return $stmt->execute(['paused', date('c'), $executionId, $tenantId]);
+        return $stmt->execute(['paused', DateTimeHelper::now(), $executionId, $tenantId]);
     }
 
     public function resumeExecution(
@@ -116,7 +117,7 @@ class WorkflowEngine implements WorkflowEngineContract
             "UPDATE {$this->tablePrefix}executions SET status = ?, resumed_at = ? WHERE id = ? AND tenant_id = ?"
         );
 
-        return $stmt->execute(['running', date('c'), $executionId, $tenantId]);
+        return $stmt->execute(['running', DateTimeHelper::now(), $executionId, $tenantId]);
     }
 
     public function cancelExecution(
@@ -128,7 +129,7 @@ class WorkflowEngine implements WorkflowEngineContract
             "UPDATE {$this->tablePrefix}executions SET status = ?, cancel_reason = ?, cancelled_at = ? WHERE id = ? AND tenant_id = ?"
         );
 
-        return $stmt->execute(['cancelled', $reason, date('c'), $executionId, $tenantId]);
+        return $stmt->execute(['cancelled', $reason, DateTimeHelper::now(), $executionId, $tenantId]);
     }
 
     public function getStepOutput(

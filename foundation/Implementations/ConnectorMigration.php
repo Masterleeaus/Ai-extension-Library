@@ -7,6 +7,7 @@ namespace Foundation\Implementations;
 use Foundation\Contracts\ConnectorMigrationContract;
 use PDO;
 use Foundation\Support\JsonHelper;
+use Foundation\Support\DateTimeHelper;
 
 class ConnectorMigration implements ConnectorMigrationContract
 {
@@ -53,7 +54,7 @@ class ConnectorMigration implements ConnectorMigrationContract
             $connectorId,
             $targetRuntime,
             'draft',
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return [
@@ -93,7 +94,7 @@ class ConnectorMigration implements ConnectorMigrationContract
             count($conformanceRules),
             count($failures),
             json_encode($failures),
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return [
@@ -123,7 +124,7 @@ class ConnectorMigration implements ConnectorMigrationContract
             $connectorId,
             json_encode($testData),
             $isValid ? 'passed' : 'failed',
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return $isValid;
@@ -144,7 +145,7 @@ class ConnectorMigration implements ConnectorMigrationContract
             $connectorId,
             $targetRuntime,
             'completed',
-            date('c'),
+            DateTimeHelper::now(),
         ]);
     }
 
@@ -159,7 +160,7 @@ class ConnectorMigration implements ConnectorMigrationContract
             $results[] = [
                 'capability' => $capability,
                 'supported' => true,
-                'tested_at' => date('c'),
+                'tested_at' => DateTimeHelper::now(),
             ];
         }
 
@@ -183,7 +184,7 @@ class ConnectorMigration implements ConnectorMigrationContract
             $tenantId,
             $connectorId,
             json_encode($migrationPath),
-            date('c'),
+            DateTimeHelper::now(),
         ]);
     }
 

@@ -7,6 +7,7 @@ namespace Foundation\Implementations;
 use Foundation\Contracts\WorkCoreOperationsContract;
 use PDO;
 use Foundation\Support\JsonHelper;
+use Foundation\Support\DateTimeHelper;
 
 class WorkCoreOperations implements WorkCoreOperationsContract
 {
@@ -34,7 +35,7 @@ class WorkCoreOperations implements WorkCoreOperationsContract
             $tenantId,
             json_encode($jobData),
             'scheduled',
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return $jobId;
@@ -73,7 +74,7 @@ class WorkCoreOperations implements WorkCoreOperationsContract
             $routeId,
             $tenantId,
             json_encode($routeData),
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return $routeId;
@@ -100,7 +101,7 @@ class WorkCoreOperations implements WorkCoreOperationsContract
             $routeId,
             $tenantId,
             json_encode(['algorithm' => 'tsp', 'improvement_percentage' => 15]),
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return [
@@ -141,7 +142,7 @@ class WorkCoreOperations implements WorkCoreOperationsContract
 
         return $stmt->execute([
             json_encode($statusData),
-            date('c'),
+            DateTimeHelper::now(),
             $vehicleId,
             $tenantId,
         ]);
@@ -156,7 +157,7 @@ class WorkCoreOperations implements WorkCoreOperationsContract
             "UPDATE {$this->tablePrefix}fleet_vehicles SET driver_id = ?, assigned_at = ? WHERE id = ? AND tenant_id = ?"
         );
 
-        return $stmt->execute([$driverId, date('c'), $vehicleId, $tenantId]);
+        return $stmt->execute([$driverId, DateTimeHelper::now(), $vehicleId, $tenantId]);
     }
 
     public function getOperationalMetrics(

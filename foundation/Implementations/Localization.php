@@ -7,6 +7,7 @@ namespace Foundation\Implementations;
 use Foundation\Contracts\LocalizationContract;
 use PDO;
 use Foundation\Support\JsonHelper;
+use Foundation\Support\DateTimeHelper;
 
 class Localization implements LocalizationContract
 {
@@ -28,7 +29,7 @@ class Localization implements LocalizationContract
              ON DUPLICATE KEY UPDATE locale = ?, updated_at = ?"
         );
 
-        $now = date('c');
+        $now = DateTimeHelper::now();
 
         return $stmt->execute([$tenantId, $locale, $now, $locale, $now]);
     }
@@ -101,7 +102,7 @@ class Localization implements LocalizationContract
              ON DUPLICATE KEY UPDATE translation = ?, updated_at = ?"
         );
 
-        $now = date('c');
+        $now = DateTimeHelper::now();
 
         return $stmt->execute([
             $tenantId,

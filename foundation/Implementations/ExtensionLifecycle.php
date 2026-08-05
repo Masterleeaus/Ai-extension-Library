@@ -10,6 +10,7 @@ use Foundation\Support\ValidationException;
 use Foundation\Support\TransactionHelper;
 use PDO;
 use Foundation\Support\JsonHelper;
+use Foundation\Support\DateTimeHelper;
 
 class ExtensionLifecycle implements ExtensionLifecycleContract
 {
@@ -46,7 +47,7 @@ class ExtensionLifecycle implements ExtensionLifecycleContract
             $extensionName,
             json_encode($extensionMetadata),
             'draft',
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return $extensionId;
@@ -89,7 +90,7 @@ class ExtensionLifecycle implements ExtensionLifecycleContract
                     $tenantId,
                     $version,
                     json_encode($releaseNotes),
-                    date('c'),
+                    DateTimeHelper::now(),
                 ])) {
                     throw new \Exception('Failed to insert version record');
                 }
@@ -99,7 +100,7 @@ class ExtensionLifecycle implements ExtensionLifecycleContract
                     "UPDATE {$this->tablePrefix}extensions SET status = ?, published_version = ?, updated_at = ? WHERE id = ? AND tenant_id = ?"
                 );
 
-                if (!$updateStmt->execute(['published', $version, date('c'), $extensionId, $tenantId])) {
+                if (!$updateStmt->execute(['published', $version, DateTimeHelper::now(), $extensionId, $tenantId])) {
                     throw new \Exception('Failed to update extension status');
                 }
 
@@ -118,7 +119,7 @@ class ExtensionLifecycle implements ExtensionLifecycleContract
             "UPDATE {$this->tablePrefix}extensions SET status = ?, enabled_at = ? WHERE id = ? AND tenant_id = ?"
         );
 
-        return $stmt->execute(['enabled', date('c'), $extensionId, $tenantId]);
+        return $stmt->execute(['enabled', DateTimeHelper::now(), $extensionId, $tenantId]);
     }
 
     public function disableExtension(
@@ -130,7 +131,7 @@ class ExtensionLifecycle implements ExtensionLifecycleContract
             "UPDATE {$this->tablePrefix}extensions SET status = ?, disabled_reason = ?, disabled_at = ? WHERE id = ? AND tenant_id = ?"
         );
 
-        return $stmt->execute(['disabled', $reason, date('c'), $extensionId, $tenantId]);
+        return $stmt->execute(['disabled', $reason, DateTimeHelper::now(), $extensionId, $tenantId]);
     }
 
     public function grantExtensionPass(
@@ -154,7 +155,7 @@ class ExtensionLifecycle implements ExtensionLifecycleContract
             $tenantId,
             $passType,
             $expiresAt,
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return $passId;

@@ -7,6 +7,7 @@ namespace Foundation\Implementations;
 use Foundation\Contracts\KnowledgeEngineContract;
 use PDO;
 use Foundation\Support\JsonHelper;
+use Foundation\Support\DateTimeHelper;
 
 class KnowledgeEngine implements KnowledgeEngineContract
 {
@@ -25,7 +26,7 @@ class KnowledgeEngine implements KnowledgeEngineContract
         array $metadata = []
     ): string {
         $ingestionId = bin2hex(random_bytes(16));
-        $createdAt = date('c');
+        $createdAt = DateTimeHelper::now();
 
         $stmt = $this->db->prepare(
             "INSERT INTO {$this->tablePrefix}ingestions (id, tenant_id, document_id, content, metadata, created_at)
@@ -95,7 +96,7 @@ class KnowledgeEngine implements KnowledgeEngineContract
             'document_id' => $documentId,
             'start' => $startOffset,
             'end' => $endOffset,
-            'created_at' => date('c'),
+            'created_at' => DateTimeHelper::now(),
         ];
 
         return base64_encode(json_encode($citation));
@@ -134,7 +135,7 @@ class KnowledgeEngine implements KnowledgeEngineContract
             $tenantId,
             $conversationId,
             $messagesJson,
-            date('c'),
+            DateTimeHelper::now(),
             $messagesJson,
         ]);
     }

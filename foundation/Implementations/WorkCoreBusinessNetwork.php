@@ -7,6 +7,7 @@ namespace Foundation\Implementations;
 use Foundation\Contracts\WorkCoreBusinessNetworkContract;
 use PDO;
 use Foundation\Support\JsonHelper;
+use Foundation\Support\DateTimeHelper;
 
 class WorkCoreBusinessNetwork implements WorkCoreBusinessNetworkContract
 {
@@ -33,7 +34,7 @@ class WorkCoreBusinessNetwork implements WorkCoreBusinessNetworkContract
             $customerId,
             $tenantId,
             json_encode($customerData),
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return $customerId;
@@ -74,7 +75,7 @@ class WorkCoreBusinessNetwork implements WorkCoreBusinessNetworkContract
             "UPDATE {$this->tablePrefix}customers SET data = ?, updated_at = ? WHERE id = ? AND tenant_id = ?"
         );
 
-        return $stmt->execute([json_encode($mergedData), date('c'), $customerId, $tenantId]);
+        return $stmt->execute([json_encode($mergedData), DateTimeHelper::now(), $customerId, $tenantId]);
     }
 
     public function createProduct(
@@ -92,7 +93,7 @@ class WorkCoreBusinessNetwork implements WorkCoreBusinessNetworkContract
             $productId,
             $tenantId,
             json_encode($productData),
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return $productId;
@@ -139,7 +140,7 @@ class WorkCoreBusinessNetwork implements WorkCoreBusinessNetworkContract
         );
 
         $contentJson = json_encode($content);
-        $now = date('c');
+        $now = DateTimeHelper::now();
 
         return $stmt->execute([
             $knowledgeId,
@@ -180,7 +181,7 @@ class WorkCoreBusinessNetwork implements WorkCoreBusinessNetworkContract
         );
 
         $configJson = json_encode($crmConfig);
-        $now = date('c');
+        $now = DateTimeHelper::now();
 
         return $stmt->execute([
             $tenantId,

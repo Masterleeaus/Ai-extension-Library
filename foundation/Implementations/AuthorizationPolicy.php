@@ -7,6 +7,7 @@ namespace Foundation\Implementations;
 use Foundation\Contracts\AuthorizationPolicyContract;
 use Foundation\Contracts\TenantContextContract;
 use PDO;
+use Foundation\Support\DateTimeHelper;
 
 class AuthorizationPolicy implements AuthorizationPolicyContract
 {
@@ -97,7 +98,7 @@ class AuthorizationPolicy implements AuthorizationPolicyContract
             $resource,
             (int)$approved,
             json_encode($attributes),
-            date('c'),
+            DateTimeHelper::now(),
         ]);
     }
 }

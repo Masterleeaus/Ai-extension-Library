@@ -7,6 +7,7 @@ namespace Foundation\Implementations;
 use Foundation\Contracts\RateLimitingContract;
 use PDO;
 use Foundation\Support\JsonHelper;
+use Foundation\Support\DateTimeHelper;
 
 class RateLimiting implements RateLimitingContract
 {
@@ -48,7 +49,7 @@ class RateLimiting implements RateLimitingContract
              VALUES (?, ?, ?, ?)"
         );
 
-        $stmt->execute([$tenantId, $identifier, $bucket, date('c')]);
+        $stmt->execute([$tenantId, $identifier, $bucket, DateTimeHelper::now()]);
 
         return $this->getCurrentRequestCount($tenantId, $identifier, $bucket);
     }
@@ -98,7 +99,7 @@ class RateLimiting implements RateLimitingContract
         );
 
         $limitsJson = json_encode($limits);
-        $now = date('c');
+        $now = DateTimeHelper::now();
 
         return $stmt->execute([
             $tenantId,

@@ -7,6 +7,7 @@ namespace Foundation\Implementations;
 use Foundation\Contracts\WorkCoreCommercialContract;
 use PDO;
 use Foundation\Support\JsonHelper;
+use Foundation\Support\DateTimeHelper;
 
 class WorkCoreCommercial implements WorkCoreCommercialContract
 {
@@ -33,7 +34,7 @@ class WorkCoreCommercial implements WorkCoreCommercialContract
             $transactionId,
             $tenantId,
             json_encode($transactionData),
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return $transactionId;
@@ -73,7 +74,7 @@ class WorkCoreCommercial implements WorkCoreCommercialContract
             $tenantId,
             json_encode($payrollData),
             'processing',
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return $payrollId;
@@ -109,7 +110,7 @@ class WorkCoreCommercial implements WorkCoreCommercialContract
 
         $sku = $inventoryData['sku_id'] ?? null;
         $quantity = $inventoryData['quantity'] ?? 0;
-        $now = date('c');
+        $now = DateTimeHelper::now();
 
         return $stmt->execute([
             $tenantId,
@@ -154,7 +155,7 @@ class WorkCoreCommercial implements WorkCoreCommercialContract
             $tenantId,
             $reportType,
             json_encode($parameters),
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return $reportId;
@@ -171,7 +172,7 @@ class WorkCoreCommercial implements WorkCoreCommercialContract
         );
 
         $configJson = json_encode($gatewayConfig);
-        $now = date('c');
+        $now = DateTimeHelper::now();
 
         return $stmt->execute([
             $tenantId,

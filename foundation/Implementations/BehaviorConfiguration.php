@@ -7,6 +7,7 @@ namespace Foundation\Implementations;
 use Foundation\Contracts\BehaviorConfigurationContract;
 use PDO;
 use Foundation\Support\JsonHelper;
+use Foundation\Support\DateTimeHelper;
 
 class BehaviorConfiguration implements BehaviorConfigurationContract
 {
@@ -35,7 +36,7 @@ class BehaviorConfiguration implements BehaviorConfigurationContract
             $tenantId,
             $configName,
             json_encode($behaviors),
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return $configId;
@@ -68,7 +69,7 @@ class BehaviorConfiguration implements BehaviorConfigurationContract
             "UPDATE {$this->tablePrefix}configs SET behaviors = ?, updated_at = ? WHERE id = ? AND tenant_id = ?"
         );
 
-        return $stmt->execute([json_encode($behaviors), date('c'), $configId, $tenantId]);
+        return $stmt->execute([json_encode($behaviors), DateTimeHelper::now(), $configId, $tenantId]);
     }
 
     public function addBehaviorRule(
@@ -92,7 +93,7 @@ class BehaviorConfiguration implements BehaviorConfigurationContract
             $trigger,
             $action,
             json_encode($conditions),
-            date('c'),
+            DateTimeHelper::now(),
         ]);
     }
 
@@ -151,7 +152,7 @@ class BehaviorConfiguration implements BehaviorConfigurationContract
             $tenantId,
             json_encode($testData),
             $conditionsMet ? 1 : 0,
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return [
@@ -189,6 +190,6 @@ class BehaviorConfiguration implements BehaviorConfigurationContract
              VALUES (?, ?, ?, ?)"
         );
 
-        return $stmt->execute([$configId, $tenantId, $scope, date('c')]);
+        return $stmt->execute([$configId, $tenantId, $scope, DateTimeHelper::now()]);
     }
 }

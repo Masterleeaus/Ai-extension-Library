@@ -7,6 +7,7 @@ namespace Foundation\Implementations;
 use Foundation\Contracts\EcommerceIntegrationContract;
 use PDO;
 use Foundation\Support\JsonHelper;
+use Foundation\Support\DateTimeHelper;
 
 class EcommerceIntegration implements EcommerceIntegrationContract
 {
@@ -34,7 +35,7 @@ class EcommerceIntegration implements EcommerceIntegrationContract
             $tenantId,
             json_encode($catalogConfig),
             'active',
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return $catalogId;
@@ -80,7 +81,7 @@ class EcommerceIntegration implements EcommerceIntegrationContract
             $tenantId,
             $catalogId,
             json_encode($products),
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return count($products);
@@ -102,7 +103,7 @@ class EcommerceIntegration implements EcommerceIntegrationContract
             $tenantId,
             json_encode($orderData),
             'pending',
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return $orderId;
@@ -138,7 +139,7 @@ class EcommerceIntegration implements EcommerceIntegrationContract
         return $stmt->execute([
             $tenantId,
             json_encode($paymentData),
-            date('c'),
+            DateTimeHelper::now(),
         ]);
     }
 
@@ -176,7 +177,7 @@ class EcommerceIntegration implements EcommerceIntegrationContract
         return [
             'valid' => $isValid,
             'catalog_count' => $catalogs['total_catalogs'] ?? 0,
-            'validation_timestamp' => date('c'),
+            'validation_timestamp' => DateTimeHelper::now(),
         ];
     }
 }

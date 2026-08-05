@@ -7,6 +7,7 @@ namespace Foundation\Implementations;
 use Foundation\Contracts\FeatureFlagContract;
 use PDO;
 use Foundation\Support\JsonHelper;
+use Foundation\Support\DateTimeHelper;
 
 class FeatureFlag implements FeatureFlagContract
 {
@@ -38,7 +39,7 @@ class FeatureFlag implements FeatureFlagContract
             $enabled ? 1 : 0,
             json_encode($metadata),
             100,
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return $flagId;
@@ -104,7 +105,7 @@ class FeatureFlag implements FeatureFlagContract
 
         return $stmt->execute([
             $rolloutPercentage ?? 100,
-            date('c'),
+            DateTimeHelper::now(),
             $tenantId,
             $flagName,
         ]);
@@ -118,7 +119,7 @@ class FeatureFlag implements FeatureFlagContract
             "UPDATE {$this->tablePrefix}flags SET enabled = 0, updated_at = ? WHERE tenant_id = ? AND name = ?"
         );
 
-        return $stmt->execute([date('c'), $tenantId, $flagName]);
+        return $stmt->execute([DateTimeHelper::now(), $tenantId, $flagName]);
     }
 
     public function setRollout(
@@ -130,7 +131,7 @@ class FeatureFlag implements FeatureFlagContract
             "UPDATE {$this->tablePrefix}flags SET rollout_percentage = ?, updated_at = ? WHERE tenant_id = ? AND name = ?"
         );
 
-        return $stmt->execute([$percentage, date('c'), $tenantId, $flagName]);
+        return $stmt->execute([$percentage, DateTimeHelper::now(), $tenantId, $flagName]);
     }
 
     public function addUserVariant(
@@ -145,7 +146,7 @@ class FeatureFlag implements FeatureFlagContract
              ON DUPLICATE KEY UPDATE enabled = ?, updated_at = ?"
         );
 
-        $now = date('c');
+        $now = DateTimeHelper::now();
 
         return $stmt->execute([
             $tenantId,

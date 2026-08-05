@@ -8,6 +8,7 @@ use Foundation\Contracts\ToolExecutionContract;
 use Foundation\Contracts\TenantContextContract;
 use PDO;
 use Foundation\Support\JsonHelper;
+use Foundation\Support\DateTimeHelper;
 
 class ToolExecution implements ToolExecutionContract
 {
@@ -40,13 +41,13 @@ class ToolExecution implements ToolExecutionContract
             json_encode($params),
             json_encode($context),
             'running',
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return [
             'execution_id' => $executionId,
             'status' => 'running',
-            'started_at' => date('c'),
+            'started_at' => DateTimeHelper::now(),
         ];
     }
 
@@ -99,7 +100,7 @@ class ToolExecution implements ToolExecutionContract
             $toolId,
             json_encode($execution),
             $costEstimate,
-            date('c'),
+            DateTimeHelper::now(),
         ]);
     }
 

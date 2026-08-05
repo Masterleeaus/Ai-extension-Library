@@ -7,6 +7,7 @@ namespace Foundation\Implementations;
 use Foundation\Contracts\ShadowValidationContract;
 use PDO;
 use Foundation\Support\JsonHelper;
+use Foundation\Support\DateTimeHelper;
 
 class ShadowValidation implements ShadowValidationContract
 {
@@ -38,7 +39,7 @@ class ShadowValidation implements ShadowValidationContract
             $dataSource,
             json_encode($rules),
             'active',
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return $validationId;
@@ -95,7 +96,7 @@ class ShadowValidation implements ShadowValidationContract
             json_encode($targetRecord),
             json_encode($errors),
             $isValid ? 1 : 0,
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return [
@@ -160,7 +161,7 @@ class ShadowValidation implements ShadowValidationContract
             $validationId,
             $tenantId,
             json_encode($discrepancy),
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return $discrepancyId;
@@ -196,7 +197,7 @@ class ShadowValidation implements ShadowValidationContract
         return $stmt->execute([
             'completed',
             $approved ? 1 : 0,
-            date('c'),
+            DateTimeHelper::now(),
             $validationId,
             $tenantId,
         ]);
@@ -214,7 +215,7 @@ class ShadowValidation implements ShadowValidationContract
             'comparison' => $comparison,
             'discrepancies_count' => count($discrepancies),
             'discrepancies' => $discrepancies,
-            'generated_at' => date('c'),
+            'generated_at' => DateTimeHelper::now(),
         ];
 
         return json_encode($report, JSON_PRETTY_PRINT);

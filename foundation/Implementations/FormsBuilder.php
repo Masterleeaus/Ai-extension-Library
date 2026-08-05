@@ -7,6 +7,7 @@ namespace Foundation\Implementations;
 use Foundation\Contracts\FormsBuilderContract;
 use PDO;
 use Foundation\Support\JsonHelper;
+use Foundation\Support\DateTimeHelper;
 
 class FormsBuilder implements FormsBuilderContract
 {
@@ -35,7 +36,7 @@ class FormsBuilder implements FormsBuilderContract
             $tenantId,
             $formName,
             json_encode($formSchema),
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return $formId;
@@ -68,7 +69,7 @@ class FormsBuilder implements FormsBuilderContract
             "UPDATE {$this->tablePrefix}forms SET schema = ?, updated_at = ? WHERE id = ? AND tenant_id = ?"
         );
 
-        return $stmt->execute([json_encode($formSchema), date('c'), $formId, $tenantId]);
+        return $stmt->execute([json_encode($formSchema), DateTimeHelper::now(), $formId, $tenantId]);
     }
 
     public function addField(

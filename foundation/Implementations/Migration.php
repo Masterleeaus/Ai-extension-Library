@@ -7,6 +7,7 @@ namespace Foundation\Implementations;
 use Foundation\Contracts\MigrationContract;
 use PDO;
 use Foundation\Support\JsonHelper;
+use Foundation\Support\DateTimeHelper;
 
 class Migration implements MigrationContract
 {
@@ -37,7 +38,7 @@ class Migration implements MigrationContract
             $targetSystem,
             json_encode($options),
             'running',
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return $migrationId;
@@ -69,7 +70,7 @@ class Migration implements MigrationContract
             "UPDATE {$this->tablePrefix}registry SET status = ?, rolled_back_at = ? WHERE id = ? AND tenant_id = ?"
         );
 
-        return $stmt->execute(['rolled_back', date('c'), $migrationId, $tenantId]);
+        return $stmt->execute(['rolled_back', DateTimeHelper::now(), $migrationId, $tenantId]);
     }
 
     public function commit(
@@ -80,7 +81,7 @@ class Migration implements MigrationContract
             "UPDATE {$this->tablePrefix}registry SET status = ?, committed_at = ? WHERE id = ? AND tenant_id = ?"
         );
 
-        return $stmt->execute(['committed', date('c'), $migrationId, $tenantId]);
+        return $stmt->execute(['committed', DateTimeHelper::now(), $migrationId, $tenantId]);
     }
 
     public function getMigrationHistory(
@@ -124,7 +125,7 @@ class Migration implements MigrationContract
             "UPDATE {$this->tablePrefix}registry SET status = ?, pause_reason = ?, paused_at = ? WHERE id = ? AND tenant_id = ?"
         );
 
-        return $stmt->execute(['paused', $reason, date('c'), $migrationId, $tenantId]);
+        return $stmt->execute(['paused', $reason, DateTimeHelper::now(), $migrationId, $tenantId]);
     }
 
     public function resumeMigration(
@@ -135,7 +136,7 @@ class Migration implements MigrationContract
             "UPDATE {$this->tablePrefix}registry SET status = ?, resumed_at = ? WHERE id = ? AND tenant_id = ?"
         );
 
-        return $stmt->execute(['running', date('c'), $migrationId, $tenantId]);
+        return $stmt->execute(['running', DateTimeHelper::now(), $migrationId, $tenantId]);
     }
 
     public function recordProgress(
@@ -154,7 +155,7 @@ class Migration implements MigrationContract
             $tenantId,
             $recordsProcessed,
             $recordsFailed,
-            date('c'),
+            DateTimeHelper::now(),
         ]);
     }
 }

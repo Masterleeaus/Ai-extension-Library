@@ -7,6 +7,7 @@ namespace Foundation\Implementations;
 use Foundation\Contracts\CustomerIdentityContract;
 use PDO;
 use Foundation\Support\JsonHelper;
+use Foundation\Support\DateTimeHelper;
 
 class CustomerIdentity implements CustomerIdentityContract
 {
@@ -56,7 +57,7 @@ class CustomerIdentity implements CustomerIdentityContract
             $customerId,
             $providerId,
             json_encode($providerIdentity),
-            date('c'),
+            DateTimeHelper::now(),
         ]);
     }
 
@@ -128,9 +129,9 @@ class CustomerIdentity implements CustomerIdentityContract
             $tenantId,
             $customerId,
             $profileJson,
-            date('c'),
+            DateTimeHelper::now(),
             $profileJson,
-            date('c'),
+            DateTimeHelper::now(),
         ]);
     }
 }

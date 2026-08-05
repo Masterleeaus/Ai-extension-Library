@@ -7,6 +7,7 @@ namespace Foundation\Implementations;
 use Foundation\Contracts\BrandingThemingContract;
 use PDO;
 use Foundation\Support\JsonHelper;
+use Foundation\Support\DateTimeHelper;
 
 class BrandingTheming implements BrandingThemingContract
 {
@@ -35,7 +36,7 @@ class BrandingTheming implements BrandingThemingContract
             $tenantId,
             $themeName,
             json_encode($themeConfig),
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return $themeId;
@@ -68,7 +69,7 @@ class BrandingTheming implements BrandingThemingContract
             "UPDATE {$this->tablePrefix}themes SET config = ?, updated_at = ? WHERE id = ? AND tenant_id = ?"
         );
 
-        return $stmt->execute([json_encode($themeConfig), date('c'), $themeId, $tenantId]);
+        return $stmt->execute([json_encode($themeConfig), DateTimeHelper::now(), $themeId, $tenantId]);
     }
 
     public function applyTheme(
@@ -85,7 +86,7 @@ class BrandingTheming implements BrandingThemingContract
             "UPDATE {$this->tablePrefix}tenant_active_theme SET theme_id = ?, applied_at = ? WHERE tenant_id = ?"
         );
 
-        $result = $stmt->execute([$themeId, date('c'), $tenantId]);
+        $result = $stmt->execute([$themeId, DateTimeHelper::now(), $tenantId]);
 
         if ($stmt->rowCount() === 0) {
             $insertStmt = $this->db->prepare(
@@ -93,7 +94,7 @@ class BrandingTheming implements BrandingThemingContract
                  VALUES (?, ?, ?)"
             );
 
-            return $insertStmt->execute([$tenantId, $themeId, date('c')]);
+            return $insertStmt->execute([$tenantId, $themeId, DateTimeHelper::now()]);
         }
 
         return $result;

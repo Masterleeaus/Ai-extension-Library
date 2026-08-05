@@ -7,6 +7,7 @@ namespace Foundation\Implementations;
 use Foundation\Contracts\WorkCoreFoundationContract;
 use PDO;
 use Foundation\Support\JsonHelper;
+use Foundation\Support\DateTimeHelper;
 
 class WorkCoreFoundation implements WorkCoreFoundationContract
 {
@@ -29,7 +30,7 @@ class WorkCoreFoundation implements WorkCoreFoundationContract
         );
 
         $configJson = json_encode($tenantConfig);
-        $now = date('c');
+        $now = DateTimeHelper::now();
 
         return $stmt->execute([
             $tenantId,
@@ -73,7 +74,7 @@ class WorkCoreFoundation implements WorkCoreFoundationContract
             "UPDATE {$this->tablePrefix}tenants SET config = ?, updated_at = ? WHERE tenant_id = ?"
         );
 
-        return $stmt->execute([json_encode($mergedConfig), date('c'), $tenantId]);
+        return $stmt->execute([json_encode($mergedConfig), DateTimeHelper::now(), $tenantId]);
     }
 
     public function grantPermission(
@@ -87,7 +88,7 @@ class WorkCoreFoundation implements WorkCoreFoundationContract
              VALUES (?, ?, ?, ?, ?)"
         );
 
-        return $stmt->execute([$tenantId, $userId, $resource, $action, date('c')]);
+        return $stmt->execute([$tenantId, $userId, $resource, $action, DateTimeHelper::now()]);
     }
 
     public function checkPermission(
@@ -132,7 +133,7 @@ class WorkCoreFoundation implements WorkCoreFoundationContract
             $tenantId,
             json_encode($data),
             'completed',
-            date('c'),
+            DateTimeHelper::now(),
         ]);
     }
 

@@ -7,6 +7,7 @@ namespace Foundation\Implementations;
 use Foundation\Contracts\AuditTrailContract;
 use PDO;
 use Foundation\Support\JsonHelper;
+use Foundation\Support\DateTimeHelper;
 
 class AuditTrail implements AuditTrailContract
 {
@@ -43,7 +44,7 @@ class AuditTrail implements AuditTrailContract
             json_encode($changes),
             $userId,
             json_encode($metadata),
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return $entryId;
