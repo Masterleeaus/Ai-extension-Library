@@ -53,8 +53,11 @@ class DateTimeHelper
 
     public static function fromUnix(int $timestamp): string
     {
-        return DateTimeImmutable::createFromFormat('U', (string) $timestamp, self::getUtcZone())
-            ->format('Y-m-d\TH:i:s.uP');
+        $dt = DateTimeImmutable::createFromFormat('U', (string) $timestamp, self::getUtcZone());
+        if ($dt === false) {
+            throw new \InvalidArgumentException("Invalid Unix timestamp: {$timestamp}");
+        }
+        return $dt->format('Y-m-d\TH:i:s.uP');
     }
 
     public static function format(string $timestamp, string $format): string

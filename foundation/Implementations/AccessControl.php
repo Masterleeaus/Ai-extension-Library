@@ -11,7 +11,6 @@ use PDO;
 
 class AccessControl implements AccessControlContract
 {
-    private DatabaseRepositoryContract $repository;
     private PDO $db;
     private const TABLE_PERMISSIONS = 'access_permissions';
     private const TABLE_ROLES = 'access_roles';
@@ -19,7 +18,6 @@ class AccessControl implements AccessControlContract
 
     public function __construct(DatabaseRepositoryContract $repository)
     {
-        $this->repository = $repository;
         $this->db = $repository->getPDO();
     }
 
@@ -88,7 +86,7 @@ class AccessControl implements AccessControlContract
             $permission,
         ]);
 
-        return $stmt->rowCount() > 0;
+        return $stmt->fetch() !== false;
     }
 
     public function getUserPermissions(
