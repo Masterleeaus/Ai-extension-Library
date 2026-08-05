@@ -21,6 +21,8 @@ enum PlatformEnum: string
 
     case youtube_shorts = 'youtube-shorts';
 
+    case ebay = 'ebay';
+
     public function contentCharacterLength(): int
     {
         return match ($this) {
@@ -31,6 +33,7 @@ enum PlatformEnum: string
             self::tiktok         => 2900,
             self::youtube        => 5000,
             self::youtube_shorts => 150,
+            self::ebay           => 500000,
         };
     }
 
@@ -44,6 +47,7 @@ enum PlatformEnum: string
             self::tiktok->value,
             self::youtube->value,
             self::youtube_shorts->value,
+            self::ebay->value,
         ];
     }
 
@@ -57,6 +61,7 @@ enum PlatformEnum: string
             self::tiktok,
             self::youtube,
             self::youtube_shorts,
+            self::ebay,
         ];
     }
 
@@ -64,7 +69,7 @@ enum PlatformEnum: string
     {
         $platforms = SocialMediaPlatform::query()
             ->where('user_id', Auth::id())
-            ->whereIn('platform', array_values(self::all()))
+            ->whereIn('platform', self::toArray())
             ->orderByDesc('expires_at')
             ->get();
 
@@ -76,6 +81,7 @@ enum PlatformEnum: string
             self::tiktok         => $platforms->where('platform', self::tiktok->value)->first(),
             self::youtube        => $platforms->where('platform', self::youtube->value)->first(),
             self::youtube_shorts => $platforms->where('platform', self::youtube_shorts->value)->first(),
+            self::ebay           => $platforms->where('platform', self::ebay->value)->first(),
         };
     }
 
@@ -93,7 +99,6 @@ enum PlatformEnum: string
                 'instagram_webhook_secret' => setting('INSTAGRAM_WEBHOOK_SECRET', 'default-password'),
             ],
             self::x => [
-                //                'x_app_id'              => setting('X_APP_ID'),
                 'x_api_key'             => setting('X_API_KEY'),
                 'x_api_secret'          => setting('X_API_SECRET'),
                 'x_access_token'        => setting('X_ACCESS_TOKEN'),
@@ -117,6 +122,11 @@ enum PlatformEnum: string
             self::youtube_shorts => [
                 'youtube_client_id'     => setting('YOUTUBE_CLIENT_ID'),
                 'youtube_client_secret' => setting('YOUTUBE_CLIENT_SECRET'),
+            ],
+            self::ebay => [
+                'ebay_client_id'     => setting('EBAY_CLIENT_ID'),
+                'ebay_client_secret' => setting('EBAY_CLIENT_SECRET'),
+                'ebay_redirect_uri'  => setting('EBAY_REDIRECT_URI'),
             ],
         };
     }
@@ -142,6 +152,7 @@ enum PlatformEnum: string
             self::tiktok         => 'TikTok',
             self::youtube        => 'YouTube',
             self::youtube_shorts => 'YouTube Shorts',
+            self::ebay           => 'eBay',
         };
     }
 }
