@@ -31,10 +31,10 @@ foreach ([
 }
 
 foreach ([
-    "($parts['scheme'] ?? null) !== 'https'",
-    "isset($parts['user'])",
-    "isset($parts['pass'])",
-    "($parts['port'] ?? 443) !== 443",
+    '($parts[\'scheme\'] ?? null) !== \'https\'',
+    'isset($parts[\'user\'])',
+    'isset($parts[\'pass\'])',
+    '($parts[\'port\'] ?? 443) !== 443',
     'dns_get_record',
     'FILTER_FLAG_NO_PRIV_RANGE',
     'FILTER_FLAG_NO_RES_RANGE',
