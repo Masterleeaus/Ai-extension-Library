@@ -5,16 +5,22 @@ declare(strict_types=1);
 namespace Foundation\Implementations;
 
 use Foundation\Contracts\ExtensionLifecycleContract;
+use Foundation\Support\InputValidator;
+use Foundation\Support\ValidationException;
+use Foundation\Support\TransactionHelper;
 use PDO;
+use Foundation\Support\JsonHelper;
 
 class ExtensionLifecycle implements ExtensionLifecycleContract
 {
     private PDO $db;
     private string $tablePrefix = 'extension_lifecycle_';
+    private TransactionHelper $transactions;
 
-    public function __construct(PDO $db)
+    public function __construct(PDO $db, ?TransactionHelper $transactions = null)
     {
         $this->db = $db;
+        $this->transactions = $transactions ?? new TransactionHelper($db);
     }
 
     public function registerExtension(
@@ -22,6 +28,11 @@ class ExtensionLifecycle implements ExtensionLifecycleContract
         string $extensionName,
         array $extensionMetadata
     ): string {
+        // Validate inputs
+        InputValidator::validateTenantId($tenantId);
+        InputValidator::validateNonEmptyString($extensionName, 'extensionName', 255);
+        InputValidator::validateArray($extensionMetadata, 'extensionMetadata', false, 1000);
+
         $extensionId = bin2hex(random_bytes(16));
 
         $stmt = $this->db->prepare(
@@ -53,7 +64,7 @@ class ExtensionLifecycle implements ExtensionLifecycleContract
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($result) {
-            $result['metadata'] = json_decode($result['metadata'], true);
+            $result['metadata'] = JsonHelper::decode($result['metadata']);
         }
 
         return $result ?: null;
@@ -65,28 +76,38 @@ class ExtensionLifecycle implements ExtensionLifecycleContract
         string $version,
         array $releaseNotes
     ): bool {
-        $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}versions (extension_id, tenant_id, version, release_notes, published_at)
-             VALUES (?, ?, ?, ?, ?)"
+        return $this->transactions->executeInTransaction(
+            function (PDO $db) use ($tenantId, $extensionId, $version, $releaseNotes) {
+                // Step 1: Insert version record
+                $stmt = $db->prepare(
+                    "INSERT INTO {$this->tablePrefix}versions (extension_id, tenant_id, version, release_notes, published_at)
+                     VALUES (?, ?, ?, ?, ?)"
+                );
+
+                if (!$stmt->execute([
+                    $extensionId,
+                    $tenantId,
+                    $version,
+                    json_encode($releaseNotes),
+                    date('c'),
+                ])) {
+                    throw new \Exception('Failed to insert version record');
+                }
+
+                // Step 2: Update extension status
+                $updateStmt = $db->prepare(
+                    "UPDATE {$this->tablePrefix}extensions SET status = ?, published_version = ?, updated_at = ? WHERE id = ? AND tenant_id = ?"
+                );
+
+                if (!$updateStmt->execute(['published', $version, date('c'), $extensionId, $tenantId])) {
+                    throw new \Exception('Failed to update extension status');
+                }
+
+                return true;
+            },
+            'publishExtensionVersion',
+            ['extension_id' => $extensionId, 'version' => $version]
         );
-
-        $result = $stmt->execute([
-            $extensionId,
-            $tenantId,
-            $version,
-            json_encode($releaseNotes),
-            date('c'),
-        ]);
-
-        if ($result) {
-            $updateStmt = $this->db->prepare(
-                "UPDATE {$this->tablePrefix}extensions SET status = ?, published_version = ?, updated_at = ? WHERE id = ? AND tenant_id = ?"
-            );
-
-            $updateStmt->execute(['published', $version, date('c'), $extensionId, $tenantId]);
-        }
-
-        return $result;
     }
 
     public function enableExtension(

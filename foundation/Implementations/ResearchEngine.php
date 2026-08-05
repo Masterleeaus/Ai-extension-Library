@@ -6,6 +6,7 @@ namespace Foundation\Implementations;
 
 use Foundation\Contracts\ResearchEngineContract;
 use PDO;
+use Foundation\Support\JsonHelper;
 
 class ResearchEngine implements ResearchEngineContract
 {
@@ -53,7 +54,7 @@ class ResearchEngine implements ResearchEngineContract
         $session = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($session) {
-            $session['parameters'] = json_decode($session['parameters'], true);
+            $session['parameters'] = JsonHelper::decode($session['parameters']);
         }
 
         return $session ?: null;
@@ -71,7 +72,7 @@ class ResearchEngine implements ResearchEngineContract
         $findings = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         foreach ($findings as &$finding) {
-            $finding['data'] = json_decode($finding['data'], true);
+            $finding['data'] = JsonHelper::decode($finding['data']);
         }
 
         return $findings;

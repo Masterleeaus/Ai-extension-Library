@@ -6,6 +6,7 @@ namespace Foundation\Implementations;
 
 use Foundation\Contracts\MigrationContract;
 use PDO;
+use Foundation\Support\JsonHelper;
 
 class Migration implements MigrationContract
 {
@@ -54,7 +55,7 @@ class Migration implements MigrationContract
         $migration = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($migration) {
-            $migration['options'] = json_decode($migration['options'], true);
+            $migration['options'] = JsonHelper::decode($migration['options']);
         }
 
         return $migration ?: null;
@@ -108,7 +109,7 @@ class Migration implements MigrationContract
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         foreach ($results as &$result) {
-            $result['options'] = json_decode($result['options'], true);
+            $result['options'] = JsonHelper::decode($result['options']);
         }
 
         return $results;

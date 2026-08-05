@@ -6,6 +6,7 @@ namespace Foundation\Implementations;
 
 use Foundation\Contracts\FeatureFlagContract;
 use PDO;
+use Foundation\Support\JsonHelper;
 
 class FeatureFlag implements FeatureFlagContract
 {
@@ -55,7 +56,7 @@ class FeatureFlag implements FeatureFlagContract
         $flag = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($flag) {
-            $flag['metadata'] = json_decode($flag['metadata'], true);
+            $flag['metadata'] = JsonHelper::decode($flag['metadata']);
         }
 
         return $flag ?: null;
@@ -166,7 +167,7 @@ class FeatureFlag implements FeatureFlagContract
         $flags = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         foreach ($flags as &$flag) {
-            $flag['metadata'] = json_decode($flag['metadata'], true);
+            $flag['metadata'] = JsonHelper::decode($flag['metadata']);
         }
 
         return $flags;

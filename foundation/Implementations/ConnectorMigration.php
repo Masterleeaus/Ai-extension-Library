@@ -6,6 +6,7 @@ namespace Foundation\Implementations;
 
 use Foundation\Contracts\ConnectorMigrationContract;
 use PDO;
+use Foundation\Support\JsonHelper;
 
 class ConnectorMigration implements ConnectorMigrationContract
 {
@@ -198,7 +199,7 @@ class ConnectorMigration implements ConnectorMigrationContract
         $plan = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($plan) {
-            $plan['steps'] = json_decode($plan['steps'] ?? '[]', true);
+            $plan['steps'] = JsonHelper::decode($plan['steps'] ?? '[]');
         }
 
         return $plan ?: null;
