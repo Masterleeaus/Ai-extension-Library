@@ -4,6 +4,7 @@ import '../foundations/titan_spacing.dart';
 
 enum TitanTextFieldVariant { boxed, basic }
 
+/// Native Titan text input with boxed and basic presentation variants.
 class TitanTextField extends StatefulWidget {
   const TitanTextField({
     required this.controller,
