@@ -14,7 +14,7 @@ class TitanLoading extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final indicator = const SizedBox.square(
+    const indicator = SizedBox.square(
       dimension: 28,
       child: CircularProgressIndicator(strokeWidth: 3),
     );
