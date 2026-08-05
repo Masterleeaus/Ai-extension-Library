@@ -54,5 +54,8 @@ return [
         'model' => env('INTERACTION_AI_MODEL', 'gpt-4o-mini'),
         'max_tokens' => (int) env('INTERACTION_AI_MAX_TOKENS', 150),
         'temperature' => (float) env('INTERACTION_AI_TEMPERATURE', 0.3),
+        'proposal' => [
+            'max_attempts' => (int) env('INTERACTION_AI_PROPOSAL_MAX_ATTEMPTS', 2),
+        ],
     ],
 ];
