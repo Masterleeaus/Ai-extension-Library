@@ -1,4 +1,4 @@
-name: WorkCore Wizard Vertical Context Temporary Verification
+name: WorkCore Wizard Vertical Context Final Verification
 
 on:
   pull_request:
@@ -10,15 +10,22 @@ permissions:
   contents: write
 
 jobs:
-  verify:
+  verify-and-clean:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 40
     steps:
       - name: Checkout feature branch
         uses: actions/checkout@v4
         with:
           ref: feature/workcore-wizard-vertical-context
           fetch-depth: 0
+
+      - name: Merge current main
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch origin main
+          git merge --no-edit origin/main
 
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
@@ -29,10 +36,20 @@ jobs:
 
       - name: Install isolated Illuminate test dependencies
         run: |
+          rm -rf /tmp/workcore-context-test
           mkdir -p /tmp/workcore-context-test
           cd /tmp/workcore-context-test
           printf '%s\n' '{"require":{"php":"^8.2","illuminate/database":"^10.0","illuminate/events":"^10.0"}}' > composer.json
           composer install --no-interaction --no-progress --prefer-dist
+
+      - name: Generate canonical business-network checksum manifest
+        working-directory: app/extensions/WorkCore_Platform
+        run: |
+          rm -rf /tmp/workcore-checksums
+          python tools/refresh_package_checksums.py --repo . --output-dir /tmp/workcore-checksums
+          cp /tmp/workcore-checksums/workcore-business-network.files.sha256.json packages/workcore-business-network/files.sha256.json
+          changed="$(git -C ../../.. diff --name-only -- app/extensions/WorkCore_Platform/packages)"
+          test "$changed" = "app/extensions/WorkCore_Platform/packages/workcore-business-network/files.sha256.json"
 
       - name: Run WorkCore wizard vertical context contract
         env:
@@ -46,15 +63,6 @@ jobs:
           php packages/titan-interaction-engine/tests/run.php
           php packages/titan-interaction-engine/bin/verify.php
 
-      - name: Generate canonical business-network checksum manifest
-        working-directory: app/extensions/WorkCore_Platform
-        run: |
-          rm -rf /tmp/workcore-checksums
-          python tools/refresh_package_checksums.py --repo . --output-dir /tmp/workcore-checksums
-          cp /tmp/workcore-checksums/workcore-business-network.files.sha256.json packages/workcore-business-network/files.sha256.json
-          changed="$(git -C ../../.. diff --name-only -- app/extensions/WorkCore_Platform/packages)"
-          test "$changed" = "app/extensions/WorkCore_Platform/packages/workcore-business-network/files.sha256.json"
-
       - name: Run WorkCore Platform contract suite
         working-directory: app/extensions/WorkCore_Platform
         run: python -m unittest discover tests -p 'test_*.py' -v
@@ -67,21 +75,14 @@ jobs:
           find app/extensions/WorkCore_Platform/packages/workcore-business-network/src/Domains/WorkCore/System/Modules/Wizards \
             -name '*VerticalContext*.php' -print0 | xargs -0 -r -n1 php -l
 
-      - name: Commit canonical checksum manifest
+      - name: Remove temporary workflows and validate production diff
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add app/extensions/WorkCore_Platform/packages/workcore-business-network/files.sha256.json
-          if ! git diff --cached --quiet; then
-            git commit -m "chore(workcore): refresh business network checksums"
-            git push origin HEAD:feature/workcore-wizard-vertical-context
-          fi
-
-      - name: Upload regenerated checksum manifest
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: workcore-business-network-checksums
-          path: app/extensions/WorkCore_Platform/packages/workcore-business-network/files.sha256.json
-          if-no-files-found: error
-          retention-days: 1
+          rm -f .github/workflows/workcore-source-manifest-diagnostic-temp.yml
+          rm -f .github/workflows/workcore-wizard-vertical-context-temp.yml
+          git add -A
+          git commit -m "feat(workcore): finalize wizard vertical context bridge [skip ci]"
+          files="$(git diff --name-only origin/main...HEAD | sort)"
+          printf '%s\n' "$files"
+          test "$(printf '%s\n' "$files" | grep -c '^')" -eq 7
+          ! printf '%s\n' "$files" | grep -q '^\.github/workflows/'
+          git push origin HEAD:feature/workcore-wizard-vertical-context
