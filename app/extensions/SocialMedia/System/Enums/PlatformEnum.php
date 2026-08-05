@@ -39,16 +39,7 @@ enum PlatformEnum: string
 
     public static function toArray(): array
     {
-        return [
-            self::facebook->value,
-            self::instagram->value,
-            self::x->value,
-            self::linkedin->value,
-            self::tiktok->value,
-            self::youtube->value,
-            self::youtube_shorts->value,
-            self::ebay->value,
-        ];
+        return array_map(static fn (self $platform) => $platform->value, self::all());
     }
 
     public static function all(): array
@@ -61,15 +52,24 @@ enum PlatformEnum: string
             self::tiktok,
             self::youtube,
             self::youtube_shorts,
-            self::ebay,
         ];
+    }
+
+    public static function channels(): array
+    {
+        return [...self::all(), self::ebay];
+    }
+
+    public static function channelValues(): array
+    {
+        return array_map(static fn (self $platform) => $platform->value, self::channels());
     }
 
     public function platform()
     {
         $platforms = SocialMediaPlatform::query()
             ->where('user_id', Auth::id())
-            ->whereIn('platform', self::toArray())
+            ->whereIn('platform', self::channelValues())
             ->orderByDesc('expires_at')
             ->get();
 
