@@ -32,7 +32,7 @@ return [
             'booking_offer',
             'hire_rental_listing',
         ],
-        'required_fields' => ['title', 'board_id', 'image_url'],
+        'required_fields' => ['title', 'board_id', 'images'],
         'media_rules' => [
             'images' => true,
             'videos' => false,
