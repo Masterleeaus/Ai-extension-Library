@@ -47,6 +47,13 @@ class SocialMediaPlatformController extends Controller
             ]);
         }
 
+        if ((int) $platform->user_id !== (int) Auth::id()) {
+            return back()->with([
+                'type'    => 'error',
+                'message' => trans('You are not authorized to disconnect this channel.'),
+            ]);
+        }
+
         try {
             $platform->delete();
 
@@ -55,9 +62,11 @@ class SocialMediaPlatformController extends Controller
                 'message' => trans('Channel has been disconnected.'),
             ]);
         } catch (Exception $exception) {
+            report($exception);
+
             return back()->with([
                 'type'    => 'error',
-                'message' => $exception->getMessage(),
+                'message' => trans('The channel could not be disconnected.'),
             ]);
         }
     }
