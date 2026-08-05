@@ -136,7 +136,7 @@ class RoutePageList {
     //!categories
     GetPage(
       name: Routes.bottomNavBarScreen,
-      page: () => BottomNavBarScreen(),
+      page: () => const BottomNavBarScreen(),
       binding: InitialScreenBindings(),
     ),
     GetPage(
