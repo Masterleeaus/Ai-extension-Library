@@ -1,4 +1,4 @@
-name: Wizard Recomposition Boundary Diagnostic
+name: Wizard Answer Recomposition Temporary Verification
 
 on:
   pull_request:
@@ -9,43 +9,33 @@ permissions:
   contents: read
 
 jobs:
-  inspect:
+  verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
         with:
-          ref: feature/wizard-answer-recomposition
+          php-version: '8.2'
+          extensions: pdo_sqlite, sqlite3
+          coverage: none
 
-      - name: Inspect action, event and wizard schema contracts
-        shell: bash
+      - name: Install isolated Illuminate dependencies
         run: |
-          set -euo pipefail
-          echo '===== ACTION REQUEST AND DOMAIN EVENT CONTRACTS ====='
-          while IFS= read -r file; do
-            echo "--- ${file} ---"
-            sed -n '1,320p' "$file"
-          done < <(
-            grep -RIl --exclude-dir=.git -E 'class ActionRequest|readonly class ActionRequest|class PendingDomainEvent|readonly class PendingDomainEvent|class BusinessActionDispatcher' app/extensions/WorkCore_Platform/packages | sort | head -30
-          )
+          rm -rf /tmp/workcore-recomposition-test
+          mkdir -p /tmp/workcore-recomposition-test
+          cd /tmp/workcore-recomposition-test
+          printf '%s\n' '{"require":{"php":"^8.2","illuminate/database":"^10.0","illuminate/events":"^10.0","illuminate/support":"^10.0"}}' > composer.json
+          composer install --no-interaction --no-progress --prefer-dist
 
-          echo '===== WIZARD TABLE MIGRATIONS ====='
-          while IFS= read -r file; do
-            echo "--- ${file} ---"
-            sed -n '1,360p' "$file"
-          done < <(
-            grep -RIl --exclude-dir=.git -E "tz_wizard_(runs|answers|events|section_approvals)" app/extensions/WorkCore_Platform/packages/*/database app/extensions/WorkCore_Platform/native-extensions 2>/dev/null | sort | head -30
-          )
+      - name: Run focused wizard recomposition contract
+        env:
+          AI_EXTENSIONS_REPO_ROOT: ${{ github.workspace }}
+          WORKCORE_TEST_VENDOR_AUTOLOAD: /tmp/workcore-recomposition-test/vendor/autoload.php
+        run: php app/extensions/WorkCore_Platform/tests/wizard_answer_recomposition.php
 
-          echo '===== EVENT LISTENER REGISTRATION PATTERNS ====='
-          grep -RIn --exclude-dir=.git -E 'ShouldQueue|listen\(|Event::listen|PendingDomainEvent' app/extensions/WorkCore_Platform/packages/workcore-business-network/src app/extensions/WorkCore_Platform/packages/workcore-shared-foundation/src | head -260 || true
-
-          echo '===== WIZARD DEFINITION SAMPLE ====='
-          python - <<'PY'
-          import json
-          from pathlib import Path
-          p=Path('app/extensions/WorkCore_Platform/packages/workcore-business-network/src/Domains/WorkCore/System/Modules/Wizards/config/definitions.json')
-          data=json.loads(p.read_text())
-          for definition in data[:2]:
-              print(json.dumps(definition, indent=2)[:12000])
-          PY
+      - name: Lint focused test
+        if: always()
+        run: php -l app/extensions/WorkCore_Platform/tests/wizard_answer_recomposition.php
