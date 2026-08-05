@@ -19,20 +19,38 @@ jobs:
         with:
           ref: feature/workcore-wizard-vertical-context
 
-      - name: Collect manifest contract sources
+      - name: Introspect manifest contract source
         working-directory: app/extensions/WorkCore_Platform
         run: |
           rm -rf /tmp/workcore-source-manifest-diagnostics
           mkdir -p /tmp/workcore-source-manifest-diagnostics
-          {
-            find . -type f \( -name 'source-files.json' -o -name '*source*manifest*.py' \) -print
-            grep -RIl --exclude-dir='__pycache__' -E 'source-files\.json|test_contract_manifest_matches_canonical_tree' tests tools contracts .github 2>/dev/null || true
-          } | sort -u | while read -r file; do
-            [ -f "$file" ] || continue
-            target="/tmp/workcore-source-manifest-diagnostics/${file#./}"
-            mkdir -p "$(dirname "$target")"
-            cp "$file" "$target"
-          done
+          python - <<'PY'
+          import importlib
+          import inspect
+          import shutil
+          import sys
+          from pathlib import Path
+
+          tests = Path('tests').resolve()
+          sys.path.insert(0, str(tests))
+          module = importlib.import_module('test_contract_source_manifest')
+          source_path = Path(module.__file__).resolve()
+          print('MODULE_FILE', source_path)
+          print(source_path.read_text(encoding='utf-8'))
+          target = Path('/tmp/workcore-source-manifest-diagnostics/tests') / source_path.name
+          target.parent.mkdir(parents=True, exist_ok=True)
+          shutil.copy2(source_path, target)
+
+          for candidate in Path('.').rglob('*'):
+              if not candidate.is_file():
+                  continue
+              name = candidate.name.lower()
+              if ('source' in name and 'manifest' in name) or name == 'source-files.json':
+                  print('CANDIDATE', candidate)
+                  output = Path('/tmp/workcore-source-manifest-diagnostics/repository') / candidate
+                  output.parent.mkdir(parents=True, exist_ok=True)
+                  shutil.copy2(candidate, output)
+          PY
           find /tmp/workcore-source-manifest-diagnostics -type f -print
 
       - name: Upload diagnostics
