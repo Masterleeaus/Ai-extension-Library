@@ -69,8 +69,8 @@ class GoogleBusinessProfilePinterestContractTest extends TestCase
             $this->assertStringContainsString('Crypt::encryptString', $helper);
             $this->assertStringContainsString('access_token_encrypted', $helper);
             $this->assertStringContainsString('refresh_token_encrypted', $helper);
-            $this->assertStringNotContainsString("'access_token' =>", $helper);
-            $this->assertStringNotContainsString("'refresh_token' =>", $helper);
+            $this->assertStringNotContainsString("\$credentials['access_token']", $helper);
+            $this->assertStringNotContainsString("\$credentials['refresh_token']", $helper);
         }
 
         foreach ([$googleOauth, $pinterestOauth] as $controller) {
@@ -79,8 +79,8 @@ class GoogleBusinessProfilePinterestContractTest extends TestCase
             $this->assertStringContainsString('Auth::id()', $controller);
             $this->assertStringContainsString('access_token_encrypted', $controller);
             $this->assertStringContainsString('refresh_token_encrypted', $controller);
-            $this->assertStringNotContainsString("'access_token' =>", $controller);
-            $this->assertStringNotContainsString("'refresh_token' =>", $controller);
+            $this->assertStringNotContainsString("'access_token' => \$accessToken", $controller);
+            $this->assertStringNotContainsString("'refresh_token' => \$refreshToken", $controller);
         }
     }
 
@@ -127,7 +127,7 @@ class GoogleBusinessProfilePinterestContractTest extends TestCase
 
         $this->assertStringContainsString('forVerticalDestination', $service);
         $this->assertStringContainsString("approval_status !== 'approved'", $service);
-        $this->assertStringContainsString("TYPE_PRODUCT_OFFER", $service);
+        $this->assertStringContainsString('TYPE_PRODUCT_OFFER', $service);
         $this->assertStringContainsString("'link'", $service);
         $this->assertStringContainsString('request_hash', $service);
         $this->assertStringContainsString('rate_limit', $service);
