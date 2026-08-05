@@ -38,8 +38,6 @@ class EbayListingController extends Controller
 
         return $this->respond(fn () => $this->locked(
             $item,
-            'draft',
-            (string) $validated['idempotency_key'],
             fn () => $this->service->syncDraft(
                 $request->user(),
                 $item,
@@ -56,8 +54,6 @@ class EbayListingController extends Controller
 
         return $this->respond(fn () => $this->locked(
             $item,
-            'publish',
-            (string) $validated['idempotency_key'],
             fn () => $this->service->publish(
                 $request->user(),
                 $item,
@@ -74,8 +70,6 @@ class EbayListingController extends Controller
 
         return $this->respond(fn () => $this->locked(
             $item,
-            'revise',
-            (string) $validated['idempotency_key'],
             fn () => $this->service->revise(
                 $request->user(),
                 $item,
@@ -95,8 +89,6 @@ class EbayListingController extends Controller
 
         return $this->respond(fn () => $this->locked(
             $item,
-            'withdraw',
-            (string) $validated['idempotency_key'],
             fn () => $this->service->withdraw(
                 $request->user(),
                 $item,
@@ -112,10 +104,13 @@ class EbayListingController extends Controller
             'account_id' => 'required|integer',
         ]);
 
-        return $this->respond(fn () => $this->service->reconcile(
-            $request->user(),
+        return $this->respond(fn () => $this->locked(
             $item,
-            $this->account((int) $validated['account_id'])
+            fn () => $this->service->reconcile(
+                $request->user(),
+                $item,
+                $this->account((int) $validated['account_id'])
+            )
         ));
     }
 
@@ -130,11 +125,14 @@ class EbayListingController extends Controller
             'question.received_at' => 'nullable|date',
         ]);
 
-        return $this->respond(fn () => $this->service->buyerQuestionHandoff(
-            $request->user(),
+        return $this->respond(fn () => $this->locked(
             $item,
-            $this->account((int) $validated['account_id']),
-            (array) $validated['question']
+            fn () => $this->service->buyerQuestionHandoff(
+                $request->user(),
+                $item,
+                $this->account((int) $validated['account_id']),
+                (array) $validated["question"]
+            )
         ));
     }
 
@@ -156,25 +154,23 @@ class EbayListingController extends Controller
             ->firstOrFail();
     }
 
-    private function locked(
-        DistributionItem $item,
-        string $operation,
-        string $idempotencyKey,
-        callable $callback
-    ): mixed {
+    private function locked(DistributionItem $item, callable $callback): mixed
+    {
         $lockName = implode(':', [
             'titan-reach',
             'ebay',
             Auth::id(),
             $item->getKey(),
-            $operation,
-            hash('sha256', $idempotencyKey),
         ]);
 
         try {
-            return Cache::lock($lockName, 120)->block(5, $callback);
+            return Cache::lock($lockName, 120)->block(5, function () use ($item, $callback) {
+                $item->refresh();
+
+                return $callback();
+            });
         } catch (LockTimeoutException $exception) {
-            throw new RuntimeException('Another request is already processing this eBay operation.', previous: $exception);
+            throw new RuntimeException('Another request is already processing this eBay listing.', previous: $exception);
         }
     }
 
