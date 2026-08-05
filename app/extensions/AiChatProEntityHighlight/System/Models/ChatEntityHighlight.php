@@ -13,7 +13,11 @@ class ChatEntityHighlight extends Model
 {
     protected $table = 'chat_entity_highlights';
 
-    protected $guarded = [];
+    protected $fillable = [
+        'user_id',
+        'message_id',
+        'entities',
+    ];
 
     protected $casts = [
         'entities' => 'array',

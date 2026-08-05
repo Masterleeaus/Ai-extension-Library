@@ -9,6 +9,20 @@ use Illuminate\Database\Eloquent\Model;
 final class GovernedMemory extends Model
 {
     protected $table = 'titan_ai_governed_memories';
-    protected $guarded = [];
-    protected $casts = ['payload'=>'array','metadata'=>'array','approved_at'=>'datetime','expires_at'=>'datetime','last_reinforced_at'=>'datetime'];
+
+    protected $fillable = [
+        'payload',
+        'metadata',
+        'approved_at',
+        'expires_at',
+        'last_reinforced_at',
+    ];
+
+    protected $casts = [
+        'payload' => 'array',
+        'metadata' => 'array',
+        'approved_at' => 'datetime',
+        'expires_at' => 'datetime',
+        'last_reinforced_at' => 'datetime',
+    ];
 }

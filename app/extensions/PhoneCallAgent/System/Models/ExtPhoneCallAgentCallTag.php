@@ -11,7 +11,11 @@ class ExtPhoneCallAgentCallTag extends Model
 {
     protected $table = 'ext_phone_call_agent_call_tags';
 
-    protected $guarded = [];
+    protected $fillable = [
+        'name',
+        'description',
+        'color',
+    ];
 
     public function calls(): BelongsToMany
     {
