@@ -1,0 +1,44 @@
+name: Vertical AI Proposal Boundary Diagnostic
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/vertical-ai-proposal-bridge
+
+      - name: Locate AI service and provider contracts
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo '===== AI SERVICE MATCHES ====='
+          grep -RIl --exclude-dir=.git --exclude='*.map' -E 'AIServiceInterface|interface[[:space:]]+AIService|class[[:space:]].*AI.*Provider|ProviderRegistry|ModelProvider' app packages foundation 2>/dev/null | sort | head -120 || true
+
+          echo '===== LIKELY CONTRACT SOURCES ====='
+          while IFS= read -r file; do
+            echo "--- ${file} ---"
+            sed -n '1,260p' "$file"
+          done < <(
+            grep -RIl --exclude-dir=.git --exclude='*.map' -E 'AIServiceInterface|interface[[:space:]]+AIService' app packages foundation 2>/dev/null | sort | head -20
+          )
+
+          echo '===== PROVIDER SELECTION SOURCES ====='
+          while IFS= read -r file; do
+            echo "--- ${file} ---"
+            sed -n '1,220p' "$file"
+          done < <(
+            grep -RIl --exclude-dir=.git --exclude='*.map' -E 'ProviderRegistry|provider.*model|model.*provider|default_provider|ai_provider' app packages foundation 2>/dev/null | sort | grep -E '\.(php|json)$' | head -25
+          )
+
+          echo '===== STRUCTURED OUTPUT PATTERNS ====='
+          grep -RIn --exclude-dir=.git --exclude='*.map' -E 'JSON_THROW_ON_ERROR|json_schema|response_format|structured.*output|schema.*validation' app packages foundation 2>/dev/null | head -120 || true
