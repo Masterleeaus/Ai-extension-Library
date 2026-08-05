@@ -23,6 +23,21 @@ on:
   pull_request:
     branches:
       - main
+    paths:
+      - .github/workflows/materialize-ai-extensions.yml
+      - scripts/restore_extensions.py
+      - scripts/apply_ecommerce_overlay.py
+      - scripts/apply_chatbot_embedding_scope_patch.py
+      - scripts/package_titanai_hybrid.py
+      - scripts/tests/test_package_titanai_hybrid.py
+      - scripts/apply_interaction_engine_packages.py
+      - scripts/verify_interaction_engine_architecture.py
+      - transport/dataset-manifest.json
+      - transport/pass3-overlay-manifest.json
+      - transport/ecommerce-overlay-manifest.json
+      - transport/interaction-engine-packages-manifest.json
+      - extensions/**
+      - packages/**
     types: [opened, synchronize, reopened]
   workflow_dispatch:
 
