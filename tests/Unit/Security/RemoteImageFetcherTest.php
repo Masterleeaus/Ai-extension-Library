@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use App\Services\Security\RemoteImageFetcher;
-use RuntimeException;
 
 function remoteImageFetcher(): RemoteImageFetcher
 {
@@ -12,22 +11,22 @@ function remoteImageFetcher(): RemoteImageFetcher
 
 test('remote image downloads require HTTPS', function (): void {
     expect(fn () => remoteImageFetcher()->resolveTarget('http://example.com/image.png'))
-        ->toThrow(RuntimeException::class);
+        ->toThrow(\RuntimeException::class);
 });
 
 test('remote image downloads reject URL credentials', function (): void {
     expect(fn () => remoteImageFetcher()->resolveTarget('https://user:secret@example.com/image.png'))
-        ->toThrow(RuntimeException::class);
+        ->toThrow(\RuntimeException::class);
 });
 
 test('remote image downloads reject non-standard ports', function (): void {
     expect(fn () => remoteImageFetcher()->resolveTarget('https://example.com:8443/image.png'))
-        ->toThrow(RuntimeException::class);
+        ->toThrow(\RuntimeException::class);
 });
 
 test('remote image downloads reject private and reserved IPv4 targets', function (string $url): void {
     expect(fn () => remoteImageFetcher()->resolveTarget($url))
-        ->toThrow(RuntimeException::class);
+        ->toThrow(\RuntimeException::class);
 })->with([
     'loopback' => 'https://127.0.0.1/image.png',
     'private class A' => 'https://10.0.0.1/image.png',
@@ -40,7 +39,7 @@ test('remote image downloads reject private and reserved IPv4 targets', function
 
 test('remote image downloads reject local and reserved IPv6 targets', function (string $url): void {
     expect(fn () => remoteImageFetcher()->resolveTarget($url))
-        ->toThrow(RuntimeException::class);
+        ->toThrow(\RuntimeException::class);
 })->with([
     'loopback' => 'https://[::1]/image.png',
     'unique local' => 'https://[fc00::1]/image.png',
@@ -50,7 +49,7 @@ test('remote image downloads reject local and reserved IPv6 targets', function (
 
 test('remote image downloads reject local hostnames', function (): void {
     expect(fn () => remoteImageFetcher()->resolveTarget('https://localhost/image.png'))
-        ->toThrow(RuntimeException::class);
+        ->toThrow(\RuntimeException::class);
 });
 
 test('a public HTTPS IP can pass URL policy without making a request', function (): void {
