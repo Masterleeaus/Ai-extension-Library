@@ -22,7 +22,7 @@ class SocialMediaPlatformController extends Controller
         $user = Auth::user();
 
         return view('social-media::platforms', [
-            'platforms'     => PlatformEnum::all(),
+            'platforms'     => PlatformEnum::channels(),
             'userPlatforms' => SocialMediaPlatform::query()
                 ->when(request('active') === 'on', function ($query) {
                     return $query->where('expires_at', '>', now());
