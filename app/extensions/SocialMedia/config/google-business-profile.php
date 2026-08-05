@@ -29,7 +29,7 @@ return [
             'class_session_offer',
             'booking_offer',
         ],
-        'required_fields' => ['content', 'location_name'],
+        'required_fields' => ['content', 'location'],
         'media_rules' => [
             'images' => true,
             'videos' => false,
