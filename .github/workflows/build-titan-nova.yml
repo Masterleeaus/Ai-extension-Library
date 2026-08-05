@@ -1,0 +1,59 @@
+name: Build Titan Nova integrated extension
+
+on:
+  push:
+    branches:
+      - feature/titan-nova-integrated-build
+    paths:
+      - scripts/build_titan_nova_integrated.py
+      - .github/workflows/build-titan-nova.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: titan-nova-integrated-build-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  materialise:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: none
+      - name: Materialise Titan Nova from BlogPilot donor
+        run: python scripts/build_titan_nova_integrated.py
+      - name: Validate JSON
+        run: |
+          python -m json.tool app/extensions/TitanNova/extension.json >/dev/null
+          python -m json.tool app/extensions/Chatbot/resources/titan-apps/TemplateSchemas/index.json >/dev/null
+          python -m json.tool app/extensions/Chatbot/resources/titan-apps/TemplateSchemas/titan-nova-operator.json >/dev/null
+      - name: PHP syntax verification
+        run: |
+          find app/extensions/TitanNova -type f -name '*.php' -print0 | xargs -0 -n1 php -l >/tmp/titan-nova-php-lint.log
+          echo "PHP linted $(wc -l </tmp/titan-nova-php-lint.log) files"
+      - name: Run Titan Nova extension verifier
+        run: php app/extensions/TitanNova/tests/titan_nova_verify.php
+      - name: Commit generated integration
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add app/extensions/TitanNova app/Domains/Marketplace/MarketplaceServiceProvider.php \
+            app/extensions/Chatbot/resources/titan-apps/TemplateSchemas/index.json \
+            app/extensions/Chatbot/resources/titan-apps/TemplateSchemas/legacy-index-v1.json \
+            app/extensions/Chatbot/resources/titan-apps/TemplateSchemas/titan-nova-operator.json \
+            docs/titan-nova
+          if git diff --cached --quiet; then
+            echo "No generated changes"
+          else
+            git commit -m "feat: materialise Titan Nova extension and operator PWA"
+            git push origin HEAD:${{ github.ref_name }}
+          fi
