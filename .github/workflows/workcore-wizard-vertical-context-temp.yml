@@ -44,7 +44,8 @@ jobs:
           php packages/titan-interaction-engine/bin/verify.php
 
       - name: Run WorkCore Platform contract suite
-        run: python -m unittest discover app/extensions/WorkCore_Platform/tests -p 'test_*.py' -v
+        working-directory: app/extensions/WorkCore_Platform
+        run: python -m unittest discover tests -p 'test_*.py' -v
 
       - name: Lint focused test and implementation
         run: |
