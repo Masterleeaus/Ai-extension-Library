@@ -6,6 +6,7 @@ namespace Foundation\Implementations;
 
 use Foundation\Contracts\RateLimitingContract;
 use PDO;
+use Foundation\Support\JsonHelper;
 
 class RateLimiting implements RateLimitingContract
 {
@@ -63,7 +64,7 @@ class RateLimiting implements RateLimitingContract
             return PHP_INT_MAX;
         }
 
-        $limits = json_decode($policy['limits'], true);
+        $limits = JsonHelper::decode($policy['limits']);
         $limit = $limits['limit'] ?? 100;
         $windowSeconds = $limits['window_seconds'] ?? 60;
 
@@ -121,7 +122,7 @@ class RateLimiting implements RateLimitingContract
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($result) {
-            $result['limits'] = json_decode($result['limits'], true);
+            $result['limits'] = JsonHelper::decode($result['limits']);
         }
 
         return $result ?: null;

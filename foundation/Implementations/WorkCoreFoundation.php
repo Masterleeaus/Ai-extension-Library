@@ -6,6 +6,7 @@ namespace Foundation\Implementations;
 
 use Foundation\Contracts\WorkCoreFoundationContract;
 use PDO;
+use Foundation\Support\JsonHelper;
 
 class WorkCoreFoundation implements WorkCoreFoundationContract
 {
@@ -50,7 +51,7 @@ class WorkCoreFoundation implements WorkCoreFoundationContract
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($result) {
-            return json_decode($result['config'], true);
+            return JsonHelper::decode($result['config']);
         }
 
         return null;

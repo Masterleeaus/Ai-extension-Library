@@ -6,6 +6,7 @@ namespace Foundation\Implementations;
 
 use Foundation\Contracts\ShadowValidationContract;
 use PDO;
+use Foundation\Support\JsonHelper;
 
 class ShadowValidation implements ShadowValidationContract
 {
@@ -55,7 +56,7 @@ class ShadowValidation implements ShadowValidationContract
             return ['valid' => false, 'errors' => ['Validation not found']];
         }
 
-        $rules = json_decode($validation['rules'], true);
+        $rules = JsonHelper::decode($validation['rules']);
         $errors = [];
 
         foreach ($rules as $rule) {
@@ -116,7 +117,7 @@ class ShadowValidation implements ShadowValidationContract
         $validation = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($validation) {
-            $validation['rules'] = json_decode($validation['rules'], true);
+            $validation['rules'] = JsonHelper::decode($validation['rules']);
         }
 
         return $validation ?: null;
@@ -177,7 +178,7 @@ class ShadowValidation implements ShadowValidationContract
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         foreach ($results as &$result) {
-            $result['details'] = json_decode($result['details'], true);
+            $result['details'] = JsonHelper::decode($result['details']);
         }
 
         return $results;

@@ -5,16 +5,22 @@ declare(strict_types=1);
 namespace Foundation\Implementations;
 
 use Foundation\Contracts\ExtensionLifecycleContract;
+use Foundation\Support\InputValidator;
+use Foundation\Support\ValidationException;
+use Foundation\Support\TransactionHelper;
 use PDO;
+use Foundation\Support\JsonHelper;
 
 class ExtensionLifecycle implements ExtensionLifecycleContract
 {
     private PDO $db;
     private string $tablePrefix = 'extension_lifecycle_';
+    private TransactionHelper $transactions;
 
-    public function __construct(PDO $db)
+    public function __construct(PDO $db, ?TransactionHelper $transactions = null)
     {
         $this->db = $db;
+        $this->transactions = $transactions ?? new TransactionHelper($db);
     }
 
     public function registerExtension(
@@ -22,6 +28,11 @@ class ExtensionLifecycle implements ExtensionLifecycleContract
         string $extensionName,
         array $extensionMetadata
     ): string {
+        // Validate inputs
+        InputValidator::validateTenantId($tenantId);
+        InputValidator::validateNonEmptyString($extensionName, 'extensionName', 255);
+        InputValidator::validateArray($extensionMetadata, 'extensionMetadata', false, 1000);
+
         $extensionId = bin2hex(random_bytes(16));
 
         $stmt = $this->db->prepare(
@@ -53,7 +64,7 @@ class ExtensionLifecycle implements ExtensionLifecycleContract
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($result) {
-            $result['metadata'] = json_decode($result['metadata'], true);
+            $result['metadata'] = JsonHelper::decode($result['metadata']);
         }
 
         return $result ?: null;

@@ -6,6 +6,7 @@ namespace Foundation\Implementations;
 
 use Foundation\Contracts\FormsBuilderContract;
 use PDO;
+use Foundation\Support\JsonHelper;
 
 class FormsBuilder implements FormsBuilderContract
 {
@@ -52,7 +53,7 @@ class FormsBuilder implements FormsBuilderContract
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($result) {
-            $result['schema'] = json_decode($result['schema'], true);
+            $result['schema'] = JsonHelper::decode($result['schema']);
         }
 
         return $result ?: null;

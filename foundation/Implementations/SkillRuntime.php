@@ -6,6 +6,7 @@ namespace Foundation\Implementations;
 
 use Foundation\Contracts\SkillRuntimeContract;
 use PDO;
+use Foundation\Support\JsonHelper;
 
 class SkillRuntime implements SkillRuntimeContract
 {
@@ -78,7 +79,7 @@ class SkillRuntime implements SkillRuntimeContract
 
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
         if ($result) {
-            $result['metadata'] = json_decode($result['metadata'], true);
+            $result['metadata'] = JsonHelper::decode($result['metadata']);
         }
 
         return $result ?: null;

@@ -6,6 +6,7 @@ namespace Foundation\Implementations;
 
 use Foundation\Contracts\WorkflowEngineContract;
 use PDO;
+use Foundation\Support\JsonHelper;
 
 class WorkflowEngine implements WorkflowEngineContract
 {
@@ -78,7 +79,7 @@ class WorkflowEngine implements WorkflowEngineContract
         $execution = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($execution) {
-            $execution['input'] = json_decode($execution['input'], true);
+            $execution['input'] = JsonHelper::decode($execution['input']);
 
             $stepStmt = $this->db->prepare(
                 "SELECT * FROM {$this->tablePrefix}execution_steps WHERE execution_id = ? ORDER BY step_order ASC"
@@ -88,8 +89,8 @@ class WorkflowEngine implements WorkflowEngineContract
             $execution['steps'] = $stepStmt->fetchAll(PDO::FETCH_ASSOC);
 
             foreach ($execution['steps'] as &$step) {
-                $step['input'] = json_decode($step['input'], true);
-                $step['output'] = $step['output'] ? json_decode($step['output'], true) : null;
+                $step['input'] = JsonHelper::decode($step['input']);
+                $step['output'] = $step['output'] ? JsonHelper::decode($step['output']) : null;
             }
         }
 
@@ -143,8 +144,8 @@ class WorkflowEngine implements WorkflowEngineContract
         $step = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($step) {
-            $step['input'] = json_decode($step['input'], true);
-            $step['output'] = $step['output'] ? json_decode($step['output'], true) : null;
+            $step['input'] = JsonHelper::decode($step['input']);
+            $step['output'] = $step['output'] ? JsonHelper::decode($step['output']) : null;
         }
 
         return $step ?: null;

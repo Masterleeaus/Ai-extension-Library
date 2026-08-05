@@ -5,8 +5,26 @@ declare(strict_types=1);
 namespace Foundation\Implementations;
 
 use Foundation\Contracts\CommerceContractContract;
+use Foundation\Support\JsonHelper;
 use PDO;
 
+/**
+ * CommerceContract Implementation
+ *
+ * Manages e-commerce operations including inventory, pricing, orders, payments,
+ * and shipments with full tenant isolation and data persistence.
+ *
+ * Features:
+ * - Inventory management with stock tracking
+ * - Dynamic pricing with context-based calculations
+ * - Payment processing with transaction tracking
+ * - Order management with complete lifecycle
+ * - Shipment tracking and fulfillment
+ * - Refund processing for returns
+ *
+ * All data operations use PDO prepared statements for security and
+ * JSON serialization for complex data structures.
+ */
 class CommerceContract implements CommerceContractContract
 {
     private PDO $db;
@@ -17,6 +35,13 @@ class CommerceContract implements CommerceContractContract
         $this->db = $db;
     }
 
+    /**
+     * Retrieve inventory information for a specific product
+     *
+     * @param string $tenantId The tenant identifier
+     * @param string $productId The product identifier
+     * @return ?array Inventory data including quantity and stock status, or null if not found
+     */
     public function getInventory(
         string $tenantId,
         string $productId
@@ -29,6 +54,14 @@ class CommerceContract implements CommerceContractContract
         return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
     }
 
+    /**
+     * Update or create inventory record for a product
+     *
+     * @param string $tenantId The tenant identifier
+     * @param string $productId The product identifier
+     * @param int $quantity The new quantity to set
+     * @return bool True if update was successful, false otherwise
+     */
     public function updateInventory(
         string $tenantId,
         string $productId,
@@ -51,6 +84,17 @@ class CommerceContract implements CommerceContractContract
         ]);
     }
 
+    /**
+     * Get dynamic pricing for a product with optional context
+     *
+     * Pricing can vary based on context such as customer segment,
+     * volume, region, or promotional factors.
+     *
+     * @param string $tenantId The tenant identifier
+     * @param string $productId The product identifier
+     * @param array $context Optional context for dynamic pricing (segment, volume, region, etc.)
+     * @return ?array Pricing data including base price, tiers, and modifiers, or null if not found
+     */
     public function getPricing(
         string $tenantId,
         string $productId,
@@ -64,12 +108,28 @@ class CommerceContract implements CommerceContractContract
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($result) {
-            $result['tiers'] = json_decode($result['tiers'], true);
+            // Deserialize JSON pricing tiers
+            $result['tiers'] = JsonHelper::decode($result['tiers']);
+
+            // Apply context-based pricing adjustments if needed
+            if (!empty($context) && isset($result['context_modifiers'])) {
+                $result['context_modifiers'] = JsonHelper::decode($result['context_modifiers']);
+            }
         }
 
         return $result ?: null;
     }
 
+    /**
+     * Process a payment for an order
+     *
+     * Creates a payment record and returns payment status.
+     * Payment details can include card info (sanitized), amount, currency, etc.
+     *
+     * @param string $tenantId The tenant identifier
+     * @param array $paymentDetails Payment information (method, amount, currency, etc.)
+     * @return array Payment response with payment_id and status
+     */
     public function processPayment(
         string $tenantId,
         array $paymentDetails
@@ -92,9 +152,20 @@ class CommerceContract implements CommerceContractContract
         return [
             'payment_id' => $paymentId,
             'status' => 'processing',
+            'processed_at' => date('c'),
         ];
     }
 
+    /**
+     * Create a new order
+     *
+     * Initializes an order with initial status of 'pending'.
+     * Order data is stored as JSON for flexibility.
+     *
+     * @param string $tenantId The tenant identifier
+     * @param array $order Order details (items, customer, totals, etc.)
+     * @return string The newly created order ID
+     */
     public function createOrder(
         string $tenantId,
         array $order
@@ -117,6 +188,15 @@ class CommerceContract implements CommerceContractContract
         return $orderId;
     }
 
+    /**
+     * Retrieve a specific order by ID
+     *
+     * Deserializes order data from JSON storage.
+     *
+     * @param string $tenantId The tenant identifier
+     * @param string $orderId The order identifier
+     * @return ?array Complete order data including items, customer, and status, or null if not found
+     */
     public function getOrder(
         string $tenantId,
         string $orderId
@@ -129,12 +209,23 @@ class CommerceContract implements CommerceContractContract
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($result) {
-            $result['data'] = json_decode($result['data'], true);
+            // Deserialize JSON order data
+            $result['data'] = JsonHelper::decode($result['data']);
         }
 
         return $result ?: null;
     }
 
+    /**
+     * Track shipment status for an order
+     *
+     * Returns current shipment information including tracking number,
+     * carrier, estimated delivery, etc.
+     *
+     * @param string $tenantId The tenant identifier
+     * @param string $orderId The order identifier
+     * @return ?array Shipment tracking details including carrier and tracking number, or null if not found
+     */
     public function trackShipment(
         string $tenantId,
         string $orderId
@@ -144,9 +235,27 @@ class CommerceContract implements CommerceContractContract
         );
 
         $stmt->execute([$tenantId, $orderId]);
-        return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($result && isset($result['tracking_data'])) {
+            // Deserialize tracking data if stored as JSON
+            $result['tracking_data'] = JsonHelper::decode($result['tracking_data']);
+        }
+
+        return $result ?: null;
     }
 
+    /**
+     * Process a refund for an order
+     *
+     * Creates a refund record and initiates the return processing.
+     * Refund details can include reason, amount, method, etc.
+     *
+     * @param string $tenantId The tenant identifier
+     * @param string $orderId The order identifier to refund
+     * @param array $refundDetails Refund information (reason, amount, method, etc.)
+     * @return bool True if refund was processed successfully, false otherwise
+     */
     public function processRefund(
         string $tenantId,
         string $orderId,

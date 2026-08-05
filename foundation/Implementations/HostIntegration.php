@@ -6,6 +6,7 @@ namespace Foundation\Implementations;
 
 use Foundation\Contracts\HostIntegrationContract;
 use PDO;
+use Foundation\Support\JsonHelper;
 
 class HostIntegration implements HostIntegrationContract
 {
@@ -77,7 +78,7 @@ class HostIntegration implements HostIntegrationContract
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($result) {
-            $result['config'] = json_decode($result['config'], true);
+            $result['config'] = JsonHelper::decode($result['config']);
         }
 
         return $result ?: null;
@@ -122,7 +123,7 @@ class HostIntegration implements HostIntegrationContract
             return ['valid' => false, 'errors' => ['Gate not found']];
         }
 
-        $config = json_decode($gate['config'], true);
+        $config = JsonHelper::decode($gate['config']);
         $errors = [];
 
         if (empty($config['approval_criteria'])) {
