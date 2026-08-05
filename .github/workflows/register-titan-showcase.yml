@@ -1,0 +1,66 @@
+name: Register Titan showcase once
+
+on:
+  push:
+    branches:
+      - issue/256-titan-native-design-system
+    paths:
+      - '.github/workflows/register-titan-showcase.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  register:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: issue/256-titan-native-design-system
+
+      - name: Register internal route and self-remove
+        run: |
+          python <<'PY'
+          from pathlib import Path
+
+          routes = Path('mobile apps/titan-hub/lib/routes/routes.dart')
+          route_text = routes.read_text()
+          route_needle = "  static const String bottomNavBarScreen = '/bottomNavBarScreen';\n"
+          route_insert = route_needle + "  static const String designSystemShowcase = '/design-system';\n"
+          if route_text.count(route_needle) != 1:
+              raise SystemExit('Expected one bottom navigation route declaration')
+          routes.write_text(route_text.replace(route_needle, route_insert, 1))
+
+          pages = Path('mobile apps/titan-hub/lib/routes/route_pages.dart')
+          page_text = pages.read_text()
+          import_needle = "import 'package:qrpay/routes/routes.dart';\n"
+          import_insert = import_needle + "import 'package:qrpay/features/design_system/titan_design_system_showcase.dart';\n"
+          if page_text.count(import_needle) != 1:
+              raise SystemExit('Expected one routes import')
+          page_text = page_text.replace(import_needle, import_insert, 1)
+
+          page_needle = """    GetPage(
+              name: Routes.bottomNavBarScreen,
+              page: () => const BottomNavBarScreen(),
+              binding: InitialScreenBindings(),
+            ),
+          """
+          page_insert = page_needle + """    GetPage(
+              name: Routes.designSystemShowcase,
+              page: () => const TitanDesignSystemShowcase(),
+            ),
+          """
+          if page_text.count(page_needle) != 1:
+              raise SystemExit('Expected one bottom navigation GetPage')
+          pages.write_text(page_text.replace(page_needle, page_insert, 1))
+          PY
+          rm .github/workflows/register-titan-showcase.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- \
+            'mobile apps/titan-hub/lib/routes/routes.dart' \
+            'mobile apps/titan-hub/lib/routes/route_pages.dart' \
+            .github/workflows/register-titan-showcase.yml
+          git commit -m "feat(titan-hub): register internal design system route"
+          git push origin HEAD:issue/256-titan-native-design-system
