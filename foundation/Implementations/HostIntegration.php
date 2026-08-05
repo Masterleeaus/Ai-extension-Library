@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Foundation\Implementations;
 
 use Foundation\Contracts\HostIntegrationContract;
+use Foundation\Support\TransactionHelper;
 use PDO;
 use Foundation\Support\JsonHelper;
 
@@ -12,10 +13,12 @@ class HostIntegration implements HostIntegrationContract
 {
     private PDO $db;
     private string $tablePrefix = 'host_integration_';
+    private TransactionHelper $transactions;
 
-    public function __construct(PDO $db)
+    public function __construct(PDO $db, ?TransactionHelper $transactions = null)
     {
         $this->db = $db;
+        $this->transactions = $transactions ?? new TransactionHelper($db);
     }
 
     public function registerDeploymentTarget(
@@ -36,7 +39,7 @@ class HostIntegration implements HostIntegrationContract
             $hostEnvironment,
             json_encode($hostConfig),
             'active',
-            date('c'),
+            gmdate('c'),
         ]);
 
         return $deploymentId;
@@ -49,21 +52,39 @@ class HostIntegration implements HostIntegrationContract
     ): string {
         $releaseId = bin2hex(random_bytes(16));
 
-        $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}deployments (id, tenant_id, deployment_target_id, config, status, deployed_at)
-             VALUES (?, ?, ?, ?, ?, ?)"
+        return $this->transactions->executeInTransaction(
+            function (PDO $db) use ($releaseId, $tenantId, $deploymentId, $releaseConfig) {
+                // Insert deployment record
+                $stmt = $db->prepare(
+                    "INSERT INTO {$this->tablePrefix}deployments (id, tenant_id, deployment_target_id, config, status, deployed_at)
+                     VALUES (?, ?, ?, ?, ?, ?)"
+                );
+
+                if (!$stmt->execute([
+                    $releaseId,
+                    $tenantId,
+                    $deploymentId,
+                    json_encode($releaseConfig),
+                    'in_progress',
+                    gmdate('c'),
+                ])) {
+                    throw new \Exception('Failed to insert deployment record');
+                }
+
+                // Update deployment target status
+                $updateStmt = $db->prepare(
+                    "UPDATE {$this->tablePrefix}deployment_targets SET status = ? WHERE id = ? AND tenant_id = ?"
+                );
+
+                if (!$updateStmt->execute(['in_use', $deploymentId, $tenantId])) {
+                    throw new \Exception('Failed to update deployment target status');
+                }
+
+                return $releaseId;
+            },
+            'deployToHost',
+            ['deployment_id' => $deploymentId]
         );
-
-        $stmt->execute([
-            $releaseId,
-            $tenantId,
-            $deploymentId,
-            json_encode($releaseConfig),
-            'in_progress',
-            date('c'),
-        ]);
-
-        return $releaseId;
     }
 
     public function getDeploymentStatus(
@@ -102,7 +123,7 @@ class HostIntegration implements HostIntegrationContract
             $deploymentId,
             json_encode($gateConfig),
             'pending',
-            date('c'),
+            gmdate('c'),
         ]);
 
         return $gateId;
@@ -142,32 +163,81 @@ class HostIntegration implements HostIntegrationContract
         string $gateId,
         string $approver
     ): bool {
-        $stmt = $this->db->prepare(
-            "UPDATE {$this->tablePrefix}pilot_gates SET status = ?, approver_id = ?, approved_at = ? WHERE id = ? AND tenant_id = ?"
-        );
+        return $this->transactions->executeInTransaction(
+            function (PDO $db) use ($tenantId, $gateId, $approver) {
+                // Update pilot gate approval
+                $stmt = $db->prepare(
+                    "UPDATE {$this->tablePrefix}pilot_gates SET status = ?, approver_id = ?, approved_at = ? WHERE id = ? AND tenant_id = ?"
+                );
 
-        return $stmt->execute(['approved', $approver, date('c'), $gateId, $tenantId]);
+                if (!$stmt->execute(['approved', $approver, gmdate('c'), $gateId, $tenantId])) {
+                    throw new \Exception('Failed to approve pilot gate');
+                }
+
+                // Update associated deployment status to ready for rollout
+                $gateStmt = $db->prepare(
+                    "SELECT deployment_id FROM {$this->tablePrefix}pilot_gates WHERE id = ? AND tenant_id = ?"
+                );
+
+                $gateStmt->execute([$gateId, $tenantId]);
+                $gate = $gateStmt->fetch(PDO::FETCH_ASSOC);
+
+                if ($gate) {
+                    $updateStmt = $db->prepare(
+                        "UPDATE {$this->tablePrefix}deployments SET status = ? WHERE id = ? AND tenant_id = ?"
+                    );
+
+                    if (!$updateStmt->execute(['ready_for_rollout', $gate['deployment_id'], $tenantId])) {
+                        throw new \Exception('Failed to update deployment status');
+                    }
+                }
+
+                return true;
+            },
+            'approvePilotGate',
+            ['gate_id' => $gateId]
+        );
     }
 
     public function rolloutRelease(
         string $tenantId,
         string $deploymentId
     ): bool {
-        $stmt = $this->db->prepare(
-            "UPDATE {$this->tablePrefix}deployments SET status = ?, rolled_out_at = ? WHERE id = ? AND tenant_id = ?"
-        );
+        return $this->transactions->executeInTransaction(
+            function (PDO $db) use ($tenantId, $deploymentId) {
+                $stmt = $db->prepare(
+                    "UPDATE {$this->tablePrefix}deployments SET status = ?, rolled_out_at = ? WHERE id = ? AND tenant_id = ?"
+                );
 
-        return $stmt->execute(['rolled_out', date('c'), $deploymentId, $tenantId]);
+                if (!$stmt->execute(['rolled_out', gmdate('c'), $deploymentId, $tenantId])) {
+                    throw new \Exception('Failed to rollout release');
+                }
+
+                return true;
+            },
+            'rolloutRelease',
+            ['deployment_id' => $deploymentId]
+        );
     }
 
     public function rollbackDeployment(
         string $tenantId,
         string $deploymentId
     ): bool {
-        $stmt = $this->db->prepare(
-            "UPDATE {$this->tablePrefix}deployments SET status = ?, rolled_back_at = ? WHERE id = ? AND tenant_id = ?"
-        );
+        return $this->transactions->executeInTransaction(
+            function (PDO $db) use ($tenantId, $deploymentId) {
+                $stmt = $db->prepare(
+                    "UPDATE {$this->tablePrefix}deployments SET status = ?, rolled_back_at = ? WHERE id = ? AND tenant_id = ?"
+                );
 
-        return $stmt->execute(['rolled_back', date('c'), $deploymentId, $tenantId]);
+                if (!$stmt->execute(['rolled_back', gmdate('c'), $deploymentId, $tenantId])) {
+                    throw new \Exception('Failed to rollback deployment');
+                }
+
+                return true;
+            },
+            'rollbackDeployment',
+            ['deployment_id' => $deploymentId]
+        );
     }
 }
