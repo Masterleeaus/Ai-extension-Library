@@ -49,61 +49,111 @@ class TitanListTile extends StatelessWidget {
           horizontal: TitanSpacing.lg,
           vertical: TitanSpacing.md,
         ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            if (leading != null) ...[
-              IconTheme.merge(
-                data: IconThemeData(color: titleColor),
-                child: leading!,
-              ),
-              const SizedBox(width: TitanSpacing.md),
-            ],
-            Expanded(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final copy = Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    color: titleColor,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                if (subtitle != null) ...[
+                  const SizedBox(height: TitanSpacing.xs),
                   Text(
-                    title,
-                    style: theme.textTheme.bodyLarge?.copyWith(
-                      color: titleColor,
-                      fontWeight: FontWeight.w600,
+                    subtitle!,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
                     ),
                   ),
-                  if (subtitle != null) ...[
-                    const SizedBox(height: TitanSpacing.xs),
-                    Text(
-                      subtitle!,
-                      style: theme.textTheme.bodyMedium?.copyWith(
+                ],
+              ],
+            );
+            final trailingWidget = trailing ??
+                (effectiveTap == null ? null : const Icon(Icons.chevron_right));
+            final compact = constraints.maxWidth < 360 &&
+                (metadata != null || badge != null);
+
+            if (compact) {
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      if (leading != null) ...[
+                        IconTheme.merge(
+                          data: IconThemeData(color: titleColor),
+                          child: leading!,
+                        ),
+                        const SizedBox(width: TitanSpacing.md),
+                      ],
+                      Expanded(child: copy),
+                      if (trailingWidget != null) ...[
+                        const SizedBox(width: TitanSpacing.sm),
+                        trailingWidget,
+                      ],
+                    ],
+                  ),
+                  const SizedBox(height: TitanSpacing.md),
+                  Wrap(
+                    spacing: TitanSpacing.md,
+                    runSpacing: TitanSpacing.sm,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: [
+                      if (metadata != null)
+                        Text(
+                          metadata!,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      if (badge != null) badge!,
+                    ],
+                  ),
+                ],
+              );
+            }
+
+            return Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                if (leading != null) ...[
+                  IconTheme.merge(
+                    data: IconThemeData(color: titleColor),
+                    child: leading!,
+                  ),
+                  const SizedBox(width: TitanSpacing.md),
+                ],
+                Expanded(child: copy),
+                if (metadata != null) ...[
+                  const SizedBox(width: TitanSpacing.md),
+                  Flexible(
+                    child: Text(
+                      metadata!,
+                      textAlign: TextAlign.end,
+                      style: theme.textTheme.bodySmall?.copyWith(
                         color: theme.colorScheme.onSurfaceVariant,
                       ),
                     ),
-                  ],
+                  ),
                 ],
-              ),
-            ),
-            if (metadata != null) ...[
-              const SizedBox(width: TitanSpacing.md),
-              Text(
-                metadata!,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
-                ),
-              ),
-            ],
-            if (badge != null) ...[
-              const SizedBox(width: TitanSpacing.md),
-              badge!,
-            ],
-            if (trailing != null) ...[
-              const SizedBox(width: TitanSpacing.sm),
-              trailing!,
-            ] else if (effectiveTap != null) ...[
-              const SizedBox(width: TitanSpacing.sm),
-              const Icon(Icons.chevron_right),
-            ],
-          ],
+                if (badge != null) ...[
+                  const SizedBox(width: TitanSpacing.md),
+                  badge!,
+                ],
+                if (trailingWidget != null) ...[
+                  const SizedBox(width: TitanSpacing.sm),
+                  trailingWidget,
+                ],
+              ],
+            );
+          },
         ),
       ),
     );
