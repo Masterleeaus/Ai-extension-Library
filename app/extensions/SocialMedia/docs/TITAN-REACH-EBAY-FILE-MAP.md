@@ -17,9 +17,12 @@ The eBay integration reuses `SocialMediaPlatform` for connected seller accounts 
 
 ## Existing files edited
 
-- `System/Enums/PlatformEnum.php`: adds the eBay channel and native settings fields.
-- `System/SocialMediaServiceProvider.php`: merges the eBay config and adds OAuth/listing routes.
+- `System/Enums/PlatformEnum.php`: adds eBay as a connected channel while retaining `all()` for social-only post destinations and adding `channels()` for the wider connection catalogue.
+- `System/Http/Controllers/SocialMediaPlatformController.php`: switches the existing Channels page to `PlatformEnum::channels()`.
+- `System/Http/Controllers/SocialMediaSettingController.php`: exposes eBay keys through the existing native settings page.
+- `System/SocialMediaServiceProvider.php`: merges the eBay config, activates the eBay capability declaration, and adds OAuth/listing routes.
 - `resources/views/platforms/platform-cards.blade.php`: keeps the existing native card and adds a generic initials fallback when a provider icon is absent.
+- `resources/views/components/create-post-dropdown.blade.php`: explicitly keeps marketplace channels out of the social-post composer.
 
 ## Data authority and safety boundaries
 
@@ -29,10 +32,11 @@ The eBay integration reuses `SocialMediaPlatform` for connected seller accounts 
 - User OAuth consent is required; Titan Reach does not collect eBay usernames or passwords.
 - Inventory item revisions send a complete replacement payload.
 - Publishing, revisions and withdrawals require an approved `DistributionItem` and a connected, entitled eBay channel owned by the same tenant.
-- Provider operations use explicit idempotency keys and append immutable audit snapshots.
+- Provider operations require explicit idempotency keys, use a per-item distributed mutation lock, and append immutable audit snapshots.
+- Bounded retries are limited to eBay rate-limit and transient server responses.
 - Buyer questions are handed to a human workflow; this issue does not impersonate the seller or send automated buyer messages.
 - No new user-facing Blade page is introduced. The universal Listings UI remains issue #274.
 
 ## Live validation boundary
 
-The implementation is Sandbox-ready and contract-verified. A real Sandbox seller, eBay application keyset, RuName redirect value, business policies and inventory location are required for live provider validation.
+The implementation is Sandbox-ready and source-contract verified. A real Sandbox seller, eBay application keyset, RuName redirect value, business policies and inventory location are required for live provider validation. Full Laravel commands (`composer install`, migrations, route listing and PHPUnit) remain blocked in this connector-only runtime because the repository cannot be cloned into the execution container.
