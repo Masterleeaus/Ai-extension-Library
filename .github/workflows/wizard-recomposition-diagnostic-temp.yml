@@ -1,0 +1,40 @@
+name: Wizard Recomposition Boundary Diagnostic
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/wizard-answer-recomposition
+
+      - name: Inspect canonical wizard answer lifecycle
+        shell: bash
+        run: |
+          set -euo pipefail
+          root='app/extensions/WorkCore_Platform/packages/workcore-business-network/src/Domains/WorkCore/System/Modules/Wizards'
+          echo '===== WIZARD FILES ====='
+          find "$root" -type f -name '*.php' | sort
+
+          echo '===== ANSWER PERSISTENCE MATCHES ====='
+          grep -RIn -E 'answer|answers|upsert|insert|updateOrCreate|revision|approved|dispatch\(' "$root" | head -260 || true
+
+          echo '===== LIKELY WRITE SERVICES ====='
+          while IFS= read -r file; do
+            echo "--- ${file} ---"
+            sed -n '1,320p' "$file"
+          done < <(
+            grep -RIl -E 'updateOrCreate|upsert|insertGetId|workcore_wizard_answers|wizard_answers' "$root" | sort | head -25
+          )
+
+          echo '===== DEPENDENCY METADATA ====='
+          grep -RIn -E 'depends_on|dependencies|affects|sections|question' "$root" app/extensions/WorkCore_Platform/packages/workcore-business-network/resources 2>/dev/null | head -260 || true
