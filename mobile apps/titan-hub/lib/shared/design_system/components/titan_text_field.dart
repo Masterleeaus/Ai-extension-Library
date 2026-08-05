@@ -109,7 +109,8 @@ class _TitanTextFieldState extends State<TitanTextField> {
     final border = widget.variant == TitanTextFieldVariant.basic
         ? const UnderlineInputBorder()
         : const OutlineInputBorder();
-    final preserveHelper = widget.helperText != null && widget.errorText != null;
+    final preserveHelper =
+        widget.helperText != null && widget.errorText != null;
     final field = TextField(
       controller: widget.controller,
       enabled: widget.enabled,
