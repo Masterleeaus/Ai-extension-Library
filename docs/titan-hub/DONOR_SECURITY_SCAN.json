@@ -1,0 +1,733 @@
+{
+  "issue": 254,
+  "generated_at": "2026-08-05T21:10:00+10:00",
+  "archive_verification": [
+    {
+      "name": "qrpay-user-app-new-v5.1.0(1).zip",
+      "version": "5.1.0",
+      "target": "mobile apps/titan-hub/",
+      "sha256": "77d00027b7771e219ac1a74fbea4b7e1029e905d36afe3fcb97d1b2f557f6ec8"
+    },
+    {
+      "name": "qrpay-web-new-file-v5.1.0(1).zip",
+      "version": "5.1.0",
+      "target": "integrations/qrpay-web/",
+      "sha256": "412765575258c3c17f9da652d225306b5cbab3cd69f4953b65e02a4980693037"
+    },
+    {
+      "name": "themeforest-mobilekit-bootstrap-4-based-mobile-ui-kit-template.zip",
+      "version": "2.9.1",
+      "target": "mobile apps/mobilekit-reference/",
+      "sha256": "a2f9bda06a35a2d82217692bdff736a8b901cef795422fc98f5816f667c6a736"
+    }
+  ],
+  "targets": {
+    "flutter": "mobile apps/titan-hub/",
+    "laravel": "integrations/qrpay-web/",
+    "mobilekit": "mobile apps/mobilekit-reference/"
+  },
+  "removed": [
+    {
+      "path": ".DS_Store",
+      "reason": "generated/OS file: .DS_Store"
+    },
+    {
+      "path": ".env",
+      "reason": "live/demo environment with application and Pusher secrets"
+    },
+    {
+      "path": "Documentation/.DS_Store",
+      "reason": "generated/OS file: .DS_Store"
+    },
+    {
+      "path": "Documentation/assets/.DS_Store",
+      "reason": "generated/OS file: .DS_Store"
+    },
+    {
+      "path": "Documentation/assets/css/.DS_Store",
+      "reason": "generated/OS file: .DS_Store"
+    },
+    {
+      "path": "Documentation/plugin licenses/.DS_Store",
+      "reason": "generated/OS file: .DS_Store"
+    },
+    {
+      "path": "Documentation/plugin licenses/Popperjs/.DS_Store",
+      "reason": "generated/OS file: .DS_Store"
+    },
+    {
+      "path": "HTML/.DS_Store",
+      "reason": "generated/OS file: .DS_Store"
+    },
+    {
+      "path": "HTML/assets/.DS_Store",
+      "reason": "generated/OS file: .DS_Store"
+    },
+    {
+      "path": "HTML/assets/css/.DS_Store",
+      "reason": "generated/OS file: .DS_Store"
+    },
+    {
+      "path": "HTML/assets/css/inc/.DS_Store",
+      "reason": "generated/OS file: .DS_Store"
+    },
+    {
+      "path": "HTML/assets/img/.DS_Store",
+      "reason": "generated/OS file: .DS_Store"
+    },
+    {
+      "path": "HTML/assets/img/sample/.DS_Store",
+      "reason": "generated/OS file: .DS_Store"
+    },
+    {
+      "path": "HTML/assets/img/sample/photo/.DS_Store",
+      "reason": "generated/OS file: .DS_Store"
+    },
+    {
+      "path": "Source/.DS_Store",
+      "reason": "generated/OS file: .DS_Store"
+    },
+    {
+      "path": "Source/Sketch/.DS_Store",
+      "reason": "generated/OS file: .DS_Store"
+    },
+    {
+      "path": "android/app/google-services.json",
+      "reason": "donor Firebase Android configuration"
+    },
+    {
+      "path": "android/app/key.jks",
+      "reason": "credential/signing file: .jks"
+    },
+    {
+      "path": "android/key.properties",
+      "reason": "Android signing properties"
+    },
+    {
+      "path": "bootstrap/cache",
+      "reason": "generated Laravel cache"
+    },
+    {
+      "path": "ios/Runner/GoogleService-Info.plist",
+      "reason": "donor Firebase iOS configuration"
+    },
+    {
+      "path": "public/frontend/images/support-ticket/attachment",
+      "reason": "demo/user-uploaded support attachments"
+    },
+    {
+      "path": "resources/views/vendor",
+      "reason": "generated/dependency/IDE directory: vendor"
+    },
+    {
+      "path": "storage/framework/cache",
+      "reason": "generated Laravel cache"
+    },
+    {
+      "path": "storage/framework/sessions",
+      "reason": "generated Laravel sessions"
+    },
+    {
+      "path": "storage/framework/views",
+      "reason": "compiled Laravel views"
+    },
+    {
+      "path": "storage/oauth-private.key",
+      "reason": "OAuth private key"
+    },
+    {
+      "path": "storage/oauth-public.key",
+      "reason": "OAuth public key paired with removed donor private key"
+    }
+  ],
+  "rewritten": [
+    "integrations/qrpay-web/.env.example",
+    "integrations/qrpay-web/.gitignore",
+    "integrations/qrpay-web/database/seeders (15 credential-bearing seeders sanitised)",
+    "mobile apps/mobilekit-reference/.gitignore",
+    "mobile apps/titan-hub/.gitignore",
+    "mobile apps/titan-hub/lib/firebase_options.dart"
+  ],
+  "scan": {
+    "credential_findings": [],
+    "hard_coded_domains": {
+      "ckeditor.com": 203,
+      "pub.dev": 194,
+      "api.github.com": 158,
+      "packagist.org": 158,
+      "symfony.com": 87,
+      "tidelift.com": 53,
+      "purl.org": 20,
+      "appdevs.cloud": 16,
+      "fontawesome.com": 16,
+      "js.pusher.com": 14,
+      "richtexteditor.com": 14,
+      "creativecommons.org": 10,
+      "popper.js.org": 10,
+      "fonts.gstatic.com": 9,
+      "www.apple.com": 8,
+      "www.patreon.com": 8,
+      "www.php-fig.org": 8,
+      "opensource.org": 6,
+      "rawgit.com": 6,
+      "www.doctrine-project.org": 6,
+      "developers.google.com": 5,
+      "ionic.io": 5,
+      "pqina.nl": 5,
+      "www.colinodell.com": 5,
+      "www.google.com": 5,
+      "api.paystack.co": 4,
+      "chart.googleapis.com": 4,
+      "developer.mozilla.org": 4,
+      "flareapp.io": 4,
+      "icons.getbootstrap.com": 4,
+      "nette.org": 4,
+      "play.google.com": 4,
+      "qrcode.tec-it.com": 4,
+      "stackoverflow.com": 4,
+      "svgjs.dev": 4,
+      "themeforest.net": 4,
+      "www.github.com": 4,
+      "auth.reloadly.com": 3,
+      "checkout.razorpay.com": 3,
+      "dimsemenov.com": 3,
+      "fruitcake.nl": 3,
+      "httplug.io": 3,
+      "laravel.com": 3,
+      "localhost": 3,
+      "opencollective.com": 3,
+      "paragonie.com": 3,
+      "sass-lang.com": 3,
+      "seld.be": 3,
+      "web.telegram.org": 3,
+      "www.paypal.me": 3,
+      "apexcharts.com": 2,
+      "appdevs.net": 2,
+      "carbon.nesbot.com": 2,
+      "commonmark.thephpleague.com": 2,
+      "config.thephpleague.com": 2,
+      "css-tricks.com": 2,
+      "daneden.me": 2,
+      "dashboard.flutterwave.com": 2,
+      "davidgrudl.com": 2,
+      "dev.pagadito.com": 2,
+      "farbelous.github.io": 2,
+      "js.verygoodvault.com": 2,
+      "kimmobrunfeldt.github.io": 2,
+      "nyamsprod.com": 2,
+      "packagist.com": 2,
+      "perfectmoney.com": 2,
+      "phpunit.de": 2,
+      "player.vimeo.com": 2,
+      "qrpay.appdevs.net": 2,
+      "sagikazarmark.hu": 2,
+      "spatie.be": 2,
+      "splidejs.com": 2,
+      "twitter.com": 2,
+      "uri.thephpleague.com": 2,
+      "www.dailymotion.com": 2,
+      "www.idangero.us": 2,
+      "www.paypal.com": 2,
+      "api-eu1.tatum.io": 1,
+      "api.ckbox.io": 1,
+      "api.flutterwave.com": 1,
+      "api.razorpay.com": 1,
+      "api.stripe.com": 1,
+      "beausimensen.com": 1,
+      "benramsey.com": 1,
+      "blog.maartenballiauw.be": 1,
+      "ckbox.cloud": 1,
+      "dart-lang.github.io": 1,
+      "davedevelopment.co.uk": 1,
+      "defuse.ca": 1,
+      "developer.android.com": 1,
+      "developer.microsoft.com": 1,
+      "developer.paytm.com": 1,
+      "dflydev.com": 1,
+      "docs.guzzlephp.org": 1,
+      "docs.mockery.io": 1,
+      "docx-converter.cke-cs.com": 1,
+      "download.maxmind.com": 1,
+      "embed.tawk.to": 1,
+      "example.com": 1,
+      "ezyang.com": 1
+    },
+    "vendor_branding_counts": {
+      "appdevs": 69,
+      "codecanyon": 4,
+      "mobilekit": 245,
+      "qrpay": 2508,
+      "themeforest": 12
+    }
+  },
+  "summary": {
+    "targets": {
+      "mobile apps/titan-hub": {
+        "files": 561,
+        "bytes": 4058611,
+        "largest_files": [
+          {
+            "path": "mobile apps/titan-hub/assets/card/front-part.png",
+            "bytes": 597810
+          },
+          {
+            "path": "mobile apps/titan-hub/assets/card/back-part.png",
+            "bytes": 349538
+          },
+          {
+            "path": "mobile apps/titan-hub/assets/card/google_play_front.png",
+            "bytes": 178943
+          },
+          {
+            "path": "mobile apps/titan-hub/assets/card/google_play_back.png",
+            "bytes": 175431
+          },
+          {
+            "path": "mobile apps/titan-hub/ios/Runner/Assets.xcassets/AppIcon.appiconset/1024.png",
+            "bytes": 123901
+          },
+          {
+            "path": "mobile apps/titan-hub/lib/backend/services/api_services.dart",
+            "bytes": 84913
+          },
+          {
+            "path": "mobile apps/titan-hub/assets/card/verification_person.png",
+            "bytes": 84048
+          },
+          {
+            "path": "mobile apps/titan-hub/fonts/AgencyFB-Bold.ttf",
+            "bytes": 48072
+          },
+          {
+            "path": "mobile apps/titan-hub/pubspec.lock",
+            "bytes": 47281
+          },
+          {
+            "path": "mobile apps/titan-hub/lib/backend/model/transaction_log/transaction_log_model.dart",
+            "bytes": 40800
+          },
+          {
+            "path": "mobile apps/titan-hub/assets/qr/QRcode.png",
+            "bytes": 40337
+          },
+          {
+            "path": "mobile apps/titan-hub/lib/controller/categories/withdraw_controller/withdraw_controller.dart",
+            "bytes": 33398
+          },
+          {
+            "path": "mobile apps/titan-hub/lib/controller/categories/deposit/deposti_controller.dart",
+            "bytes": 33006
+          },
+          {
+            "path": "mobile apps/titan-hub/assets/qr/AppDevs.svg",
+            "bytes": 30615
+          },
+          {
+            "path": "mobile apps/titan-hub/ios/Runner.xcodeproj/project.pbxproj",
+            "bytes": 30363
+          },
+          {
+            "path": "mobile apps/titan-hub/lib/language/english.dart",
+            "bytes": 30359
+          },
+          {
+            "path": "mobile apps/titan-hub/assets/card/stripe.png",
+            "bytes": 24466
+          },
+          {
+            "path": "mobile apps/titan-hub/assets/logo/logo.png",
+            "bytes": 22444
+          },
+          {
+            "path": "mobile apps/titan-hub/lib/views/categories/virtual_card/sudo_virtual_card/sudo_virtual_screen.dart",
+            "bytes": 19575
+          },
+          {
+            "path": "mobile apps/titan-hub/lib/views/categories/virtual_card/flutter_wave_virtual_card/flutter_wave_virtual_screen.dart",
+            "bytes": 18676
+          }
+        ],
+        "over_95_mib": []
+      },
+      "integrations/qrpay-web": {
+        "files": 1959,
+        "bytes": 105362162,
+        "largest_files": [
+          {
+            "path": "integrations/qrpay-web/resources/world/cities.json",
+            "bytes": 34636019
+          },
+          {
+            "path": "integrations/qrpay-web/public/backend/images/card-settings/seeder/virtual-card.png",
+            "bytes": 5479555
+          },
+          {
+            "path": "integrations/qrpay-web/public/frontend/images/element/virtual-card.png",
+            "bytes": 5479555
+          },
+          {
+            "path": "integrations/qrpay-web/public/frontend/images/about/about.jpg",
+            "bytes": 3058877
+          },
+          {
+            "path": "integrations/qrpay-web/public/backend/js/ckeditor.js",
+            "bytes": 2870137
+          },
+          {
+            "path": "integrations/qrpay-web/public/frontend/images/element/support.jpg",
+            "bytes": 1613061
+          },
+          {
+            "path": "integrations/qrpay-web/public/frontend/images/giftcard/google-pay-bg.png",
+            "bytes": 1513796
+          },
+          {
+            "path": "integrations/qrpay-web/public/frontend/images/checkout/checkout-bg-1.jpg",
+            "bytes": 1073306
+          },
+          {
+            "path": "integrations/qrpay-web/public/backend/fonts/la-brands-400.svg",
+            "bytes": 928648
+          },
+          {
+            "path": "integrations/qrpay-web/public/frontend/fonts/la-brands-400.svg",
+            "bytes": 928648
+          },
+          {
+            "path": "integrations/qrpay-web/public/backend/fonts/la-solid-900.svg",
+            "bytes": 926045
+          },
+          {
+            "path": "integrations/qrpay-web/public/frontend/fonts/la-solid-900.svg",
+            "bytes": 926045
+          },
+          {
+            "path": "integrations/qrpay-web/resources/world/states.json",
+            "bytes": 904430
+          },
+          {
+            "path": "integrations/qrpay-web/public/backend/webfonts/fa-solid-900.svg",
+            "bytes": 847272
+          },
+          {
+            "path": "integrations/qrpay-web/public/frontend/webfonts/fa-solid-900.svg",
+            "bytes": 847272
+          },
+          {
+            "path": "integrations/qrpay-web/database/seeders/Admin/HeaderSectionSeeder.php",
+            "bytes": 819229
+          },
+          {
+            "path": "integrations/qrpay-web/public/backend/webfonts/fa-brands-400.svg",
+            "bytes": 703999
+          },
+          {
+            "path": "integrations/qrpay-web/public/frontend/webfonts/fa-brands-400.svg",
+            "bytes": 703999
+          },
+          {
+            "path": "integrations/qrpay-web/public/backend/js/rte.js",
+            "bytes": 658707
+          },
+          {
+            "path": "integrations/qrpay-web/public/backend/images/icon/sports.png",
+            "bytes": 618963
+          }
+        ],
+        "over_95_mib": []
+      },
+      "mobile apps/mobilekit-reference": {
+        "files": 214,
+        "bytes": 6938559,
+        "largest_files": [
+          {
+            "path": "mobile apps/mobilekit-reference/Source/Sketch/Mobilekit_Sketch.sketch",
+            "bytes": 3843311
+          },
+          {
+            "path": "mobile apps/mobilekit-reference/HTML/assets/css/style.css",
+            "bytes": 192817
+          },
+          {
+            "path": "mobile apps/mobilekit-reference/Documentation/assets/css/style.css",
+            "bytes": 192137
+          },
+          {
+            "path": "mobile apps/mobilekit-reference/HTML/assets/css/inc/bootstrap/bootstrap.min.css",
+            "bytes": 163826
+          },
+          {
+            "path": "mobile apps/mobilekit-reference/HTML/assets/js/lib/bootstrap.min.js",
+            "bytes": 78080
+          },
+          {
+            "path": "mobile apps/mobilekit-reference/HTML/assets/img/sample/photo/vector3.png",
+            "bytes": 48721
+          },
+          {
+            "path": "mobile apps/mobilekit-reference/HTML/assets/img/sample/photo/vector5.png",
+            "bytes": 48721
+          },
+          {
+            "path": "mobile apps/mobilekit-reference/HTML/assets/img/sample/photo/vector6.png",
+            "bytes": 48721
+          },
+          {
+            "path": "mobile apps/mobilekit-reference/HTML/assets/img/sample/photo/vector2.png",
+            "bytes": 48721
+          },
+          {
+            "path": "mobile apps/mobilekit-reference/HTML/assets/img/sample/photo/vector1.png",
+            "bytes": 48721
+          },
+          {
+            "path": "mobile apps/mobilekit-reference/HTML/assets/img/sample/photo/vector4.png",
+            "bytes": 48721
+          },
+          {
+            "path": "mobile apps/mobilekit-reference/HTML/component-multi-listview.html",
+            "bytes": 47582
+          },
+          {
+            "path": "mobile apps/mobilekit-reference/Documentation/assets/img/testmode.png",
+            "bytes": 46758
+          },
+          {
+            "path": "mobile apps/mobilekit-reference/HTML/assets/img/logo.png",
+            "bytes": 43110
+          },
+          {
+            "path": "mobile apps/mobilekit-reference/HTML/component-notification.html",
+            "bytes": 37806
+          },
+          {
+            "path": "mobile apps/mobilekit-reference/HTML/assets/img/sample/photo/vertical1.jpg",
+            "bytes": 35440
+          },
+          {
+            "path": "mobile apps/mobilekit-reference/HTML/assets/img/sample/photo/vertical3.jpg",
+            "bytes": 35440
+          },
+          {
+            "path": "mobile apps/mobilekit-reference/HTML/assets/img/sample/photo/vertical2.jpg",
+            "bytes": 35440
+          },
+          {
+            "path": "mobile apps/mobilekit-reference/HTML/assets/img/sample/photo/vertical4.jpg",
+            "bytes": 35440
+          },
+          {
+            "path": "mobile apps/mobilekit-reference/HTML/assets/img/sample/photo/vertical5.jpg",
+            "bytes": 35440
+          }
+        ],
+        "over_95_mib": []
+      }
+    },
+    "all": {
+      "files": 2737,
+      "bytes": 116388509,
+      "largest_files": [
+        {
+          "path": "integrations/qrpay-web/resources/world/cities.json",
+          "bytes": 34636019
+        },
+        {
+          "path": "integrations/qrpay-web/public/backend/images/card-settings/seeder/virtual-card.png",
+          "bytes": 5479555
+        },
+        {
+          "path": "integrations/qrpay-web/public/frontend/images/element/virtual-card.png",
+          "bytes": 5479555
+        },
+        {
+          "path": "mobile apps/mobilekit-reference/Source/Sketch/Mobilekit_Sketch.sketch",
+          "bytes": 3843311
+        },
+        {
+          "path": "integrations/qrpay-web/public/frontend/images/about/about.jpg",
+          "bytes": 3058877
+        },
+        {
+          "path": "integrations/qrpay-web/public/backend/js/ckeditor.js",
+          "bytes": 2870137
+        },
+        {
+          "path": "integrations/qrpay-web/public/frontend/images/element/support.jpg",
+          "bytes": 1613061
+        },
+        {
+          "path": "integrations/qrpay-web/public/frontend/images/giftcard/google-pay-bg.png",
+          "bytes": 1513796
+        },
+        {
+          "path": "integrations/qrpay-web/public/frontend/images/checkout/checkout-bg-1.jpg",
+          "bytes": 1073306
+        },
+        {
+          "path": "integrations/qrpay-web/public/backend/fonts/la-brands-400.svg",
+          "bytes": 928648
+        },
+        {
+          "path": "integrations/qrpay-web/public/frontend/fonts/la-brands-400.svg",
+          "bytes": 928648
+        },
+        {
+          "path": "integrations/qrpay-web/public/backend/fonts/la-solid-900.svg",
+          "bytes": 926045
+        },
+        {
+          "path": "integrations/qrpay-web/public/frontend/fonts/la-solid-900.svg",
+          "bytes": 926045
+        },
+        {
+          "path": "integrations/qrpay-web/resources/world/states.json",
+          "bytes": 904430
+        },
+        {
+          "path": "integrations/qrpay-web/public/backend/webfonts/fa-solid-900.svg",
+          "bytes": 847272
+        },
+        {
+          "path": "integrations/qrpay-web/public/frontend/webfonts/fa-solid-900.svg",
+          "bytes": 847272
+        },
+        {
+          "path": "integrations/qrpay-web/database/seeders/Admin/HeaderSectionSeeder.php",
+          "bytes": 819229
+        },
+        {
+          "path": "integrations/qrpay-web/public/backend/webfonts/fa-brands-400.svg",
+          "bytes": 703999
+        },
+        {
+          "path": "integrations/qrpay-web/public/frontend/webfonts/fa-brands-400.svg",
+          "bytes": 703999
+        },
+        {
+          "path": "integrations/qrpay-web/public/backend/js/rte.js",
+          "bytes": 658707
+        }
+      ],
+      "over_95_mib": []
+    }
+  },
+  "notes": [
+    "No purchase code, licence key or account credential is recorded.",
+    "Vendor branding and non-secret vendor domains are inventoried, not silently rewritten, so donor provenance and behaviour remain inspectable.",
+    "QRPay Laravel is donor/reference source only and is not Titan Pay financial authority.",
+    "MobileKit is reference source only; production UI must be rebuilt as native Flutter widgets."
+  ],
+  "post_report_scan": {
+    "credential_findings": [],
+    "hard_coded_domains": {
+      "ckeditor.com": 203,
+      "pub.dev": 194,
+      "api.github.com": 158,
+      "packagist.org": 158,
+      "symfony.com": 87,
+      "tidelift.com": 53,
+      "purl.org": 20,
+      "appdevs.cloud": 16,
+      "fontawesome.com": 16,
+      "js.pusher.com": 14,
+      "richtexteditor.com": 14,
+      "creativecommons.org": 10,
+      "popper.js.org": 10,
+      "fonts.gstatic.com": 9,
+      "www.apple.com": 8,
+      "www.patreon.com": 8,
+      "www.php-fig.org": 8,
+      "opensource.org": 6,
+      "rawgit.com": 6,
+      "www.doctrine-project.org": 6,
+      "developers.google.com": 5,
+      "ionic.io": 5,
+      "pqina.nl": 5,
+      "www.colinodell.com": 5,
+      "www.google.com": 5,
+      "api.paystack.co": 4,
+      "chart.googleapis.com": 4,
+      "developer.mozilla.org": 4,
+      "flareapp.io": 4,
+      "icons.getbootstrap.com": 4,
+      "nette.org": 4,
+      "play.google.com": 4,
+      "qrcode.tec-it.com": 4,
+      "stackoverflow.com": 4,
+      "svgjs.dev": 4,
+      "themeforest.net": 4,
+      "www.github.com": 4,
+      "auth.reloadly.com": 3,
+      "checkout.razorpay.com": 3,
+      "dimsemenov.com": 3,
+      "fruitcake.nl": 3,
+      "httplug.io": 3,
+      "laravel.com": 3,
+      "localhost": 3,
+      "opencollective.com": 3,
+      "paragonie.com": 3,
+      "sass-lang.com": 3,
+      "seld.be": 3,
+      "web.telegram.org": 3,
+      "www.paypal.me": 3,
+      "apexcharts.com": 2,
+      "appdevs.net": 2,
+      "carbon.nesbot.com": 2,
+      "commonmark.thephpleague.com": 2,
+      "config.thephpleague.com": 2,
+      "css-tricks.com": 2,
+      "daneden.me": 2,
+      "dashboard.flutterwave.com": 2,
+      "davidgrudl.com": 2,
+      "dev.pagadito.com": 2,
+      "farbelous.github.io": 2,
+      "js.verygoodvault.com": 2,
+      "kimmobrunfeldt.github.io": 2,
+      "nyamsprod.com": 2,
+      "packagist.com": 2,
+      "perfectmoney.com": 2,
+      "phpunit.de": 2,
+      "player.vimeo.com": 2,
+      "qrpay.appdevs.net": 2,
+      "sagikazarmark.hu": 2,
+      "spatie.be": 2,
+      "splidejs.com": 2,
+      "twitter.com": 2,
+      "uri.thephpleague.com": 2,
+      "www.dailymotion.com": 2,
+      "www.idangero.us": 2,
+      "www.paypal.com": 2,
+      "api-eu1.tatum.io": 1,
+      "api.ckbox.io": 1,
+      "api.flutterwave.com": 1,
+      "api.razorpay.com": 1,
+      "api.stripe.com": 1,
+      "beausimensen.com": 1,
+      "benramsey.com": 1,
+      "blog.maartenballiauw.be": 1,
+      "ckbox.cloud": 1,
+      "dart-lang.github.io": 1,
+      "davedevelopment.co.uk": 1,
+      "defuse.ca": 1,
+      "developer.android.com": 1,
+      "developer.microsoft.com": 1,
+      "developer.paytm.com": 1,
+      "dflydev.com": 1,
+      "docs.guzzlephp.org": 1,
+      "docs.mockery.io": 1,
+      "docx-converter.cke-cs.com": 1,
+      "download.maxmind.com": 1,
+      "embed.tawk.to": 1,
+      "example.com": 1,
+      "ezyang.com": 1
+    },
+    "vendor_branding_counts": {
+      "appdevs": 65,
+      "codecanyon": 3,
+      "mobilekit": 244,
+      "qrpay": 2504,
+      "themeforest": 10
+    }
+  }
+}

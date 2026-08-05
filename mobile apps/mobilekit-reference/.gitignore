@@ -1,0 +1,6 @@
+# Reference-source hygiene
+.DS_Store
+__MACOSX/
+*.log
+.idea/
+.vscode/

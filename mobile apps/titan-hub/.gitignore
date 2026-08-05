@@ -1,0 +1,19 @@
+# Titan Hub donor sanitisation
+android/key.properties
+android/app/*.jks
+android/app/*.keystore
+android/app/google-services.json
+ios/Runner/GoogleService-Info.plist
+*.p8
+*.p12
+*.mobileprovision
+.env
+.env.*
+!.env.example
+build/
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+android/.gradle/
+ios/Pods/
+DerivedData/
