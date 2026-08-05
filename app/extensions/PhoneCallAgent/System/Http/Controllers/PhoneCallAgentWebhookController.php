@@ -141,10 +141,16 @@ XML;
             ->where('call_sid', $callSid)
             ->first();
 
-        if ($call && $call->agent && ! $this->verifyTwilioSignature($request, $call->agent)) {
-            Log::warning('[Twilio] Invalid status signature', ['callSid' => $callSid]);
-
-            return response('', 403);
+        // SECURITY: Must verify signature regardless of whether call exists
+        if ($call && $call->agent) {
+            if (! $this->verifyTwilioSignature($request, $call->agent)) {
+                Log::warning('[Twilio] Invalid status signature', ['callSid' => $callSid]);
+                return response('', 403);
+            }
+        } else {
+            // SECURITY: Still reject unverified orphaned status events
+            Log::warning('[Twilio] Status webhook for unknown call', ['callSid' => $callSid]);
+            return response('', 204);
         }
 
         if ($call) {
@@ -297,16 +303,43 @@ XML;
 
     public function elevenLabsTool(Request $request, string $agentUuid, string $toolName): JsonResponse
     {
+        // SECURITY: Verify tool callback signature before processing
+        if (! $this->verifyElevenLabsSignature($request)) {
+            Log::warning('[ElevenLabs Tool] Rejected: invalid signature', ['tool' => $toolName]);
+            return response()->json(
+                ['error' => 'Unauthorized'],
+                401
+            );
+        }
+
+        // SECURITY: Verify agent exists and is active with booking enabled
         $agent = ExtPhoneCallAgent::query()
             ->where('uuid', $agentUuid)
             ->where('active', true)
             ->first();
 
-        if (! $agent || ! $agent->booking_enabled) {
-            return response()->json(['result' => 'Booking is not configured for this agent.']);
+        if (! $agent) {
+            Log::warning('[ElevenLabs Tool] Rejected: agent not found', ['uuid' => $agentUuid]);
+            return response()->json(
+                ['error' => 'Agent not found'],
+                404
+            );
         }
 
-        Log::info('[ElevenLabs Tool] raw request', ['tool' => $toolName, 'body' => $request->all()]);
+        if (! $agent->booking_enabled) {
+            Log::warning('[ElevenLabs Tool] Rejected: booking not enabled', ['agent_id' => $agent->id]);
+            return response()->json(
+                ['error' => 'Booking not configured'],
+                400
+            );
+        }
+
+        // SECURITY: Log tool name and sanitized parameters only (no raw body)
+        Log::info('[ElevenLabs Tool] Processing', [
+            'agent_id' => $agent->id,
+            'tool' => $toolName,
+            'param_count' => count($request->all()),
+        ]);
 
         $parameters = $request->has('parameters')
             ? $request->input('parameters', [])
@@ -316,9 +349,19 @@ XML;
             $provider = app(BookingProviderResolver::class)->resolve($agent);
             $handler = new BookingToolHandler($provider);
             $result = $handler->handle($toolName, $parameters);
+
+            Log::info('[ElevenLabs Tool] Success', [
+                'agent_id' => $agent->id,
+                'tool' => $toolName,
+            ]);
         } catch (Throwable $e) {
-            Log::error('[ElevenLabs Tool] Handler error', ['tool' => $toolName, 'error' => $e->getMessage()]);
-            $result = 'Booking action failed: ' . $e->getMessage();
+            // SECURITY: Do not leak internal exception messages
+            Log::error('[ElevenLabs Tool] Error', [
+                'agent_id' => $agent->id,
+                'tool' => $toolName,
+                'error_class' => get_class($e),
+            ]);
+            $result = 'Booking action could not be completed';
         }
 
         return response()->json(['result' => $result]);
@@ -326,48 +369,85 @@ XML;
 
     /**
      * Validate the X-Twilio-Signature using the resolved agent's auth token.
-     * Skips when the agent has no per-agent token (legacy / global-creds setups).
+     * SECURITY: Fails closed when verification credentials are missing or invalid.
      */
     private function verifyTwilioSignature(Request $request, ExtPhoneCallAgent $agent): bool
     {
         $token = $agent->twilio_auth_token;
 
+        // CRITICAL SECURITY: Require active credentials - fail closed when missing
         if (empty($token)) {
-            return true; // verification disabled when no per-agent token is configured
+            Log::error('[Twilio] Webhook rejected: no auth token configured for agent', [
+                'agent_id' => $agent->id,
+                'call_sid' => $request->input('CallSid'),
+            ]);
+            return false;
         }
 
         $signature = $request->header('X-Twilio-Signature', '');
 
         if (empty($signature)) {
+            Log::warning('[Twilio] Webhook rejected: missing X-Twilio-Signature header', [
+                'agent_id' => $agent->id,
+                'call_sid' => $request->input('CallSid'),
+            ]);
             return false;
         }
 
-        return (new RequestValidator($token))->validate($signature, $request->fullUrl(), $request->post());
+        $isValid = (new RequestValidator($token))->validate($signature, $request->fullUrl(), $request->post());
+
+        if (!$isValid) {
+            Log::warning('[Twilio] Webhook rejected: invalid signature', [
+                'agent_id' => $agent->id,
+                'call_sid' => $request->input('CallSid'),
+            ]);
+        }
+
+        return $isValid;
     }
 
     private function verifyElevenLabsSignature(Request $request): bool
     {
         $secret = setting('elevenlabs_webhook_secret');
 
+        // CRITICAL SECURITY: Require active credentials - fail closed when missing
         if (empty($secret)) {
-            return true; // verification disabled if no secret configured
+            Log::error('[ElevenLabs] Webhook rejected: no webhook secret configured');
+            return false;
         }
 
         $header = $request->header('ElevenLabs-Signature', '');
         $body = $request->getContent();
+
+        if (empty($header)) {
+            Log::warning('[ElevenLabs] Webhook rejected: missing ElevenLabs-Signature header');
+            return false;
+        }
 
         // header format: t=<timestamp>,v0=<hex_signature>
         preg_match('/t=(\d+)/', $header, $tMatch);
         preg_match('/v0=([a-f0-9]+)/', $header, $vMatch);
 
         if (empty($tMatch[1]) || empty($vMatch[1])) {
-            Log::error('PhoneCallAgent: invalid ElevenLabs signature header', ['header' => $header]);
-
+            Log::warning('[ElevenLabs] Webhook rejected: invalid signature header format');
             return false;
         }
 
-        $timestamp = $tMatch[1];
+        $timestamp = (int) $tMatch[1];
         $receivedSig = $vMatch[1];
+
+        // SECURITY: Enforce timestamp freshness (5 minute window)
+        $now = (int) (microtime(true) * 1000); // Current time in milliseconds
+        $age = $now - $timestamp;
+        $maxAge = 5 * 60 * 1000; // 5 minutes in milliseconds
+
+        if ($age < 0 || $age > $maxAge) {
+            Log::warning('[ElevenLabs] Webhook rejected: timestamp outside freshness window', [
+                'age_ms' => $age,
+                'max_age_ms' => $maxAge,
+            ]);
+            return false;
+        }
 
         // ElevenLabs signs: HMAC-SHA256(secret, "{timestamp}.{body}")
         $expectedWithDot = hash_hmac('sha256', "{$timestamp}.{$body}", $secret);
@@ -375,8 +455,7 @@ XML;
         $expectedNoDot = hash_hmac('sha256', "{$timestamp}{$body}", $secret);
 
         if (! hash_equals($expectedWithDot, $receivedSig) && ! hash_equals($expectedNoDot, $receivedSig)) {
-            Log::error('PhoneCallAgent: ElevenLabs signature mismatch — check webhook secret in admin settings');
-
+            Log::warning('[ElevenLabs] Webhook rejected: invalid signature');
             return false;
         }
 
