@@ -39,6 +39,7 @@ class UniversalDistributionContractTest extends TestCase
         $this->assertStringContainsString("'ebay'", $config);
         $this->assertStringContainsString("'adapter_available' => false", $config);
         $this->assertStringContainsString("'effective_capabilities'", $service);
+        $this->assertStringContainsString('account_destination_mismatch', $service);
     }
 
     public function test_capability_snapshots_are_tenant_scoped_and_auditable(): void
