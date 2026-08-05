@@ -1,0 +1,65 @@
+name: Const Titan showcase once
+
+on:
+  push:
+    branches:
+      - issue/256-titan-native-design-system
+    paths:
+      - '.github/workflows/const-titan-showcase.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: issue/256-titan-native-design-system
+
+      - name: Apply analyzer-requested consts and self-remove
+        run: |
+          python <<'PY'
+          from pathlib import Path
+
+          path = Path('mobile apps/titan-hub/lib/features/design_system/titan_design_system_showcase.dart')
+          text = path.read_text()
+
+          foundations = """      _ShowcaseSection(
+                title: 'Foundations',
+                child: Wrap(
+          """
+          foundations_const = """      const _ShowcaseSection(
+                title: 'Foundations',
+                child: Wrap(
+          """
+          if text.count(foundations) != 1:
+              raise SystemExit('Expected one foundations showcase section')
+          text = text.replace(foundations, foundations_const, 1)
+
+          badges = """            Wrap(
+                      spacing: TitanSpacing.sm,
+                      runSpacing: TitanSpacing.sm,
+                      children: const [
+                        TitanBadge(label: 'Primary', tone: TitanTone.primary),
+          """
+          badges_const = """            const Wrap(
+                      spacing: TitanSpacing.sm,
+                      runSpacing: TitanSpacing.sm,
+                      children: [
+                        TitanBadge(label: 'Primary', tone: TitanTone.primary),
+          """
+          if text.count(badges) != 1:
+              raise SystemExit('Expected one badge showcase wrap')
+          path.write_text(text.replace(badges, badges_const, 1))
+          PY
+          rm .github/workflows/const-titan-showcase.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- \
+            'mobile apps/titan-hub/lib/features/design_system/titan_design_system_showcase.dart' \
+            .github/workflows/const-titan-showcase.yml
+          git commit -m "fix(titan-hub): const-qualify showcase primitives"
+          git push origin HEAD:issue/256-titan-native-design-system
