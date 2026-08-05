@@ -5,6 +5,7 @@ namespace App\Extensions\SocialMedia\System\Http\Controllers;
 use App\Extensions\SocialMedia\System\Enums\PlatformEnum;
 use App\Extensions\SocialMedia\System\Models\DistributionItem;
 use App\Extensions\SocialMedia\System\Models\SocialMediaPlatform;
+use App\Extensions\SocialMedia\System\Services\PinterestBoardGuard;
 use App\Extensions\SocialMedia\System\Services\PinterestService;
 use App\Http\Controllers\Controller;
 use Illuminate\Contracts\Cache\LockTimeoutException;
@@ -18,15 +19,19 @@ use Throwable;
 
 class PinterestController extends Controller
 {
-    public function __construct(private readonly PinterestService $service) {}
+    public function __construct(
+        private readonly PinterestService $service,
+        private readonly PinterestBoardGuard $boards
+    ) {}
 
     public function readiness(Request $request): JsonResponse
     {
         $validated = $request->validate(['account_id' => 'required|integer']);
+        $account = $this->account((int) $validated['account_id']);
 
-        return $this->respond(fn () => $this->service->readiness(
-            $request->user(),
-            $this->account((int) $validated['account_id'])
+        return $this->respond(fn () => $this->boards->synchroniseDiscovery(
+            $account,
+            $this->service->readiness($request->user(), $account)
         ));
     }
 
@@ -36,30 +41,38 @@ class PinterestController extends Controller
             'account_id' => 'required|integer',
             'bookmark' => 'nullable|string|max:2048',
         ]);
+        $account = $this->account((int) $validated['account_id']);
 
-        return $this->respond(fn () => $this->service->boards(
-            $request->user(),
-            $this->account((int) $validated['account_id']),
-            $validated['bookmark'] ?? null
+        return $this->respond(fn () => $this->boards->synchroniseBoards(
+            $account,
+            $this->service->boards(
+                $request->user(),
+                $account,
+                $validated['bookmark'] ?? null
+            )
         ));
     }
 
     public function publish(Request $request, DistributionItem $item): JsonResponse
     {
-        $this->assertItemOwner($item);
+        $this->assertOwnedItem($item);
         $validated = $request->validate([
             'account_id' => 'required|integer',
             'idempotency_key' => 'required|string|max:128',
             'payload' => 'required|array',
+            'payload.board_id' => 'required|string|max:255',
         ]);
+        $account = $this->account((int) $validated['account_id']);
+        $payload = (array) $validated['payload'];
+        $this->boards->assertWritableBoard($account, (string) $payload['board_id']);
 
         return $this->respond(fn () => $this->locked(
             $item,
             fn () => $this->service->publish(
                 $request->user(),
                 $item,
-                $this->account((int) $validated['account_id']),
-                (array) $validated['payload'],
+                $account,
+                $payload,
                 (string) $validated['idempotency_key']
             )
         ));
@@ -67,22 +80,23 @@ class PinterestController extends Controller
 
     public function reconcile(Request $request, DistributionItem $item): JsonResponse
     {
-        $this->assertItemOwner($item);
+        $this->assertOwnedItem($item);
         $validated = $request->validate(['account_id' => 'required|integer']);
+        $account = $this->account((int) $validated['account_id']);
 
         return $this->respond(fn () => $this->locked(
             $item,
             fn () => $this->service->reconcile(
                 $request->user(),
                 $item,
-                $this->account((int) $validated['account_id'])
+                $account
             )
         ));
     }
 
     public function analytics(Request $request, DistributionItem $item): JsonResponse
     {
-        $this->assertItemOwner($item);
+        $this->assertOwnedItem($item);
         $validated = $request->validate([
             'account_id' => 'required|integer',
             'start_date' => 'required|date_format:Y-m-d',
@@ -90,11 +104,12 @@ class PinterestController extends Controller
             'metrics' => 'required|array|min:1|max:20',
             'metrics.*' => 'required|string|max:100',
         ]);
+        $account = $this->account((int) $validated['account_id']);
 
         return $this->respond(fn () => $this->service->analytics(
             $request->user(),
             $item,
-            $this->account((int) $validated['account_id']),
+            $account,
             (string) $validated['start_date'],
             (string) $validated['end_date'],
             (array) $validated['metrics']
@@ -103,7 +118,7 @@ class PinterestController extends Controller
 
     public function engagementHandoff(Request $request, DistributionItem $item): JsonResponse
     {
-        $this->assertItemOwner($item);
+        $this->assertOwnedItem($item);
         $validated = $request->validate([
             'account_id' => 'required|integer',
             'engagement.engagement_id' => 'required|string|max:255',
@@ -111,23 +126,17 @@ class PinterestController extends Controller
             'engagement.message' => 'required|string|max:10000',
             'engagement.received_at' => 'nullable|date',
         ]);
+        $account = $this->account((int) $validated['account_id']);
 
         return $this->respond(fn () => $this->locked(
             $item,
             fn () => $this->service->engagementHandoff(
                 $request->user(),
                 $item,
-                $this->account((int) $validated['account_id']),
+                $account,
                 (array) $validated['engagement']
             )
         ));
-    }
-
-    private function assertItemOwner(DistributionItem $item): void
-    {
-        if ((int) $item->user_id !== (int) Auth::id()) {
-            abort(404);
-        }
     }
 
     private function account(int $accountId): SocialMediaPlatform
@@ -137,6 +146,11 @@ class PinterestController extends Controller
             ->where('user_id', Auth::id())
             ->where('platform', PlatformEnum::pinterest->value)
             ->firstOrFail();
+    }
+
+    private function assertOwnedItem(DistributionItem $item): void
+    {
+        abort_if((int) $item->user_id !== (int) Auth::id(), 404);
     }
 
     private function locked(DistributionItem $item, callable $callback): mixed
@@ -151,6 +165,7 @@ class PinterestController extends Controller
         try {
             return Cache::lock($lockName, 120)->block(5, function () use ($item, $callback) {
                 $item->refresh();
+                $this->assertOwnedItem($item);
 
                 return $callback();
             });
