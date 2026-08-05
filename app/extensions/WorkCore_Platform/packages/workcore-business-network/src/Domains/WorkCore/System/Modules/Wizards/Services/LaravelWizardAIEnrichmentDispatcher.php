@@ -19,6 +19,6 @@ final class LaravelWizardAIEnrichmentDispatcher implements WizardAIEnrichmentDis
             return;
         }
 
-        $this->bus->dispatch(EnrichWizardAnswerProposal::fromEvent($event));
+        $this->bus->dispatchAfterResponse(EnrichWizardAnswerProposal::fromEvent($event));
     }
 }
