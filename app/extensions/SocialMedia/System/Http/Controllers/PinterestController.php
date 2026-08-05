@@ -46,6 +46,7 @@ class PinterestController extends Controller
 
     public function publish(Request $request, DistributionItem $item): JsonResponse
     {
+        $this->assertItemOwner($item);
         $validated = $request->validate([
             'account_id' => 'required|integer',
             'idempotency_key' => 'required|string|max:128',
@@ -66,6 +67,7 @@ class PinterestController extends Controller
 
     public function reconcile(Request $request, DistributionItem $item): JsonResponse
     {
+        $this->assertItemOwner($item);
         $validated = $request->validate(['account_id' => 'required|integer']);
 
         return $this->respond(fn () => $this->locked(
@@ -80,6 +82,7 @@ class PinterestController extends Controller
 
     public function analytics(Request $request, DistributionItem $item): JsonResponse
     {
+        $this->assertItemOwner($item);
         $validated = $request->validate([
             'account_id' => 'required|integer',
             'start_date' => 'required|date_format:Y-m-d',
@@ -100,6 +103,7 @@ class PinterestController extends Controller
 
     public function engagementHandoff(Request $request, DistributionItem $item): JsonResponse
     {
+        $this->assertItemOwner($item);
         $validated = $request->validate([
             'account_id' => 'required|integer',
             'engagement.engagement_id' => 'required|string|max:255',
@@ -117,6 +121,13 @@ class PinterestController extends Controller
                 (array) $validated['engagement']
             )
         ));
+    }
+
+    private function assertItemOwner(DistributionItem $item): void
+    {
+        if ((int) $item->user_id !== (int) Auth::id()) {
+            abort(404);
+        }
     }
 
     private function account(int $accountId): SocialMediaPlatform
