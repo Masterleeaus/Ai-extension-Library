@@ -47,21 +47,25 @@ class EbayListingIntegrationContractTest extends TestCase
         $this->assertStringContainsString("approval_status !== 'approved'", $service);
         $this->assertStringContainsString('idempotency_key', $service);
         $this->assertStringContainsString("DB::table('ext_social_media_distribution_audits')", $service);
-        $this->assertStringContainsString('response()->json', $controller);
+        $this->assertStringContainsString('Cache::lock', $controller);
+        $this->assertStringContainsString('hash(\'sha256\', $idempotencyKey)', $controller);
         $this->assertStringContainsString('buyerQuestionHandoff', $controller);
     }
 
-    public function test_ebay_is_exposed_as_a_real_channel_only_after_adapter_registration(): void
+    public function test_ebay_is_a_channel_but_not_a_social_post_platform(): void
     {
         $platform = file_get_contents(__DIR__ . '/../../System/Enums/PlatformEnum.php');
         $config = file_get_contents(__DIR__ . '/../../config/ebay.php');
         $provider = file_get_contents(__DIR__ . '/../../System/SocialMediaServiceProvider.php');
+        $composer = file_get_contents(__DIR__ . '/../../resources/views/components/create-post-dropdown.blade.php');
 
         $this->assertStringContainsString("case ebay = 'ebay'", $platform);
+        $this->assertStringContainsString('function channels()', $platform);
         $this->assertStringContainsString("'platform'          => 'ebay'", $config);
         $this->assertStringContainsString("'adapter_available' => true", $config);
         $this->assertStringContainsString('social-media.oauth.connect.ebay', $provider);
         $this->assertStringContainsString('ebay.publish', $provider);
         $this->assertStringContainsString('ebay.withdraw', $provider);
+        $this->assertStringContainsString('PlatformEnum::ebay', $composer);
     }
 }
