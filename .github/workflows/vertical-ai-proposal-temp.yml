@@ -24,8 +24,10 @@ jobs:
       - name: Validate package metadata
         run: composer validate --no-check-publish --strict packages/titan-interaction-engine/composer.json
 
-      - name: Run focused vertical AI proposal contract
-        run: php packages/titan-interaction-engine/tests/vertical_ai_proposal.php
+      - name: Run focused vertical AI proposal contracts
+        run: |
+          php packages/titan-interaction-engine/tests/vertical_ai_proposal.php
+          php packages/titan-interaction-engine/tests/vertical_ai_proposal_security.php
 
       - name: Run Interaction Engine regression suites
         run: |
@@ -36,4 +38,5 @@ jobs:
       - name: Lint proposal implementation
         run: |
           php -l packages/titan-interaction-engine/tests/vertical_ai_proposal.php
+          php -l packages/titan-interaction-engine/tests/vertical_ai_proposal_security.php
           find packages/titan-interaction-engine/src/Vertical/AI -name '*.php' -print0 | xargs -0 -r -n1 php -l
