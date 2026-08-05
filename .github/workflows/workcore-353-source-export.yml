@@ -1,0 +1,31 @@
+name: Export WorkCore issue 353 workspace
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  export-workcore:
+    if: github.head_ref == 'feature/workcore-dynamic-pricing-353'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out feature branch
+        uses: actions/checkout@v4
+
+      - name: Package exact WorkCore platform source
+        shell: bash
+        run: |
+          set -euo pipefail
+          tar -czf /tmp/workcore-platform-main-derived.tar.gz app/extensions/WorkCore_Platform
+
+      - name: Upload WorkCore source
+        uses: actions/upload-artifact@v4
+        with:
+          name: workcore-platform-issue-353-source
+          path: /tmp/workcore-platform-main-derived.tar.gz
+          if-no-files-found: error
+          retention-days: 2
