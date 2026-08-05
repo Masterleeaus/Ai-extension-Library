@@ -7,15 +7,18 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   verify:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
-      - name: Checkout
+      - name: Checkout feature branch
         uses: actions/checkout@v4
+        with:
+          ref: feature/workcore-wizard-vertical-context
+          fetch-depth: 0
 
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
@@ -43,11 +46,14 @@ jobs:
           php packages/titan-interaction-engine/tests/run.php
           php packages/titan-interaction-engine/bin/verify.php
 
-      - name: Refresh deterministic WorkCore package manifests
+      - name: Generate canonical business-network checksum manifest
         working-directory: app/extensions/WorkCore_Platform
         run: |
-          python tools/refresh_package_checksums.py --repo .
-          test "$(git -C ../../.. diff --name-only -- app/extensions/WorkCore_Platform/packages | tr '\n' ' ')" = "app/extensions/WorkCore_Platform/packages/workcore-business-network/files.sha256.json "
+          rm -rf /tmp/workcore-checksums
+          python tools/refresh_package_checksums.py --repo . --output-dir /tmp/workcore-checksums
+          cp /tmp/workcore-checksums/workcore-business-network.files.sha256.json packages/workcore-business-network/files.sha256.json
+          changed="$(git -C ../../.. diff --name-only -- app/extensions/WorkCore_Platform/packages)"
+          test "$changed" = "app/extensions/WorkCore_Platform/packages/workcore-business-network/files.sha256.json"
 
       - name: Run WorkCore Platform contract suite
         working-directory: app/extensions/WorkCore_Platform
@@ -60,6 +66,16 @@ jobs:
           php -l app/extensions/WorkCore_Platform/packages/workcore-business-network/src/Domains/WorkCore/System/Modules/Wizards/Providers/WorkWizardsServiceProvider.php
           find app/extensions/WorkCore_Platform/packages/workcore-business-network/src/Domains/WorkCore/System/Modules/Wizards \
             -name '*VerticalContext*.php' -print0 | xargs -0 -r -n1 php -l
+
+      - name: Commit canonical checksum manifest
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add app/extensions/WorkCore_Platform/packages/workcore-business-network/files.sha256.json
+          if ! git diff --cached --quiet; then
+            git commit -m "chore(workcore): refresh business network checksums"
+            git push origin HEAD:feature/workcore-wizard-vertical-context
+          fi
 
       - name: Upload regenerated checksum manifest
         if: always()
