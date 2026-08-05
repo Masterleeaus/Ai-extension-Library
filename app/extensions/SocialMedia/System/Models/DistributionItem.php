@@ -42,6 +42,16 @@ class DistributionItem extends Model
 
     public const TYPE_JOB_LISTING = 'job_listing';
 
+    public const TYPE_ROOM_STAY_OFFER = 'room_stay_offer';
+
+    public const TYPE_MEMBERSHIP_OFFER = 'membership_offer';
+
+    public const TYPE_CLASS_SESSION_OFFER = 'class_session_offer';
+
+    public const TYPE_BOOKING_OFFER = 'booking_offer';
+
+    public const TYPE_HIRE_RENTAL_LISTING = 'hire_rental_listing';
+
     protected $table = 'ext_social_media_distribution_items';
 
     protected $fillable = [
@@ -77,6 +87,11 @@ class DistributionItem extends Model
             self::TYPE_PROPERTY_LISTING,
             self::TYPE_VEHICLE_LISTING,
             self::TYPE_JOB_LISTING,
+            self::TYPE_ROOM_STAY_OFFER,
+            self::TYPE_MEMBERSHIP_OFFER,
+            self::TYPE_CLASS_SESSION_OFFER,
+            self::TYPE_BOOKING_OFFER,
+            self::TYPE_HIRE_RENTAL_LISTING,
         ];
     }
 
