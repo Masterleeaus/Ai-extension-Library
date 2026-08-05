@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace App\Extensions\ChatbotInstagram\System\Http\Controllers\Oauth;
 
 use App\Extensions\ChatbotInstagram\System\Helpers\Instagram;

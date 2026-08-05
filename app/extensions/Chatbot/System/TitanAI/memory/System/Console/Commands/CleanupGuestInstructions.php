@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace App\Extensions\SystemAIChatMemory\System\Console\Commands;
 
 use App\Extensions\SystemAIChatMemory\System\Models\UserChatInstruction;

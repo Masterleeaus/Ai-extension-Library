@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace WorkCore\Subscriptions;
 
 use Illuminate\Support\ServiceProvider;

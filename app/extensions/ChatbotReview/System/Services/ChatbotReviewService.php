@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Extensions\ChatbotReview\System\Services;
 
 use App\Extensions\Chatbot\System\Models\ChatbotConversation;

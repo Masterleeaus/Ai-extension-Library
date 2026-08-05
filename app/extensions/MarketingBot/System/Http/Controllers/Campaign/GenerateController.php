@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace App\Extensions\MarketingBot\System\Http\Controllers\Campaign;
 
 use App\Helpers\Classes\Helper;

@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace App\Extensions\ChatbotVoice\System\Http\Controllers;
 
 use App\Extensions\ChatbotVoice\System\Models\ExtVoiceChatbot;

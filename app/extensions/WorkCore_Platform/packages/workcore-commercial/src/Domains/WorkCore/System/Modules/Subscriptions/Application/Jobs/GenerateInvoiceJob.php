@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace WorkCore\Subscriptions\Application\Jobs;
 
 use Illuminate\Bus\Queueable;

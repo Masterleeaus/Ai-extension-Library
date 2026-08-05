@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace App\Extensions\AiAvatar\System\Services;
 
 use App\Extensions\AiAvatar\System\Services\Traits\AiAvatar;

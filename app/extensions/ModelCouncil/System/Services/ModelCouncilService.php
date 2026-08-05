@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace App\Extensions\ModelCouncil\System\Services;
 
 use App\Domains\Engine\Enums\EngineEnum;

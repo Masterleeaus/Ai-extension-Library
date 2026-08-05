@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace WorkCore\Subscriptions\Domain;
 
 use Illuminate\Database\Eloquent\Model;

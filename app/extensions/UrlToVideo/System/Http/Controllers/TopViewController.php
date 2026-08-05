@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace App\Extensions\UrlToVideo\System\Http\Controllers;
 
 use App\Concerns\HasErrorResponse;

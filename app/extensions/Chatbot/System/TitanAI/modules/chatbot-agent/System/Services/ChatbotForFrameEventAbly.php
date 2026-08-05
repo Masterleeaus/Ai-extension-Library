@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace App\Extensions\ChatbotAgent\System\Services;
 
 use App\Extensions\Chatbot\System\Http\Resources\Api\ChatbotHistoryResource;

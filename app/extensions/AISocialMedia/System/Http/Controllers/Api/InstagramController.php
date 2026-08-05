@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace App\Extensions\AISocialMedia\System\Http\Controllers\Api;
 
 use App\Extensions\AISocialMedia\System\Enums\Platform;

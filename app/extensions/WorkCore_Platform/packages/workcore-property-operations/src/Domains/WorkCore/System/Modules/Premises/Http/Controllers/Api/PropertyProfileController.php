@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace App\Domains\WorkCore\System\Modules\Premises\Http\Controllers\Api;
 
 use Illuminate\Routing\Controller;

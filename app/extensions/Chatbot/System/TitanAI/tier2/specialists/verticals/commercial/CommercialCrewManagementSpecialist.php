@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace App\Services\AI\Tier2\Commercial;
 class CommercialCrewManagementSpecialist {
     public function process(array $c): array { return ['specialist' => 'CommercialCrewManagementSpecialist', 'vertical' => 'commercial', 'status' => 'processing', 'intent' => $c['intent'] ?? '']; }

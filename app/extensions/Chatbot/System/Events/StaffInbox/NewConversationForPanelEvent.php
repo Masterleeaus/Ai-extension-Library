@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace App\Extensions\Chatbot\System\Events\StaffInbox;
 
 use App\Extensions\Chatbot\System\Http\Resources\Admin\ChatbotConversationResource;

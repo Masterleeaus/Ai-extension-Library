@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace App\Extensions\SocialMediaAgent\System\Notifications;
 
 use App\Extensions\SocialMediaAgent\System\Models\SocialMediaAgentPost;

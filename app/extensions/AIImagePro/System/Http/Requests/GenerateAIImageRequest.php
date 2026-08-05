@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace App\Extensions\AIImagePro\System\Http\Requests;
 
 use App\Extensions\AIImagePro\System\Services\AIImageProService;

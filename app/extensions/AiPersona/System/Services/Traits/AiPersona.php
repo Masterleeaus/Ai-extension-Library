@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace App\Extensions\AiPersona\System\Services\Traits;
 
 use Psr\Http\Message\ResponseInterface;

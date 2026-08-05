@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace App\Extensions\SEOTool\System\Services\Search;
 
 use App\Models\SettingTwo;

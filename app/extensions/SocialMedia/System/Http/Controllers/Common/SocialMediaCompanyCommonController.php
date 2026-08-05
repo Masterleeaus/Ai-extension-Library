@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace App\Extensions\SocialMedia\System\Http\Controllers\Common;
 
 use App\Extensions\SocialMedia\System\Http\Resources\Company\CompanyResource;

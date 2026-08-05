@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace App\Extensions\Chatbot\System\Http\Middleware;
 
 use Closure;

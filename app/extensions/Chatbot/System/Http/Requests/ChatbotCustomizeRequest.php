@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace App\Extensions\Chatbot\System\Http\Requests;
 
 use App\Extensions\Chatbot\System\Enums\ColorModeEnum;

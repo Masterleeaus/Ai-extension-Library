@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace App\Extensions\AIChatPro\System\Jobs;
 
 use App\Models\UserOpenaiChatMessage;

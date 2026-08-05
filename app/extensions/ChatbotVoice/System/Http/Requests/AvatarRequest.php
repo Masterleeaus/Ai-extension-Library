@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace App\Extensions\ChatbotVoice\System\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;

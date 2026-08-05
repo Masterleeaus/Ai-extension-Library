@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace App\Extensions\SocialMedia\System\Services\Token;
 
 use App\Extensions\SocialMedia\System\Helpers\X;

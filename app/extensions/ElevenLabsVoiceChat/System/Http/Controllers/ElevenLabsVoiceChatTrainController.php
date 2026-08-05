@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace App\Extensions\ElevenLabsVoiceChat\System\Http\Controllers;
 
 use App\Extensions\ElevenLabsVoiceChat\System\Enum\TrainTypeEnum;

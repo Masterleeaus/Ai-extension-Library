@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace App\Extensions\SocialMedia\System\Helpers;
 
 use App\Extensions\SocialMedia\System\Services\FileSplitService;

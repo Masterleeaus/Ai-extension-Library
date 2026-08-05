@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace App\Extensions\AiMusicPro\System\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;

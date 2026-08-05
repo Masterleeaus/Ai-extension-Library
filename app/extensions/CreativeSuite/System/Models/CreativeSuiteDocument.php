@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace App\Extensions\CreativeSuite\System\Models;
 
 use Illuminate\Database\Eloquent\Casts\Attribute;

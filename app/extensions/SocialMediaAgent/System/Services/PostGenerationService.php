@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace App\Extensions\SocialMediaAgent\System\Services;
 
 use App\Domains\Entity\Enums\EntityEnum;

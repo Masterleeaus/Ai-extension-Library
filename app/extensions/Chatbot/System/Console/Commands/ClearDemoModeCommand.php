@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace App\Extensions\Chatbot\System\Console\Commands;
 
 use App\Extensions\Chatbot\System\Models\Chatbot;

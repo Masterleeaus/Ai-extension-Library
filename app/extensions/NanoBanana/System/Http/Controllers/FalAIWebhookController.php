@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace App\Extensions\NanoBanana\System\Http\Controllers;
 
 use App\Console\Commands\FluxProQueueCheck;

@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace App\Extensions\SocialMedia\System\Services\Generator;
 
 use App\Helpers\Classes\ApiHelper;

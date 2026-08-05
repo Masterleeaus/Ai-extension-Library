@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace App\Extensions\PhoneCallAgent\System\Enums;
 
 use App\Enums\Traits\EnumTo;

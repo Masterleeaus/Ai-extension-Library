@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace App\Extensions\PhoneCallAgent\System\Http\Requests\Train;
 
 use App\Extensions\PhoneCallAgent\System\Enums\TrainTypeEnum;

@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace App\Extensions\FashionStudio\System\Models;
 
 use App\Models\User;

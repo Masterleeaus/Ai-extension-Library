@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace App\Domains\WorkCore\System\Modules\Premises\Services;
 
 use App\Domains\WorkCore\System\Modules\Premises\Domain\Agreements\AgreementState;

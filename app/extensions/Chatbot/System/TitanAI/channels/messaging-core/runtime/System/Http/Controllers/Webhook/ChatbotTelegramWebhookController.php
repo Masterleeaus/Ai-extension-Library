@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace App\Extensions\ChatbotTelegram\System\Http\Controllers\Webhook;
 
 use App\Extensions\Chatbot\System\Models\Chatbot;

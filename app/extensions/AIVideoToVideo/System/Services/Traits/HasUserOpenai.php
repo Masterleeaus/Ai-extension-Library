@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace App\Extensions\AIVideoToVideo\System\Services\Traits;
 
 use App\Models\UserOpenai;

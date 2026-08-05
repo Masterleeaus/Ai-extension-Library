@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace App\Extensions\Chatbot\System\Tools;
 
 use App\Domains\Entity\Enums\EntityEnum;

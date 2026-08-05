@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace App\Extensions\DiscountManager\System\Enums;
 
 use App\Concerns\HasEnumConvert;

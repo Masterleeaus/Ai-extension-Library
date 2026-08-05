@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace WorkCore\Domains\WorkCore\System\Modules\ECommerce\Payments;
 
 class PaymentResult

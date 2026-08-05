@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace App\Extensions\ChatbotVoice\System\Models;
 
 use App\Extensions\ChatbotVoice\System\Enums\RoleEnum;

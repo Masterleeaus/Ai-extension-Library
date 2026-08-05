@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace WorkCore\Subscriptions\Application\Services;
 
 use WorkCore\Subscriptions\Domain\Subscription;

@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace App\Extensions\MarketingBot\System\Generators\Contracts;
 
 use App\Domains\Entity\Enums\EntityEnum;

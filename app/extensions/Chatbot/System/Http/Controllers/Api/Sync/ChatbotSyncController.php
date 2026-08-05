@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace App\Extensions\Chatbot\System\Http\Controllers\Api\Sync;
 
 use App\Extensions\Chatbot\System\Models\ChatbotSyncConflict;

@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace App\Extensions\AdvancedImage\System\Services\Traits;
 
 use Illuminate\Support\Facades\Http;

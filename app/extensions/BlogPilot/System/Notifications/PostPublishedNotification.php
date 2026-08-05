@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace App\Extensions\BlogPilot\System\Notifications;
 
 use App\Models\Blog;

@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace App\Extensions\SocialMedia\System\Http\Requests;
 
 use App\Extensions\SocialMedia\System\Enums\PlatformEnum;

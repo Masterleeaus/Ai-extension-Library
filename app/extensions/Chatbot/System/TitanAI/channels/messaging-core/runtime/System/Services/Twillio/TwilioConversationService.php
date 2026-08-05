@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace App\Extensions\ChatbotWhatsapp\System\Services\Twillio;
 
 use App\Extensions\Chatbot\System\Enums\InteractionType;

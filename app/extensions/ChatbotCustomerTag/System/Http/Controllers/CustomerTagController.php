@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace App\Extensions\ChatbotCustomerTag\System\Http\Controllers;
 
 use App\Extensions\ChatbotCustomerTag\System\Http\Requests\CustomerTagRequest;

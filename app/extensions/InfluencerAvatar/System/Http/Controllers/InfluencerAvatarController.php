@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace App\Extensions\InfluencerAvatar\System\Http\Controllers;
 
 use App\Concerns\HasErrorResponse;

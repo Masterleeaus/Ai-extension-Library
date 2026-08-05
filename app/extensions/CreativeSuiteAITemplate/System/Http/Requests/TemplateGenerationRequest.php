@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace App\Extensions\CreativeSuiteAITemplate\System\Http\Requests;
 
 use App\Helpers\Classes\MarketplaceHelper;

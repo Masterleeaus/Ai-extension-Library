@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace App\Extensions\AzureOpenai\System\Http\Controllers\Settings;
 
 use App\Domains\Entity\Models\Entity;

@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace App\Extensions\ChatbotInstagram\System\Http\Controllers\Webhook;
 
 use App\Extensions\Chatbot\System\Models\ChatbotChannel;

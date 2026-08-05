@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace App\Extensions\SocialMediaAgent\System\Models;
 
 use App\Extensions\SocialMedia\System\Models\SocialMediaPlatform;

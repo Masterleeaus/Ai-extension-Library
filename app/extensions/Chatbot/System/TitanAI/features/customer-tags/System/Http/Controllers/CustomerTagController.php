@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace App\Extensions\CustomerTags\System\Http\Controllers;
 
 use App\Extensions\CustomerTags\System\Http\Requests\CustomerTagRequest;

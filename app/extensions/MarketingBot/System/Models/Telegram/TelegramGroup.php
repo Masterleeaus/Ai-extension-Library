@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace App\Extensions\MarketingBot\System\Models\Telegram;
 
 use Database\Factories\TelegramGroupFactory;

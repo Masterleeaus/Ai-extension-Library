@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace App\Extensions\ChatSetting\System\Http\Controllers\Chatbot;
 
 use App\Helpers\Classes\Helper;

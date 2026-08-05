@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace App\Extensions\AiVideoPro\System\Jobs;
 
 use App\Extensions\AiVideoPro\System\Models\UserFall;

@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace App\Extensions\OpenRouter\System\Enums;
 
 use App\Enums\Contracts\WithStringBackedEnum;
