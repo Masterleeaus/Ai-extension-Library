@@ -43,6 +43,12 @@ jobs:
           php packages/titan-interaction-engine/tests/run.php
           php packages/titan-interaction-engine/bin/verify.php
 
+      - name: Refresh deterministic WorkCore package manifests
+        working-directory: app/extensions/WorkCore_Platform
+        run: |
+          python tools/refresh_package_checksums.py --repo .
+          test "$(git -C ../../.. diff --name-only -- app/extensions/WorkCore_Platform/packages | tr '\n' ' ')" = "app/extensions/WorkCore_Platform/packages/workcore-business-network/files.sha256.json "
+
       - name: Run WorkCore Platform contract suite
         working-directory: app/extensions/WorkCore_Platform
         run: python -m unittest discover tests -p 'test_*.py' -v
@@ -54,3 +60,12 @@ jobs:
           php -l app/extensions/WorkCore_Platform/packages/workcore-business-network/src/Domains/WorkCore/System/Modules/Wizards/Providers/WorkWizardsServiceProvider.php
           find app/extensions/WorkCore_Platform/packages/workcore-business-network/src/Domains/WorkCore/System/Modules/Wizards \
             -name '*VerticalContext*.php' -print0 | xargs -0 -r -n1 php -l
+
+      - name: Upload regenerated checksum manifest
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: workcore-business-network-checksums
+          path: app/extensions/WorkCore_Platform/packages/workcore-business-network/files.sha256.json
+          if-no-files-found: error
+          retention-days: 1
