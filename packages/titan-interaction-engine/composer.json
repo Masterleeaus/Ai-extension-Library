@@ -31,7 +31,8 @@
     "test": [
       "php tests/run.php",
       "php tests/vertical_context.php",
-      "php tests/vertical_ai_proposal.php"
+      "php tests/vertical_ai_proposal.php",
+      "php tests/vertical_ai_proposal_security.php"
     ],
     "verify": [
       "@test",
