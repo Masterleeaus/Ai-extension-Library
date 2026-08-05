@@ -107,13 +107,13 @@ class NanoBananaServiceProvider extends ServiceProvider implements ExtensionRegi
     {
 <<<<<<< HEAD
 <<<<<<< HEAD
-        $path = public_path("vendor/nanobanana");
-=======
-        $path = public_path("vendor/chatbot");
-=======
         $path = public_path("vendor/chatbot");
 =======
         $path = public_path("vendor/nanobanana");
+=======
+        $path = public_path("vendor/nanobanana");
+=======
+        $path = public_path("vendor/chatbot");
 >>>>>>> update-extensions-review-upgrade-nvbncq
 >>>>>>> update-ai-suite-extensions-issues-cvrb3y
         if (is_dir($path)) {

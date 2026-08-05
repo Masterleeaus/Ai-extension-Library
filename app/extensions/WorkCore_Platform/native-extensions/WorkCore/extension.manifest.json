@@ -522,12 +522,7 @@
       "tz_workforce_positions",
       "tz_workforce_team_members",
       "tz_workforce_teams",
-      "workcore_behavior_configurations",
-      "workcore_business_flows",
-      "workcore_idempotency_ledger",
-      "workcore_localizations",
-      "workcore_prompt_templates",
-      "workcore_themes"
+      "workcore_business_flows"
     ],
     "shared_tables": [
       "users"

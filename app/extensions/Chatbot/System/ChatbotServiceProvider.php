@@ -28,6 +28,7 @@ use App\Extensions\Chatbot\System\GenerativeUI\GenerativeUiSpecNormaliser;
 use App\Extensions\Chatbot\System\GenerativeUI\GenerativeUiResponseComposer;
 use App\Extensions\Chatbot\System\GenerativeUI\BuilderRegistry;
 use App\Extensions\Chatbot\System\Http\Controllers\Api\ChatbotApplicationController;
+use App\Extensions\Chatbot\System\Http\Controllers\ChatbotBuilderController;
 use App\Extensions\Chatbot\System\Http\Controllers\Api\TitanAI\TitanAIExecutionController;
 use App\Extensions\Chatbot\System\Http\Controllers\Api\TitanAI\FieldServiceSkillController;
 use App\Extensions\Chatbot\System\Http\Controllers\Api\TitanAI\FieldServiceToolController;
@@ -57,6 +58,8 @@ use App\Extensions\Chatbot\System\Models\TeamChat\TeamConversation;
 use App\Extensions\Chatbot\System\Policies\TeamChat\TeamConversationPolicy;
 use App\Extensions\Chatbot\System\TitanAI\WorkCoreApps\WorkCoreAppsIntegrationServiceProvider;
 use App\Extensions\Chatbot\System\TitanAI\Runtime\TitanAIRuntimeServiceProvider;
+use App\Extensions\Chatbot\System\Services\Builder\ChatbotBuilderService;
+use App\Extensions\Chatbot\System\Services\Builder\MobilekitComponentAdapter;
 use Illuminate\Support\Facades\Broadcast;
 use App\Extensions\Chatbot\System\Http\Middleware\LanguageMiddleware;
 use App\Extensions\Chatbot\System\Models\Chatbot;
@@ -86,6 +89,8 @@ class ChatbotServiceProvider extends ServiceProvider implements ExtensionRegiste
         $this->app->singleton(GenerativeUiSpecNormaliser::class);
         $this->app->singleton(GenerativeUiSpecValidator::class);
         $this->app->singleton(GenerativeUiResponseComposer::class);
+        $this->app->singleton(ChatbotBuilderService::class);
+        $this->app->singleton(MobilekitComponentAdapter::class);
         $this->registerTitanAIAutoloader();
         $this->registerConfig();
         TitanRegistry::init();
@@ -363,6 +368,22 @@ class ChatbotServiceProvider extends ServiceProvider implements ExtensionRegiste
                 $router->post('sync/conflicts/{conflict}/resolve', [ChatbotSyncController::class, 'resolve'])->name('conflicts.resolve');
                 $router->post('devices/register', [ChatbotDeviceController::class, 'register'])->name('devices.register');
                 $router->post('devices/{device}/revoke', [ChatbotDeviceController::class, 'revoke'])->name('devices.revoke');
+            })
+            ->group([
+                'middleware' => ['api', 'auth', 'throttle:60,1'],
+                'prefix' => 'api/v2/chatbot/builder',
+                'as' => 'api.v2.chatbot.builder.',
+                'controller' => ChatbotBuilderController::class,
+            ], function (Router $router) {
+                $router->post('create', 'create')->name('create');
+                $router->get('{builderId}', 'get')->name('get');
+                $router->put('{builderId}/step', 'updateStep')->name('updateStep');
+                $router->get('{builderId}/preview', 'preview')->name('preview');
+                $router->post('{builderId}/publish', 'publish')->name('publish');
+                $router->get('component/{componentType}', 'getMobilekitComponent')->name('getMobilekitComponent');
+                $router->post('{builderId}/duplicate', 'duplicate')->name('duplicate');
+                $router->get('templates/titan', 'getTitanTemplates')->name('getTitanTemplates');
+                $router->post('from-titan-template', 'fromTitanTemplate')->name('fromTitanTemplate');
             })
             ->group([
                 'middleware' => ['api', 'throttle:60,1'],

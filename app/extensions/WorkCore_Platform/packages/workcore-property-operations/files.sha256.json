@@ -1,5 +1,5 @@
 {
-  "file_count": 590,
+  "file_count": 588,
   "files": [
     {
       "bytes": 229,
@@ -2620,16 +2620,6 @@
       "bytes": 2291,
       "path": "src/Domains/WorkCore/System/Modules/Premises/routes/api.php",
       "sha256": "bb9db5c546fa709e7374d9632bc42bb9c2be0683b548ccc940ad0a381c1cfdfd"
-    },
-    {
-      "bytes": 4018,
-      "path": "src/Domains/WorkCore/System/Property/Queries/MaintenanceQueryBuilder.php",
-      "sha256": "96b04857c1bf4829c841a41e989dd3b17f0cac97b0839136a675daf13de82d8e"
-    },
-    {
-      "bytes": 3420,
-      "path": "src/Domains/WorkCore/System/Property/Queries/PropertyQueryBuilder.php",
-      "sha256": "40a4bb3def4d415b18e650c47fcc851504804abeb2cdda361f65b370c2566aaf"
     },
     {
       "bytes": 1434,

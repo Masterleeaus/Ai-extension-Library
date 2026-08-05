@@ -1,0 +1,51 @@
+<?php
+
+declare(strict_types=1);
+
+return [
+    'name' => 'Field & Home Services',
+    'slug' => 'field-services',
+    'icon' => '🔧',
+    'color' => '#FF6B6B',
+    'sub_verticals' => [
+        'plumbing',
+        'electrical',
+        'hvac',
+        'painting',
+        'carpentry',
+        'roofing',
+        'landscaping',
+        'pest_control',
+        'cleaning',
+        'handyman',
+        'appliance_repair',
+        'locksmith',
+        'gutter_cleaning',
+        'pressure_washing',
+        'septic_service',
+        'well_service',
+        'heating_repair',
+        'air_conditioning',
+        'water_damage_restoration',
+        'mold_remediation',
+        'flooring',
+        'drywall_repair',
+        'window_repair',
+        'door_installation',
+    ],
+    'features' => [
+        'multi_stop_routing',
+        'photo_documentation',
+        'on_site_signature',
+        'safety_checklists',
+        'skill_based_dispatch',
+        'inventory_tracking',
+        'warranty_management',
+    ],
+    'customizations' => [
+        'dispatch' => 'FieldServicesDispatchCustomization',
+        'work' => 'FieldServicesWorkCustomization',
+        'pay' => 'FieldServicesPayCustomization',
+        'forms' => 'FieldServicesFormsCustomization',
+    ],
+];

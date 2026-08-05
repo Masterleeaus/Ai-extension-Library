@@ -1,5 +1,5 @@
 {
-  "file_count": 438,
+  "file_count": 435,
   "files": [
     {
       "bytes": 220,
@@ -30,21 +30,6 @@
       "bytes": 672,
       "path": "src/Domains/WorkCore/Providers/CommercialServiceProvider.php",
       "sha256": "6823a9104da45dab7b0a765b056e5463b54a4a172aa8071dbfc0b6333a547807"
-    },
-    {
-      "bytes": 3655,
-      "path": "src/Domains/WorkCore/System/Commercial/Queries/InvoiceQueryBuilder.php",
-      "sha256": "6870b8ab5af582b5b918ca8ce0fd3c550373f27d5c498af028cdf59c43195cc8"
-    },
-    {
-      "bytes": 3523,
-      "path": "src/Domains/WorkCore/System/Commercial/Queries/PaymentQueryBuilder.php",
-      "sha256": "b5b3da2e2cdeedf550726406becafaa7befc53d35494ab06daf1daf92e901f14"
-    },
-    {
-      "bytes": 3622,
-      "path": "src/Domains/WorkCore/System/Commercial/Queries/ProductQueryBuilder.php",
-      "sha256": "4eba12eaf436642708c61858ace0babac62a371b51fb1720e7916e0037349937"
     },
     {
       "bytes": 371,

@@ -8,7 +8,6 @@ use RuntimeException;
 
 final class TemplateSchema
 {
-<<<<<<< HEAD
     public const VERSION = '1.0.0';
 
     public static function resolve(?string $slug): array
@@ -18,83 +17,10 @@ final class TemplateSchema
         if (! is_file($path)) {
             return self::generic($slug);
         }
-=======
-    public const VERSION = '2.0.0';
-
-    /**
-     * Resolve a shell schema while preserving non-application vertical templates.
-     * Legacy application slugs are migrated to one of the five canonical apps.
-     */
-    public static function resolve(?string $slug): array
-    {
-        $requestedSlug = trim((string) ($slug ?: 'titan-zero'));
-        $canonicalSlug = PlatformApplicationRegistry::canonicalSlug($requestedSlug);
-        $resolvedSlug = $canonicalSlug ?? $requestedSlug;
-        $schema = self::read($resolvedSlug);
-
-        if ($schema !== null) {
-            if ($canonicalSlug !== null && $requestedSlug !== $canonicalSlug) {
-                $schema['migration'] = [
-                    'requested_slug' => $requestedSlug,
-                    'canonical_slug' => $canonicalSlug,
-                    'legacy' => true,
-                ];
-            }
-
-            return $schema;
-        }
-
-        return self::generic($resolvedSlug);
-    }
-
-    /** @return list<array<string, mixed>> */
-    public static function all(): array
-    {
-        return array_map(
-            static fn (string $slug): array => self::resolve($slug),
-            PlatformApplicationRegistry::slugs(),
-        );
-    }
-
-    /**
-     * Retain access to non-application template schemas for dedicated template
-     * tooling without exposing them as top-level platform applications.
-     *
-     * @return list<array<string, mixed>>
-     */
-    public static function allTemplateSchemas(): array
-    {
-        $schemas = [];
-
-        foreach (glob(self::directory() . DIRECTORY_SEPARATOR . '*.json') ?: [] as $path) {
-            if (basename($path) === 'index.json') {
-                continue;
-            }
-
-            $decoded = json_decode((string) file_get_contents($path), true);
-            if (! is_array($decoded)) {
-                throw new RuntimeException('Invalid Titan template schema: ' . basename($path));
-            }
-
-            $schemas[] = $decoded;
-        }
-
-        return $schemas;
-    }
-
-    private static function read(string $slug): ?array
-    {
-        $path = self::directory() . DIRECTORY_SEPARATOR . $slug . '.json';
-        if (! is_file($path)) {
-            return null;
-        }
-
->>>>>>> update-extensions-review-upgrade-nvbncq
         $decoded = json_decode((string) file_get_contents($path), true);
         if (! is_array($decoded)) {
             throw new RuntimeException('Invalid Titan template schema: ' . $slug);
         }
-<<<<<<< HEAD
         return $decoded;
     }
 
@@ -102,10 +28,6 @@ final class TemplateSchema
     {
         $decoded = json_decode((string) file_get_contents(self::directory() . DIRECTORY_SEPARATOR . 'index.json'), true);
         return is_array($decoded['templates'] ?? null) ? $decoded['templates'] : [];
-=======
-
-        return $decoded;
->>>>>>> update-extensions-review-upgrade-nvbncq
     }
 
     private static function directory(): string
@@ -123,13 +45,7 @@ final class TemplateSchema
             'chat' => ['persistent' => true, 'role' => 'Chatbot', 'suggested_prompts' => [], 'context_policy' => ['minimum_scope' => true]],
             'workcore' => ['domains' => [], 'commands' => [], 'read_models' => []],
             'offline' => ['records' => [], 'packs' => [], 'retention' => ['completed_days' => 0], 'conflict_rules' => ['server_authoritative' => true]],
-<<<<<<< HEAD
             'permissions' => [], 'privacy' => ['default_mode' => 'device-first'], 'notifications' => [],
-=======
-            'permissions' => [],
-            'privacy' => ['default_mode' => 'device-first'],
-            'notifications' => [],
->>>>>>> update-extensions-review-upgrade-nvbncq
             'settings_sections' => ['privacy', 'device-security', 'offline-sync', 'appearance', 'diagnostics'],
             'preview_states' => ['mobile', 'desktop', 'offline'],
         ];

@@ -103,7 +103,7 @@ class MultiModelServiceProvider extends ServiceProvider implements ExtensionRegi
 
     public static function uninstall(): void
     {
-        $path = public_path("vendor/multimodel");
+        $path = public_path("vendor/chatbot");
         if (is_dir($path)) {
             array_map(static fn ($f) => @unlink($f), glob("$path/*.*"));
             @rmdir($path);

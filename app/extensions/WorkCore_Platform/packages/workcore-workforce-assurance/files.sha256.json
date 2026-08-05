@@ -1,5 +1,5 @@
 {
-  "file_count": 172,
+  "file_count": 167,
   "files": [
     {
       "bytes": 229,
@@ -835,31 +835,6 @@
       "bytes": 822,
       "path": "src/Domains/WorkCore/System/Modules/Workforce/routes/api.php",
       "sha256": "76db3922277524feb5b181d7f1740f9b2ea507a3d9bea287807deecdd72f8343"
-    },
-    {
-      "bytes": 3752,
-      "path": "src/Domains/WorkCore/System/Workforce/Queries/AttendanceQueryBuilder.php",
-      "sha256": "2fba22bfba4521a7c83dc90b864fe8f2035fadd9e1916711d0b439f40bbbbc4c"
-    },
-    {
-      "bytes": 3601,
-      "path": "src/Domains/WorkCore/System/Workforce/Queries/CertificationQueryBuilder.php",
-      "sha256": "78970131dfb6763f27aa1c5172df9d965aeba50d9f2ab100b3703821b293544f"
-    },
-    {
-      "bytes": 3700,
-      "path": "src/Domains/WorkCore/System/Workforce/Queries/EmployeeQueryBuilder.php",
-      "sha256": "ebe91b907d5b83ae90d2e995469ae64b2bc20535ec49589dcdc0a436af102fad"
-    },
-    {
-      "bytes": 3761,
-      "path": "src/Domains/WorkCore/System/Workforce/Queries/PerformanceQueryBuilder.php",
-      "sha256": "9e4b5fd0a07f09ff3fae89e78257faa6177568e902407694a586ce62fac6da90"
-    },
-    {
-      "bytes": 21030,
-      "path": "tests/Unit/Conformance/WorkforceAssuranceConformanceTest.php",
-      "sha256": "66475c1b9f695bce37d85bc9514735ba71b67ad2b8c5b6dd20f107b2b5c5f198"
     }
   ]
 }
