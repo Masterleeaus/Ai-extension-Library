@@ -59,11 +59,7 @@ workcore.dashboard.vertical.booking_capacity
 workcore.dashboard.ai_governance
 ```
 
-The following key must not exist:
-
-```text
-workcore.dashboard.executive
-```
+The legacy executive key is forbidden by architecture tests and must not be registered.
 
 ## Shared Response Contract
 
@@ -76,12 +72,7 @@ array{
     business_line_public_id: string|null,
     generated_at: string,
     as_of: string,
-    tabs: list<array{
-        key: string,
-        label: string,
-        active: bool,
-        route: string
-    }>,
+    tabs: list<array{key: string, label: string, active: bool, route: string}>,
     filters: array<string,mixed>,
     kpis: list<array{
         key: string,
@@ -154,17 +145,7 @@ array{
 
 - [ ] **Step 1: Write the failing catalogue test**
 
-Assert:
-
-```text
-vertical count = 9
-business-type count = 205
-dashboard keys are unique
-vertical keys are unique
-business-type slugs are unique within each vertical
-each definition has a label, capability requirements, widgets and route name
-workcore.dashboard.executive is absent
-```
+Assert nine verticals, 205 business-type entries, unique dashboard keys, unique vertical keys, unique business-type slugs within each vertical, complete route/capability/widget metadata and absence of any executive dashboard registration.
 
 - [ ] **Step 2: Run the test and verify failure**
 
@@ -172,11 +153,7 @@ workcore.dashboard.executive is absent
 python -m unittest app/extensions/WorkCore_Platform/tests/test_workcore_vertical_dashboard_catalogue.py -v
 ```
 
-Expected: failure because the vertical dashboard registry does not exist.
-
 - [ ] **Step 3: Implement immutable definitions**
-
-Use these exact keys and labels:
 
 ```php
 [
@@ -196,39 +173,17 @@ Each definition contains `key`, `label`, `readModel`, `routeName`, `capabilities
 
 - [ ] **Step 4: Copy all approved business types into the definitions**
 
-Preserve the user-approved labels. Generate normalized slugs with lowercase kebab case and reject duplicates during registry construction.
+Preserve the approved labels. Generate lowercase kebab-case slugs and reject duplicates during registry construction.
 
-- [ ] **Step 5: Implement filter normalization**
+- [ ] **Step 5: Normalize filters**
 
-Accept only:
+Accept only `as_of`, `period_from`, `period_to`, `business_line_public_id`, `branch_public_id`, `territory_public_id`, `location_public_id`, `property_public_id`, `worker_public_id`, `resource_public_id`, `currency` and `timezone`. Discard unknown keys. Normalize company-local dates to UTC for queries.
 
-```text
-as_of
-period_from
-period_to
-business_line_public_id
-branch_public_id
-territory_public_id
-location_public_id
-property_public_id
-worker_public_id
-resource_public_id
-currency
-timezone
-```
-
-Unknown keys are discarded at the HTTP boundary. Dates are normalized to the company timezone and converted to UTC for queries.
-
-- [ ] **Step 6: Run tests**
+- [ ] **Step 6: Run tests and commit**
 
 ```bash
 python -m unittest app/extensions/WorkCore_Platform/tests/test_workcore_vertical_dashboard_catalogue.py -v
 php app/extensions/WorkCore_Platform/tools/verify_workcore_entitlement_projection.php
-```
-
-- [ ] **Step 7: Commit**
-
-```bash
 git add app/extensions/WorkCore app/extensions/WorkCore_Platform/tests/test_workcore_vertical_dashboard_catalogue.py
 git commit -m "feat(workcore): add Titan Zero vertical dashboard catalogue"
 ```
@@ -246,33 +201,13 @@ git commit -m "feat(workcore): add Titan Zero vertical dashboard catalogue"
 - Test: `app/extensions/WorkCore_Platform/tests/test_workcore_vertical_dashboard_resolver.py`
 
 **Interfaces:**
-- Consumes: company profile, business-line profile, enabled verticals, capability registry, permission resolver and entitlement resolver.
 - Produces: `CompanyVerticalResolver::resolve(int $companyId, int $userId, ?string $businessLinePublicId): CompanyVerticalSelection`.
 
 - [ ] **Step 1: Write failing resolver tests**
 
-Cover:
+Cover single-vertical defaulting, configured primary selection, inaccessible-primary fallback, unentitled request rejection, ordered secondary tabs, business-line override, no-access failure and exclusion of AI Governance from customer tabs.
 
-```text
-single enabled vertical becomes primary
-configured primary wins when accessible
-inaccessible configured primary falls back to first accessible enabled vertical
-request cannot activate an unentitled vertical
-secondary verticals become ordered tabs
-business-line vertical overrides company default only for that business line
-no accessible vertical throws NoAccessibleVertical
-AI Governance never appears in customer tabs
-```
-
-- [ ] **Step 2: Verify failure**
-
-```bash
-python -m unittest app/extensions/WorkCore_Platform/tests/test_workcore_vertical_dashboard_resolver.py -v
-```
-
-- [ ] **Step 3: Implement server-side resolution**
-
-Resolution order:
+- [ ] **Step 2: Implement resolution order**
 
 ```text
 1. authorised business-line primary vertical
@@ -281,13 +216,11 @@ Resolution order:
 4. fail closed
 ```
 
-Do not trust `vertical` from the request until the selected key is checked against the authorised tab set.
+- [ ] **Step 3: Build authorised tab metadata**
 
-- [ ] **Step 4: Build tab metadata**
+Each tab returns key, translated label, active state and route. Omit tabs lacking enabled capabilities.
 
-Each tab returns key, translated label, active state and route. Tabs with no enabled capability are omitted, not disabled client-side.
-
-- [ ] **Step 5: Run tests and commit**
+- [ ] **Step 4: Run tests and commit**
 
 ```bash
 python -m unittest app/extensions/WorkCore_Platform/tests/test_workcore_vertical_dashboard_resolver.py -v
@@ -313,15 +246,12 @@ git commit -m "feat(workcore): resolve primary and secondary vertical dashboards
 - Test: `app/extensions/WorkCore_Platform/tests/test_workcore_vertical_widget_composition.py`
 
 **Interfaces:**
-- Produces:
 
 ```php
 interface DashboardWidgetProvider
 {
     public function key(): string;
-
     public function supports(VerticalWidgetDefinition $widget): bool;
-
     public function load(
         VerticalWidgetDefinition $widget,
         CompanyVerticalSelection $selection,
@@ -332,47 +262,17 @@ interface DashboardWidgetProvider
 
 - [ ] **Step 1: Write failing composition tests**
 
-Assert deterministic widget order, tenant propagation, capability filtering, unavailable-widget reasons, duplicate-provider rejection, schema validation and cache-key isolation.
+Assert deterministic widget order, tenant propagation, capability filtering, unavailable-widget reasons, duplicate-provider rejection, response validation and cache isolation.
 
-- [ ] **Step 2: Verify failure**
+- [ ] **Step 2: Implement provider registry and composer**
 
-```bash
-python -m unittest app/extensions/WorkCore_Platform/tests/test_workcore_vertical_widget_composition.py -v
-```
+The composer resolves the selected vertical, filters widgets by entitlement/permission/access level, calls providers through registered contracts, marks optional missing capabilities as unavailable, fails only when a required core capability is absent, and emits tabs, KPIs, widgets, alerts and freshness metadata.
 
-- [ ] **Step 3: Implement provider registry**
+- [ ] **Step 3: Implement cache-key isolation**
 
-Registration fails when two providers claim the same provider key. Providers execute only registered read models; they cannot use table names from another package.
+Include company, user, access revision, permission revision, entitlement revision, vertical, business line and normalized filters.
 
-- [ ] **Step 4: Implement the composer**
-
-The composer:
-
-1. Resolves the company and selected vertical.
-2. Loads the immutable definition.
-3. Filters widgets by entitlement, permission and access level.
-4. Calls providers through registered contracts.
-5. Converts missing optional capabilities to `unavailable_reason`.
-6. Fails the whole response only when the vertical’s required core capability is unavailable.
-7. Produces tabs, KPIs, widgets, alerts and freshness metadata.
-8. Caches after tenant and permission resolution.
-
-- [ ] **Step 5: Implement cache keys**
-
-```php
-sha1(json_encode([
-    'company' => $companyId,
-    'user' => $userId,
-    'access_revision' => $accessRevision,
-    'permission_revision' => $permissionRevision,
-    'entitlement_revision' => $entitlementRevision,
-    'vertical' => $verticalKey,
-    'business_line' => $businessLinePublicId,
-    'filters' => $filter->toArray(),
-]))
-```
-
-- [ ] **Step 6: Run tests and commit**
+- [ ] **Step 4: Run tests and commit**
 
 ```bash
 python -m unittest app/extensions/WorkCore_Platform/tests/test_workcore_vertical_widget_composition.py -v
@@ -396,43 +296,21 @@ git commit -m "feat(workcore): compose vertical dashboards from domain widgets"
 - Modify: `app/extensions/WorkCore/routes/api.php`
 - Test: `app/extensions/WorkCore_Platform/tests/test_workcore_vertical_dashboard_routes.py`
 
-**Interfaces:**
-- Produces:
-  - `GET /dashboard/workcore`
-  - `GET /dashboard/workcore/vertical/{vertical}`
-  - `GET /api/v1/workcore/vertical-dashboards/{vertical}`
-
-- [ ] **Step 1: Write failing route tests**
-
-Cover default resolution, authorised tab switching, unknown key 404, inaccessible key 404, missing tenant failure, API schema, stale state and empty state.
-
-- [ ] **Step 2: Verify failure**
-
-```bash
-python -m unittest app/extensions/WorkCore_Platform/tests/test_workcore_vertical_dashboard_routes.py -v
-```
-
-- [ ] **Step 3: Register routes**
+**Routes:**
 
 ```php
 Route::get('/dashboard/workcore', [VerticalDashboardController::class, 'default'])
     ->name('dashboard.user.workcore.vertical.default');
-
 Route::get('/dashboard/workcore/vertical/{vertical}', [VerticalDashboardController::class, 'show'])
     ->name('dashboard.user.workcore.vertical.show');
 ```
 
-The API route uses the existing authenticated tenant middleware and returns `VerticalDashboardResource`.
+The authenticated API route is `GET /api/v1/workcore/vertical-dashboards/{vertical}`.
 
-- [ ] **Step 4: Build reusable Blade components**
-
-Components must render explicit loading, empty, partial, stale and error states. They must not display sample metrics when data is absent.
-
-- [ ] **Step 5: Preserve drill-down workspaces**
-
-CRM, Operations, Workforce, Resources and Commercial routes remain available as operational tables, boards, calendars, maps, workbenches and 360 profiles. They are linked from widget drilldowns rather than used as the customer home page.
-
-- [ ] **Step 6: Run tests and commit**
+- [ ] **Step 1: Test default resolution, authorised switching, unknown/inaccessible keys, tenant failure, API schema, stale state and empty state**
+- [ ] **Step 2: Implement routes and reusable Blade components with loading, empty, partial, stale and error states**
+- [ ] **Step 3: Keep CRM, Operations, Workforce, Resources and Commercial as operational drilldowns linked from widgets**
+- [ ] **Step 4: Run tests and commit**
 
 ```bash
 python -m unittest app/extensions/WorkCore_Platform/tests/test_workcore_vertical_dashboard_routes.py -v
@@ -452,57 +330,14 @@ git commit -m "feat(workcore): add vertical dashboard routes and views"
 - Modify: `app/extensions/WorkCore/System/VerticalDashboards/vertical-dashboard-definitions.php`
 - Test: `app/extensions/WorkCore_Platform/packages/workcore-work-operations/tests/Feature/Dashboards/GetFieldServicesOperationsSnapshotTest.php`
 
-**Interfaces:**
-- Produces widget source `workcore.vertical.field_services.operations`.
+**Metrics:** jobs booked/dispatched/completed today, unassigned/overdue/emergency jobs, available workers, on-time arrival, first-time completion, technician utilisation, callbacks, jobs awaiting invoice and compliance-blocked jobs.
 
-- [ ] **Step 1: Write failing tenant-isolation tests**
+**Widgets:** today job board, dispatch/route map, unassigned and overdue queue, worker capacity, materials/equipment, site access/compliance, completion evidence, invoice readiness, callbacks/warranty and customer communications.
 
-Cover:
-
-```text
-jobs_booked_today
-jobs_dispatched_today
-jobs_completed_today
-unassigned_jobs
-overdue_jobs
-emergency_jobs
-available_workers
-on_time_arrival_rate
-first_time_completion_rate
-technician_utilisation
-callbacks_open
-jobs_awaiting_invoice
-compliance_blocked_jobs
-```
-
-- [ ] **Step 2: Verify failure**
-
-```bash
-php artisan test --filter=GetFieldServicesOperationsSnapshotTest
-```
-
-- [ ] **Step 3: Implement the bounded snapshot**
-
-Reuse dispatch-board status, assignment, worker, premises and date-window semantics. Add widgets:
-
-```text
-today_job_board
-dispatch_and_route_map
-unassigned_and_overdue_queue
-worker_capacity
-materials_and_equipment
-site_access_and_compliance
-completion_evidence
-invoice_readiness
-callbacks_and_warranty
-customer_communications
-```
-
-- [ ] **Step 4: Register field-services composition**
-
-Required engines: Operations and Workforce. Optional engines: CRM, Resources, Inventory, Commercial and Assurance.
-
-- [ ] **Step 5: Run tests and commit**
+- [ ] **Step 1: Write tenant-isolation and metric tests**
+- [ ] **Step 2: Implement bounded snapshot using dispatch-board status, assignment, worker, premises and date-window semantics**
+- [ ] **Step 3: Register Operations and Workforce as required; CRM, Resources, Inventory, Commercial and Assurance as optional**
+- [ ] **Step 4: Run tests and commit**
 
 ```bash
 php artisan test --filter=GetFieldServicesOperationsSnapshotTest
@@ -522,55 +357,14 @@ git commit -m "feat(workcore): add field services dashboard pack"
 - Modify: `app/extensions/WorkCore/System/VerticalDashboards/vertical-dashboard-definitions.php`
 - Test: `app/extensions/WorkCore_Platform/packages/workcore-property-operations/tests/Feature/Dashboards/GetAccommodationDashboardSnapshotTest.php`
 
-**Interfaces:**
-- Consumes existing accommodation reservations, stays, housekeeping and premises readiness.
-- Produces widget source `workcore.vertical.accommodation.operations`.
+**Metrics:** occupancy, arrivals, departures, in-house guests, available/dirty/blocked rooms, open housekeeping, late turnovers, maintenance-blocked nights, outstanding balances and average stay.
 
-- [ ] **Step 1: Write failing tests**
+**Widgets:** occupancy board, arrivals/departures, check-in/out queue, housekeeping, room readiness, maintenance blocks, guest requests/incidents, folio exceptions, linen/supply and rooming agreements/notices.
 
-Cover:
-
-```text
-occupancy_rate
-arrivals_today
-departures_today
-in_house_guests
-rooms_available
-rooms_dirty
-rooms_blocked
-open_housekeeping
-late_turnovers
-maintenance_blocked_nights
-outstanding_guest_balances
-average_length_of_stay
-```
-
-- [ ] **Step 2: Verify failure**
-
-```bash
-php artisan test --filter=GetAccommodationDashboardSnapshotTest
-```
-
-- [ ] **Step 3: Implement widgets**
-
-```text
-occupancy_board
-arrivals_and_departures
-check_in_out_queue
-housekeeping_board
-room_readiness
-maintenance_blocks
-guest_requests_and_incidents
-folio_and_balance_exceptions
-linen_and_supply
-rooming_agreements_and_notices
-```
-
-- [ ] **Step 4: Preserve accommodation record authority**
-
-Do not create parallel reservation, stay, room, housekeeping or folio tables.
-
-- [ ] **Step 5: Run tests and commit**
+- [ ] **Step 1: Test tenant isolation and all metrics**
+- [ ] **Step 2: Implement using canonical reservations, stays, rooms, housekeeping and premises readiness**
+- [ ] **Step 3: Confirm no parallel accommodation tables are introduced**
+- [ ] **Step 4: Run tests and commit**
 
 ```bash
 php artisan test --filter=GetAccommodationDashboardSnapshotTest
@@ -588,56 +382,14 @@ git commit -m "feat(workcore): add accommodation dashboard pack"
 - Modify: `app/extensions/WorkCore/System/VerticalDashboards/vertical-dashboard-definitions.php`
 - Test: `app/extensions/WorkCore_Platform/packages/workcore-property-operations/tests/Feature/Dashboards/GetRealEstatePortfolioSnapshotTest.php`
 
-**Interfaces:**
-- Produces widget source `workcore.vertical.real_estate.portfolio`.
+**Metrics:** properties managed, occupied/vacant properties, average vacancy days, pending applications, inspections due, expiring leases, overdue receivables, open maintenance, compliance blocks, sales pipeline and owner/tenant requests.
 
-- [ ] **Step 1: Write failing tests**
+**Widgets:** portfolio position, vacancy/leasing, sales pipeline, applications, inspections, agreement expiry, owner/tenant requests, maintenance coordination, property compliance, profitability and agent workload.
 
-Cover:
-
-```text
-properties_managed
-occupied_properties
-vacant_properties
-days_vacant_average
-applications_pending
-inspections_due
-leases_expiring
-receivables_overdue
-maintenance_open
-compliance_blocked_properties
-sales_pipeline_value
-owner_requests_open
-tenant_requests_open
-```
-
-- [ ] **Step 2: Verify failure**
-
-```bash
-php artisan test --filter=GetRealEstatePortfolioSnapshotTest
-```
-
-- [ ] **Step 3: Implement widgets**
-
-```text
-portfolio_position
-vacancy_and_leasing
-sales_pipeline
-applications_queue
-inspection_schedule
-lease_and_agreement_expiry
-owner_and_tenant_requests
-maintenance_coordination
-property_compliance
-portfolio_profitability
-agent_workload
-```
-
-- [ ] **Step 4: Use premises readiness for compliance blockers**
-
-Premise access, service windows, plans, keys and readiness blockers remain sourced from the existing premises readiness query.
-
-- [ ] **Step 5: Run tests and commit**
+- [ ] **Step 1: Test tenant isolation and metrics**
+- [ ] **Step 2: Implement with premises, agreements, applications, visits, inspections, maintenance and CRM read models**
+- [ ] **Step 3: Reuse premises readiness for access, service-window, plan and key blockers**
+- [ ] **Step 4: Run tests and commit**
 
 ```bash
 php artisan test --filter=GetRealEstatePortfolioSnapshotTest
@@ -655,54 +407,14 @@ git commit -m "feat(workcore): add real estate dashboard pack"
 - Modify: `app/extensions/WorkCore/System/VerticalDashboards/vertical-dashboard-definitions.php`
 - Test: `app/extensions/WorkCore_Platform/packages/workcore-work-operations/tests/Feature/Dashboards/GetSalonCapacitySnapshotTest.php`
 
-**Interfaces:**
-- Produces widget source `workcore.vertical.salons.capacity`.
+**Metrics:** appointments, available slots, late arrivals, no-shows, waitlist, appointment/staff utilisation, rebooking, client spend, retail attachment, package balances and unpaid balances.
 
-- [ ] **Step 1: Write failing tests**
+**Widgets:** appointment book, availability gaps, staff/room capacity, walk-ins/waitlist, rebooking, memberships/packages, retail stock, commissions, deposits/balances and service recovery.
 
-Cover:
-
-```text
-appointments_today
-available_slots
-late_arrivals
-no_shows
-waitlist_count
-appointment_utilisation
-staff_utilisation
-rebooking_rate
-average_client_spend
-retail_attachment_rate
-membership_package_balance
-unpaid_balances
-```
-
-- [ ] **Step 2: Verify failure**
-
-```bash
-php artisan test --filter=GetSalonCapacitySnapshotTest
-```
-
-- [ ] **Step 3: Implement widgets**
-
-```text
-today_appointment_book
-availability_gaps
-staff_room_capacity
-walk_in_and_waitlist
-client_rebooking
-memberships_and_packages
-retail_stock
-staff_commissions
-deposits_and_balances
-reviews_and_service_recovery
-```
-
-- [ ] **Step 4: Apply terminology profiles**
-
-The same resource type can render as chair, room, practitioner station or treatment room based on the selected business type.
-
-- [ ] **Step 5: Run tests and commit**
+- [ ] **Step 1: Test metrics, tenant isolation and terminology**
+- [ ] **Step 2: Implement capacity read model**
+- [ ] **Step 3: Render resource terminology as chair, room, practitioner station or treatment room from the business-type profile**
+- [ ] **Step 4: Run tests and commit**
 
 ```bash
 php artisan test --filter=GetSalonCapacitySnapshotTest
@@ -720,56 +432,14 @@ git commit -m "feat(workcore): add salons and personal care dashboard pack"
 - Modify: `app/extensions/WorkCore/System/VerticalDashboards/vertical-dashboard-definitions.php`
 - Test: `app/extensions/WorkCore_Platform/packages/workcore-business-network/tests/Feature/Dashboards/GetFitnessMembershipSnapshotTest.php`
 
-**Interfaces:**
-- Produces widget source `workcore.vertical.fitness.membership`.
+**Metrics:** active/new/cancelled members, net growth, churn risk, recurring revenue, revenue per member, class utilisation, waitlists, check-in frequency, trial conversion, failed payments and expiries.
 
-- [ ] **Step 1: Write failing tests**
+**Widgets:** membership position, growth/churn, class capacity, trainer coverage, attendance, engagement, trials/leads, payment failures, expiries, facility issues and staff credentials.
 
-Cover:
-
-```text
-active_members
-new_members
-cancellations
-net_member_growth
-members_at_churn_risk
-monthly_recurring_revenue
-average_revenue_per_member
-class_utilisation
-waitlist_count
-check_in_frequency
-trial_conversion_rate
-failed_payment_count
-memberships_expiring
-```
-
-- [ ] **Step 2: Verify failure**
-
-```bash
-php artisan test --filter=GetFitnessMembershipSnapshotTest
-```
-
-- [ ] **Step 3: Implement widgets**
-
-```text
-membership_position
-growth_and_churn
-class_schedule_and_capacity
-trainer_coverage
-check_ins_and_attendance
-member_engagement
-trials_and_leads
-payments_and_failures
-membership_expiries
-equipment_and_facility_issues
-staff_credentials
-```
-
-- [ ] **Step 4: Fail optional widgets independently**
-
-Where membership or recurring billing capabilities are not enabled, return a clear unavailable reason while preserving schedule and attendance widgets.
-
-- [ ] **Step 5: Run tests and commit**
+- [ ] **Step 1: Test metrics and tenant isolation**
+- [ ] **Step 2: Implement membership snapshot**
+- [ ] **Step 3: When membership or recurring billing is unavailable, preserve schedule/attendance widgets and return explicit unavailable reasons**
+- [ ] **Step 4: Run tests and commit**
 
 ```bash
 php artisan test --filter=GetFitnessMembershipSnapshotTest
@@ -787,56 +457,14 @@ git commit -m "feat(workcore): add fitness and membership dashboard pack"
 - Modify: `app/extensions/WorkCore/System/VerticalDashboards/vertical-dashboard-definitions.php`
 - Test: `app/extensions/WorkCore_Platform/packages/workcore-work-operations/tests/Feature/Dashboards/GetAutomotiveWorkshopSnapshotTest.php`
 
-**Interfaces:**
-- Produces widget source `workcore.vertical.automotive.workshop`.
+**Metrics:** vehicles booked, awaiting diagnosis, quotes awaiting approval, jobs awaiting parts, work in progress, ready for collection, bay utilisation, technician productivity, labour recovery, repair-order value, comeback rate and fleet services due.
 
-- [ ] **Step 1: Write failing tests**
+**Widgets:** workshop board, arrivals, diagnosis, approvals, parts delays, technician/bay allocation, roadworthy inspections, collection queue, parts/supplier ETA, warranty/comebacks, fleet maintenance and towing/roadside.
 
-Cover:
-
-```text
-vehicles_booked_today
-awaiting_diagnosis
-quotes_awaiting_approval
-jobs_awaiting_parts
-work_in_progress
-ready_for_collection
-bay_utilisation
-technician_productivity
-labour_recovery_rate
-average_repair_order_value
-comeback_rate
-fleet_services_due
-```
-
-- [ ] **Step 2: Verify failure**
-
-```bash
-php artisan test --filter=GetAutomotiveWorkshopSnapshotTest
-```
-
-- [ ] **Step 3: Implement widgets**
-
-```text
-workshop_job_board
-vehicle_arrivals
-diagnosis_queue
-quote_approvals
-jobs_waiting_for_parts
-technician_and_bay_allocation
-roadworthy_and_inspections
-ready_for_collection
-parts_stock_and_supplier_eta
-warranty_and_comebacks
-fleet_maintenance_schedule
-towing_and_roadside_queue
-```
-
-- [ ] **Step 4: Link vehicle, work-order, parts and invoice drilldowns**
-
-Use public identifiers and existing authorised routes. Never expose registration, VIN or customer details outside the active company and user access scope.
-
-- [ ] **Step 5: Run tests and commit**
+- [ ] **Step 1: Test metrics and tenant isolation**
+- [ ] **Step 2: Implement workshop snapshot and authorised drilldowns using public identifiers**
+- [ ] **Step 3: Verify registration, VIN and customer details never cross access scope**
+- [ ] **Step 4: Run tests and commit**
 
 ```bash
 php artisan test --filter=GetAutomotiveWorkshopSnapshotTest
@@ -854,59 +482,14 @@ git commit -m "feat(workcore): add automotive services dashboard pack"
 - Modify: `app/extensions/WorkCore/System/VerticalDashboards/vertical-dashboard-definitions.php`
 - Test: `app/extensions/WorkCore_Platform/packages/workcore-commercial/tests/Feature/Dashboards/GetRetailCommerceSnapshotTest.php`
 
-**Interfaces:**
-- Produces widget source `workcore.vertical.ecommerce_retail.commerce`.
+**Metrics:** gross/net sales, orders, average order value, margin, payment/fulfilment queues, returns, refunds, stockouts, low stock, repeat purchasing and subscription churn.
 
-- [ ] **Step 1: Write failing tests**
+**Widgets:** sales, fulfilment, click-and-collect, returns/refunds, product/channel/location performance, inventory, purchase orders/supplier delays, abandoned carts, subscriptions, support, profitability and reconciliation.
 
-Cover:
-
-```text
-gross_sales
-net_sales
-order_count
-average_order_value
-gross_margin
-orders_awaiting_payment
-orders_awaiting_fulfilment
-returns_open
-refund_value
-stockout_count
-low_stock_count
-repeat_purchase_rate
-subscription_churn
-```
-
-- [ ] **Step 2: Verify failure**
-
-```bash
-php artisan test --filter=GetRetailCommerceSnapshotTest
-```
-
-- [ ] **Step 3: Implement widgets**
-
-```text
-sales_today
-order_fulfilment_queue
-click_and_collect
-returns_and_refunds
-product_performance
-channel_performance
-location_performance
-inventory_availability
-purchase_orders_and_supplier_delays
-abandoned_carts
-subscription_orders
-customer_support
-product_profitability
-payment_reconciliation
-```
-
-- [ ] **Step 4: Preserve canonical commercial authority**
-
-Use current catalogue, inventory, supply, order, invoice and Titan Money authorities. Do not create dashboard order or inventory tables.
-
-- [ ] **Step 5: Run tests and commit**
+- [ ] **Step 1: Test metrics and tenant isolation**
+- [ ] **Step 2: Implement using canonical catalogue, inventory, supply, order, invoice and Titan Money authorities**
+- [ ] **Step 3: Verify no dashboard order or inventory tables are introduced**
+- [ ] **Step 4: Run tests and commit**
 
 ```bash
 php artisan test --filter=GetRetailCommerceSnapshotTest
@@ -925,57 +508,14 @@ git commit -m "feat(workcore): add ecommerce and retail dashboard pack"
 - Modify: `app/extensions/WorkCore/System/VerticalDashboards/vertical-dashboard-definitions.php`
 - Test: `app/extensions/WorkCore_Platform/packages/workcore-property-operations/tests/Feature/Dashboards/GetHireRentalSnapshotTest.php`
 
-**Interfaces:**
-- Produces widget source `workcore.vertical.hire_rental.assets`.
+**Metrics:** available/reserved/on-hire assets, returns due, overdue returns, preparation queue, maintenance blocks, utilisation, revenue per asset, hire duration, damage rate and deposit exposure.
 
-- [ ] **Step 1: Write failing tests**
+**Widgets:** availability calendar, reservations, preparation/dispatch, pickups/deliveries, due/overdue returns, on-hire assets, condition/damage, turnaround, maintenance, deposits/usage charges, contracts/waivers, location and profitability.
 
-Cover:
-
-```text
-assets_available
-assets_reserved
-assets_on_hire
-returns_due_today
-overdue_returns
-assets_awaiting_preparation
-maintenance_blocked_assets
-asset_utilisation
-revenue_per_asset
-average_hire_duration
-damage_rate
-deposit_exposure
-```
-
-- [ ] **Step 2: Verify failure**
-
-```bash
-php artisan test --filter=GetHireRentalSnapshotTest
-```
-
-- [ ] **Step 3: Implement widgets**
-
-```text
-availability_calendar
-reservation_queue
-preparation_and_dispatch
-pickups_and_deliveries
-returns_due_and_overdue
-assets_on_hire
-damage_and_condition
-cleaning_and_turnaround
-maintenance_blocks
-deposits_and_usage_charges
-contracts_and_waivers
-asset_location
-utilisation_and_profitability
-```
-
-- [ ] **Step 4: Enforce reservation conflict rules**
-
-The dashboard reads the same availability and reservation rules used by booking actions; it must never infer availability from a simple status column alone.
-
-- [ ] **Step 5: Run tests and commit**
+- [ ] **Step 1: Test metrics and tenant isolation**
+- [ ] **Step 2: Implement using canonical asset, availability, reservation, maintenance and commercial rules**
+- [ ] **Step 3: Verify availability is calculated through reservation-conflict rules rather than a status column alone**
+- [ ] **Step 4: Run tests and commit**
 
 ```bash
 php artisan test --filter=GetHireRentalSnapshotTest
@@ -993,57 +533,14 @@ git commit -m "feat(workcore): add hire and rental dashboard pack"
 - Modify: `app/extensions/WorkCore/System/VerticalDashboards/vertical-dashboard-definitions.php`
 - Test: `app/extensions/WorkCore_Platform/packages/workcore-work-operations/tests/Feature/Dashboards/GetBookingCapacitySnapshotTest.php`
 
-**Interfaces:**
-- Produces widget source `workcore.vertical.booking_capacity.schedule`.
+**Metrics:** available/booked capacity, utilisation, bookings, waitlist, conflicts, cancellations, no-shows, revenue per slot, booking value, deposit collection and repeat booking.
 
-- [ ] **Step 1: Write failing tests**
+**Widgets:** booking calendar, capacity timeline, available slots, waitlist, conflicts, staff/resource availability, arrivals/check-ins, cancellations/no-shows, deposits/balances, group/recurring bookings, preparation, source performance and forecast.
 
-Cover:
-
-```text
-capacity_available
-capacity_booked
-capacity_utilisation
-bookings_today
-waitlist_count
-overbooking_conflicts
-cancellations
-no_shows
-revenue_per_available_slot
-average_booking_value
-deposit_collection_rate
-repeat_booking_rate
-```
-
-- [ ] **Step 2: Verify failure**
-
-```bash
-php artisan test --filter=GetBookingCapacitySnapshotTest
-```
-
-- [ ] **Step 3: Implement widgets**
-
-```text
-booking_calendar
-capacity_timeline
-available_slots
-waitlist
-overbooking_and_conflicts
-staff_and_resource_availability
-arrivals_and_check_ins
-cancellations_and_no_shows
-deposits_and_balances
-group_and_recurring_bookings
-venue_or_resource_preparation
-booking_source_performance
-capacity_forecast
-```
-
-- [ ] **Step 4: Support terminology without forking logic**
-
-Render capacity units as appointments, seats, rooms, courts, vehicles, equipment, tables or places according to the vertical terminology profile.
-
-- [ ] **Step 5: Run tests and commit**
+- [ ] **Step 1: Test metrics, conflicts, tenant isolation and terminology**
+- [ ] **Step 2: Implement capacity snapshot**
+- [ ] **Step 3: Render capacity as appointments, seats, rooms, courts, vehicles, equipment, tables or places from the terminology profile**
+- [ ] **Step 4: Run tests and commit**
 
 ```bash
 php artisan test --filter=GetBookingCapacitySnapshotTest
@@ -1064,56 +561,13 @@ git commit -m "feat(workcore): add booking and capacity dashboard pack"
 - Test: `app/extensions/WorkCore_Platform/packages/workcore-business-network/tests/Feature/AI/GetAiGovernanceDashboardTest.php`
 - Test: `app/extensions/WorkCore_Platform/tests/test_workcore_ai_governance_routes.py`
 
-**Interfaces:**
-- Consumes AI approvals, agents, versions, orchestration runs and steps, tool runs, usage ledger, model/provider profiles, policy versions and audit/outbox records.
-- Produces read model `workcore.dashboard.ai_governance`.
+**Metrics:** pending/overdue approvals, active/failed agent runs, failed tool runs, retries, overrides, reversals, usage, estimated cost, high-risk actions, active policies and outbox failures.
 
-- [ ] **Step 1: Write failing authorization and tenant tests**
+**Widgets:** approval queue, run health, tool failures, override/reversal log, usage/cost, model-provider-agent breakdown, policy adoption, high-risk actions and outbox/audit failures.
 
-Cover administrator access, ordinary-user denial, cross-company isolation and absence from vertical tabs.
-
-- [ ] **Step 2: Write failing metric tests**
-
-Cover:
-
-```text
-approvals_pending
-approvals_overdue
-agent_runs_active
-agent_runs_failed
-tool_runs_failed
-retries
-human_overrides
-reversals
-usage_units
-estimated_cost
-high_risk_actions
-policy_versions_active
-outbox_failures
-```
-
-- [ ] **Step 3: Verify failure**
-
-```bash
-php artisan test --filter=GetAiGovernanceDashboardTest
-python -m unittest app/extensions/WorkCore_Platform/tests/test_workcore_ai_governance_routes.py -v
-```
-
-- [ ] **Step 4: Implement admin-only route and widgets**
-
-```text
-approval_queue
-run_health
-tool_failures
-override_and_reversal_log
-usage_and_cost
-model_provider_agent_breakdown
-policy_adoption
-high_risk_action_log
-outbox_and_audit_failures
-```
-
-- [ ] **Step 5: Run tests and commit**
+- [ ] **Step 1: Test administrator access, ordinary-user denial, cross-company isolation and absence from vertical tabs**
+- [ ] **Step 2: Implement read model `workcore.dashboard.ai_governance` and admin-only routes**
+- [ ] **Step 3: Run tests and commit**
 
 ```bash
 php artisan test --filter=GetAiGovernanceDashboardTest
@@ -1137,39 +591,11 @@ git commit -m "feat(workcore): add administrator AI governance dashboard"
 - Test: `app/extensions/WorkCore_Platform/tests/test_workcore_vertical_dashboard_projection.py`
 - Test: `app/extensions/WorkCore_Platform/tests/test_workcore_vertical_dashboard_performance.py`
 
-**Interfaces:**
-- Consumes the shared `VerticalDashboardResponse`.
-- Produces presentation-density projections without changing metric meaning or authorization.
-
-- [ ] **Step 1: Write failing projection tests**
-
-Assert:
-
-```text
-all surfaces retain dashboard_key, company_id, tabs, alerts and freshness
-mobile prioritises urgent alerts, today queues and next actions
-tablet retains operational boards and maps
-workspace retains complete widget set
-Titan Flow exposes concise cards and governed action links
-no surface adds data not present in the shared response
-```
-
-- [ ] **Step 2: Write performance budgets**
-
-```text
-cached dashboard p95 <= 250 ms
-uncached dashboard p95 <= 1500 ms
-initial payload <= 250 KB before compression
-no widget may execute more than one unbounded query
-list widgets return at most 100 rows
-map widgets return at most 500 lightweight points
-```
-
-- [ ] **Step 3: Implement projections and semantic markup**
-
-Use heading order, labelled controls, keyboard-accessible tabs, non-colour severity labels and readable empty/error states.
-
-- [ ] **Step 4: Run tests and commit**
+- [ ] **Step 1: Test that all surfaces retain dashboard/company/tabs/alerts/freshness and never add unauthorised data**
+- [ ] **Step 2: Make mobile prioritise urgent alerts, today queues and next actions; tablet retain boards/maps; workspace retain the complete set; Titan Flow expose concise cards and governed actions**
+- [ ] **Step 3: Enforce budgets: cached p95 <= 250 ms, uncached p95 <= 1500 ms, initial payload <= 250 KB, list widgets <= 100 rows and map widgets <= 500 points**
+- [ ] **Step 4: Add labelled controls, keyboard tabs, non-colour severity labels and semantic headings**
+- [ ] **Step 5: Run tests and commit**
 
 ```bash
 python -m unittest app/extensions/WorkCore_Platform/tests/test_workcore_vertical_dashboard_projection.py -v
@@ -1188,64 +614,26 @@ git commit -m "feat(workcore): project vertical dashboards across Titan surfaces
 - Modify: `app/extensions/WorkCore_Platform/native-extensions/catalogue.json`
 - Modify: `app/extensions/WorkCore_Platform/docs/superpowers/specs/2026-08-04-workcore-navigation-workspaces-design.md`
 
-**Interfaces:**
-- Verifies the complete dashboard architecture and documents its boundaries.
-
-- [ ] **Step 1: Add architecture assertions**
-
-Assert:
-
-```text
-exactly 9 customer vertical dashboards
-exactly 205 approved business-type entries
-no executive dashboard definition, route, read model or navigation item
-AI Governance is admin-only
-every widget source is registered
-every drilldown route exists
-every read model enforces tenant context
-no package imports another package's Eloquent models
-no dashboard-owned business tables or migrations
-five domain workspaces remain available
-```
-
-- [ ] **Step 2: Run all targeted dashboard tests**
+- [ ] **Step 1: Assert exactly nine customer vertical dashboards and 205 approved business types**
+- [ ] **Step 2: Assert no universal executive dashboard definition, route, read model or navigation entry exists**
+- [ ] **Step 3: Assert AI Governance is admin-only, every widget source and drilldown is registered, all read models enforce tenant context, packages do not import another package's Eloquent models, no dashboard business tables exist and five domain workspaces remain available**
+- [ ] **Step 4: Run verification**
 
 ```bash
 python -m unittest discover app/extensions/WorkCore_Platform/tests -p "test_workcore_vertical_dashboard*.py" -v
 php artisan test --filter=Dashboard
-```
-
-- [ ] **Step 3: Run repository verification**
-
-```bash
 python app/extensions/WorkCore_Platform/tools/validate_repository.py --repo app/extensions/WorkCore_Platform
 php app/extensions/WorkCore_Platform/tools/verify_workcore_entitlement_projection.php
 php tests/Architecture/verify_magicai_workcore_extraction.php
 php tests/Standalone/WorkCoreExtraction/run.php
 ```
 
-- [ ] **Step 4: Scan for forbidden architecture residue**
+- [ ] **Step 5: Scan runtime and customer-facing documentation for the removed executive architecture**
 
-```bash
-grep -R "workcore.dashboard.executive" app/extensions/WorkCore app/extensions/WorkCore_Platform
-grep -R "Ground Zero" app/extensions/WorkCore app/extensions/WorkCore_Platform
-```
+The verification test performs this scan and fails when the legacy dashboard key or removed branding appears in runtime definitions, routes, tests or customer-facing navigation.
 
-Expected: no matches in runtime definitions, routes, tests or customer-facing documentation.
-
-- [ ] **Step 5: Update documentation**
-
-Document:
-
-- nine customer verticals and their 205 business types;
-- primary and secondary vertical resolution;
-- shared domain widget engines;
-- canonical ownership and no-second-authority rule;
-- customer dashboard routes;
-- administrator-only AI Governance;
-- mobile, tablet, workspace and Titan Flow projections.
-
-- [ ] **Step 6: Commit**
+- [ ] **Step 6: Document the nine verticals, 205 business types, resolver, shared engines, canonical ownership, routes, AI Governance and surface projections**
+- [ ] **Step 7: Commit**
 
 ```bash
 git add app/extensions/WorkCore app/extensions/WorkCore_Platform
@@ -1267,19 +655,16 @@ git commit -m "docs(workcore): finalize vertical dashboard architecture"
 9. **AI Governance** — Task 14
 10. **Multi-surface projection and final verification** — Tasks 15–16
 
-Each pull request must be independently deployable, preserve existing routes and data, include tenant-isolation tests, and leave unavailable optional widgets explicit rather than fabricating metrics.
+Each pull request must be independently deployable, preserve existing routes and data, include tenant-isolation tests, and make unavailable optional widgets explicit rather than fabricating metrics.
 
 ## Completion Criteria
 
-The implementation is complete only when:
-
 - Every authorised company resolves to one primary vertical dashboard.
 - Multi-vertical companies can switch among authorised tabs.
-- All nine approved verticals are registered.
-- All 205 approved business-type entries are represented.
+- All nine approved verticals and 205 business types are represented.
 - The five WorkCore domain workspaces remain operational drilldowns.
 - AI Governance is restricted to authorised administrators.
-- No executive dashboard key, route or customer navigation entry exists.
-- Every displayed metric is derived from canonical tenant-scoped records.
+- No universal executive dashboard key, route or customer navigation entry exists.
+- Every metric derives from canonical tenant-scoped records.
 - Desktop, tablet, mobile and Titan Flow use the same response semantics.
 - Targeted tests and repository verification commands pass.
