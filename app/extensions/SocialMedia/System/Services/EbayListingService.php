@@ -104,6 +104,7 @@ class EbayListingService
         $this->audit($user, $account, 'ebay_draft_synced', [
             'distribution_item_id' => $item->getKey(),
             'idempotency_key' => $idempotencyKey,
+            'listing' => $listing,
             'result' => $result,
         ]);
 
@@ -123,6 +124,7 @@ class EbayListingService
             return $cached;
         }
 
+        $listing = $this->validatedListing($listing);
         $draft = $this->syncDraft(
             $user,
             $item,
@@ -147,6 +149,7 @@ class EbayListingService
         $this->audit($user, $account, 'ebay_offer_published', [
             'distribution_item_id' => $item->getKey(),
             'idempotency_key' => $idempotencyKey,
+            'listing' => $listing,
             'result' => $result,
         ]);
 
@@ -199,6 +202,7 @@ class EbayListingService
         $this->audit($user, $account, 'ebay_offer_revised', [
             'distribution_item_id' => $item->getKey(),
             'idempotency_key' => $idempotencyKey,
+            'listing' => $listing,
             'result' => $result,
         ]);
 
@@ -297,6 +301,12 @@ class EbayListingService
 
         $payload = (array) $item->payload;
         $handoffs = (array) data_get($payload, 'ebay.buyer_question_handoffs', []);
+        $existing = collect($handoffs)->firstWhere('question_id', $handoff['question_id']);
+
+        if (is_array($existing)) {
+            return $existing;
+        }
+
         $handoffs[] = $handoff;
         data_set($payload, 'ebay.buyer_question_handoffs', array_slice($handoffs, -100));
         $item->update(['payload' => $payload]);
@@ -375,8 +385,32 @@ class EbayListingService
             }
         }
 
-        $listing['quantity'] = max(0, (int) $listing['quantity']);
-        $listing['image_urls'] = array_values(array_unique(array_filter((array) $listing['image_urls'])));
+        if (! is_numeric($listing['quantity']) || (int) $listing['quantity'] < 0) {
+            throw new InvalidArgumentException('The eBay listing quantity must be zero or greater.');
+        }
+
+        if (! is_numeric(data_get($listing, 'price.value'))
+            || (float) data_get($listing, 'price.value') <= 0) {
+            throw new InvalidArgumentException('The eBay listing price must be greater than zero.');
+        }
+
+        $listing['quantity'] = (int) $listing['quantity'];
+        $listing['image_urls'] = array_values(array_unique(array_filter(
+            (array) $listing['image_urls'],
+            static fn ($url) => is_string($url) && trim($url) !== ''
+        )));
+
+        if ($listing['image_urls'] === []) {
+            throw new InvalidArgumentException('At least one valid eBay image URL is required.');
+        }
+
+        foreach ($listing['image_urls'] as $imageUrl) {
+            if (! filter_var($imageUrl, FILTER_VALIDATE_URL)
+                || strtolower((string) parse_url($imageUrl, PHP_URL_SCHEME)) !== 'https') {
+                throw new InvalidArgumentException('Every eBay image URL must be a valid HTTPS URL.');
+            }
+        }
+
         $listing['format'] = (string) ($listing['format'] ?? 'FIXED_PRICE');
         $listing['listing_duration'] = (string) ($listing['listing_duration'] ?? 'GTC');
         $listing['aspects'] = (array) ($listing['aspects'] ?? []);
