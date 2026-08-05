@@ -1,0 +1,38 @@
+name: Titan Create security contracts
+
+on:
+  pull_request:
+    branches:
+      - main
+    types: [opened, synchronize, reopened]
+    paths:
+      - .github/workflows/titan-create-security.yml
+      - app/extensions/CreativeSuite/System/Http/Controllers/CreativeSuiteDocumentController.php
+      - tests/contracts/creative_suite_document_ownership.php
+      - tests/Feature/Extensions/CreativeSuite/CreativeSuiteDocumentOwnershipTest.php
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: titan-create-security-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  creative-suite-document-ownership:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          ref: ${{ github.head_ref || github.ref_name }}
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: none
+      - name: Validate CreativeSuite controller syntax
+        run: php -l app/extensions/CreativeSuite/System/Http/Controllers/CreativeSuiteDocumentController.php
+      - name: Run CreativeSuite document ownership contract
+        run: php tests/contracts/creative_suite_document_ownership.php
