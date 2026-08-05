@@ -1,0 +1,27 @@
+name: Vertical AI Proposal Temporary Verification
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run focused vertical AI proposal contract
+        run: php packages/titan-interaction-engine/tests/vertical_ai_proposal.php
+
+      - name: Run vertical context regression suite
+        if: success()
+        run: php packages/titan-interaction-engine/tests/vertical_context.php
+
+      - name: Lint focused test
+        if: always()
+        run: php -l packages/titan-interaction-engine/tests/vertical_ai_proposal.php
