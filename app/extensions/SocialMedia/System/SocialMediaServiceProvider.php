@@ -188,12 +188,12 @@ class SocialMediaServiceProvider extends ServiceProvider implements UninstallExt
                         $router->post('video/generate', SocialMediaVideoController::class)->name('video.generate');
                         $router->get('video/status', [SocialMediaVideoController::class, 'status'])->name('video.status');
 
-                        $router->get('ebay/readiness', [EbayListingController::class, 'readiness'])->name('ebay.readiness');
+                        $router->post('ebay/readiness', [EbayListingController::class, 'readiness'])->name('ebay.readiness');
                         $router->post('distribution/{item}/ebay/draft', [EbayListingController::class, 'draft'])->name('ebay.draft');
                         $router->post('distribution/{item}/ebay/publish', [EbayListingController::class, 'publish'])->name('ebay.publish');
                         $router->put('distribution/{item}/ebay/revise', [EbayListingController::class, 'revise'])->name('ebay.revise');
                         $router->post('distribution/{item}/ebay/withdraw', [EbayListingController::class, 'withdraw'])->name('ebay.withdraw');
-                        $router->get('distribution/{item}/ebay/reconcile', [EbayListingController::class, 'reconcile'])->name('ebay.reconcile');
+                        $router->post('distribution/{item}/ebay/reconcile', [EbayListingController::class, 'reconcile'])->name('ebay.reconcile');
                         $router->post('distribution/{item}/ebay/buyer-question-handoff', [EbayListingController::class, 'buyerQuestionHandoff'])->name('ebay.buyer-question-handoff');
                     });
 
