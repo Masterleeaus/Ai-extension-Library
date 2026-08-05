@@ -11,17 +11,29 @@ permissions:
 jobs:
   verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          coverage: none
+
+      - name: Validate package metadata
+        run: composer validate --no-check-publish --strict packages/titan-interaction-engine/composer.json
 
       - name: Run focused vertical AI proposal contract
         run: php packages/titan-interaction-engine/tests/vertical_ai_proposal.php
 
-      - name: Run vertical context regression suite
-        if: success()
-        run: php packages/titan-interaction-engine/tests/vertical_context.php
+      - name: Run Interaction Engine regression suites
+        run: |
+          php packages/titan-interaction-engine/tests/vertical_context.php
+          php packages/titan-interaction-engine/tests/run.php
+          php packages/titan-interaction-engine/bin/verify.php
 
-      - name: Lint focused test
-        if: always()
-        run: php -l packages/titan-interaction-engine/tests/vertical_ai_proposal.php
+      - name: Lint proposal implementation
+        run: |
+          php -l packages/titan-interaction-engine/tests/vertical_ai_proposal.php
+          find packages/titan-interaction-engine/src/Vertical/AI -name '*.php' -print0 | xargs -0 -r -n1 php -l
