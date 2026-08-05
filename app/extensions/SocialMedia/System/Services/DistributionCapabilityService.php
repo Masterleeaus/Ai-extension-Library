@@ -5,11 +5,22 @@ namespace App\Extensions\SocialMedia\System\Services;
 use App\Extensions\SocialMedia\System\Models\DistributionItem;
 use App\Extensions\SocialMedia\System\Models\SocialMediaPlatform;
 use App\Models\User;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
+use Throwable;
 
 class DistributionCapabilityService
 {
+    public const SUITABILITY_PRIMARY = 'primary';
+
+    public const SUITABILITY_SUPPORTED = 'supported';
+
+    public const SUITABILITY_SPECIAL_CASE = 'special-case';
+
+    public const SUITABILITY_NOT_APPLICABLE = 'not-applicable';
+
     public function __construct(
         private readonly SocialMediaChannelEntitlementService $entitlements
     ) {}
@@ -71,6 +82,167 @@ class DistributionCapabilityService
         return $result;
     }
 
+    public function forVerticalDestination(
+        User $user,
+        string $destination,
+        string $contentType,
+        ?string $vertical = null,
+        ?string $subtype = null,
+        ?SocialMediaPlatform $account = null,
+        bool $audit = true
+    ): array {
+        $base = $this->forDestination($user, $destination, $account, false);
+        $suitability = $this->suitabilityFor(
+            $vertical,
+            $destination,
+            $contentType,
+            $subtype,
+            $user
+        );
+        $available = $base['available'] && $suitability['available'];
+        $result = [
+            ...$base,
+            'available' => $available,
+            'reason' => $base['reason'] ?? $suitability['reason'],
+            'content_type' => $contentType,
+            'vertical' => $suitability['vertical'],
+            'vertical_label' => $suitability['vertical_label'],
+            'business_subtype' => $suitability['business_subtype'],
+            'subtype_known' => $suitability['subtype_known'],
+            'suitability' => $suitability['suitability'],
+            'required_fields' => array_values(array_unique([
+                ...$base['required_fields'],
+                ...$suitability['required_fields'],
+            ])),
+            'media_guidance' => $suitability['media_guidance'],
+            'calls_to_action' => $suitability['calls_to_action'],
+            'handoff_targets' => $suitability['handoff_targets'],
+            'compliance_warnings' => $suitability['compliance_warnings'],
+            'profile_version' => $suitability['profile_version'],
+            'profile_provenance' => $suitability['profile_provenance'],
+            'effective_capabilities' => $available
+                ? $base['effective_capabilities']
+                : array_map(static fn () => false, $base['declared_capabilities']),
+        ];
+
+        if ($audit) {
+            $this->audit(
+                $user,
+                $destination,
+                $account,
+                $result,
+                'vertical_capability_snapshot'
+            );
+        }
+
+        return $result;
+    }
+
+    public function suitabilityFor(
+        ?string $vertical,
+        string $destination,
+        string $contentType,
+        ?string $subtype = null,
+        ?User $user = null
+    ): array {
+        $profile = $this->resolveVerticalProfile($vertical, $subtype, $user);
+        $definition = $this->destinations()[$destination] ?? null;
+        $suitability = (string) data_get(
+            $profile,
+            "destination_suitability.{$destination}",
+            self::SUITABILITY_NOT_APPLICABLE
+        );
+        $validContentType = in_array($contentType, DistributionItem::contentTypes(), true);
+        $profileSupportsContent = in_array(
+            $contentType,
+            (array) ($profile['content_types'] ?? []),
+            true
+        );
+        $destinationSupportsContent = $definition
+            && $this->destinationSupportsContent($definition, $contentType);
+        $available = $validContentType
+            && $profileSupportsContent
+            && $destinationSupportsContent
+            && $suitability !== self::SUITABILITY_NOT_APPLICABLE;
+
+        return [
+            'vertical' => (string) ($profile['slug'] ?? 'generic-business'),
+            'vertical_label' => (string) ($profile['label'] ?? 'Generic Business'),
+            'business_subtype' => $profile['resolved_subtype'] ?? null,
+            'subtype_known' => (bool) ($profile['subtype_known'] ?? false),
+            'destination' => $destination,
+            'content_type' => $contentType,
+            'suitability' => $suitability,
+            'available' => $available,
+            'reason' => $this->suitabilityReason(
+                $validContentType,
+                $profileSupportsContent,
+                (bool) $definition,
+                (bool) $destinationSupportsContent,
+                $suitability
+            ),
+            'required_fields' => array_values((array) ($profile['required_fields'] ?? [])),
+            'media_guidance' => array_values((array) ($profile['media_guidance'] ?? [])),
+            'calls_to_action' => array_values((array) ($profile['calls_to_action'] ?? [])),
+            'handoff_targets' => (array) ($profile['handoff_targets'] ?? []),
+            'compliance_warnings' => array_values((array) ($profile['compliance_warnings'] ?? [])),
+            'profile_version' => (string) ($profile['profile_version'] ?? $this->profileVersion()),
+            'profile_provenance' => array_values((array) ($profile['profile_provenance'] ?? [])),
+        ];
+    }
+
+    public function resolveVerticalProfile(
+        ?string $vertical = null,
+        ?string $subtype = null,
+        ?User $user = null
+    ): array {
+        $context = $this->resolveVerticalContext($vertical, $subtype, $user);
+        $profiles = $this->verticalProfiles();
+        $slug = $this->canonicalVerticalSlug($context['vertical'] ?? null, $profiles);
+        $provenance = array_values((array) ($context['provenance'] ?? []));
+
+        if (! $slug) {
+            $profile = $this->genericProfile();
+            $profile['resolved_subtype'] = $this->normaliseSlug($context['subtype'] ?? null);
+            $profile['subtype_known'] = false;
+            $profile['profile_version'] = $this->profileVersion();
+            $profile['profile_provenance'] = array_values(array_unique([
+                ...$provenance,
+                'generic_fallback',
+            ]));
+
+            return $profile;
+        }
+
+        $profile = $profiles[$slug];
+        $resolvedSubtype = $this->normaliseSlug($context['subtype'] ?? null);
+        $profile['resolved_subtype'] = $resolvedSubtype;
+        $profile['subtype_known'] = $resolvedSubtype
+            ? in_array($resolvedSubtype, (array) ($profile['subtypes'] ?? []), true)
+            : false;
+        $profile['profile_version'] = $this->profileVersion();
+        $profile['profile_provenance'] = array_values(array_unique([
+            ...$provenance,
+            'canonical_catalogue',
+        ]));
+
+        $tenantOverride = $this->tenantOverride($user, $slug);
+
+        if ($tenantOverride !== []) {
+            $profile = array_replace_recursive($profile, $tenantOverride);
+            $profile['slug'] = $slug;
+            $profile['profile_provenance'][] = 'tenant_override';
+            $profile['profile_provenance'] = array_values(array_unique($profile['profile_provenance']));
+        }
+
+        return $profile;
+    }
+
+    public function canonicalVerticalSlugs(): array
+    {
+        return array_keys($this->verticalProfiles());
+    }
+
     public function matrixForUser(User $user, bool $audit = false): array
     {
         return collect($this->destinations())
@@ -98,6 +270,232 @@ class DistributionCapabilityService
         $configuredDestinations = (array) config('social-media.distribution.destinations', []);
 
         return array_replace_recursive($baseDestinations, $configuredDestinations);
+    }
+
+    private function verticalCatalogue(): array
+    {
+        $catalogue = require dirname(__DIR__, 2) . '/config/vertical-distribution.php';
+        $configured = (array) config('social-media.vertical_distribution', []);
+
+        return array_replace_recursive($catalogue, Arr::except($configured, ['verticals']));
+    }
+
+    private function verticalProfiles(): array
+    {
+        $catalogue = require dirname(__DIR__, 2) . '/config/vertical-distribution.php';
+        $baseProfiles = (array) ($catalogue['verticals'] ?? []);
+        $configuredProfiles = (array) config('social-media.vertical_distribution.verticals', []);
+        $overrides = array_intersect_key($configuredProfiles, $baseProfiles);
+
+        return array_replace_recursive($baseProfiles, $overrides);
+    }
+
+    private function genericProfile(): array
+    {
+        $catalogue = $this->verticalCatalogue();
+        $configured = (array) config('social-media.vertical_distribution.generic_profile', []);
+
+        return array_replace_recursive(
+            (array) ($catalogue['generic_profile'] ?? []),
+            $configured
+        );
+    }
+
+    private function profileVersion(): string
+    {
+        return (string) ($this->verticalCatalogue()['profile_version'] ?? 'unversioned');
+    }
+
+    private function resolveVerticalContext(
+        ?string $vertical,
+        ?string $subtype,
+        ?User $user
+    ): array {
+        if ($vertical !== null && trim($vertical) !== '') {
+            return [
+                'vertical' => $vertical,
+                'subtype' => $subtype,
+                'provenance' => ['explicit_context'],
+            ];
+        }
+
+        $resolver = config(
+            'social-media.vertical_distribution.vertical_context_resolver',
+            $this->verticalCatalogue()['vertical_context_resolver'] ?? null
+        );
+
+        if ($user && is_string($resolver) && $resolver !== '' && class_exists($resolver)) {
+            try {
+                $instance = app($resolver);
+
+                if (method_exists($instance, 'resolve')) {
+                    $resolved = (array) $instance->resolve($user);
+
+                    return [
+                        'vertical' => $resolved['vertical'] ?? $resolved['vertical_slug'] ?? null,
+                        'subtype' => $resolved['subtype'] ?? $resolved['business_subtype'] ?? $subtype,
+                        'provenance' => ['vertical_context_resolver'],
+                    ];
+                }
+            } catch (Throwable $exception) {
+                report($exception);
+            }
+        }
+
+        return [
+            'vertical' => null,
+            'subtype' => $subtype,
+            'provenance' => ['generic_context'],
+        ];
+    }
+
+    private function canonicalVerticalSlug(?string $vertical, array $profiles): ?string
+    {
+        $slug = $this->normaliseSlug($vertical);
+
+        if (! $slug) {
+            return null;
+        }
+
+        $slug = $this->verticalAliases()[$slug] ?? $slug;
+
+        if (array_key_exists($slug, $profiles)) {
+            return $slug;
+        }
+
+        foreach ($profiles as $profileSlug => $profile) {
+            if (in_array($slug, (array) ($profile['subtypes'] ?? []), true)) {
+                return $profileSlug;
+            }
+        }
+
+        return null;
+    }
+
+    private function verticalAliases(): array
+    {
+        return [
+            'field-and-home-services' => 'field-home-services',
+            'facilities-management' => 'field-home-services',
+            'facilities-maintenance' => 'field-home-services',
+            'bnb-hotel-and-rooming-services' => 'accommodation',
+            'bnb-hotel-rooming-services' => 'accommodation',
+            'hotel-bnb-rooming-services' => 'accommodation',
+            'salons-and-personal-care' => 'salons-personal-care',
+            'fitness-and-membership-businesses' => 'fitness-membership',
+            'automotive' => 'automotive-services',
+            'e-commerce-and-retail' => 'ecommerce-retail',
+            'e-commerce-retail' => 'ecommerce-retail',
+            'hire-and-rental' => 'hire-rental',
+            'booking-reservation-and-capacity-based-businesses' => 'booking-capacity',
+            'booking-reservation-capacity-businesses' => 'booking-capacity',
+        ];
+    }
+
+    private function tenantOverride(?User $user, string $slug): array
+    {
+        if (! $user) {
+            return [];
+        }
+
+        $override = (array) data_get(
+            config('social-media.vertical_distribution.tenant_overrides', []),
+            $user->getKey() . '.' . $slug,
+            []
+        );
+
+        return Arr::only($override, [
+            'content_types',
+            'destination_suitability',
+            'required_fields',
+            'media_guidance',
+            'calls_to_action',
+            'handoff_targets',
+            'compliance_warnings',
+        ]);
+    }
+
+    private function destinationSupportsContent(array $definition, string $contentType): bool
+    {
+        $declared = (array) ($definition['content_types'] ?? []);
+
+        if (in_array($contentType, $declared, true)) {
+            return true;
+        }
+
+        foreach ($this->providerContentAliases()[$contentType] ?? [] as $alias) {
+            if (in_array($alias, $declared, true)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function providerContentAliases(): array
+    {
+        return [
+            DistributionItem::TYPE_ROOM_STAY_OFFER => [
+                DistributionItem::TYPE_PRODUCT_OFFER,
+                DistributionItem::TYPE_SERVICE_PROMOTION,
+                DistributionItem::TYPE_PROPERTY_LISTING,
+            ],
+            DistributionItem::TYPE_MEMBERSHIP_OFFER => [
+                DistributionItem::TYPE_PRODUCT_OFFER,
+                DistributionItem::TYPE_SERVICE_PROMOTION,
+            ],
+            DistributionItem::TYPE_CLASS_SESSION_OFFER => [
+                DistributionItem::TYPE_EVENT,
+                DistributionItem::TYPE_SERVICE_PROMOTION,
+            ],
+            DistributionItem::TYPE_BOOKING_OFFER => [
+                DistributionItem::TYPE_EVENT,
+                DistributionItem::TYPE_SERVICE_PROMOTION,
+                DistributionItem::TYPE_PRODUCT_OFFER,
+            ],
+            DistributionItem::TYPE_HIRE_RENTAL_LISTING => [
+                DistributionItem::TYPE_MARKETPLACE_LISTING,
+                DistributionItem::TYPE_PRODUCT_OFFER,
+                DistributionItem::TYPE_CLASSIFIED_LISTING,
+            ],
+        ];
+    }
+
+    private function suitabilityReason(
+        bool $validContentType,
+        bool $profileSupportsContent,
+        bool $destinationExists,
+        bool $destinationSupportsContent,
+        string $suitability
+    ): ?string {
+        if (! $validContentType) {
+            return 'unsupported_content_type';
+        }
+
+        if (! $profileSupportsContent) {
+            return 'content_not_supported_by_vertical';
+        }
+
+        if (! $destinationExists) {
+            return 'destination_unknown';
+        }
+
+        if (! $destinationSupportsContent) {
+            return 'content_not_supported_by_destination';
+        }
+
+        if ($suitability === self::SUITABILITY_NOT_APPLICABLE) {
+            return 'destination_not_applicable_to_vertical';
+        }
+
+        return null;
+    }
+
+    private function normaliseSlug(?string $value): ?string
+    {
+        $value = trim((string) $value);
+
+        return $value === '' ? null : Str::slug($value);
     }
 
     private function reason(
@@ -135,7 +533,8 @@ class DistributionCapabilityService
         User $user,
         string $destination,
         ?SocialMediaPlatform $account,
-        array $snapshot
+        array $snapshot,
+        string $action = 'capability_snapshot'
     ): void {
         if (! Schema::hasTable('ext_social_media_distribution_audits')) {
             return;
@@ -147,7 +546,7 @@ class DistributionCapabilityService
                 ? $account->getKey()
                 : null,
             'destination'              => $destination,
-            'action'                   => 'capability_snapshot',
+            'action'                   => $action,
             'snapshot'                 => json_encode($snapshot, JSON_THROW_ON_ERROR),
             'created_at'               => now(),
         ]);
