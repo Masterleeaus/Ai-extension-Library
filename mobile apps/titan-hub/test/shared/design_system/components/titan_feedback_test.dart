@@ -17,7 +17,8 @@ Widget _app(Widget child, {double textScale = 1}) {
 }
 
 void main() {
-  testWidgets('status banner announces tone, title and message', (tester) async {
+  testWidgets('status banner announces tone, title and message',
+      (tester) async {
     var presses = 0;
 
     await tester.pumpWidget(

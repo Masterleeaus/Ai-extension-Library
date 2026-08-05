@@ -36,8 +36,7 @@ class TitanStatusBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final presentation = _presentation(theme, tone);
-    final semanticLabel =
-        '${presentation.name}. $title. $message';
+    final semanticLabel = '${presentation.name}. $title. $message';
 
     return Semantics(
       label: semanticLabel,
@@ -111,8 +110,8 @@ class TitanStatusBanner extends StatelessWidget {
 _StatusPresentation _presentation(ThemeData theme, TitanStatusTone tone) {
   final semantic = theme.extension<TitanSemanticColors>()!;
   return switch (tone) {
-    TitanStatusTone.success =>
-      _StatusPresentation('Success', semantic.success, Icons.check_circle_outline),
+    TitanStatusTone.success => _StatusPresentation(
+        'Success', semantic.success, Icons.check_circle_outline),
     TitanStatusTone.warning =>
       _StatusPresentation('Warning', semantic.warning, Icons.warning_amber),
     TitanStatusTone.danger =>

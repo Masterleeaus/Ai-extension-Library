@@ -60,7 +60,8 @@ void main() {
     );
   });
 
-  testWidgets('badge and section header preserve semantic text', (tester) async {
+  testWidgets('badge and section header preserve semantic text',
+      (tester) async {
     await tester.pumpWidget(
       _app(
         const Column(
@@ -86,7 +87,8 @@ void main() {
     );
   });
 
-  testWidgets('whole card is a labelled accessible press target', (tester) async {
+  testWidgets('whole card is a labelled accessible press target',
+      (tester) async {
     var presses = 0;
 
     await tester.pumpWidget(

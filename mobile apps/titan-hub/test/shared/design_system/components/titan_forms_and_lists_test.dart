@@ -125,14 +125,17 @@ void main() {
       ),
     );
 
-    expect(tester.widget<TextField>(find.byType(TextField)).obscureText, isTrue);
+    expect(
+        tester.widget<TextField>(find.byType(TextField)).obscureText, isTrue);
     await tester.tap(find.byTooltip('Show Password'));
     await tester.pump();
-    expect(tester.widget<TextField>(find.byType(TextField)).obscureText, isFalse);
+    expect(
+        tester.widget<TextField>(find.byType(TextField)).obscureText, isFalse);
     expect(find.byTooltip('Hide Password'), findsOneWidget);
   });
 
-  testWidgets('basic multiline field supports 200 percent text', (tester) async {
+  testWidgets('basic multiline field supports 200 percent text',
+      (tester) async {
     final controller = TextEditingController();
     addTearDown(controller.dispose);
 
