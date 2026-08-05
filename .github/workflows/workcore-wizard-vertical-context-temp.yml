@@ -1,0 +1,46 @@
+name: WorkCore Wizard Vertical Context Temporary Verification
+
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: pdo_sqlite, sqlite3
+          coverage: none
+
+      - name: Install isolated Illuminate test dependencies
+        run: |
+          mkdir -p /tmp/workcore-context-test
+          cd /tmp/workcore-context-test
+          printf '%s\n' '{"require":{"php":"^8.2","illuminate/database":"^10.0","illuminate/events":"^10.0"}}' > composer.json
+          composer install --no-interaction --no-progress --prefer-dist
+
+      - name: Run WorkCore wizard vertical context contract
+        env:
+          AI_EXTENSIONS_REPO_ROOT: ${{ github.workspace }}
+          WORKCORE_TEST_VENDOR_AUTOLOAD: /tmp/workcore-context-test/vendor/autoload.php
+        run: php app/extensions/WorkCore_Platform/tests/vertical_wizard_context.php
+
+      - name: Lint focused test and implementation
+        run: |
+          php -l app/extensions/WorkCore_Platform/tests/vertical_wizard_context.php
+          if [ -d app/extensions/WorkCore_Platform/packages/workcore-business-network/src/Domains/WorkCore/System/Modules/Wizards ]; then
+            find app/extensions/WorkCore_Platform/packages/workcore-business-network/src/Domains/WorkCore/System/Modules/Wizards \
+              -name '*VerticalContext*.php' -print0 | xargs -0 -r -n1 php -l
+          fi
