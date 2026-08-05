@@ -12,7 +12,7 @@ class UniversalDistributionContractTest extends TestCase
         $post = file_get_contents(__DIR__ . '/../../System/Models/SocialMediaPost.php');
         $migration = file_get_contents(__DIR__ . '/../../database/migrations/2026_08_05_000001_create_ext_social_media_distribution_items_table.php');
 
-        $this->assertStringContainsString("protected $table = 'ext_social_media_distribution_items'", $model);
+        $this->assertStringContainsString("protected \$table = 'ext_social_media_distribution_items'", $model);
         $this->assertStringContainsString("'social_post'", $model);
         $this->assertStringContainsString("'marketplace_listing'", $model);
         $this->assertStringContainsString("'property_listing'", $model);
@@ -46,8 +46,8 @@ class UniversalDistributionContractTest extends TestCase
         $service = file_get_contents(__DIR__ . '/../../System/Services/DistributionCapabilityService.php');
         $migration = file_get_contents(__DIR__ . '/../../database/migrations/2026_08_05_000001_create_ext_social_media_distribution_items_table.php');
 
-        $this->assertStringContainsString('$account->user_id', $service);
-        $this->assertStringContainsString('$user->getKey()', $service);
+        $this->assertStringContainsString('\$account->user_id', $service);
+        $this->assertStringContainsString('\$user->getKey()', $service);
         $this->assertStringContainsString('SocialMediaChannelEntitlementService', $service);
         $this->assertStringContainsString("DB::table('ext_social_media_distribution_audits')", $service);
         $this->assertStringContainsString("Schema::create('ext_social_media_distribution_audits'", $migration);
