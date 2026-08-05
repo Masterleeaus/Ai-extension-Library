@@ -117,7 +117,7 @@ jobs:
               print(f'{name}: {detail}')
 
           remote_available = all(item[1] for item in results)
-          mode = 'remote' if remote_available else 'committed'
+          mode = 'remote' if remote_available else 'git-fallback'
           output = Path(os.environ['GITHUB_OUTPUT'])
           with output.open('a', encoding='utf-8') as handle:
               handle.write(f'available={str(remote_available).lower()}\n')
@@ -131,7 +131,10 @@ jobs:
                   mark = '✅' if available else '⚠️'
                   handle.write(f'- {mark} `{name}`: {detail}\n')
               if not remote_available:
-                  handle.write('\nRemote transport is incomplete, so the workflow will preserve and verify the committed materialised source.\n')
+                  handle.write(
+                      '\nRemote transport is incomplete, so the workflow will reconstruct the verified '
+                      'materialised workspace from preserved Git refs.\n'
+                  )
           PY
       - name: Restore base library and apply verified Pass 3 overlay
         if: steps.transport.outputs.available == 'true'
@@ -141,9 +144,58 @@ jobs:
             --clean \
             --url "$DATASET_URL" \
             --overlay-manifest transport/pass3-overlay-manifest.json
-      - name: Verify committed materialised source fallback
+      - name: Reconstruct verified materialised workspace from Git
+        id: fallback
         if: steps.transport.outputs.available != 'true'
         run: |
+          set -euo pipefail
+
+          BASE_REF=origin/agent/import-ai-extensions
+          CORE_REF=origin/agent/package-titanai-hybrid-core-r2
+          ECOMMERCE_REF=origin/agent/upgrade-chatbot-ecommerce-v4.9.0-r3
+          INTERACTION_REF=origin/agent/import-interaction-engine-packages
+
+          for ref in "$BASE_REF" "$CORE_REF" "$ECOMMERCE_REF" "$INTERACTION_REF"; do
+            git rev-parse --verify "$ref^{commit}" >/dev/null
+          done
+
+          rm -rf \
+            extensions \
+            foundation/TitanAI-Hybrid \
+            packages/titanai-hybrid-core \
+            packages/titan-interaction-engine \
+            packages/titan-interaction-contracts \
+            packages/titan-interaction-engine-offline
+
+          git checkout "$BASE_REF" -- extensions
+          git checkout "$CORE_REF" -- \
+            extensions/AIAgent \
+            extensions/AIChatPro \
+            extensions/Chatbot \
+            packages/titanai-hybrid-core
+          git checkout "$ECOMMERCE_REF" -- extensions/ChatbotEcommerce
+          git checkout "$INTERACTION_REF" -- \
+            extensions/InteractionEngineChatbotBridge \
+            packages/titan-interaction-engine \
+            packages/titan-interaction-contracts \
+            packages/titan-interaction-engine-offline
+
+          while IFS= read -r -d '' path; do
+            if git cat-file -e "HEAD:$path" 2>/dev/null; then
+              git checkout HEAD -- "$path"
+            else
+              rm -rf "$path"
+            fi
+          done < <(
+            git diff --name-only -z origin/main...HEAD -- \
+              extensions \
+              foundation/TitanAI-Hybrid \
+              packages/titanai-hybrid-core \
+              packages/titan-interaction-engine \
+              packages/titan-interaction-contracts \
+              packages/titan-interaction-engine-offline
+          )
+
           python - <<'PY'
           from pathlib import Path
           import json
@@ -153,17 +205,22 @@ jobs:
           root = Path('.').resolve()
           required = [
               Path('extensions/AIAgent/extension.json'),
+              Path('extensions/AIAgent/titanai-package.json'),
               Path('extensions/AIChatPro/extension.json'),
+              Path('extensions/AIChatPro/titanai-package.json'),
               Path('extensions/Chatbot/extension.json'),
+              Path('extensions/Chatbot/titanai-package.json'),
               Path('extensions/ChatbotEcommerce/extension.json'),
               Path('extensions/InteractionEngineChatbotBridge/extension.json'),
+              Path('packages/titanai-hybrid-core/composer.json'),
               Path('packages/titan-interaction-engine/composer.json'),
               Path('packages/titan-interaction-contracts/composer.json'),
+              Path('packages/titan-interaction-contracts/package.json'),
               Path('packages/titan-interaction-engine-offline/package.json'),
           ]
           missing = [str(path) for path in required if not path.is_file()]
           if missing:
-              raise SystemExit('Committed materialised source is incomplete; missing: ' + ', '.join(missing))
+              raise SystemExit('Git fallback workspace is incomplete; missing: ' + ', '.join(missing))
 
           for path in required:
               json.loads(path.read_text(encoding='utf-8-sig'))
@@ -171,18 +228,16 @@ jobs:
           ecommerce = json.loads(Path('extensions/ChatbotEcommerce/extension.json').read_text(encoding='utf-8-sig'))
           if str(ecommerce.get('version')) != '4.9.0':
               raise SystemExit(
-                  f"Committed ChatbotEcommerce version mismatch: {ecommerce.get('version')} != 4.9.0"
+                  f"Fallback ChatbotEcommerce version mismatch: {ecommerce.get('version')} != 4.9.0"
               )
 
           extension_files = [path for path in Path('extensions').rglob('*') if path.is_file()]
           extension_dirs = [path for path in Path('extensions').iterdir() if path.is_dir()]
           if len(extension_files) < 4204:
-              raise SystemExit(
-                  f'Committed extension source is unexpectedly small: {len(extension_files)} files'
-              )
+              raise SystemExit(f'Git fallback extension source is unexpectedly small: {len(extension_files)} files')
           if len(extension_dirs) < 70:
               raise SystemExit(
-                  f'Committed extension catalogue is unexpectedly small: {len(extension_dirs)} extensions'
+                  f'Git fallback extension catalogue is unexpectedly small: {len(extension_dirs)} extensions'
               )
 
           categories = {}
@@ -200,11 +255,19 @@ jobs:
           write_inventory(root, stats)
           total_bytes = sum(path.stat().st_size for path in extension_files)
           print(
-              f'Using committed materialised source: {len(extension_files)} files, '
+              f'Reconstructed Git fallback workspace: {len(extension_files)} files, '
               f'{total_bytes} bytes across {len(extension_dirs)} extensions'
           )
           PY
+
+          {
+            echo "base_sha=$(git rev-parse "$BASE_REF")"
+            echo "core_sha=$(git rev-parse "$CORE_REF")"
+            echo "ecommerce_sha=$(git rev-parse "$ECOMMERCE_REF")"
+            echo "interaction_sha=$(git rev-parse "$INTERACTION_REF")"
+          } >> "$GITHUB_OUTPUT"
       - name: Convert TitanAI foundation to Composer package
+        if: steps.transport.outputs.available == 'true'
         run: python scripts/package_titanai_hybrid.py --root .
       - name: Apply verified ChatbotEcommerce overlay
         if: steps.transport.outputs.available == 'true'
@@ -270,6 +333,10 @@ jobs:
       - name: Write materialisation summary
         env:
           MATERIALIZATION_MODE: ${{ steps.transport.outputs.mode }}
+          FALLBACK_BASE_SHA: ${{ steps.fallback.outputs.base_sha }}
+          FALLBACK_CORE_SHA: ${{ steps.fallback.outputs.core_sha }}
+          FALLBACK_ECOMMERCE_SHA: ${{ steps.fallback.outputs.ecommerce_sha }}
+          FALLBACK_INTERACTION_SHA: ${{ steps.fallback.outputs.interaction_sha }}
         run: |
           python - <<'PY'
           from pathlib import Path
@@ -281,17 +348,24 @@ jobs:
           core = json.load(open('transport/pass3-overlay-manifest.json'))
           ecommerce = json.load(open('transport/ecommerce-overlay-manifest.json'))
           mode = os.environ.get('MATERIALIZATION_MODE', 'unknown')
-          source = (
-              'Remote MiniUp lossless Parquet transport dataset and verified overlays.'
-              if mode == 'remote'
-              else 'Committed materialised source fallback; remote transport assets were unavailable.'
-          )
+          if mode == 'remote':
+              source = 'Remote MiniUp lossless Parquet transport dataset and verified overlays.'
+              provenance = ''
+          else:
+              source = 'Verified Git fallback reconstructed from preserved materialisation refs.'
+              provenance = (
+                  f"Fallback base SHA: `{os.environ.get('FALLBACK_BASE_SHA', '')}`  \n"
+                  f"Fallback core SHA: `{os.environ.get('FALLBACK_CORE_SHA', '')}`  \n"
+                  f"Fallback ecommerce SHA: `{os.environ.get('FALLBACK_ECOMMERCE_SHA', '')}`  \n"
+                  f"Fallback Interaction Engine SHA: `{os.environ.get('FALLBACK_INTERACTION_SHA', '')}`  \n"
+              )
           Path('MATERIALIZED.md').write_text(
               '# Materialised source tree\n\n'
               f'Mode: **{mode}**  \n'
               f'Files: **{len(files):,}**  \n'
               f'Bytes: **{size:,}**  \n'
               f'Base source: {source}  \n'
+              f'{provenance}'
               f"Core overlay: **{core['source_bundle']}**  \n"
               f"Core overlay SHA-256: `{core['archive_sha256']}`  \n"
               'Composer package: **titanai/hybrid-core 1.0.0**  \n'
@@ -304,6 +378,7 @@ jobs:
           )
           PY
       - name: Commit materialised source
+        if: steps.transport.outputs.available == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
