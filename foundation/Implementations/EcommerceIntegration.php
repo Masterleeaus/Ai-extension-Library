@@ -7,11 +7,17 @@ namespace Foundation\Implementations;
 use Foundation\Contracts\EcommerceIntegrationContract;
 use PDO;
 use Foundation\Support\JsonHelper;
+use Foundation\Support\DateTimeHelper;
 
 class EcommerceIntegration implements EcommerceIntegrationContract
 {
     private PDO $db;
-    private string $tablePrefix = 'ecommerce_';
+    private const TABLE_PREFIX = 'ecommerce_';
+    private const TABLE_CATALOGS = self::TABLE_PREFIX . 'catalogs';
+    private const TABLE_ORDERS = self::TABLE_PREFIX . 'orders';
+    private const TABLE_PAYMENT_CALLBACKS = self::TABLE_PREFIX . 'payment_callbacks';
+    private const TABLE_PRODUCT_SYNCS = self::TABLE_PREFIX . 'product_syncs';
+    private string $tablePrefix = self::TABLE_PREFIX;
 
     public function __construct(PDO $db)
     {
@@ -25,7 +31,7 @@ class EcommerceIntegration implements EcommerceIntegrationContract
         $catalogId = bin2hex(random_bytes(16));
 
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}catalogs (id, tenant_id, config, status, registered_at)
+            "INSERT INTO " . self::TABLE_CATALOGS . " (id, tenant_id, config, status, registered_at)
              VALUES (?, ?, ?, ?, ?)"
         );
 
@@ -34,7 +40,7 @@ class EcommerceIntegration implements EcommerceIntegrationContract
             $tenantId,
             json_encode($catalogConfig),
             'active',
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return $catalogId;
@@ -45,7 +51,7 @@ class EcommerceIntegration implements EcommerceIntegrationContract
         string $catalogId
     ): ?array {
         $stmt = $this->db->prepare(
-            "SELECT * FROM {$this->tablePrefix}catalogs WHERE id = ? AND tenant_id = ?"
+            "SELECT * FROM " . self::TABLE_CATALOGS . " WHERE id = ? AND tenant_id = ?"
         );
 
         $stmt->execute([$catalogId, $tenantId]);
@@ -71,7 +77,7 @@ class EcommerceIntegration implements EcommerceIntegrationContract
 
         $syncId = bin2hex(random_bytes(16));
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}product_syncs (id, tenant_id, catalog_id, products, synced_at)
+            "INSERT INTO " . self::TABLE_PRODUCT_SYNCS . " (id, tenant_id, catalog_id, products, synced_at)
              VALUES (?, ?, ?, ?, ?)"
         );
 
@@ -80,7 +86,7 @@ class EcommerceIntegration implements EcommerceIntegrationContract
             $tenantId,
             $catalogId,
             json_encode($products),
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return count($products);
@@ -93,7 +99,7 @@ class EcommerceIntegration implements EcommerceIntegrationContract
         $orderId = bin2hex(random_bytes(16));
 
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}orders (id, tenant_id, data, status, processed_at)
+            "INSERT INTO " . self::TABLE_ORDERS . " (id, tenant_id, data, status, processed_at)
              VALUES (?, ?, ?, ?, ?)"
         );
 
@@ -102,7 +108,7 @@ class EcommerceIntegration implements EcommerceIntegrationContract
             $tenantId,
             json_encode($orderData),
             'pending',
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return $orderId;
@@ -113,7 +119,7 @@ class EcommerceIntegration implements EcommerceIntegrationContract
         string $orderId
     ): ?array {
         $stmt = $this->db->prepare(
-            "SELECT * FROM {$this->tablePrefix}orders WHERE id = ? AND tenant_id = ?"
+            "SELECT * FROM " . self::TABLE_ORDERS . " WHERE id = ? AND tenant_id = ?"
         );
 
         $stmt->execute([$orderId, $tenantId]);
@@ -131,14 +137,14 @@ class EcommerceIntegration implements EcommerceIntegrationContract
         array $paymentData
     ): bool {
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}payment_callbacks (tenant_id, data, processed_at)
+            "INSERT INTO " . self::TABLE_PAYMENT_CALLBACKS . " (tenant_id, data, processed_at)
              VALUES (?, ?, ?)"
         );
 
         return $stmt->execute([
             $tenantId,
             json_encode($paymentData),
-            date('c'),
+            DateTimeHelper::now(),
         ]);
     }
 
@@ -146,7 +152,7 @@ class EcommerceIntegration implements EcommerceIntegrationContract
         string $tenantId
     ): array {
         $stmt = $this->db->prepare(
-            "SELECT COUNT(*) as catalog_count FROM {$this->tablePrefix}catalogs WHERE tenant_id = ?"
+            "SELECT COUNT(*) as catalog_count FROM " . self::TABLE_CATALOGS . " WHERE tenant_id = ?"
         );
 
         $stmt->execute([$tenantId]);
@@ -165,7 +171,7 @@ class EcommerceIntegration implements EcommerceIntegrationContract
         string $tenantId
     ): array {
         $stmt = $this->db->prepare(
-            "SELECT COUNT(*) as total_catalogs FROM {$this->tablePrefix}catalogs WHERE tenant_id = ?"
+            "SELECT COUNT(*) as total_catalogs FROM " . self::TABLE_CATALOGS . " WHERE tenant_id = ?"
         );
 
         $stmt->execute([$tenantId]);
@@ -176,7 +182,7 @@ class EcommerceIntegration implements EcommerceIntegrationContract
         return [
             'valid' => $isValid,
             'catalog_count' => $catalogs['total_catalogs'] ?? 0,
-            'validation_timestamp' => date('c'),
+            'validation_timestamp' => DateTimeHelper::now(),
         ];
     }
 }

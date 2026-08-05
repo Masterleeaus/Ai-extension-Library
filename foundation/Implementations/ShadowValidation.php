@@ -7,11 +7,16 @@ namespace Foundation\Implementations;
 use Foundation\Contracts\ShadowValidationContract;
 use PDO;
 use Foundation\Support\JsonHelper;
+use Foundation\Support\DateTimeHelper;
 
 class ShadowValidation implements ShadowValidationContract
 {
     private PDO $db;
-    private string $tablePrefix = 'shadow_validation_';
+    private const TABLE_PREFIX = 'shadow_validation_';
+    private const TABLE_DISCREPANCIES = self::TABLE_PREFIX . 'discrepancies';
+    private const TABLE_RESULTS = self::TABLE_PREFIX . 'results';
+    private const TABLE_SESSIONS = self::TABLE_PREFIX . 'sessions';
+    private string $tablePrefix = self::TABLE_PREFIX;
 
     public function __construct(PDO $db)
     {
@@ -27,7 +32,7 @@ class ShadowValidation implements ShadowValidationContract
         $validationId = bin2hex(random_bytes(16));
 
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}sessions (id, tenant_id, migration_id, data_source, rules, status, created_at)
+            "INSERT INTO " . self::TABLE_SESSIONS . " (id, tenant_id, migration_id, data_source, rules, status, created_at)
              VALUES (?, ?, ?, ?, ?, ?, ?)"
         );
 
@@ -38,7 +43,7 @@ class ShadowValidation implements ShadowValidationContract
             $dataSource,
             json_encode($rules),
             'active',
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return $validationId;
@@ -82,7 +87,7 @@ class ShadowValidation implements ShadowValidationContract
 
         $validationResultId = bin2hex(random_bytes(16));
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}results (id, validation_id, tenant_id, source_data, target_data, errors, valid, recorded_at)
+            "INSERT INTO " . self::TABLE_RESULTS . " (id, validation_id, tenant_id, source_data, target_data, errors, valid, recorded_at)
              VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
         );
 
@@ -95,7 +100,7 @@ class ShadowValidation implements ShadowValidationContract
             json_encode($targetRecord),
             json_encode($errors),
             $isValid ? 1 : 0,
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return [
@@ -110,7 +115,7 @@ class ShadowValidation implements ShadowValidationContract
         string $validationId
     ): ?array {
         $stmt = $this->db->prepare(
-            "SELECT * FROM {$this->tablePrefix}sessions WHERE id = ? AND tenant_id = ?"
+            "SELECT * FROM " . self::TABLE_SESSIONS . " WHERE id = ? AND tenant_id = ?"
         );
 
         $stmt->execute([$validationId, $tenantId]);
@@ -129,7 +134,7 @@ class ShadowValidation implements ShadowValidationContract
     ): array {
         $stmt = $this->db->prepare(
             "SELECT COUNT(*) as total, SUM(CASE WHEN valid = 1 THEN 1 ELSE 0 END) as passed
-             FROM {$this->tablePrefix}results WHERE validation_id = ? AND tenant_id = ?"
+             FROM " . self::TABLE_RESULTS . " WHERE validation_id = ? AND tenant_id = ?"
         );
 
         $stmt->execute([$validationId, $tenantId]);
@@ -151,7 +156,7 @@ class ShadowValidation implements ShadowValidationContract
         $discrepancyId = bin2hex(random_bytes(16));
 
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}discrepancies (id, validation_id, tenant_id, details, recorded_at)
+            "INSERT INTO " . self::TABLE_DISCREPANCIES . " (id, validation_id, tenant_id, details, recorded_at)
              VALUES (?, ?, ?, ?, ?)"
         );
 
@@ -160,7 +165,7 @@ class ShadowValidation implements ShadowValidationContract
             $validationId,
             $tenantId,
             json_encode($discrepancy),
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return $discrepancyId;
@@ -171,7 +176,7 @@ class ShadowValidation implements ShadowValidationContract
         string $validationId
     ): array {
         $stmt = $this->db->prepare(
-            "SELECT * FROM {$this->tablePrefix}discrepancies WHERE validation_id = ? AND tenant_id = ? ORDER BY recorded_at DESC"
+            "SELECT * FROM " . self::TABLE_DISCREPANCIES . " WHERE validation_id = ? AND tenant_id = ? ORDER BY recorded_at DESC"
         );
 
         $stmt->execute([$validationId, $tenantId]);
@@ -190,13 +195,13 @@ class ShadowValidation implements ShadowValidationContract
         bool $approved
     ): bool {
         $stmt = $this->db->prepare(
-            "UPDATE {$this->tablePrefix}sessions SET status = ?, approved = ?, completed_at = ? WHERE id = ? AND tenant_id = ?"
+            "UPDATE " . self::TABLE_SESSIONS . " SET status = ?, approved = ?, completed_at = ? WHERE id = ? AND tenant_id = ?"
         );
 
         return $stmt->execute([
             'completed',
             $approved ? 1 : 0,
-            date('c'),
+            DateTimeHelper::now(),
             $validationId,
             $tenantId,
         ]);
@@ -214,7 +219,7 @@ class ShadowValidation implements ShadowValidationContract
             'comparison' => $comparison,
             'discrepancies_count' => count($discrepancies),
             'discrepancies' => $discrepancies,
-            'generated_at' => date('c'),
+            'generated_at' => DateTimeHelper::now(),
         ];
 
         return json_encode($report, JSON_PRETTY_PRINT);

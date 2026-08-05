@@ -7,11 +7,14 @@ namespace Foundation\Implementations;
 use Foundation\Contracts\FormsBuilderContract;
 use PDO;
 use Foundation\Support\JsonHelper;
+use Foundation\Support\DateTimeHelper;
 
 class FormsBuilder implements FormsBuilderContract
 {
     private PDO $db;
-    private string $tablePrefix = 'forms_builder_';
+    private const TABLE_PREFIX = 'forms_builder_';
+    private const TABLE_FORMS = self::TABLE_PREFIX . 'forms';
+    private string $tablePrefix = self::TABLE_PREFIX;
 
     public function __construct(PDO $db)
     {
@@ -26,7 +29,7 @@ class FormsBuilder implements FormsBuilderContract
         $formId = bin2hex(random_bytes(16));
 
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}forms (id, tenant_id, name, schema, created_at)
+            "INSERT INTO " . self::TABLE_FORMS . " (id, tenant_id, name, schema, created_at)
              VALUES (?, ?, ?, ?, ?)"
         );
 
@@ -35,7 +38,7 @@ class FormsBuilder implements FormsBuilderContract
             $tenantId,
             $formName,
             json_encode($formSchema),
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return $formId;
@@ -46,7 +49,7 @@ class FormsBuilder implements FormsBuilderContract
         string $formId
     ): ?array {
         $stmt = $this->db->prepare(
-            "SELECT * FROM {$this->tablePrefix}forms WHERE id = ? AND tenant_id = ?"
+            "SELECT * FROM " . self::TABLE_FORMS . " WHERE id = ? AND tenant_id = ?"
         );
 
         $stmt->execute([$formId, $tenantId]);
@@ -65,10 +68,10 @@ class FormsBuilder implements FormsBuilderContract
         array $formSchema
     ): bool {
         $stmt = $this->db->prepare(
-            "UPDATE {$this->tablePrefix}forms SET schema = ?, updated_at = ? WHERE id = ? AND tenant_id = ?"
+            "UPDATE " . self::TABLE_FORMS . " SET schema = ?, updated_at = ? WHERE id = ? AND tenant_id = ?"
         );
 
-        return $stmt->execute([json_encode($formSchema), date('c'), $formId, $tenantId]);
+        return $stmt->execute([json_encode($formSchema), DateTimeHelper::now(), $formId, $tenantId]);
     }
 
     public function addField(
@@ -144,7 +147,7 @@ class FormsBuilder implements FormsBuilderContract
         string $tenantId
     ): array {
         $stmt = $this->db->prepare(
-            "SELECT id, name, created_at FROM {$this->tablePrefix}forms WHERE tenant_id = ? ORDER BY created_at DESC"
+            "SELECT id, name, created_at FROM " . self::TABLE_FORMS . " WHERE tenant_id = ? ORDER BY created_at DESC"
         );
 
         $stmt->execute([$tenantId]);
@@ -156,7 +159,7 @@ class FormsBuilder implements FormsBuilderContract
         string $formId
     ): bool {
         $stmt = $this->db->prepare(
-            "DELETE FROM {$this->tablePrefix}forms WHERE id = ? AND tenant_id = ?"
+            "DELETE FROM " . self::TABLE_FORMS . " WHERE id = ? AND tenant_id = ?"
         );
 
         return $stmt->execute([$formId, $tenantId]);

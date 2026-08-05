@@ -7,11 +7,15 @@ namespace Foundation\Implementations;
 use Foundation\Contracts\FeatureFlagContract;
 use PDO;
 use Foundation\Support\JsonHelper;
+use Foundation\Support\DateTimeHelper;
 
 class FeatureFlag implements FeatureFlagContract
 {
     private PDO $db;
-    private string $tablePrefix = 'feature_flags_';
+    private const TABLE_PREFIX = 'feature_flags_';
+    private const TABLE_FLAGS = self::TABLE_PREFIX . 'flags';
+    private const TABLE_USER_VARIANTS = self::TABLE_PREFIX . 'user_variants';
+    private string $tablePrefix = self::TABLE_PREFIX;
 
     public function __construct(PDO $db)
     {
@@ -27,7 +31,7 @@ class FeatureFlag implements FeatureFlagContract
         $flagId = bin2hex(random_bytes(16));
 
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}flags (id, tenant_id, name, enabled, metadata, rollout_percentage, created_at)
+            "INSERT INTO " . self::TABLE_FLAGS . " (id, tenant_id, name, enabled, metadata, rollout_percentage, created_at)
              VALUES (?, ?, ?, ?, ?, ?, ?)"
         );
 
@@ -38,7 +42,7 @@ class FeatureFlag implements FeatureFlagContract
             $enabled ? 1 : 0,
             json_encode($metadata),
             100,
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return $flagId;
@@ -49,7 +53,7 @@ class FeatureFlag implements FeatureFlagContract
         string $flagName
     ): ?array {
         $stmt = $this->db->prepare(
-            "SELECT * FROM {$this->tablePrefix}flags WHERE tenant_id = ? AND name = ?"
+            "SELECT * FROM " . self::TABLE_FLAGS . " WHERE tenant_id = ? AND name = ?"
         );
 
         $stmt->execute([$tenantId, $flagName]);
@@ -99,12 +103,12 @@ class FeatureFlag implements FeatureFlagContract
         ?int $rolloutPercentage = null
     ): bool {
         $stmt = $this->db->prepare(
-            "UPDATE {$this->tablePrefix}flags SET enabled = 1, rollout_percentage = ?, updated_at = ? WHERE tenant_id = ? AND name = ?"
+            "UPDATE " . self::TABLE_FLAGS . " SET enabled = 1, rollout_percentage = ?, updated_at = ? WHERE tenant_id = ? AND name = ?"
         );
 
         return $stmt->execute([
             $rolloutPercentage ?? 100,
-            date('c'),
+            DateTimeHelper::now(),
             $tenantId,
             $flagName,
         ]);
@@ -115,10 +119,10 @@ class FeatureFlag implements FeatureFlagContract
         string $flagName
     ): bool {
         $stmt = $this->db->prepare(
-            "UPDATE {$this->tablePrefix}flags SET enabled = 0, updated_at = ? WHERE tenant_id = ? AND name = ?"
+            "UPDATE " . self::TABLE_FLAGS . " SET enabled = 0, updated_at = ? WHERE tenant_id = ? AND name = ?"
         );
 
-        return $stmt->execute([date('c'), $tenantId, $flagName]);
+        return $stmt->execute([DateTimeHelper::now(), $tenantId, $flagName]);
     }
 
     public function setRollout(
@@ -127,10 +131,10 @@ class FeatureFlag implements FeatureFlagContract
         int $percentage
     ): bool {
         $stmt = $this->db->prepare(
-            "UPDATE {$this->tablePrefix}flags SET rollout_percentage = ?, updated_at = ? WHERE tenant_id = ? AND name = ?"
+            "UPDATE " . self::TABLE_FLAGS . " SET rollout_percentage = ?, updated_at = ? WHERE tenant_id = ? AND name = ?"
         );
 
-        return $stmt->execute([$percentage, date('c'), $tenantId, $flagName]);
+        return $stmt->execute([$percentage, DateTimeHelper::now(), $tenantId, $flagName]);
     }
 
     public function addUserVariant(
@@ -140,12 +144,12 @@ class FeatureFlag implements FeatureFlagContract
         bool $enabled
     ): bool {
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}user_variants (tenant_id, flag_name, user_id, enabled, created_at)
+            "INSERT INTO " . self::TABLE_USER_VARIANTS . " (tenant_id, flag_name, user_id, enabled, created_at)
              VALUES (?, ?, ?, ?, ?)
              ON DUPLICATE KEY UPDATE enabled = ?, updated_at = ?"
         );
 
-        $now = date('c');
+        $now = DateTimeHelper::now();
 
         return $stmt->execute([
             $tenantId,
@@ -160,7 +164,7 @@ class FeatureFlag implements FeatureFlagContract
 
     public function listFlags(string $tenantId): array {
         $stmt = $this->db->prepare(
-            "SELECT * FROM {$this->tablePrefix}flags WHERE tenant_id = ? ORDER BY created_at DESC"
+            "SELECT * FROM " . self::TABLE_FLAGS . " WHERE tenant_id = ? ORDER BY created_at DESC"
         );
 
         $stmt->execute([$tenantId]);
@@ -175,7 +179,7 @@ class FeatureFlag implements FeatureFlagContract
 
     private function getUserVariant(string $tenantId, string $flagName, string $userId): ?bool {
         $stmt = $this->db->prepare(
-            "SELECT enabled FROM {$this->tablePrefix}user_variants WHERE tenant_id = ? AND flag_name = ? AND user_id = ?"
+            "SELECT enabled FROM " . self::TABLE_USER_VARIANTS . " WHERE tenant_id = ? AND flag_name = ? AND user_id = ?"
         );
 
         $stmt->execute([$tenantId, $flagName, $userId]);

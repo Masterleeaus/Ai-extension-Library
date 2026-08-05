@@ -7,11 +7,17 @@ namespace Foundation\Implementations;
 use Foundation\Contracts\WorkCoreBusinessNetworkContract;
 use PDO;
 use Foundation\Support\JsonHelper;
+use Foundation\Support\DateTimeHelper;
 
 class WorkCoreBusinessNetwork implements WorkCoreBusinessNetworkContract
 {
     private PDO $db;
-    private string $tablePrefix = 'workcore_business_';
+    private const TABLE_PREFIX = 'workcore_business_';
+    private const TABLE_CRM_INTEGRATIONS = self::TABLE_PREFIX . 'crm_integrations';
+    private const TABLE_CUSTOMERS = self::TABLE_PREFIX . 'customers';
+    private const TABLE_KNOWLEDGE = self::TABLE_PREFIX . 'knowledge';
+    private const TABLE_PRODUCTS = self::TABLE_PREFIX . 'products';
+    private string $tablePrefix = self::TABLE_PREFIX;
 
     public function __construct(PDO $db)
     {
@@ -25,7 +31,7 @@ class WorkCoreBusinessNetwork implements WorkCoreBusinessNetworkContract
         $customerId = bin2hex(random_bytes(16));
 
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}customers (id, tenant_id, data, created_at)
+            "INSERT INTO " . self::TABLE_CUSTOMERS . " (id, tenant_id, data, created_at)
              VALUES (?, ?, ?, ?)"
         );
 
@@ -33,7 +39,7 @@ class WorkCoreBusinessNetwork implements WorkCoreBusinessNetworkContract
             $customerId,
             $tenantId,
             json_encode($customerData),
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return $customerId;
@@ -44,7 +50,7 @@ class WorkCoreBusinessNetwork implements WorkCoreBusinessNetworkContract
         string $customerId
     ): ?array {
         $stmt = $this->db->prepare(
-            "SELECT * FROM {$this->tablePrefix}customers WHERE id = ? AND tenant_id = ?"
+            "SELECT * FROM " . self::TABLE_CUSTOMERS . " WHERE id = ? AND tenant_id = ?"
         );
 
         $stmt->execute([$customerId, $tenantId]);
@@ -71,10 +77,10 @@ class WorkCoreBusinessNetwork implements WorkCoreBusinessNetworkContract
         $mergedData = array_merge($customer['data'], $updates);
 
         $stmt = $this->db->prepare(
-            "UPDATE {$this->tablePrefix}customers SET data = ?, updated_at = ? WHERE id = ? AND tenant_id = ?"
+            "UPDATE " . self::TABLE_CUSTOMERS . " SET data = ?, updated_at = ? WHERE id = ? AND tenant_id = ?"
         );
 
-        return $stmt->execute([json_encode($mergedData), date('c'), $customerId, $tenantId]);
+        return $stmt->execute([json_encode($mergedData), DateTimeHelper::now(), $customerId, $tenantId]);
     }
 
     public function createProduct(
@@ -84,7 +90,7 @@ class WorkCoreBusinessNetwork implements WorkCoreBusinessNetworkContract
         $productId = bin2hex(random_bytes(16));
 
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}products (id, tenant_id, data, created_at)
+            "INSERT INTO " . self::TABLE_PRODUCTS . " (id, tenant_id, data, created_at)
              VALUES (?, ?, ?, ?)"
         );
 
@@ -92,7 +98,7 @@ class WorkCoreBusinessNetwork implements WorkCoreBusinessNetworkContract
             $productId,
             $tenantId,
             json_encode($productData),
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return $productId;
@@ -102,7 +108,7 @@ class WorkCoreBusinessNetwork implements WorkCoreBusinessNetworkContract
         string $tenantId,
         array $filters
     ): array {
-        $query = "SELECT * FROM {$this->tablePrefix}products WHERE tenant_id = ?";
+        $query = "SELECT * FROM " . self::TABLE_PRODUCTS . " WHERE tenant_id = ?";
         $params = [$tenantId];
 
         if (!empty($filters['category'])) {
@@ -133,13 +139,13 @@ class WorkCoreBusinessNetwork implements WorkCoreBusinessNetworkContract
         array $content
     ): bool {
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}knowledge (id, tenant_id, content, stored_at)
+            "INSERT INTO " . self::TABLE_KNOWLEDGE . " (id, tenant_id, content, stored_at)
              VALUES (?, ?, ?, ?)
              ON DUPLICATE KEY UPDATE content = ?, updated_at = ?"
         );
 
         $contentJson = json_encode($content);
-        $now = date('c');
+        $now = DateTimeHelper::now();
 
         return $stmt->execute([
             $knowledgeId,
@@ -156,7 +162,7 @@ class WorkCoreBusinessNetwork implements WorkCoreBusinessNetworkContract
         string $query
     ): array {
         $stmt = $this->db->prepare(
-            "SELECT id, content FROM {$this->tablePrefix}knowledge WHERE tenant_id = ? AND MATCH(content) AGAINST(? IN BOOLEAN MODE)"
+            "SELECT id, content FROM " . self::TABLE_KNOWLEDGE . " WHERE tenant_id = ? AND MATCH(content) AGAINST(? IN BOOLEAN MODE)"
         );
 
         $stmt->execute([$tenantId, $query]);
@@ -174,13 +180,13 @@ class WorkCoreBusinessNetwork implements WorkCoreBusinessNetworkContract
         array $crmConfig
     ): bool {
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}crm_integrations (tenant_id, config, integrated_at)
+            "INSERT INTO " . self::TABLE_CRM_INTEGRATIONS . " (tenant_id, config, integrated_at)
              VALUES (?, ?, ?)
              ON DUPLICATE KEY UPDATE config = ?, updated_at = ?"
         );
 
         $configJson = json_encode($crmConfig);
-        $now = date('c');
+        $now = DateTimeHelper::now();
 
         return $stmt->execute([
             $tenantId,

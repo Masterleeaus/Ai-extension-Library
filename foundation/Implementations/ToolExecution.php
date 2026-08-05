@@ -8,11 +8,18 @@ use Foundation\Contracts\ToolExecutionContract;
 use Foundation\Contracts\TenantContextContract;
 use PDO;
 use Foundation\Support\JsonHelper;
+use Foundation\Support\DateTimeHelper;
 
 class ToolExecution implements ToolExecutionContract
 {
     private PDO $db;
-    private string $tablePrefix = 'tools_';
+    private const TABLE_PREFIX = 'tools_';
+    private const TABLE_DEFINITIONS = self::TABLE_PREFIX . 'definitions';
+    private const TABLE_EXECUTIONS = self::TABLE_PREFIX . 'executions';
+    private const TABLE_HISTORY = self::TABLE_PREFIX . 'history';
+    private const TABLE_LIMITS = self::TABLE_PREFIX . 'limits';
+    private const TABLE_PERMISSIONS = self::TABLE_PREFIX . 'permissions';
+    private string $tablePrefix = self::TABLE_PREFIX;
 
     public function __construct(PDO $db)
     {
@@ -29,7 +36,7 @@ class ToolExecution implements ToolExecutionContract
         $startTime = microtime(true);
 
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}executions (id, tenant_id, tool_id, params, context, status, started_at)
+            "INSERT INTO " . self::TABLE_EXECUTIONS . " (id, tenant_id, tool_id, params, context, status, started_at)
              VALUES (?, ?, ?, ?, ?, ?, ?)"
         );
 
@@ -40,13 +47,13 @@ class ToolExecution implements ToolExecutionContract
             json_encode($params),
             json_encode($context),
             'running',
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return [
             'execution_id' => $executionId,
             'status' => 'running',
-            'started_at' => date('c'),
+            'started_at' => DateTimeHelper::now(),
         ];
     }
 
@@ -56,7 +63,7 @@ class ToolExecution implements ToolExecutionContract
         array $params = []
     ): bool {
         $stmt = $this->db->prepare(
-            "SELECT * FROM {$this->tablePrefix}permissions
+            "SELECT * FROM " . self::TABLE_PERMISSIONS . "
              WHERE tenant_id = ? AND tool_id = ?"
         );
 
@@ -73,7 +80,7 @@ class ToolExecution implements ToolExecutionContract
         string $toolId
     ): ?int {
         $stmt = $this->db->prepare(
-            "SELECT rate_limit FROM {$this->tablePrefix}limits
+            "SELECT rate_limit FROM " . self::TABLE_LIMITS . "
              WHERE tenant_id = ? AND tool_id = ?"
         );
 
@@ -90,7 +97,7 @@ class ToolExecution implements ToolExecutionContract
         float $costEstimate = 0.0
     ): void {
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}history (tenant_id, tool_id, execution, cost_estimate, recorded_at)
+            "INSERT INTO " . self::TABLE_HISTORY . " (tenant_id, tool_id, execution, cost_estimate, recorded_at)
              VALUES (?, ?, ?, ?, ?)"
         );
 
@@ -99,7 +106,7 @@ class ToolExecution implements ToolExecutionContract
             $toolId,
             json_encode($execution),
             $costEstimate,
-            date('c'),
+            DateTimeHelper::now(),
         ]);
     }
 
@@ -107,7 +114,7 @@ class ToolExecution implements ToolExecutionContract
         string $tenantId
     ): array {
         $stmt = $this->db->prepare(
-            "SELECT * FROM {$this->tablePrefix}definitions WHERE tenant_id = ? OR is_public = 1"
+            "SELECT * FROM " . self::TABLE_DEFINITIONS . " WHERE tenant_id = ? OR is_public = 1"
         );
         $stmt->execute([$tenantId]);
 
@@ -118,7 +125,7 @@ class ToolExecution implements ToolExecutionContract
         string $toolId
     ): ?array {
         $stmt = $this->db->prepare(
-            "SELECT * FROM {$this->tablePrefix}definitions WHERE id = ?"
+            "SELECT * FROM " . self::TABLE_DEFINITIONS . " WHERE id = ?"
         );
         $stmt->execute([$toolId]);
 

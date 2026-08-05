@@ -7,11 +7,16 @@ namespace Foundation\Implementations;
 use Foundation\Contracts\AuthorizationPolicyContract;
 use Foundation\Contracts\TenantContextContract;
 use PDO;
+use Foundation\Support\DateTimeHelper;
 
 class AuthorizationPolicy implements AuthorizationPolicyContract
 {
     private PDO $db;
-    private string $tablePrefix = 'authz_';
+    private const TABLE_PREFIX = 'authz_';
+    private const TABLE_AUDITS = self::TABLE_PREFIX . 'audits';
+    private const TABLE_GRANTS = self::TABLE_PREFIX . 'grants';
+    private const TABLE_POLICIES = self::TABLE_PREFIX . 'policies';
+    private string $tablePrefix = self::TABLE_PREFIX;
 
     public function __construct(PDO $db)
     {
@@ -33,7 +38,7 @@ class AuthorizationPolicy implements AuthorizationPolicyContract
 
         // Check if user has permission for the action-resource combination
         $stmt = $this->db->prepare(
-            "SELECT 1 FROM {$this->tablePrefix}policies
+            "SELECT 1 FROM " . self::TABLE_POLICIES . "
              WHERE tenant_id = ? AND action = ? AND resource = ? AND active = 1
              LIMIT 1"
         );
@@ -51,7 +56,7 @@ class AuthorizationPolicy implements AuthorizationPolicyContract
 
         // Check if user has been granted this permission
         $stmt = $this->db->prepare(
-            "SELECT 1 FROM {$this->tablePrefix}grants
+            "SELECT 1 FROM " . self::TABLE_GRANTS . "
              WHERE tenant_id = ? AND user_id = ? AND action = ? AND resource = ? AND revoked_at IS NULL
              LIMIT 1"
         );
@@ -63,7 +68,7 @@ class AuthorizationPolicy implements AuthorizationPolicyContract
 
     public function getRequiredPermissions(string $action, string $resource): array {
         $stmt = $this->db->prepare(
-            "SELECT DISTINCT permission FROM {$this->tablePrefix}policies
+            "SELECT DISTINCT permission FROM " . self::TABLE_POLICIES . "
              WHERE action = ? AND resource = ? AND active = 1
              ORDER BY permission ASC"
         );
@@ -84,7 +89,7 @@ class AuthorizationPolicy implements AuthorizationPolicyContract
         $auditId = bin2hex(random_bytes(16));
 
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}audits
+            "INSERT INTO " . self::TABLE_AUDITS . "
              (id, tenant_id, user_id, action, resource, approved, attributes, recorded_at)
              VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
         );
@@ -97,7 +102,7 @@ class AuthorizationPolicy implements AuthorizationPolicyContract
             $resource,
             (int)$approved,
             json_encode($attributes),
-            date('c'),
+            DateTimeHelper::now(),
         ]);
     }
 }

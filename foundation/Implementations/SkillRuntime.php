@@ -7,11 +7,16 @@ namespace Foundation\Implementations;
 use Foundation\Contracts\SkillRuntimeContract;
 use PDO;
 use Foundation\Support\JsonHelper;
+use Foundation\Support\DateTimeHelper;
 
 class SkillRuntime implements SkillRuntimeContract
 {
     private PDO $db;
-    private string $tablePrefix = 'skills_';
+    private const TABLE_PREFIX = 'skills_';
+    private const TABLE_EXECUTIONS = self::TABLE_PREFIX . 'executions';
+    private const TABLE_REGISTRY = self::TABLE_PREFIX . 'registry';
+    private const TABLE_VERSIONS = self::TABLE_PREFIX . 'versions';
+    private string $tablePrefix = self::TABLE_PREFIX;
     private array $registry = [];
 
     public function __construct(PDO $db)
@@ -25,7 +30,7 @@ class SkillRuntime implements SkillRuntimeContract
         array $metadata = []
     ): bool {
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}registry (skill_id, class_name, metadata, registered_at)
+            "INSERT INTO " . self::TABLE_REGISTRY . " (skill_id, class_name, metadata, registered_at)
              VALUES (?, ?, ?, ?)
              ON DUPLICATE KEY UPDATE metadata = ?"
         );
@@ -35,7 +40,7 @@ class SkillRuntime implements SkillRuntimeContract
             $skillId,
             $className,
             $metadataJson,
-            date('c'),
+            DateTimeHelper::now(),
             $metadataJson,
         ]);
     }
@@ -49,7 +54,7 @@ class SkillRuntime implements SkillRuntimeContract
         $executionId = bin2hex(random_bytes(16));
 
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}executions (id, tenant_id, skill_id, input, context, status, created_at)
+            "INSERT INTO " . self::TABLE_EXECUTIONS . " (id, tenant_id, skill_id, input, context, status, created_at)
              VALUES (?, ?, ?, ?, ?, ?, ?)"
         );
 
@@ -60,7 +65,7 @@ class SkillRuntime implements SkillRuntimeContract
             json_encode($input),
             json_encode($context),
             'running',
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return [
@@ -73,7 +78,7 @@ class SkillRuntime implements SkillRuntimeContract
         string $skillId
     ): ?array {
         $stmt = $this->db->prepare(
-            "SELECT * FROM {$this->tablePrefix}registry WHERE skill_id = ?"
+            "SELECT * FROM " . self::TABLE_REGISTRY . " WHERE skill_id = ?"
         );
         $stmt->execute([$skillId]);
 
@@ -89,7 +94,7 @@ class SkillRuntime implements SkillRuntimeContract
         string $tenantId,
         ?string $category = null
     ): array {
-        $query = "SELECT * FROM {$this->tablePrefix}registry";
+        $query = "SELECT * FROM " . self::TABLE_REGISTRY . "";
         $params = [];
 
         if ($category) {
@@ -128,7 +133,7 @@ class SkillRuntime implements SkillRuntimeContract
         array $metadata = []
     ): bool {
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}versions (skill_id, version, metadata, published_at)
+            "INSERT INTO " . self::TABLE_VERSIONS . " (skill_id, version, metadata, published_at)
              VALUES (?, ?, ?, ?)"
         );
 
@@ -136,7 +141,7 @@ class SkillRuntime implements SkillRuntimeContract
             $skillId,
             $version,
             json_encode($metadata),
-            date('c'),
+            DateTimeHelper::now(),
         ]);
     }
 }

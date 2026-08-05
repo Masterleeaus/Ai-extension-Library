@@ -7,11 +7,15 @@ namespace Foundation\Implementations;
 use Foundation\Contracts\WebhookSecurityContract;
 use PDO;
 use Foundation\Support\JsonHelper;
+use Foundation\Support\DateTimeHelper;
 
 class WebhookSecurity implements WebhookSecurityContract
 {
     private PDO $db;
-    private string $tablePrefix = 'webhook_security_';
+    private const TABLE_PREFIX = 'webhook_security_';
+    private const TABLE_DELIVERIES = self::TABLE_PREFIX . 'deliveries';
+    private const TABLE_ENDPOINTS = self::TABLE_PREFIX . 'endpoints';
+    private string $tablePrefix = self::TABLE_PREFIX;
 
     public function __construct(PDO $db)
     {
@@ -27,7 +31,7 @@ class WebhookSecurity implements WebhookSecurityContract
         $endpointId = bin2hex(random_bytes(16));
 
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}endpoints (id, tenant_id, url, events, secret, active, created_at)
+            "INSERT INTO " . self::TABLE_ENDPOINTS . " (id, tenant_id, url, events, secret, active, created_at)
              VALUES (?, ?, ?, ?, ?, ?, ?)"
         );
 
@@ -38,7 +42,7 @@ class WebhookSecurity implements WebhookSecurityContract
             json_encode($events),
             hash('sha256', $secret),
             1,
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return $endpointId;
@@ -49,11 +53,11 @@ class WebhookSecurity implements WebhookSecurityContract
         string $endpointId
     ): bool {
         $stmt = $this->db->prepare(
-            "UPDATE {$this->tablePrefix}endpoints SET active = 0, deactivated_at = ?
+            "UPDATE " . self::TABLE_ENDPOINTS . " SET active = 0, deactivated_at = ?
              WHERE id = ? AND tenant_id = ?"
         );
 
-        return $stmt->execute([date('c'), $endpointId, $tenantId]);
+        return $stmt->execute([DateTimeHelper::now(), $endpointId, $tenantId]);
     }
 
     public function validateSignature(
@@ -71,7 +75,7 @@ class WebhookSecurity implements WebhookSecurityContract
         string $tenantId
     ): bool {
         $stmt = $this->db->prepare(
-            "SELECT id FROM {$this->tablePrefix}endpoints WHERE id = ? AND tenant_id = ? AND active = 1"
+            "SELECT id FROM " . self::TABLE_ENDPOINTS . " WHERE id = ? AND tenant_id = ? AND active = 1"
         );
 
         $stmt->execute([$endpointId, $tenantId]);
@@ -86,7 +90,7 @@ class WebhookSecurity implements WebhookSecurityContract
         $webhookId = bin2hex(random_bytes(16));
 
         $stmt = $this->db->prepare(
-            "SELECT * FROM {$this->tablePrefix}endpoints WHERE tenant_id = ? AND active = 1"
+            "SELECT * FROM " . self::TABLE_ENDPOINTS . " WHERE tenant_id = ? AND active = 1"
         );
 
         $stmt->execute([$tenantId]);
@@ -102,7 +106,7 @@ class WebhookSecurity implements WebhookSecurityContract
 
                 $deliveryId = bin2hex(random_bytes(16));
                 $deliveryStmt = $this->db->prepare(
-                    "INSERT INTO {$this->tablePrefix}deliveries (id, webhook_id, endpoint_id, event_type, payload, signature, status, attempts, created_at)
+                    "INSERT INTO " . self::TABLE_DELIVERIES . " (id, webhook_id, endpoint_id, event_type, payload, signature, status, attempts, created_at)
                      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
                 );
 
@@ -115,7 +119,7 @@ class WebhookSecurity implements WebhookSecurityContract
                     $signature,
                     'pending',
                     0,
-                    date('c'),
+                    DateTimeHelper::now(),
                 ]);
 
                 $dispatchResults[] = [
@@ -140,8 +144,8 @@ class WebhookSecurity implements WebhookSecurityContract
         int $maxAttempts = 3
     ): bool {
         $stmt = $this->db->prepare(
-            "SELECT d.* FROM {$this->tablePrefix}deliveries d
-             JOIN {$this->tablePrefix}endpoints e ON d.endpoint_id = e.id
+            "SELECT d.* FROM " . self::TABLE_DELIVERIES . " d
+             JOIN " . self::TABLE_ENDPOINTS . " e ON d.endpoint_id = e.id
              WHERE e.tenant_id = ? AND d.webhook_id = ? AND d.status = 'failed' AND d.attempts < ?"
         );
 
@@ -150,7 +154,7 @@ class WebhookSecurity implements WebhookSecurityContract
 
         foreach ($failures as $delivery) {
             $updateStmt = $this->db->prepare(
-                "UPDATE {$this->tablePrefix}deliveries SET status = 'pending', attempts = attempts + 1
+                "UPDATE " . self::TABLE_DELIVERIES . " SET status = 'pending', attempts = attempts + 1
                  WHERE id = ?"
             );
 
@@ -165,8 +169,8 @@ class WebhookSecurity implements WebhookSecurityContract
         string $webhookId
     ): ?array {
         $stmt = $this->db->prepare(
-            "SELECT d.* FROM {$this->tablePrefix}deliveries d
-             JOIN {$this->tablePrefix}endpoints e ON d.endpoint_id = e.id
+            "SELECT d.* FROM " . self::TABLE_DELIVERIES . " d
+             JOIN " . self::TABLE_ENDPOINTS . " e ON d.endpoint_id = e.id
              WHERE e.tenant_id = ? AND d.webhook_id = ?
              ORDER BY d.created_at DESC
              LIMIT 1"
@@ -186,7 +190,7 @@ class WebhookSecurity implements WebhookSecurityContract
         string $tenantId,
         ?string $event = null
     ): array {
-        $query = "SELECT * FROM {$this->tablePrefix}endpoints WHERE tenant_id = ? AND active = 1";
+        $query = "SELECT * FROM " . self::TABLE_ENDPOINTS . " WHERE tenant_id = ? AND active = 1";
         $params = [$tenantId];
 
         if ($event) {

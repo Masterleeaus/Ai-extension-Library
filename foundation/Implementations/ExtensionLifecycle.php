@@ -10,11 +10,16 @@ use Foundation\Support\ValidationException;
 use Foundation\Support\TransactionHelper;
 use PDO;
 use Foundation\Support\JsonHelper;
+use Foundation\Support\DateTimeHelper;
 
 class ExtensionLifecycle implements ExtensionLifecycleContract
 {
     private PDO $db;
-    private string $tablePrefix = 'extension_lifecycle_';
+    private const TABLE_PREFIX = 'extension_lifecycle_';
+    private const TABLE_EXTENSIONS = self::TABLE_PREFIX . 'extensions';
+    private const TABLE_PASSES = self::TABLE_PREFIX . 'passes';
+    private const TABLE_VERSIONS = self::TABLE_PREFIX . 'versions';
+    private string $tablePrefix = self::TABLE_PREFIX;
     private TransactionHelper $transactions;
 
     public function __construct(PDO $db, ?TransactionHelper $transactions = null)
@@ -36,7 +41,7 @@ class ExtensionLifecycle implements ExtensionLifecycleContract
         $extensionId = bin2hex(random_bytes(16));
 
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}extensions (id, tenant_id, name, metadata, status, registered_at)
+            "INSERT INTO " . self::TABLE_EXTENSIONS . " (id, tenant_id, name, metadata, status, registered_at)
              VALUES (?, ?, ?, ?, ?, ?)"
         );
 
@@ -46,7 +51,7 @@ class ExtensionLifecycle implements ExtensionLifecycleContract
             $extensionName,
             json_encode($extensionMetadata),
             'draft',
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return $extensionId;
@@ -57,7 +62,7 @@ class ExtensionLifecycle implements ExtensionLifecycleContract
         string $extensionId
     ): ?array {
         $stmt = $this->db->prepare(
-            "SELECT * FROM {$this->tablePrefix}extensions WHERE id = ? AND tenant_id = ?"
+            "SELECT * FROM " . self::TABLE_EXTENSIONS . " WHERE id = ? AND tenant_id = ?"
         );
 
         $stmt->execute([$extensionId, $tenantId]);
@@ -80,7 +85,7 @@ class ExtensionLifecycle implements ExtensionLifecycleContract
             function (PDO $db) use ($tenantId, $extensionId, $version, $releaseNotes) {
                 // Step 1: Insert version record
                 $stmt = $db->prepare(
-                    "INSERT INTO {$this->tablePrefix}versions (extension_id, tenant_id, version, release_notes, published_at)
+                    "INSERT INTO " . self::TABLE_VERSIONS . " (extension_id, tenant_id, version, release_notes, published_at)
                      VALUES (?, ?, ?, ?, ?)"
                 );
 
@@ -89,17 +94,17 @@ class ExtensionLifecycle implements ExtensionLifecycleContract
                     $tenantId,
                     $version,
                     json_encode($releaseNotes),
-                    date('c'),
+                    DateTimeHelper::now(),
                 ])) {
                     throw new \Exception('Failed to insert version record');
                 }
 
                 // Step 2: Update extension status
                 $updateStmt = $db->prepare(
-                    "UPDATE {$this->tablePrefix}extensions SET status = ?, published_version = ?, updated_at = ? WHERE id = ? AND tenant_id = ?"
+                    "UPDATE " . self::TABLE_EXTENSIONS . " SET status = ?, published_version = ?, updated_at = ? WHERE id = ? AND tenant_id = ?"
                 );
 
-                if (!$updateStmt->execute(['published', $version, date('c'), $extensionId, $tenantId])) {
+                if (!$updateStmt->execute(['published', $version, DateTimeHelper::now(), $extensionId, $tenantId])) {
                     throw new \Exception('Failed to update extension status');
                 }
 
@@ -115,10 +120,10 @@ class ExtensionLifecycle implements ExtensionLifecycleContract
         string $extensionId
     ): bool {
         $stmt = $this->db->prepare(
-            "UPDATE {$this->tablePrefix}extensions SET status = ?, enabled_at = ? WHERE id = ? AND tenant_id = ?"
+            "UPDATE " . self::TABLE_EXTENSIONS . " SET status = ?, enabled_at = ? WHERE id = ? AND tenant_id = ?"
         );
 
-        return $stmt->execute(['enabled', date('c'), $extensionId, $tenantId]);
+        return $stmt->execute(['enabled', DateTimeHelper::now(), $extensionId, $tenantId]);
     }
 
     public function disableExtension(
@@ -127,10 +132,10 @@ class ExtensionLifecycle implements ExtensionLifecycleContract
         string $reason
     ): bool {
         $stmt = $this->db->prepare(
-            "UPDATE {$this->tablePrefix}extensions SET status = ?, disabled_reason = ?, disabled_at = ? WHERE id = ? AND tenant_id = ?"
+            "UPDATE " . self::TABLE_EXTENSIONS . " SET status = ?, disabled_reason = ?, disabled_at = ? WHERE id = ? AND tenant_id = ?"
         );
 
-        return $stmt->execute(['disabled', $reason, date('c'), $extensionId, $tenantId]);
+        return $stmt->execute(['disabled', $reason, DateTimeHelper::now(), $extensionId, $tenantId]);
     }
 
     public function grantExtensionPass(
@@ -144,7 +149,7 @@ class ExtensionLifecycle implements ExtensionLifecycleContract
         $expiresAt = date('c', strtotime("+{$durationDays} days"));
 
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}passes (id, extension_id, tenant_id, type, expires_at, granted_at)
+            "INSERT INTO " . self::TABLE_PASSES . " (id, extension_id, tenant_id, type, expires_at, granted_at)
              VALUES (?, ?, ?, ?, ?, ?)"
         );
 
@@ -154,7 +159,7 @@ class ExtensionLifecycle implements ExtensionLifecycleContract
             $tenantId,
             $passType,
             $expiresAt,
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return $passId;
@@ -165,7 +170,7 @@ class ExtensionLifecycle implements ExtensionLifecycleContract
         string $passId
     ): bool {
         $stmt = $this->db->prepare(
-            "SELECT expires_at FROM {$this->tablePrefix}passes WHERE id = ? AND tenant_id = ?"
+            "SELECT expires_at FROM " . self::TABLE_PASSES . " WHERE id = ? AND tenant_id = ?"
         );
 
         $stmt->execute([$passId, $tenantId]);
@@ -182,7 +187,7 @@ class ExtensionLifecycle implements ExtensionLifecycleContract
         string $tenantId,
         ?string $status = null
     ): array {
-        $query = "SELECT id, name, status, registered_at FROM {$this->tablePrefix}extensions WHERE tenant_id = ?";
+        $query = "SELECT id, name, status, registered_at FROM " . self::TABLE_EXTENSIONS . " WHERE tenant_id = ?";
         $params = [$tenantId];
 
         if ($status) {

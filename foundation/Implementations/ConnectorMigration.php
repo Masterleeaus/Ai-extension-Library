@@ -7,11 +7,19 @@ namespace Foundation\Implementations;
 use Foundation\Contracts\ConnectorMigrationContract;
 use PDO;
 use Foundation\Support\JsonHelper;
+use Foundation\Support\DateTimeHelper;
 
 class ConnectorMigration implements ConnectorMigrationContract
 {
     private PDO $db;
-    private string $tablePrefix = 'connector_migration_';
+    private const TABLE_PREFIX = 'connector_migration_';
+    private const TABLE_CONFIG_MIGRATIONS = self::TABLE_PREFIX . 'config_migrations';
+    private const TABLE_CONFORMANCE_RESULTS = self::TABLE_PREFIX . 'conformance_results';
+    private const TABLE_PATHS = self::TABLE_PREFIX . 'paths';
+    private const TABLE_PLANS = self::TABLE_PREFIX . 'plans';
+    private const TABLE_ROLLBACK_PLANS = self::TABLE_PREFIX . 'rollback_plans';
+    private const TABLE_VALIDATION_TESTS = self::TABLE_PREFIX . 'validation_tests';
+    private string $tablePrefix = self::TABLE_PREFIX;
 
     public function __construct(PDO $db)
     {
@@ -43,7 +51,7 @@ class ConnectorMigration implements ConnectorMigrationContract
         $planId = bin2hex(random_bytes(16));
 
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}plans (id, tenant_id, connector_id, target_runtime, status, created_at)
+            "INSERT INTO " . self::TABLE_PLANS . " (id, tenant_id, connector_id, target_runtime, status, created_at)
              VALUES (?, ?, ?, ?, ?, ?)"
         );
 
@@ -53,7 +61,7 @@ class ConnectorMigration implements ConnectorMigrationContract
             $connectorId,
             $targetRuntime,
             'draft',
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return [
@@ -82,7 +90,7 @@ class ConnectorMigration implements ConnectorMigrationContract
         }
 
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}conformance_results (id, tenant_id, connector_id, rules_count, failures_count, failures, created_at)
+            "INSERT INTO " . self::TABLE_CONFORMANCE_RESULTS . " (id, tenant_id, connector_id, rules_count, failures_count, failures, created_at)
              VALUES (?, ?, ?, ?, ?, ?, ?)"
         );
 
@@ -93,7 +101,7 @@ class ConnectorMigration implements ConnectorMigrationContract
             count($conformanceRules),
             count($failures),
             json_encode($failures),
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return [
@@ -112,7 +120,7 @@ class ConnectorMigration implements ConnectorMigrationContract
         array $testData
     ): bool {
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}validation_tests (tenant_id, connector_id, test_data, result, created_at)
+            "INSERT INTO " . self::TABLE_VALIDATION_TESTS . " (tenant_id, connector_id, test_data, result, created_at)
              VALUES (?, ?, ?, ?, ?)"
         );
 
@@ -123,7 +131,7 @@ class ConnectorMigration implements ConnectorMigrationContract
             $connectorId,
             json_encode($testData),
             $isValid ? 'passed' : 'failed',
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return $isValid;
@@ -135,7 +143,7 @@ class ConnectorMigration implements ConnectorMigrationContract
         string $targetRuntime
     ): bool {
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}config_migrations (tenant_id, connector_id, target_runtime, status, migrated_at)
+            "INSERT INTO " . self::TABLE_CONFIG_MIGRATIONS . " (tenant_id, connector_id, target_runtime, status, migrated_at)
              VALUES (?, ?, ?, ?, ?)"
         );
 
@@ -144,7 +152,7 @@ class ConnectorMigration implements ConnectorMigrationContract
             $connectorId,
             $targetRuntime,
             'completed',
-            date('c'),
+            DateTimeHelper::now(),
         ]);
     }
 
@@ -159,7 +167,7 @@ class ConnectorMigration implements ConnectorMigrationContract
             $results[] = [
                 'capability' => $capability,
                 'supported' => true,
-                'tested_at' => date('c'),
+                'tested_at' => DateTimeHelper::now(),
             ];
         }
 
@@ -174,7 +182,7 @@ class ConnectorMigration implements ConnectorMigrationContract
         $pathId = bin2hex(random_bytes(16));
 
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}paths (id, tenant_id, connector_id, path, recorded_at)
+            "INSERT INTO " . self::TABLE_PATHS . " (id, tenant_id, connector_id, path, recorded_at)
              VALUES (?, ?, ?, ?, ?)"
         );
 
@@ -183,7 +191,7 @@ class ConnectorMigration implements ConnectorMigrationContract
             $tenantId,
             $connectorId,
             json_encode($migrationPath),
-            date('c'),
+            DateTimeHelper::now(),
         ]);
     }
 
@@ -192,7 +200,7 @@ class ConnectorMigration implements ConnectorMigrationContract
         string $connectorId
     ): ?array {
         $stmt = $this->db->prepare(
-            "SELECT * FROM {$this->tablePrefix}rollback_plans WHERE tenant_id = ? AND connector_id = ? ORDER BY created_at DESC LIMIT 1"
+            "SELECT * FROM " . self::TABLE_ROLLBACK_PLANS . " WHERE tenant_id = ? AND connector_id = ? ORDER BY created_at DESC LIMIT 1"
         );
 
         $stmt->execute([$tenantId, $connectorId]);

@@ -7,11 +7,18 @@ namespace Foundation\Implementations;
 use Foundation\Contracts\WorkCoreCommercialContract;
 use PDO;
 use Foundation\Support\JsonHelper;
+use Foundation\Support\DateTimeHelper;
 
 class WorkCoreCommercial implements WorkCoreCommercialContract
 {
     private PDO $db;
-    private string $tablePrefix = 'workcore_commercial_';
+    private const TABLE_PREFIX = 'workcore_commercial_';
+    private const TABLE_INVENTORY = self::TABLE_PREFIX . 'inventory';
+    private const TABLE_PAYMENT_GATEWAYS = self::TABLE_PREFIX . 'payment_gateways';
+    private const TABLE_PAYROLL = self::TABLE_PREFIX . 'payroll';
+    private const TABLE_REPORTS = self::TABLE_PREFIX . 'reports';
+    private const TABLE_TRANSACTIONS = self::TABLE_PREFIX . 'transactions';
+    private string $tablePrefix = self::TABLE_PREFIX;
 
     public function __construct(PDO $db)
     {
@@ -25,7 +32,7 @@ class WorkCoreCommercial implements WorkCoreCommercialContract
         $transactionId = bin2hex(random_bytes(16));
 
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}transactions (id, tenant_id, data, recorded_at)
+            "INSERT INTO " . self::TABLE_TRANSACTIONS . " (id, tenant_id, data, recorded_at)
              VALUES (?, ?, ?, ?)"
         );
 
@@ -33,7 +40,7 @@ class WorkCoreCommercial implements WorkCoreCommercialContract
             $transactionId,
             $tenantId,
             json_encode($transactionData),
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return $transactionId;
@@ -44,7 +51,7 @@ class WorkCoreCommercial implements WorkCoreCommercialContract
         string $transactionId
     ): ?array {
         $stmt = $this->db->prepare(
-            "SELECT * FROM {$this->tablePrefix}transactions WHERE id = ? AND tenant_id = ?"
+            "SELECT * FROM " . self::TABLE_TRANSACTIONS . " WHERE id = ? AND tenant_id = ?"
         );
 
         $stmt->execute([$transactionId, $tenantId]);
@@ -64,7 +71,7 @@ class WorkCoreCommercial implements WorkCoreCommercialContract
         $payrollId = bin2hex(random_bytes(16));
 
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}payroll (id, tenant_id, data, status, processed_at)
+            "INSERT INTO " . self::TABLE_PAYROLL . " (id, tenant_id, data, status, processed_at)
              VALUES (?, ?, ?, ?, ?)"
         );
 
@@ -73,7 +80,7 @@ class WorkCoreCommercial implements WorkCoreCommercialContract
             $tenantId,
             json_encode($payrollData),
             'processing',
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return $payrollId;
@@ -84,7 +91,7 @@ class WorkCoreCommercial implements WorkCoreCommercialContract
         string $payrollId
     ): ?array {
         $stmt = $this->db->prepare(
-            "SELECT * FROM {$this->tablePrefix}payroll WHERE id = ? AND tenant_id = ?"
+            "SELECT * FROM " . self::TABLE_PAYROLL . " WHERE id = ? AND tenant_id = ?"
         );
 
         $stmt->execute([$payrollId, $tenantId]);
@@ -102,14 +109,14 @@ class WorkCoreCommercial implements WorkCoreCommercialContract
         array $inventoryData
     ): bool {
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}inventory (tenant_id, sku_id, quantity, data, updated_at)
+            "INSERT INTO " . self::TABLE_INVENTORY . " (tenant_id, sku_id, quantity, data, updated_at)
              VALUES (?, ?, ?, ?, ?)
              ON DUPLICATE KEY UPDATE quantity = ?, data = ?, updated_at = ?"
         );
 
         $sku = $inventoryData['sku_id'] ?? null;
         $quantity = $inventoryData['quantity'] ?? 0;
-        $now = date('c');
+        $now = DateTimeHelper::now();
 
         return $stmt->execute([
             $tenantId,
@@ -128,7 +135,7 @@ class WorkCoreCommercial implements WorkCoreCommercialContract
         string $skuId
     ): ?int {
         $stmt = $this->db->prepare(
-            "SELECT quantity FROM {$this->tablePrefix}inventory WHERE tenant_id = ? AND sku_id = ?"
+            "SELECT quantity FROM " . self::TABLE_INVENTORY . " WHERE tenant_id = ? AND sku_id = ?"
         );
 
         $stmt->execute([$tenantId, $skuId]);
@@ -145,7 +152,7 @@ class WorkCoreCommercial implements WorkCoreCommercialContract
         $reportId = bin2hex(random_bytes(16));
 
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}reports (id, tenant_id, type, parameters, generated_at)
+            "INSERT INTO " . self::TABLE_REPORTS . " (id, tenant_id, type, parameters, generated_at)
              VALUES (?, ?, ?, ?, ?)"
         );
 
@@ -154,7 +161,7 @@ class WorkCoreCommercial implements WorkCoreCommercialContract
             $tenantId,
             $reportType,
             json_encode($parameters),
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return $reportId;
@@ -165,13 +172,13 @@ class WorkCoreCommercial implements WorkCoreCommercialContract
         array $gatewayConfig
     ): bool {
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}payment_gateways (tenant_id, config, integrated_at)
+            "INSERT INTO " . self::TABLE_PAYMENT_GATEWAYS . " (tenant_id, config, integrated_at)
              VALUES (?, ?, ?)
              ON DUPLICATE KEY UPDATE config = ?, updated_at = ?"
         );
 
         $configJson = json_encode($gatewayConfig);
-        $now = date('c');
+        $now = DateTimeHelper::now();
 
         return $stmt->execute([
             $tenantId,

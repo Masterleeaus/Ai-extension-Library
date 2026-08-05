@@ -7,6 +7,7 @@ namespace Foundation\Implementations;
 use Foundation\Contracts\CommerceContractContract;
 use Foundation\Support\JsonHelper;
 use PDO;
+use Foundation\Support\DateTimeHelper;
 
 /**
  * CommerceContract Implementation
@@ -28,7 +29,14 @@ use PDO;
 class CommerceContract implements CommerceContractContract
 {
     private PDO $db;
-    private string $tablePrefix = 'commerce_';
+    private const TABLE_PREFIX = 'commerce_';
+    private const TABLE_INVENTORY = self::TABLE_PREFIX . 'inventory';
+    private const TABLE_ORDERS = self::TABLE_PREFIX . 'orders';
+    private const TABLE_PAYMENTS = self::TABLE_PREFIX . 'payments';
+    private const TABLE_PRICING = self::TABLE_PREFIX . 'pricing';
+    private const TABLE_REFUNDS = self::TABLE_PREFIX . 'refunds';
+    private const TABLE_SHIPMENTS = self::TABLE_PREFIX . 'shipments';
+    private string $tablePrefix = self::TABLE_PREFIX;
 
     public function __construct(PDO $db)
     {
@@ -47,7 +55,7 @@ class CommerceContract implements CommerceContractContract
         string $productId
     ): ?array {
         $stmt = $this->db->prepare(
-            "SELECT * FROM {$this->tablePrefix}inventory WHERE tenant_id = ? AND product_id = ?"
+            "SELECT * FROM " . self::TABLE_INVENTORY . " WHERE tenant_id = ? AND product_id = ?"
         );
 
         $stmt->execute([$tenantId, $productId]);
@@ -68,12 +76,12 @@ class CommerceContract implements CommerceContractContract
         int $quantity
     ): bool {
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}inventory (tenant_id, product_id, quantity, updated_at)
+            "INSERT INTO " . self::TABLE_INVENTORY . " (tenant_id, product_id, quantity, updated_at)
              VALUES (?, ?, ?, ?)
              ON DUPLICATE KEY UPDATE quantity = ?, updated_at = ?"
         );
 
-        $now = date('c');
+        $now = DateTimeHelper::now();
         return $stmt->execute([
             $tenantId,
             $productId,
@@ -101,7 +109,7 @@ class CommerceContract implements CommerceContractContract
         array $context = []
     ): ?array {
         $stmt = $this->db->prepare(
-            "SELECT * FROM {$this->tablePrefix}pricing WHERE tenant_id = ? AND product_id = ?"
+            "SELECT * FROM " . self::TABLE_PRICING . " WHERE tenant_id = ? AND product_id = ?"
         );
 
         $stmt->execute([$tenantId, $productId]);
@@ -137,7 +145,7 @@ class CommerceContract implements CommerceContractContract
         $paymentId = bin2hex(random_bytes(16));
 
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}payments (id, tenant_id, details, status, processed_at)
+            "INSERT INTO " . self::TABLE_PAYMENTS . " (id, tenant_id, details, status, processed_at)
              VALUES (?, ?, ?, ?, ?)"
         );
 
@@ -146,13 +154,13 @@ class CommerceContract implements CommerceContractContract
             $tenantId,
             json_encode($paymentDetails),
             'processing',
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return [
             'payment_id' => $paymentId,
             'status' => 'processing',
-            'processed_at' => date('c'),
+            'processed_at' => DateTimeHelper::now(),
         ];
     }
 
@@ -173,7 +181,7 @@ class CommerceContract implements CommerceContractContract
         $orderId = bin2hex(random_bytes(16));
 
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}orders (id, tenant_id, data, status, created_at)
+            "INSERT INTO " . self::TABLE_ORDERS . " (id, tenant_id, data, status, created_at)
              VALUES (?, ?, ?, ?, ?)"
         );
 
@@ -182,7 +190,7 @@ class CommerceContract implements CommerceContractContract
             $tenantId,
             json_encode($order),
             'pending',
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return $orderId;
@@ -202,7 +210,7 @@ class CommerceContract implements CommerceContractContract
         string $orderId
     ): ?array {
         $stmt = $this->db->prepare(
-            "SELECT * FROM {$this->tablePrefix}orders WHERE id = ? AND tenant_id = ?"
+            "SELECT * FROM " . self::TABLE_ORDERS . " WHERE id = ? AND tenant_id = ?"
         );
 
         $stmt->execute([$orderId, $tenantId]);
@@ -231,7 +239,7 @@ class CommerceContract implements CommerceContractContract
         string $orderId
     ): ?array {
         $stmt = $this->db->prepare(
-            "SELECT * FROM {$this->tablePrefix}shipments WHERE tenant_id = ? AND order_id = ?"
+            "SELECT * FROM " . self::TABLE_SHIPMENTS . " WHERE tenant_id = ? AND order_id = ?"
         );
 
         $stmt->execute([$tenantId, $orderId]);
@@ -264,7 +272,7 @@ class CommerceContract implements CommerceContractContract
         $refundId = bin2hex(random_bytes(16));
 
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}refunds (id, tenant_id, order_id, details, status, created_at)
+            "INSERT INTO " . self::TABLE_REFUNDS . " (id, tenant_id, order_id, details, status, created_at)
              VALUES (?, ?, ?, ?, ?, ?)"
         );
 
@@ -274,7 +282,7 @@ class CommerceContract implements CommerceContractContract
             $orderId,
             json_encode($refundDetails),
             'pending',
-            date('c'),
+            DateTimeHelper::now(),
         ]);
     }
 }

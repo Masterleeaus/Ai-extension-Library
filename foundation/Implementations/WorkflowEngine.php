@@ -7,11 +7,16 @@ namespace Foundation\Implementations;
 use Foundation\Contracts\WorkflowEngineContract;
 use PDO;
 use Foundation\Support\JsonHelper;
+use Foundation\Support\DateTimeHelper;
 
 class WorkflowEngine implements WorkflowEngineContract
 {
     private PDO $db;
-    private string $tablePrefix = 'workflow_';
+    private const TABLE_PREFIX = 'workflow_';
+    private const TABLE_DEFINITIONS = self::TABLE_PREFIX . 'definitions';
+    private const TABLE_EXECUTION_STEPS = self::TABLE_PREFIX . 'execution_steps';
+    private const TABLE_EXECUTIONS = self::TABLE_PREFIX . 'executions';
+    private string $tablePrefix = self::TABLE_PREFIX;
 
     public function __construct(PDO $db)
     {
@@ -27,7 +32,7 @@ class WorkflowEngine implements WorkflowEngineContract
         $workflowId = bin2hex(random_bytes(16));
 
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}definitions (id, tenant_id, name, steps, metadata, created_at)
+            "INSERT INTO " . self::TABLE_DEFINITIONS . " (id, tenant_id, name, steps, metadata, created_at)
              VALUES (?, ?, ?, ?, ?, ?)"
         );
 
@@ -37,7 +42,7 @@ class WorkflowEngine implements WorkflowEngineContract
             $workflowName,
             json_encode($steps),
             json_encode($metadata),
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return $workflowId;
@@ -51,7 +56,7 @@ class WorkflowEngine implements WorkflowEngineContract
         $executionId = bin2hex(random_bytes(16));
 
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}executions (id, tenant_id, workflow_id, input, status, started_at)
+            "INSERT INTO " . self::TABLE_EXECUTIONS . " (id, tenant_id, workflow_id, input, status, started_at)
              VALUES (?, ?, ?, ?, ?, ?)"
         );
 
@@ -61,7 +66,7 @@ class WorkflowEngine implements WorkflowEngineContract
             $workflowId,
             json_encode($input),
             'running',
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return $executionId;
@@ -72,7 +77,7 @@ class WorkflowEngine implements WorkflowEngineContract
         string $executionId
     ): ?array {
         $stmt = $this->db->prepare(
-            "SELECT * FROM {$this->tablePrefix}executions WHERE id = ? AND tenant_id = ?"
+            "SELECT * FROM " . self::TABLE_EXECUTIONS . " WHERE id = ? AND tenant_id = ?"
         );
 
         $stmt->execute([$executionId, $tenantId]);
@@ -82,7 +87,7 @@ class WorkflowEngine implements WorkflowEngineContract
             $execution['input'] = JsonHelper::decode($execution['input']);
 
             $stepStmt = $this->db->prepare(
-                "SELECT * FROM {$this->tablePrefix}execution_steps WHERE execution_id = ? ORDER BY step_order ASC"
+                "SELECT * FROM " . self::TABLE_EXECUTION_STEPS . " WHERE execution_id = ? ORDER BY step_order ASC"
             );
 
             $stepStmt->execute([$executionId]);
@@ -102,10 +107,10 @@ class WorkflowEngine implements WorkflowEngineContract
         string $executionId
     ): bool {
         $stmt = $this->db->prepare(
-            "UPDATE {$this->tablePrefix}executions SET status = ?, paused_at = ? WHERE id = ? AND tenant_id = ?"
+            "UPDATE " . self::TABLE_EXECUTIONS . " SET status = ?, paused_at = ? WHERE id = ? AND tenant_id = ?"
         );
 
-        return $stmt->execute(['paused', date('c'), $executionId, $tenantId]);
+        return $stmt->execute(['paused', DateTimeHelper::now(), $executionId, $tenantId]);
     }
 
     public function resumeExecution(
@@ -113,10 +118,10 @@ class WorkflowEngine implements WorkflowEngineContract
         string $executionId
     ): bool {
         $stmt = $this->db->prepare(
-            "UPDATE {$this->tablePrefix}executions SET status = ?, resumed_at = ? WHERE id = ? AND tenant_id = ?"
+            "UPDATE " . self::TABLE_EXECUTIONS . " SET status = ?, resumed_at = ? WHERE id = ? AND tenant_id = ?"
         );
 
-        return $stmt->execute(['running', date('c'), $executionId, $tenantId]);
+        return $stmt->execute(['running', DateTimeHelper::now(), $executionId, $tenantId]);
     }
 
     public function cancelExecution(
@@ -125,10 +130,10 @@ class WorkflowEngine implements WorkflowEngineContract
         string $reason
     ): bool {
         $stmt = $this->db->prepare(
-            "UPDATE {$this->tablePrefix}executions SET status = ?, cancel_reason = ?, cancelled_at = ? WHERE id = ? AND tenant_id = ?"
+            "UPDATE " . self::TABLE_EXECUTIONS . " SET status = ?, cancel_reason = ?, cancelled_at = ? WHERE id = ? AND tenant_id = ?"
         );
 
-        return $stmt->execute(['cancelled', $reason, date('c'), $executionId, $tenantId]);
+        return $stmt->execute(['cancelled', $reason, DateTimeHelper::now(), $executionId, $tenantId]);
     }
 
     public function getStepOutput(
@@ -137,7 +142,7 @@ class WorkflowEngine implements WorkflowEngineContract
         string $stepId
     ): ?array {
         $stmt = $this->db->prepare(
-            "SELECT * FROM {$this->tablePrefix}execution_steps WHERE id = ? AND execution_id = ? AND tenant_id = ?"
+            "SELECT * FROM " . self::TABLE_EXECUTION_STEPS . " WHERE id = ? AND execution_id = ? AND tenant_id = ?"
         );
 
         $stmt->execute([$stepId, $executionId, $tenantId]);
@@ -156,7 +161,7 @@ class WorkflowEngine implements WorkflowEngineContract
         string $workflowId
     ): array {
         $stmt = $this->db->prepare(
-            "SELECT * FROM {$this->tablePrefix}executions WHERE tenant_id = ? AND workflow_id = ? ORDER BY started_at DESC"
+            "SELECT * FROM " . self::TABLE_EXECUTIONS . " WHERE tenant_id = ? AND workflow_id = ? ORDER BY started_at DESC"
         );
 
         $stmt->execute([$tenantId, $workflowId]);

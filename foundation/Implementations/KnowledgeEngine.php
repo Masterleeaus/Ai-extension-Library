@@ -7,11 +7,16 @@ namespace Foundation\Implementations;
 use Foundation\Contracts\KnowledgeEngineContract;
 use PDO;
 use Foundation\Support\JsonHelper;
+use Foundation\Support\DateTimeHelper;
 
 class KnowledgeEngine implements KnowledgeEngineContract
 {
     private PDO $db;
-    private string $tablePrefix = 'knowledge_';
+    private const TABLE_PREFIX = 'knowledge_';
+    private const TABLE_CONVERSATIONS = self::TABLE_PREFIX . 'conversations';
+    private const TABLE_DOCUMENTS = self::TABLE_PREFIX . 'documents';
+    private const TABLE_INGESTIONS = self::TABLE_PREFIX . 'ingestions';
+    private string $tablePrefix = self::TABLE_PREFIX;
 
     public function __construct(PDO $db)
     {
@@ -25,10 +30,10 @@ class KnowledgeEngine implements KnowledgeEngineContract
         array $metadata = []
     ): string {
         $ingestionId = bin2hex(random_bytes(16));
-        $createdAt = date('c');
+        $createdAt = DateTimeHelper::now();
 
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}ingestions (id, tenant_id, document_id, content, metadata, created_at)
+            "INSERT INTO " . self::TABLE_INGESTIONS . " (id, tenant_id, document_id, content, metadata, created_at)
              VALUES (?, ?, ?, ?, ?, ?)"
         );
 
@@ -49,7 +54,7 @@ class KnowledgeEngine implements KnowledgeEngineContract
         string $documentId
     ): ?array {
         $stmt = $this->db->prepare(
-            "SELECT * FROM {$this->tablePrefix}documents WHERE tenant_id = ? AND id = ? LIMIT 1"
+            "SELECT * FROM " . self::TABLE_DOCUMENTS . " WHERE tenant_id = ? AND id = ? LIMIT 1"
         );
         $stmt->execute([$tenantId, $documentId]);
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -62,7 +67,7 @@ class KnowledgeEngine implements KnowledgeEngineContract
         string $documentId
     ): bool {
         $stmt = $this->db->prepare(
-            "DELETE FROM {$this->tablePrefix}documents WHERE tenant_id = ? AND id = ?"
+            "DELETE FROM " . self::TABLE_DOCUMENTS . " WHERE tenant_id = ? AND id = ?"
         );
         return $stmt->execute([$tenantId, $documentId]);
     }
@@ -74,7 +79,7 @@ class KnowledgeEngine implements KnowledgeEngineContract
     ): array {
         $limit = $limit ?? 10;
         $stmt = $this->db->prepare(
-            "SELECT * FROM {$this->tablePrefix}documents
+            "SELECT * FROM " . self::TABLE_DOCUMENTS . "
              WHERE tenant_id = ? AND (content LIKE ? OR metadata LIKE ?)
              LIMIT ?"
         );
@@ -95,7 +100,7 @@ class KnowledgeEngine implements KnowledgeEngineContract
             'document_id' => $documentId,
             'start' => $startOffset,
             'end' => $endOffset,
-            'created_at' => date('c'),
+            'created_at' => DateTimeHelper::now(),
         ];
 
         return base64_encode(json_encode($citation));
@@ -124,7 +129,7 @@ class KnowledgeEngine implements KnowledgeEngineContract
         array $messages
     ): bool {
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}conversations (tenant_id, id, messages, created_at)
+            "INSERT INTO " . self::TABLE_CONVERSATIONS . " (tenant_id, id, messages, created_at)
              VALUES (?, ?, ?, ?)
              ON DUPLICATE KEY UPDATE messages = ?"
         );
@@ -134,7 +139,7 @@ class KnowledgeEngine implements KnowledgeEngineContract
             $tenantId,
             $conversationId,
             $messagesJson,
-            date('c'),
+            DateTimeHelper::now(),
             $messagesJson,
         ]);
     }

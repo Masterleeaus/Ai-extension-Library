@@ -7,11 +7,15 @@ namespace Foundation\Implementations;
 use Foundation\Contracts\CustomerIdentityContract;
 use PDO;
 use Foundation\Support\JsonHelper;
+use Foundation\Support\DateTimeHelper;
 
 class CustomerIdentity implements CustomerIdentityContract
 {
     private PDO $db;
-    private string $tablePrefix = 'identity_';
+    private const TABLE_PREFIX = 'identity_';
+    private const TABLE_MAPPINGS = self::TABLE_PREFIX . 'mappings';
+    private const TABLE_PROFILES = self::TABLE_PREFIX . 'profiles';
+    private string $tablePrefix = self::TABLE_PREFIX;
 
     public function __construct(PDO $db)
     {
@@ -24,7 +28,7 @@ class CustomerIdentity implements CustomerIdentityContract
         array $identifiers
     ): ?string {
         $stmt = $this->db->prepare(
-            "SELECT customer_id FROM {$this->tablePrefix}mappings
+            "SELECT customer_id FROM " . self::TABLE_MAPPINGS . "
              WHERE tenant_id = ? AND provider_id = ? AND identifiers = ?
              LIMIT 1"
         );
@@ -46,7 +50,7 @@ class CustomerIdentity implements CustomerIdentityContract
         array $providerIdentity
     ): bool {
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}mappings
+            "INSERT INTO " . self::TABLE_MAPPINGS . "
              (tenant_id, customer_id, provider_id, identifiers, linked_at)
              VALUES (?, ?, ?, ?, ?)"
         );
@@ -56,7 +60,7 @@ class CustomerIdentity implements CustomerIdentityContract
             $customerId,
             $providerId,
             json_encode($providerIdentity),
-            date('c'),
+            DateTimeHelper::now(),
         ]);
     }
 
@@ -65,7 +69,7 @@ class CustomerIdentity implements CustomerIdentityContract
         string $customerId
     ): array {
         $stmt = $this->db->prepare(
-            "SELECT provider_id, identifiers FROM {$this->tablePrefix}mappings
+            "SELECT provider_id, identifiers FROM " . self::TABLE_MAPPINGS . "
              WHERE tenant_id = ? AND customer_id = ?"
         );
 
@@ -85,7 +89,7 @@ class CustomerIdentity implements CustomerIdentityContract
         string $providerId
     ): bool {
         $stmt = $this->db->prepare(
-            "DELETE FROM {$this->tablePrefix}mappings
+            "DELETE FROM " . self::TABLE_MAPPINGS . "
              WHERE tenant_id = ? AND customer_id = ? AND provider_id = ?"
         );
 
@@ -97,7 +101,7 @@ class CustomerIdentity implements CustomerIdentityContract
         string $customerId
     ): ?array {
         $stmt = $this->db->prepare(
-            "SELECT * FROM {$this->tablePrefix}profiles
+            "SELECT * FROM " . self::TABLE_PROFILES . "
              WHERE tenant_id = ? AND customer_id = ?"
         );
 
@@ -117,7 +121,7 @@ class CustomerIdentity implements CustomerIdentityContract
         array $profile
     ): bool {
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}profiles
+            "INSERT INTO " . self::TABLE_PROFILES . "
              (tenant_id, customer_id, data, updated_at)
              VALUES (?, ?, ?, ?)
              ON DUPLICATE KEY UPDATE data = ?, updated_at = ?"
@@ -128,9 +132,9 @@ class CustomerIdentity implements CustomerIdentityContract
             $tenantId,
             $customerId,
             $profileJson,
-            date('c'),
+            DateTimeHelper::now(),
             $profileJson,
-            date('c'),
+            DateTimeHelper::now(),
         ]);
     }
 }

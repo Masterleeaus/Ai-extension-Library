@@ -7,11 +7,15 @@ namespace Foundation\Implementations;
 use Foundation\Contracts\BrandingThemingContract;
 use PDO;
 use Foundation\Support\JsonHelper;
+use Foundation\Support\DateTimeHelper;
 
 class BrandingTheming implements BrandingThemingContract
 {
     private PDO $db;
-    private string $tablePrefix = 'branding_theming_';
+    private const TABLE_PREFIX = 'branding_theming_';
+    private const TABLE_TENANT_ACTIVE_THEME = self::TABLE_PREFIX . 'tenant_active_theme';
+    private const TABLE_THEMES = self::TABLE_PREFIX . 'themes';
+    private string $tablePrefix = self::TABLE_PREFIX;
 
     public function __construct(PDO $db)
     {
@@ -26,7 +30,7 @@ class BrandingTheming implements BrandingThemingContract
         $themeId = bin2hex(random_bytes(16));
 
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}themes (id, tenant_id, name, config, created_at)
+            "INSERT INTO " . self::TABLE_THEMES . " (id, tenant_id, name, config, created_at)
              VALUES (?, ?, ?, ?, ?)"
         );
 
@@ -35,7 +39,7 @@ class BrandingTheming implements BrandingThemingContract
             $tenantId,
             $themeName,
             json_encode($themeConfig),
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return $themeId;
@@ -46,7 +50,7 @@ class BrandingTheming implements BrandingThemingContract
         string $themeId
     ): ?array {
         $stmt = $this->db->prepare(
-            "SELECT * FROM {$this->tablePrefix}themes WHERE id = ? AND tenant_id = ?"
+            "SELECT * FROM " . self::TABLE_THEMES . " WHERE id = ? AND tenant_id = ?"
         );
 
         $stmt->execute([$themeId, $tenantId]);
@@ -65,10 +69,10 @@ class BrandingTheming implements BrandingThemingContract
         array $themeConfig
     ): bool {
         $stmt = $this->db->prepare(
-            "UPDATE {$this->tablePrefix}themes SET config = ?, updated_at = ? WHERE id = ? AND tenant_id = ?"
+            "UPDATE " . self::TABLE_THEMES . " SET config = ?, updated_at = ? WHERE id = ? AND tenant_id = ?"
         );
 
-        return $stmt->execute([json_encode($themeConfig), date('c'), $themeId, $tenantId]);
+        return $stmt->execute([json_encode($themeConfig), DateTimeHelper::now(), $themeId, $tenantId]);
     }
 
     public function applyTheme(
@@ -82,18 +86,18 @@ class BrandingTheming implements BrandingThemingContract
         }
 
         $stmt = $this->db->prepare(
-            "UPDATE {$this->tablePrefix}tenant_active_theme SET theme_id = ?, applied_at = ? WHERE tenant_id = ?"
+            "UPDATE " . self::TABLE_TENANT_ACTIVE_THEME . " SET theme_id = ?, applied_at = ? WHERE tenant_id = ?"
         );
 
-        $result = $stmt->execute([$themeId, date('c'), $tenantId]);
+        $result = $stmt->execute([$themeId, DateTimeHelper::now(), $tenantId]);
 
         if ($stmt->rowCount() === 0) {
             $insertStmt = $this->db->prepare(
-                "INSERT INTO {$this->tablePrefix}tenant_active_theme (tenant_id, theme_id, applied_at)
+                "INSERT INTO " . self::TABLE_TENANT_ACTIVE_THEME . " (tenant_id, theme_id, applied_at)
                  VALUES (?, ?, ?)"
             );
 
-            return $insertStmt->execute([$tenantId, $themeId, date('c')]);
+            return $insertStmt->execute([$tenantId, $themeId, DateTimeHelper::now()]);
         }
 
         return $result;
@@ -103,8 +107,8 @@ class BrandingTheming implements BrandingThemingContract
         string $tenantId
     ): ?array {
         $stmt = $this->db->prepare(
-            "SELECT t.* FROM {$this->tablePrefix}themes t
-             INNER JOIN {$this->tablePrefix}tenant_active_theme tat ON t.id = tat.theme_id
+            "SELECT t.* FROM " . self::TABLE_THEMES . " t
+             INNER JOIN " . self::TABLE_TENANT_ACTIVE_THEME . " tat ON t.id = tat.theme_id
              WHERE t.tenant_id = ? AND tat.tenant_id = ?"
         );
 
@@ -122,7 +126,7 @@ class BrandingTheming implements BrandingThemingContract
         string $tenantId
     ): array {
         $stmt = $this->db->prepare(
-            "SELECT id, name, created_at FROM {$this->tablePrefix}themes WHERE tenant_id = ? ORDER BY created_at DESC"
+            "SELECT id, name, created_at FROM " . self::TABLE_THEMES . " WHERE tenant_id = ? ORDER BY created_at DESC"
         );
 
         $stmt->execute([$tenantId]);
@@ -147,7 +151,7 @@ class BrandingTheming implements BrandingThemingContract
         string $themeId
     ): bool {
         $stmt = $this->db->prepare(
-            "DELETE FROM {$this->tablePrefix}themes WHERE id = ? AND tenant_id = ?"
+            "DELETE FROM " . self::TABLE_THEMES . " WHERE id = ? AND tenant_id = ?"
         );
 
         return $stmt->execute([$themeId, $tenantId]);

@@ -7,11 +7,17 @@ namespace Foundation\Implementations;
 use Foundation\Contracts\BehaviorConfigurationContract;
 use PDO;
 use Foundation\Support\JsonHelper;
+use Foundation\Support\DateTimeHelper;
 
 class BehaviorConfiguration implements BehaviorConfigurationContract
 {
     private PDO $db;
-    private string $tablePrefix = 'behavior_configuration_';
+    private const TABLE_PREFIX = 'behavior_configuration_';
+    private const TABLE_APPLIED_SCOPES = self::TABLE_PREFIX . 'applied_scopes';
+    private const TABLE_CONFIGS = self::TABLE_PREFIX . 'configs';
+    private const TABLE_RULES = self::TABLE_PREFIX . 'rules';
+    private const TABLE_TEST_RESULTS = self::TABLE_PREFIX . 'test_results';
+    private string $tablePrefix = self::TABLE_PREFIX;
 
     public function __construct(PDO $db)
     {
@@ -26,7 +32,7 @@ class BehaviorConfiguration implements BehaviorConfigurationContract
         $configId = bin2hex(random_bytes(16));
 
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}configs (id, tenant_id, name, behaviors, created_at)
+            "INSERT INTO " . self::TABLE_CONFIGS . " (id, tenant_id, name, behaviors, created_at)
              VALUES (?, ?, ?, ?, ?)"
         );
 
@@ -35,7 +41,7 @@ class BehaviorConfiguration implements BehaviorConfigurationContract
             $tenantId,
             $configName,
             json_encode($behaviors),
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return $configId;
@@ -46,7 +52,7 @@ class BehaviorConfiguration implements BehaviorConfigurationContract
         string $configId
     ): ?array {
         $stmt = $this->db->prepare(
-            "SELECT * FROM {$this->tablePrefix}configs WHERE id = ? AND tenant_id = ?"
+            "SELECT * FROM " . self::TABLE_CONFIGS . " WHERE id = ? AND tenant_id = ?"
         );
 
         $stmt->execute([$configId, $tenantId]);
@@ -65,10 +71,10 @@ class BehaviorConfiguration implements BehaviorConfigurationContract
         array $behaviors
     ): bool {
         $stmt = $this->db->prepare(
-            "UPDATE {$this->tablePrefix}configs SET behaviors = ?, updated_at = ? WHERE id = ? AND tenant_id = ?"
+            "UPDATE " . self::TABLE_CONFIGS . " SET behaviors = ?, updated_at = ? WHERE id = ? AND tenant_id = ?"
         );
 
-        return $stmt->execute([json_encode($behaviors), date('c'), $configId, $tenantId]);
+        return $stmt->execute([json_encode($behaviors), DateTimeHelper::now(), $configId, $tenantId]);
     }
 
     public function addBehaviorRule(
@@ -81,7 +87,7 @@ class BehaviorConfiguration implements BehaviorConfigurationContract
         $ruleId = bin2hex(random_bytes(16));
 
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}rules (id, config_id, tenant_id, trigger, action, conditions, created_at)
+            "INSERT INTO " . self::TABLE_RULES . " (id, config_id, tenant_id, trigger, action, conditions, created_at)
              VALUES (?, ?, ?, ?, ?, ?, ?)"
         );
 
@@ -92,7 +98,7 @@ class BehaviorConfiguration implements BehaviorConfigurationContract
             $trigger,
             $action,
             json_encode($conditions),
-            date('c'),
+            DateTimeHelper::now(),
         ]);
     }
 
@@ -102,7 +108,7 @@ class BehaviorConfiguration implements BehaviorConfigurationContract
         string $ruleId
     ): bool {
         $stmt = $this->db->prepare(
-            "DELETE FROM {$this->tablePrefix}rules WHERE id = ? AND config_id = ? AND tenant_id = ?"
+            "DELETE FROM " . self::TABLE_RULES . " WHERE id = ? AND config_id = ? AND tenant_id = ?"
         );
 
         return $stmt->execute([$ruleId, $configId, $tenantId]);
@@ -114,7 +120,7 @@ class BehaviorConfiguration implements BehaviorConfigurationContract
         array $testData
     ): array {
         $stmt = $this->db->prepare(
-            "SELECT trigger, action, conditions FROM {$this->tablePrefix}rules WHERE id = ? AND tenant_id = ?"
+            "SELECT trigger, action, conditions FROM " . self::TABLE_RULES . " WHERE id = ? AND tenant_id = ?"
         );
 
         $stmt->execute([$ruleId, $tenantId]);
@@ -141,7 +147,7 @@ class BehaviorConfiguration implements BehaviorConfigurationContract
 
         $testId = bin2hex(random_bytes(16));
         $testStmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}test_results (id, rule_id, tenant_id, test_data, passed, tested_at)
+            "INSERT INTO " . self::TABLE_TEST_RESULTS . " (id, rule_id, tenant_id, test_data, passed, tested_at)
              VALUES (?, ?, ?, ?, ?, ?)"
         );
 
@@ -151,7 +157,7 @@ class BehaviorConfiguration implements BehaviorConfigurationContract
             $tenantId,
             json_encode($testData),
             $conditionsMet ? 1 : 0,
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return [
@@ -166,7 +172,7 @@ class BehaviorConfiguration implements BehaviorConfigurationContract
         string $tenantId
     ): array {
         $stmt = $this->db->prepare(
-            "SELECT id, name, created_at FROM {$this->tablePrefix}configs WHERE tenant_id = ? ORDER BY created_at DESC"
+            "SELECT id, name, created_at FROM " . self::TABLE_CONFIGS . " WHERE tenant_id = ? ORDER BY created_at DESC"
         );
 
         $stmt->execute([$tenantId]);
@@ -185,10 +191,10 @@ class BehaviorConfiguration implements BehaviorConfigurationContract
         }
 
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}applied_scopes (config_id, tenant_id, scope, applied_at)
+            "INSERT INTO " . self::TABLE_APPLIED_SCOPES . " (config_id, tenant_id, scope, applied_at)
              VALUES (?, ?, ?, ?)"
         );
 
-        return $stmt->execute([$configId, $tenantId, $scope, date('c')]);
+        return $stmt->execute([$configId, $tenantId, $scope, DateTimeHelper::now()]);
     }
 }

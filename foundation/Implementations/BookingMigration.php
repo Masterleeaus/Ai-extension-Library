@@ -7,11 +7,15 @@ namespace Foundation\Implementations;
 use Foundation\Contracts\BookingMigrationContract;
 use PDO;
 use Foundation\Support\JsonHelper;
+use Foundation\Support\DateTimeHelper;
 
 class BookingMigration implements BookingMigrationContract
 {
     private PDO $db;
-    private string $tablePrefix = 'booking_migration_';
+    private const TABLE_PREFIX = 'booking_migration_';
+    private const TABLE_BATCHES = self::TABLE_PREFIX . 'batches';
+    private const TABLE_RECORDS = self::TABLE_PREFIX . 'records';
+    private string $tablePrefix = self::TABLE_PREFIX;
 
     public function __construct(PDO $db)
     {
@@ -81,7 +85,7 @@ class BookingMigration implements BookingMigrationContract
         $migrationId = bin2hex(random_bytes(16));
 
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}records (id, tenant_id, legacy_booking_id, mapped_data, status, migrated_at)
+            "INSERT INTO " . self::TABLE_RECORDS . " (id, tenant_id, legacy_booking_id, mapped_data, status, migrated_at)
              VALUES (?, ?, ?, ?, ?, ?)"
         );
 
@@ -91,7 +95,7 @@ class BookingMigration implements BookingMigrationContract
             $bookingId,
             json_encode($mapped),
             'completed',
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return $migrationId;
@@ -102,7 +106,7 @@ class BookingMigration implements BookingMigrationContract
         string $bookingId
     ): ?array {
         $stmt = $this->db->prepare(
-            "SELECT * FROM {$this->tablePrefix}records WHERE tenant_id = ? AND legacy_booking_id = ?"
+            "SELECT * FROM " . self::TABLE_RECORDS . " WHERE tenant_id = ? AND legacy_booking_id = ?"
         );
 
         $stmt->execute([$tenantId, $bookingId]);
@@ -120,10 +124,10 @@ class BookingMigration implements BookingMigrationContract
         string $bookingId
     ): bool {
         $stmt = $this->db->prepare(
-            "UPDATE {$this->tablePrefix}records SET status = ?, rolled_back_at = ? WHERE tenant_id = ? AND legacy_booking_id = ?"
+            "UPDATE " . self::TABLE_RECORDS . " SET status = ?, rolled_back_at = ? WHERE tenant_id = ? AND legacy_booking_id = ?"
         );
 
-        return $stmt->execute(['rolled_back', date('c'), $tenantId, $bookingId]);
+        return $stmt->execute(['rolled_back', DateTimeHelper::now(), $tenantId, $bookingId]);
     }
 
     public function getBulkMigrationProgress(
@@ -132,7 +136,7 @@ class BookingMigration implements BookingMigrationContract
     ): array {
         $stmt = $this->db->prepare(
             "SELECT COUNT(*) as total, SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) as completed
-             FROM {$this->tablePrefix}records WHERE tenant_id = ? AND batch_id = ?"
+             FROM " . self::TABLE_RECORDS . " WHERE tenant_id = ? AND batch_id = ?"
         );
 
         $stmt->execute([$tenantId, $migrationBatchId]);
@@ -153,7 +157,7 @@ class BookingMigration implements BookingMigrationContract
         $batchId = bin2hex(random_bytes(16));
 
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}batches (id, tenant_id, total_bookings, status, started_at)
+            "INSERT INTO " . self::TABLE_BATCHES . " (id, tenant_id, total_bookings, status, started_at)
              VALUES (?, ?, ?, ?, ?)"
         );
 
@@ -162,7 +166,7 @@ class BookingMigration implements BookingMigrationContract
             $tenantId,
             count($legacyBookings),
             'processing',
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return $batchId;

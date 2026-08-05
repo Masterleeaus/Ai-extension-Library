@@ -7,11 +7,14 @@ namespace Foundation\Implementations;
 use Foundation\Contracts\AuditTrailContract;
 use PDO;
 use Foundation\Support\JsonHelper;
+use Foundation\Support\DateTimeHelper;
 
 class AuditTrail implements AuditTrailContract
 {
     private PDO $db;
-    private string $tablePrefix = 'audit_';
+    private const TABLE_PREFIX = 'audit_';
+    private const TABLE_ENTRIES = self::TABLE_PREFIX . 'entries';
+    private string $tablePrefix = self::TABLE_PREFIX;
 
     public function __construct(PDO $db)
     {
@@ -30,7 +33,7 @@ class AuditTrail implements AuditTrailContract
         $entryId = bin2hex(random_bytes(16));
 
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}entries (id, tenant_id, action, resource_type, resource_id, changes, user_id, metadata, created_at)
+            "INSERT INTO " . self::TABLE_ENTRIES . " (id, tenant_id, action, resource_type, resource_id, changes, user_id, metadata, created_at)
              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
         );
 
@@ -43,7 +46,7 @@ class AuditTrail implements AuditTrailContract
             json_encode($changes),
             $userId,
             json_encode($metadata),
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return $entryId;
@@ -54,7 +57,7 @@ class AuditTrail implements AuditTrailContract
         string $entryId
     ): ?array {
         $stmt = $this->db->prepare(
-            "SELECT * FROM {$this->tablePrefix}entries WHERE id = ? AND tenant_id = ?"
+            "SELECT * FROM " . self::TABLE_ENTRIES . " WHERE id = ? AND tenant_id = ?"
         );
 
         $stmt->execute([$entryId, $tenantId]);
@@ -74,7 +77,7 @@ class AuditTrail implements AuditTrailContract
         string $resourceId
     ): array {
         $stmt = $this->db->prepare(
-            "SELECT * FROM {$this->tablePrefix}entries
+            "SELECT * FROM " . self::TABLE_ENTRIES . "
              WHERE tenant_id = ? AND resource_type = ? AND resource_id = ?
              ORDER BY created_at DESC"
         );
@@ -87,7 +90,7 @@ class AuditTrail implements AuditTrailContract
         string $tenantId,
         array $filters = []
     ): array {
-        $query = "SELECT * FROM {$this->tablePrefix}entries WHERE tenant_id = ?";
+        $query = "SELECT * FROM " . self::TABLE_ENTRIES . " WHERE tenant_id = ?";
         $params = [$tenantId];
 
         if (isset($filters['action'])) {
@@ -123,7 +126,7 @@ class AuditTrail implements AuditTrailContract
         string $userId,
         ?int $limit = null
     ): array {
-        $query = "SELECT * FROM {$this->tablePrefix}entries
+        $query = "SELECT * FROM " . self::TABLE_ENTRIES . "
                   WHERE tenant_id = ? AND user_id = ?
                   ORDER BY created_at DESC";
         $params = [$tenantId, $userId];
@@ -145,7 +148,7 @@ class AuditTrail implements AuditTrailContract
         string $resourceId,
         ?int $limit = null
     ): array {
-        $query = "SELECT * FROM {$this->tablePrefix}entries
+        $query = "SELECT * FROM " . self::TABLE_ENTRIES . "
                   WHERE tenant_id = ? AND resource_type = ? AND resource_id = ?
                   ORDER BY created_at DESC";
         $params = [$tenantId, $resourceType, $resourceId];
@@ -174,7 +177,7 @@ class AuditTrail implements AuditTrailContract
         int $daysToKeep
     ): int {
         $stmt = $this->db->prepare(
-            "DELETE FROM {$this->tablePrefix}entries
+            "DELETE FROM " . self::TABLE_ENTRIES . "
              WHERE tenant_id = ? AND created_at < DATE_SUB(NOW(), INTERVAL ? DAY)"
         );
 

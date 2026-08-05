@@ -6,11 +6,16 @@ namespace Foundation\Implementations;
 
 use Foundation\Contracts\AccessControlContract;
 use Foundation\Contracts\DatabaseRepositoryContract;
+use Foundation\Support\DateTimeHelper;
 
 class AccessControl implements AccessControlContract
 {
     private DatabaseRepositoryContract $repository;
-    private string $tablePrefix = 'access_';
+    private const TABLE_PREFIX = 'access_';
+    private const TABLE_PERMISSIONS = self::TABLE_PREFIX . 'permissions';
+    private const TABLE_ROLE_PERMS = self::TABLE_PREFIX . 'role_perms';
+    private const TABLE_ROLES = self::TABLE_PREFIX . 'roles';
+    private string $tablePrefix = self::TABLE_PREFIX;
 
     public function __construct(DatabaseRepositoryContract $repository)
     {
@@ -25,7 +30,7 @@ class AccessControl implements AccessControlContract
         string $permission
     ): bool {
         $stmt = $this->db->prepare(
-            "INSERT IGNORE INTO {$this->tablePrefix}permissions
+            "INSERT IGNORE INTO " . self::TABLE_PERMISSIONS . "
              (tenant_id, user_id, resource_type, resource_id, permission, granted_at)
              VALUES (?, ?, ?, ?, ?, ?)"
         );
@@ -36,7 +41,7 @@ class AccessControl implements AccessControlContract
             $resourceType,
             $resourceId,
             $permission,
-            date('c'),
+            DateTimeHelper::now(),
         ]);
     }
 
@@ -48,7 +53,7 @@ class AccessControl implements AccessControlContract
         string $permission
     ): bool {
         $stmt = $this->db->prepare(
-            "DELETE FROM {$this->tablePrefix}permissions
+            "DELETE FROM " . self::TABLE_PERMISSIONS . "
              WHERE tenant_id = ? AND user_id = ? AND resource_type = ? AND resource_id = ? AND permission = ?"
         );
 
@@ -70,7 +75,7 @@ class AccessControl implements AccessControlContract
     ): bool {
         try {
             $stmt = $this->helper->safePrepare(
-                "SELECT 1 FROM {$this->tablePrefix}permissions
+                "SELECT 1 FROM " . self::TABLE_PERMISSIONS . "
                  WHERE tenant_id = ? AND user_id = ? AND resource_type = ? AND resource_id = ? AND permission = ?
                  LIMIT 1"
             );
@@ -96,7 +101,7 @@ class AccessControl implements AccessControlContract
         ?string $resourceType = null
     ): array {
         try {
-            $query = "SELECT * FROM {$this->tablePrefix}permissions
+            $query = "SELECT * FROM " . self::TABLE_PERMISSIONS . "
                       WHERE tenant_id = ? AND user_id = ?";
             $params = [$tenantId, $userId];
 
@@ -122,7 +127,7 @@ class AccessControl implements AccessControlContract
     ): array {
         try {
             $stmt = $this->helper->safePrepare(
-                "SELECT user_id, permission FROM {$this->tablePrefix}permissions
+                "SELECT user_id, permission FROM " . self::TABLE_PERMISSIONS . "
                  WHERE tenant_id = ? AND resource_type = ? AND resource_id = ?"
             );
 
@@ -141,11 +146,11 @@ class AccessControl implements AccessControlContract
     ): bool {
         try {
             $stmt = $this->helper->safePrepare(
-                "INSERT IGNORE INTO {$this->tablePrefix}roles (tenant_id, user_id, role, assigned_at)
+                "INSERT IGNORE INTO " . self::TABLE_ROLES . " (tenant_id, user_id, role, assigned_at)
                  VALUES (?, ?, ?, ?)"
             );
 
-            return $this->helper->safeExecute($stmt, [$tenantId, $userId, $role, date('c')], 'INSERT');
+            return $this->helper->safeExecute($stmt, [$tenantId, $userId, $role, DateTimeHelper::now()], 'INSERT');
         } catch (DatabaseException $e) {
             error_log("Database error in assignRole: {$e->getMessage()}");
             throw $e;
@@ -159,7 +164,7 @@ class AccessControl implements AccessControlContract
     ): bool {
         try {
             $stmt = $this->helper->safePrepare(
-                "DELETE FROM {$this->tablePrefix}roles
+                "DELETE FROM " . self::TABLE_ROLES . "
                  WHERE tenant_id = ? AND user_id = ? AND role = ?"
             );
 
@@ -176,7 +181,7 @@ class AccessControl implements AccessControlContract
     ): array {
         try {
             $stmt = $this->helper->safePrepare(
-                "SELECT DISTINCT permission FROM {$this->tablePrefix}role_perms
+                "SELECT DISTINCT permission FROM " . self::TABLE_ROLE_PERMS . "
                  WHERE tenant_id = ? AND role = ?"
             );
 

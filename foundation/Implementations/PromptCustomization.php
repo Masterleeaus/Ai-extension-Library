@@ -7,11 +7,15 @@ namespace Foundation\Implementations;
 use Foundation\Contracts\PromptCustomizationContract;
 use PDO;
 use Foundation\Support\JsonHelper;
+use Foundation\Support\DateTimeHelper;
 
 class PromptCustomization implements PromptCustomizationContract
 {
     private PDO $db;
-    private string $tablePrefix = 'prompt_customization_';
+    private const TABLE_PREFIX = 'prompt_customization_';
+    private const TABLE_PROMPTS = self::TABLE_PREFIX . 'prompts';
+    private const TABLE_TEST_RESULTS = self::TABLE_PREFIX . 'test_results';
+    private string $tablePrefix = self::TABLE_PREFIX;
 
     public function __construct(PDO $db)
     {
@@ -27,7 +31,7 @@ class PromptCustomization implements PromptCustomizationContract
         $promptId = bin2hex(random_bytes(16));
 
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}prompts (id, tenant_id, name, system_prompt, metadata, version, created_at)
+            "INSERT INTO " . self::TABLE_PROMPTS . " (id, tenant_id, name, system_prompt, metadata, version, created_at)
              VALUES (?, ?, ?, ?, ?, ?, ?)"
         );
 
@@ -38,7 +42,7 @@ class PromptCustomization implements PromptCustomizationContract
             $systemPrompt,
             json_encode($metadata),
             1,
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return $promptId;
@@ -49,7 +53,7 @@ class PromptCustomization implements PromptCustomizationContract
         string $promptId
     ): ?array {
         $stmt = $this->db->prepare(
-            "SELECT * FROM {$this->tablePrefix}prompts WHERE id = ? AND tenant_id = ?"
+            "SELECT * FROM " . self::TABLE_PROMPTS . " WHERE id = ? AND tenant_id = ?"
         );
 
         $stmt->execute([$promptId, $tenantId]);
@@ -68,10 +72,10 @@ class PromptCustomization implements PromptCustomizationContract
         string $systemPrompt
     ): bool {
         $stmt = $this->db->prepare(
-            "UPDATE {$this->tablePrefix}prompts SET system_prompt = ?, version = version + 1, updated_at = ? WHERE id = ? AND tenant_id = ?"
+            "UPDATE " . self::TABLE_PROMPTS . " SET system_prompt = ?, version = version + 1, updated_at = ? WHERE id = ? AND tenant_id = ?"
         );
 
-        return $stmt->execute([$systemPrompt, date('c'), $promptId, $tenantId]);
+        return $stmt->execute([$systemPrompt, DateTimeHelper::now(), $promptId, $tenantId]);
     }
 
     public function testPrompt(
@@ -87,12 +91,12 @@ class PromptCustomization implements PromptCustomizationContract
 
         $testId = bin2hex(random_bytes(16));
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}test_results (id, prompt_id, tenant_id, user_input, output, tested_at)
+            "INSERT INTO " . self::TABLE_TEST_RESULTS . " (id, prompt_id, tenant_id, user_input, output, tested_at)
              VALUES (?, ?, ?, ?, ?, ?)"
         );
 
         $mockOutput = "Test output for: {$userInput}";
-        $stmt->execute([$testId, $promptId, $tenantId, $userInput, $mockOutput, date('c')]);
+        $stmt->execute([$testId, $promptId, $tenantId, $userInput, $mockOutput, DateTimeHelper::now()]);
 
         return [
             'success' => true,
@@ -108,17 +112,17 @@ class PromptCustomization implements PromptCustomizationContract
         string $version
     ): bool {
         $stmt = $this->db->prepare(
-            "UPDATE {$this->tablePrefix}prompts SET published = 1, published_version = ?, published_at = ? WHERE id = ? AND tenant_id = ?"
+            "UPDATE " . self::TABLE_PROMPTS . " SET published = 1, published_version = ?, published_at = ? WHERE id = ? AND tenant_id = ?"
         );
 
-        return $stmt->execute([$version, date('c'), $promptId, $tenantId]);
+        return $stmt->execute([$version, DateTimeHelper::now(), $promptId, $tenantId]);
     }
 
     public function listPrompts(
         string $tenantId,
         ?string $category = null
     ): array {
-        $query = "SELECT id, name, version, published, created_at FROM {$this->tablePrefix}prompts WHERE tenant_id = ?";
+        $query = "SELECT id, name, version, published, created_at FROM " . self::TABLE_PROMPTS . " WHERE tenant_id = ?";
         $params = [$tenantId];
 
         if ($category) {
@@ -158,7 +162,7 @@ class PromptCustomization implements PromptCustomizationContract
         string $promptId
     ): bool {
         $stmt = $this->db->prepare(
-            "DELETE FROM {$this->tablePrefix}prompts WHERE id = ? AND tenant_id = ?"
+            "DELETE FROM " . self::TABLE_PROMPTS . " WHERE id = ? AND tenant_id = ?"
         );
 
         return $stmt->execute([$promptId, $tenantId]);

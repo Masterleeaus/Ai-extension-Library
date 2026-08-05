@@ -7,11 +7,18 @@ namespace Foundation\Implementations;
 use Foundation\Contracts\WorkCoreWorkforceContract;
 use PDO;
 use Foundation\Support\JsonHelper;
+use Foundation\Support\DateTimeHelper;
 
 class WorkCoreWorkforce implements WorkCoreWorkforceContract
 {
     private PDO $db;
-    private string $tablePrefix = 'workcore_workforce_';
+    private const TABLE_PREFIX = 'workcore_workforce_';
+    private const TABLE_COMPLIANCE = self::TABLE_PREFIX . 'compliance';
+    private const TABLE_EMPLOYEE_ROLES = self::TABLE_PREFIX . 'employee_roles';
+    private const TABLE_EMPLOYEES = self::TABLE_PREFIX . 'employees';
+    private const TABLE_NDIS_VERIFICATION = self::TABLE_PREFIX . 'ndis_verification';
+    private const TABLE_TRAINING = self::TABLE_PREFIX . 'training';
+    private string $tablePrefix = self::TABLE_PREFIX;
 
     public function __construct(PDO $db)
     {
@@ -25,7 +32,7 @@ class WorkCoreWorkforce implements WorkCoreWorkforceContract
         $employeeId = bin2hex(random_bytes(16));
 
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}employees (id, tenant_id, data, registered_at)
+            "INSERT INTO " . self::TABLE_EMPLOYEES . " (id, tenant_id, data, registered_at)
              VALUES (?, ?, ?, ?)"
         );
 
@@ -33,7 +40,7 @@ class WorkCoreWorkforce implements WorkCoreWorkforceContract
             $employeeId,
             $tenantId,
             json_encode($employeeData),
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return $employeeId;
@@ -44,7 +51,7 @@ class WorkCoreWorkforce implements WorkCoreWorkforceContract
         string $employeeId
     ): ?array {
         $stmt = $this->db->prepare(
-            "SELECT * FROM {$this->tablePrefix}employees WHERE id = ? AND tenant_id = ?"
+            "SELECT * FROM " . self::TABLE_EMPLOYEES . " WHERE id = ? AND tenant_id = ?"
         );
 
         $stmt->execute([$employeeId, $tenantId]);
@@ -71,10 +78,10 @@ class WorkCoreWorkforce implements WorkCoreWorkforceContract
         $mergedData = array_merge($employee['data'], $updates);
 
         $stmt = $this->db->prepare(
-            "UPDATE {$this->tablePrefix}employees SET data = ?, updated_at = ? WHERE id = ? AND tenant_id = ?"
+            "UPDATE " . self::TABLE_EMPLOYEES . " SET data = ?, updated_at = ? WHERE id = ? AND tenant_id = ?"
         );
 
-        return $stmt->execute([json_encode($mergedData), date('c'), $employeeId, $tenantId]);
+        return $stmt->execute([json_encode($mergedData), DateTimeHelper::now(), $employeeId, $tenantId]);
     }
 
     public function trackCompliance(
@@ -83,7 +90,7 @@ class WorkCoreWorkforce implements WorkCoreWorkforceContract
         array $complianceData
     ): bool {
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}compliance (employee_id, tenant_id, data, tracked_at)
+            "INSERT INTO " . self::TABLE_COMPLIANCE . " (employee_id, tenant_id, data, tracked_at)
              VALUES (?, ?, ?, ?)"
         );
 
@@ -91,7 +98,7 @@ class WorkCoreWorkforce implements WorkCoreWorkforceContract
             $employeeId,
             $tenantId,
             json_encode($complianceData),
-            date('c'),
+            DateTimeHelper::now(),
         ]);
     }
 
@@ -106,11 +113,11 @@ class WorkCoreWorkforce implements WorkCoreWorkforceContract
         }
 
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}ndis_verification (employee_id, tenant_id, verified, verified_at)
+            "INSERT INTO " . self::TABLE_NDIS_VERIFICATION . " (employee_id, tenant_id, verified, verified_at)
              VALUES (?, ?, ?, ?)"
         );
 
-        return $stmt->execute([$employeeId, $tenantId, 1, date('c')]);
+        return $stmt->execute([$employeeId, $tenantId, 1, DateTimeHelper::now()]);
     }
 
     public function recordTraining(
@@ -121,7 +128,7 @@ class WorkCoreWorkforce implements WorkCoreWorkforceContract
         $trainingId = bin2hex(random_bytes(16));
 
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}training (id, employee_id, tenant_id, data, recorded_at)
+            "INSERT INTO " . self::TABLE_TRAINING . " (id, employee_id, tenant_id, data, recorded_at)
              VALUES (?, ?, ?, ?, ?)"
         );
 
@@ -130,7 +137,7 @@ class WorkCoreWorkforce implements WorkCoreWorkforceContract
             $employeeId,
             $tenantId,
             json_encode($trainingData),
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return $trainingId;
@@ -143,7 +150,7 @@ class WorkCoreWorkforce implements WorkCoreWorkforceContract
         $reportId = bin2hex(random_bytes(16));
 
         $query = "SELECT COUNT(*) as total_employees, SUM(CASE WHEN data LIKE '%verified%' THEN 1 ELSE 0 END) as verified
-                  FROM {$this->tablePrefix}compliance WHERE tenant_id = ?";
+                  FROM " . self::TABLE_COMPLIANCE . " WHERE tenant_id = ?";
         $params = [$tenantId];
 
         $stmt = $this->db->prepare($query);
@@ -155,7 +162,7 @@ class WorkCoreWorkforce implements WorkCoreWorkforceContract
             'tenant_id' => $tenantId,
             'total_employees' => $stats['total_employees'] ?? 0,
             'verified_employees' => $stats['verified'] ?? 0,
-            'generated_at' => date('c'),
+            'generated_at' => DateTimeHelper::now(),
         ];
 
         return json_encode($reportData, JSON_PRETTY_PRINT);
@@ -167,13 +174,13 @@ class WorkCoreWorkforce implements WorkCoreWorkforceContract
         array $roles
     ): bool {
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}employee_roles (employee_id, tenant_id, roles, assigned_at)
+            "INSERT INTO " . self::TABLE_EMPLOYEE_ROLES . " (employee_id, tenant_id, roles, assigned_at)
              VALUES (?, ?, ?, ?)
              ON DUPLICATE KEY UPDATE roles = ?, updated_at = ?"
         );
 
         $rolesJson = json_encode($roles);
-        $now = date('c');
+        $now = DateTimeHelper::now();
 
         return $stmt->execute([
             $employeeId,

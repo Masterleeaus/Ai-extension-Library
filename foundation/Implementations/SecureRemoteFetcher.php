@@ -6,11 +6,16 @@ namespace Foundation\Implementations;
 
 use Foundation\Contracts\SecureRemoteFetcherContract;
 use PDO;
+use Foundation\Support\DateTimeHelper;
 
 class SecureRemoteFetcher implements SecureRemoteFetcherContract
 {
     private PDO $db;
-    private string $tablePrefix = 'remote_fetch_';
+    private const TABLE_PREFIX = 'remote_fetch_';
+    private const TABLE_BLOCKED = self::TABLE_PREFIX . 'blocked';
+    private const TABLE_HISTORY = self::TABLE_PREFIX . 'history';
+    private const TABLE_LIMITS = self::TABLE_PREFIX . 'limits';
+    private string $tablePrefix = self::TABLE_PREFIX;
     private int $maxRedirects = 5;
     private int $timeout = 30;
 
@@ -86,17 +91,17 @@ class SecureRemoteFetcher implements SecureRemoteFetcherContract
         int $requestsPerMinute
     ): bool {
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}limits (tenant_id, requests_per_minute, set_at)
+            "INSERT INTO " . self::TABLE_LIMITS . " (tenant_id, requests_per_minute, set_at)
              VALUES (?, ?, ?)
              ON DUPLICATE KEY UPDATE requests_per_minute = ?"
         );
 
-        return $stmt->execute([$tenantId, $requestsPerMinute, date('c'), $requestsPerMinute]);
+        return $stmt->execute([$tenantId, $requestsPerMinute, DateTimeHelper::now(), $requestsPerMinute]);
     }
 
     public function getRateLimit(string $tenantId): ?int {
         $stmt = $this->db->prepare(
-            "SELECT requests_per_minute FROM {$this->tablePrefix}limits WHERE tenant_id = ?"
+            "SELECT requests_per_minute FROM " . self::TABLE_LIMITS . " WHERE tenant_id = ?"
         );
 
         $stmt->execute([$tenantId]);
@@ -113,7 +118,7 @@ class SecureRemoteFetcher implements SecureRemoteFetcherContract
         float $duration
     ): void {
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}history (tenant_id, url, status_code, bytes_transferred, duration, recorded_at)
+            "INSERT INTO " . self::TABLE_HISTORY . " (tenant_id, url, status_code, bytes_transferred, duration, recorded_at)
              VALUES (?, ?, ?, ?, ?, ?)"
         );
 
@@ -123,13 +128,13 @@ class SecureRemoteFetcher implements SecureRemoteFetcherContract
             $statusCode,
             $bytesTransferred,
             $duration,
-            date('c'),
+            DateTimeHelper::now(),
         ]);
     }
 
     public function getBlockedDomains(): array {
         $stmt = $this->db->prepare(
-            "SELECT domain FROM {$this->tablePrefix}blocked"
+            "SELECT domain FROM " . self::TABLE_BLOCKED . ""
         );
 
         $stmt->execute();
@@ -140,15 +145,15 @@ class SecureRemoteFetcher implements SecureRemoteFetcherContract
 
     public function addBlockedDomain(string $domain): bool {
         $stmt = $this->db->prepare(
-            "INSERT IGNORE INTO {$this->tablePrefix}blocked (domain, added_at) VALUES (?, ?)"
+            "INSERT IGNORE INTO " . self::TABLE_BLOCKED . " (domain, added_at) VALUES (?, ?)"
         );
 
-        return $stmt->execute([$domain, date('c')]);
+        return $stmt->execute([$domain, DateTimeHelper::now()]);
     }
 
     public function removeBlockedDomain(string $domain): bool {
         $stmt = $this->db->prepare(
-            "DELETE FROM {$this->tablePrefix}blocked WHERE domain = ?"
+            "DELETE FROM " . self::TABLE_BLOCKED . " WHERE domain = ?"
         );
 
         return $stmt->execute([$domain]);

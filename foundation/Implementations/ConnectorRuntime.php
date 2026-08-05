@@ -7,11 +7,15 @@ namespace Foundation\Implementations;
 use Foundation\Contracts\ConnectorRuntimeContract;
 use PDO;
 use Foundation\Support\JsonHelper;
+use Foundation\Support\DateTimeHelper;
 
 class ConnectorRuntime implements ConnectorRuntimeContract
 {
     private PDO $db;
-    private string $tablePrefix = 'connectors_';
+    private const TABLE_PREFIX = 'connectors_';
+    private const TABLE_EXECUTIONS = self::TABLE_PREFIX . 'executions';
+    private const TABLE_REGISTRY = self::TABLE_PREFIX . 'registry';
+    private string $tablePrefix = self::TABLE_PREFIX;
 
     public function __construct(PDO $db)
     {
@@ -27,7 +31,7 @@ class ConnectorRuntime implements ConnectorRuntimeContract
         $connectorId = bin2hex(random_bytes(16));
 
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}registry (id, tenant_id, name, type, config, registered_at)
+            "INSERT INTO " . self::TABLE_REGISTRY . " (id, tenant_id, name, type, config, registered_at)
              VALUES (?, ?, ?, ?, ?, ?)"
         );
 
@@ -37,7 +41,7 @@ class ConnectorRuntime implements ConnectorRuntimeContract
             $connectorName,
             $connectorType,
             json_encode($config),
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return $connectorId;
@@ -49,7 +53,7 @@ class ConnectorRuntime implements ConnectorRuntimeContract
         array $credentials = []
     ): bool {
         $stmt = $this->db->prepare(
-            "UPDATE {$this->tablePrefix}registry
+            "UPDATE " . self::TABLE_REGISTRY . "
              SET status = ?, credentials = ?, connected_at = ?
              WHERE id = ? AND tenant_id = ?"
         );
@@ -57,7 +61,7 @@ class ConnectorRuntime implements ConnectorRuntimeContract
         return $stmt->execute([
             'connected',
             json_encode($credentials),
-            date('c'),
+            DateTimeHelper::now(),
             $connectorId,
             $tenantId,
         ]);
@@ -68,14 +72,14 @@ class ConnectorRuntime implements ConnectorRuntimeContract
         string $connectorId
     ): bool {
         $stmt = $this->db->prepare(
-            "UPDATE {$this->tablePrefix}registry
+            "UPDATE " . self::TABLE_REGISTRY . "
              SET status = ?, disconnected_at = ?
              WHERE id = ? AND tenant_id = ?"
         );
 
         return $stmt->execute([
             'disconnected',
-            date('c'),
+            DateTimeHelper::now(),
             $connectorId,
             $tenantId,
         ]);
@@ -90,7 +94,7 @@ class ConnectorRuntime implements ConnectorRuntimeContract
         $executionId = bin2hex(random_bytes(16));
 
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}executions (id, tenant_id, connector_id, operation, params, status, created_at)
+            "INSERT INTO " . self::TABLE_EXECUTIONS . " (id, tenant_id, connector_id, operation, params, status, created_at)
              VALUES (?, ?, ?, ?, ?, ?, ?)"
         );
 
@@ -101,7 +105,7 @@ class ConnectorRuntime implements ConnectorRuntimeContract
             $operation,
             json_encode($params),
             'running',
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return [
@@ -115,7 +119,7 @@ class ConnectorRuntime implements ConnectorRuntimeContract
         string $connectorId
     ): ?array {
         $stmt = $this->db->prepare(
-            "SELECT * FROM {$this->tablePrefix}registry WHERE id = ? AND tenant_id = ?"
+            "SELECT * FROM " . self::TABLE_REGISTRY . " WHERE id = ? AND tenant_id = ?"
         );
 
         $stmt->execute([$connectorId, $tenantId]);
@@ -132,7 +136,7 @@ class ConnectorRuntime implements ConnectorRuntimeContract
         string $tenantId
     ): array {
         $stmt = $this->db->prepare(
-            "SELECT * FROM {$this->tablePrefix}registry WHERE tenant_id = ?"
+            "SELECT * FROM " . self::TABLE_REGISTRY . " WHERE tenant_id = ?"
         );
 
         $stmt->execute([$tenantId]);

@@ -7,11 +7,15 @@ namespace Foundation\Implementations;
 use Foundation\Contracts\MigrationContract;
 use PDO;
 use Foundation\Support\JsonHelper;
+use Foundation\Support\DateTimeHelper;
 
 class Migration implements MigrationContract
 {
     private PDO $db;
-    private string $tablePrefix = 'migrations_';
+    private const TABLE_PREFIX = 'migrations_';
+    private const TABLE_PROGRESS = self::TABLE_PREFIX . 'progress';
+    private const TABLE_REGISTRY = self::TABLE_PREFIX . 'registry';
+    private string $tablePrefix = self::TABLE_PREFIX;
 
     public function __construct(PDO $db)
     {
@@ -26,7 +30,7 @@ class Migration implements MigrationContract
         array $options = []
     ): string {
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}registry (id, tenant_id, source_system, target_system, options, status, started_at)
+            "INSERT INTO " . self::TABLE_REGISTRY . " (id, tenant_id, source_system, target_system, options, status, started_at)
              VALUES (?, ?, ?, ?, ?, ?, ?)"
         );
 
@@ -37,7 +41,7 @@ class Migration implements MigrationContract
             $targetSystem,
             json_encode($options),
             'running',
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return $migrationId;
@@ -48,7 +52,7 @@ class Migration implements MigrationContract
         string $migrationId
     ): ?array {
         $stmt = $this->db->prepare(
-            "SELECT * FROM {$this->tablePrefix}registry WHERE id = ? AND tenant_id = ?"
+            "SELECT * FROM " . self::TABLE_REGISTRY . " WHERE id = ? AND tenant_id = ?"
         );
 
         $stmt->execute([$migrationId, $tenantId]);
@@ -66,10 +70,10 @@ class Migration implements MigrationContract
         string $migrationId
     ): bool {
         $stmt = $this->db->prepare(
-            "UPDATE {$this->tablePrefix}registry SET status = ?, rolled_back_at = ? WHERE id = ? AND tenant_id = ?"
+            "UPDATE " . self::TABLE_REGISTRY . " SET status = ?, rolled_back_at = ? WHERE id = ? AND tenant_id = ?"
         );
 
-        return $stmt->execute(['rolled_back', date('c'), $migrationId, $tenantId]);
+        return $stmt->execute(['rolled_back', DateTimeHelper::now(), $migrationId, $tenantId]);
     }
 
     public function commit(
@@ -77,10 +81,10 @@ class Migration implements MigrationContract
         string $migrationId
     ): bool {
         $stmt = $this->db->prepare(
-            "UPDATE {$this->tablePrefix}registry SET status = ?, committed_at = ? WHERE id = ? AND tenant_id = ?"
+            "UPDATE " . self::TABLE_REGISTRY . " SET status = ?, committed_at = ? WHERE id = ? AND tenant_id = ?"
         );
 
-        return $stmt->execute(['committed', date('c'), $migrationId, $tenantId]);
+        return $stmt->execute(['committed', DateTimeHelper::now(), $migrationId, $tenantId]);
     }
 
     public function getMigrationHistory(
@@ -88,7 +92,7 @@ class Migration implements MigrationContract
         ?string $sourceSystem = null,
         ?string $targetSystem = null
     ): array {
-        $query = "SELECT * FROM {$this->tablePrefix}registry WHERE tenant_id = ?";
+        $query = "SELECT * FROM " . self::TABLE_REGISTRY . " WHERE tenant_id = ?";
         $params = [$tenantId];
 
         if ($sourceSystem) {
@@ -121,10 +125,10 @@ class Migration implements MigrationContract
         string $reason
     ): bool {
         $stmt = $this->db->prepare(
-            "UPDATE {$this->tablePrefix}registry SET status = ?, pause_reason = ?, paused_at = ? WHERE id = ? AND tenant_id = ?"
+            "UPDATE " . self::TABLE_REGISTRY . " SET status = ?, pause_reason = ?, paused_at = ? WHERE id = ? AND tenant_id = ?"
         );
 
-        return $stmt->execute(['paused', $reason, date('c'), $migrationId, $tenantId]);
+        return $stmt->execute(['paused', $reason, DateTimeHelper::now(), $migrationId, $tenantId]);
     }
 
     public function resumeMigration(
@@ -132,10 +136,10 @@ class Migration implements MigrationContract
         string $migrationId
     ): bool {
         $stmt = $this->db->prepare(
-            "UPDATE {$this->tablePrefix}registry SET status = ?, resumed_at = ? WHERE id = ? AND tenant_id = ?"
+            "UPDATE " . self::TABLE_REGISTRY . " SET status = ?, resumed_at = ? WHERE id = ? AND tenant_id = ?"
         );
 
-        return $stmt->execute(['running', date('c'), $migrationId, $tenantId]);
+        return $stmt->execute(['running', DateTimeHelper::now(), $migrationId, $tenantId]);
     }
 
     public function recordProgress(
@@ -145,7 +149,7 @@ class Migration implements MigrationContract
         int $recordsFailed
     ): void {
         $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}progress (migration_id, tenant_id, records_processed, records_failed, recorded_at)
+            "INSERT INTO " . self::TABLE_PROGRESS . " (migration_id, tenant_id, records_processed, records_failed, recorded_at)
              VALUES (?, ?, ?, ?, ?)"
         );
 
@@ -154,7 +158,7 @@ class Migration implements MigrationContract
             $tenantId,
             $recordsProcessed,
             $recordsFailed,
-            date('c'),
+            DateTimeHelper::now(),
         ]);
     }
 }
