@@ -25,8 +25,7 @@ class TitanDesignSystemShowcase extends StatefulWidget {
       _TitanDesignSystemShowcaseState();
 }
 
-class _TitanDesignSystemShowcaseState
-    extends State<TitanDesignSystemShowcase> {
+class _TitanDesignSystemShowcaseState extends State<TitanDesignSystemShowcase> {
   final _emailController = TextEditingController(text: 'team@titanzero.io');
   final _passwordController = TextEditingController(text: 'showcase-only');
   final _notesController = TextEditingController();
