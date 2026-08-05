@@ -32,7 +32,10 @@ jobs:
         with:
           php-version: '8.3'
           coverage: none
-      - name: Validate CreativeSuite controller syntax
-        run: php -l app/extensions/CreativeSuite/System/Http/Controllers/CreativeSuiteDocumentController.php
+      - name: Validate CreativeSuite security PHP syntax
+        run: |
+          php -l app/extensions/CreativeSuite/System/Http/Controllers/CreativeSuiteDocumentController.php
+          php -l tests/contracts/creative_suite_document_ownership.php
+          php -l tests/Feature/Extensions/CreativeSuite/CreativeSuiteDocumentOwnershipTest.php
       - name: Run CreativeSuite document ownership contract
         run: php tests/contracts/creative_suite_document_ownership.php
