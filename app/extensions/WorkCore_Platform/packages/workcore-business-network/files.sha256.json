@@ -1,5 +1,5 @@
 {
-  "file_count": 448,
+  "file_count": 455,
   "files": [
     {
       "bytes": 226,
@@ -590,6 +590,21 @@
       "bytes": 24664,
       "path": "src/Domains/WorkCore/System/Expansion/Providers/WorkExpansionServiceProvider.php",
       "sha256": "8ea273837a931caa53cffd4793b3fb34c557cc933bd17d2f1d9d8fe3678036f9"
+    },
+    {
+      "bytes": 4149,
+      "path": "src/Domains/WorkCore/System/Expansion/Queries/ContactQueryBuilder.php",
+      "sha256": "7cce8ba656fc396f73d31e2f63a46199ac1735d196d91b15b1438d479d7d9ec2"
+    },
+    {
+      "bytes": 4644,
+      "path": "src/Domains/WorkCore/System/Expansion/Queries/CustomerQueryBuilder.php",
+      "sha256": "86f6cbcd3ee58ce5e8aa4fc8cebf9baaf8ca3d71a451efe14d66c13a2af8ea5e"
+    },
+    {
+      "bytes": 3494,
+      "path": "src/Domains/WorkCore/System/Expansion/Queries/OrderQueryBuilder.php",
+      "sha256": "517932283b2f655cef4bb213f580755d749093aa729cd9bead41ec3e415f4357"
     },
     {
       "bytes": 1303,
@@ -2127,6 +2142,11 @@
       "sha256": "69b7656d64bff61b860ea8ba796bd8041f559e808eae11723cc87d02a32e3187"
     },
     {
+      "bytes": 227,
+      "path": "src/Domains/WorkCore/System/Modules/Wizards/Contracts/WizardVerticalContextRepositoryContract.php",
+      "sha256": "d7920e08bc04ccdaf7b280738d6586b9b0525961f4d4ddb514ac5c47655ba6c9"
+    },
+    {
       "bytes": 3768,
       "path": "src/Domains/WorkCore/System/Modules/Wizards/Http/Controllers/WizardController.php",
       "sha256": "08af9c1b01014bb329141cee35cb72fe9fdfcfca4ae3160feb6ec47292a57c95"
@@ -2157,9 +2177,9 @@
       "sha256": "7d16f3f9a59eeed19f50b707f48d242d7788419ec4cd95591e89d4418bceef05"
     },
     {
-      "bytes": 3686,
+      "bytes": 5549,
       "path": "src/Domains/WorkCore/System/Modules/Wizards/Providers/WorkWizardsServiceProvider.php",
-      "sha256": "4c264058c929e331571cac08dff7c88de61368f734ecc963ecb1354e86093cf5"
+      "sha256": "96a45388b9b22f80ae3453bb2e01bc578b9949f7086d1dc14185b52922c67485"
     },
     {
       "bytes": 395,
@@ -2177,6 +2197,11 @@
       "sha256": "ab4df0806a5198a0ff6af4df8f14e6aae58d10949ea2f1d0486c5fbef9160595"
     },
     {
+      "bytes": 5895,
+      "path": "src/Domains/WorkCore/System/Modules/Wizards/Repositories/DatabaseWizardVerticalContextRepository.php",
+      "sha256": "e6a58aafbedb5fbd3883d63c3ed4d18a4aa4fc21280897a6c9f2d443018963b9"
+    },
+    {
       "bytes": 7656,
       "path": "src/Domains/WorkCore/System/Modules/Wizards/Repositories/EloquentWizardRepository.php",
       "sha256": "a8c845a6f5756575c4f2363119868d7ac04a436bd73c12e82dfa9446954ead9d"
@@ -2192,9 +2217,9 @@
       "sha256": "b0914edc2b6434d9c4c0ad326ce88d335de459ab4697fa8f0d161a3350077a97"
     },
     {
-      "bytes": 1526,
+      "bytes": 4139,
       "path": "src/Domains/WorkCore/System/Modules/Wizards/Services/WizardDefinitionRegistry.php",
-      "sha256": "04ffd6a5c0da90686b78c3d267ea3664d982cd985830d1a4e3d494f3f7f39e3a"
+      "sha256": "53d9306136b161c4a3784ad4da9f924783ee0ba30fa41f2c73e24e43f67eb6a5"
     },
     {
       "bytes": 809,
@@ -2205,6 +2230,11 @@
       "bytes": 6005,
       "path": "src/Domains/WorkCore/System/Modules/Wizards/Services/WizardRuntime.php",
       "sha256": "052c38bff5e7155f323bcbcf4e1851edf2fc83f4d8b196418b9f3bc3f9c69c9a"
+    },
+    {
+      "bytes": 11899,
+      "path": "src/Domains/WorkCore/System/Modules/Wizards/Services/WizardVerticalContextAdapter.php",
+      "sha256": "1e5a73164a3efa55fb2151825402309a824a30f0e3bf75b27de805eb9c3e2725"
     },
     {
       "bytes": 87544,
@@ -2240,6 +2270,11 @@
       "bytes": 495,
       "path": "src/Domains/WorkCore/System/Modules/Wizards/routes/web.php",
       "sha256": "273e60b3e760a37dc7bd6355e339af73e460b1633f27cde311750808d8d74a9c"
+    },
+    {
+      "bytes": 15299,
+      "path": "tests/Unit/Query/QueryBuilderConformanceTest.php",
+      "sha256": "de5d17c9c207acdfa694c61de148c3d330ab56f97642a103d60f6b21f4724469"
     }
   ]
 }
