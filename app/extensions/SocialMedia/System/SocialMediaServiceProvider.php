@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace App\Extensions\SocialMedia\System;
 
 use App\Domains\Marketplace\Contracts\UninstallExtensionServiceProviderInterface;
+use App\Extensions\SocialMedia\System\Http\Controllers\AssistedMarketplaceController;
 use App\Extensions\SocialMedia\System\Http\Controllers\Common\DemoDataController;
 use App\Extensions\SocialMedia\System\Http\Controllers\Common\SocialMediaCampaignCommonController;
 use App\Extensions\SocialMedia\System\Http\Controllers\Common\SocialMediaCompanyCommonController;
 use App\Extensions\SocialMedia\System\Http\Controllers\EbayListingController;
 use App\Extensions\SocialMedia\System\Http\Controllers\ImageStatusController;
+use App\Extensions\SocialMedia\System\Http\Controllers\MetaAdsController;
 use App\Extensions\SocialMedia\System\Http\Controllers\Oauth\EbayController;
 use App\Extensions\SocialMedia\System\Http\Controllers\Oauth\FacebookController;
 use App\Extensions\SocialMedia\System\Http\Controllers\Oauth\InstagramController;
@@ -25,9 +27,11 @@ use App\Extensions\SocialMedia\System\Http\Controllers\SocialMediaPostController
 use App\Extensions\SocialMedia\System\Http\Controllers\SocialMediaSettingController;
 use App\Extensions\SocialMedia\System\Http\Controllers\SocialMediaUploadController;
 use App\Extensions\SocialMedia\System\Http\Controllers\SocialMediaVideoController;
+use App\Extensions\SocialMedia\System\Models\PaidMediaCampaign;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Routing\Router;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 
@@ -40,6 +44,8 @@ class SocialMediaServiceProvider extends ServiceProvider implements UninstallExt
 
     public function boot(Kernel $kernel): void
     {
+        $this->registerDefaultPaidMediaGates();
+
         $this->registerTranslations()
             ->registerViews()
             ->registerRoutes()
@@ -94,7 +100,18 @@ class SocialMediaServiceProvider extends ServiceProvider implements UninstallExt
     {
         $this->mergeConfigFrom(__DIR__ . '/../config/social-media.php', 'social-media');
         $this->mergeConfigFrom(__DIR__ . '/../config/ebay.php', 'social-media.ebay');
+        $this->mergeConfigFrom(__DIR__ . '/../config/meta-ads.php', 'social-media.meta_ads');
+        $this->mergeConfigFrom(
+            __DIR__ . '/../config/assisted-marketplaces.php',
+            'social-media.assisted_marketplaces'
+        );
+
         config()->set('social-media.distribution.destinations.ebay', config('social-media.ebay.destination'));
+        config()->set('social-media.distribution.destinations.meta-ads', config('social-media.meta_ads.destination'));
+
+        foreach ((array) config('social-media.assisted_marketplaces.destinations', []) as $destination => $definition) {
+            config()->set("social-media.distribution.destinations.{$destination}", $definition);
+        }
 
         return $this;
     }
@@ -195,6 +212,23 @@ class SocialMediaServiceProvider extends ServiceProvider implements UninstallExt
                         $router->post('distribution/{item}/ebay/withdraw', [EbayListingController::class, 'withdraw'])->name('ebay.withdraw');
                         $router->post('distribution/{item}/ebay/reconcile', [EbayListingController::class, 'reconcile'])->name('ebay.reconcile');
                         $router->post('distribution/{item}/ebay/buyer-question-handoff', [EbayListingController::class, 'buyerQuestionHandoff'])->name('ebay.buyer-question-handoff');
+
+                        $router->post('distribution/{item}/meta-ads/draft', [MetaAdsController::class, 'createDraft'])->name('meta-ads.draft.create');
+                        $router->put('paid-media/{campaign}/draft', [MetaAdsController::class, 'updateDraft'])->name('meta-ads.draft.update');
+                        $router->get('paid-media/{campaign}/recommendations', [MetaAdsController::class, 'recommendations'])->name('meta-ads.recommendations');
+                        $router->post('paid-media/{campaign}/approve-budget', [MetaAdsController::class, 'approveBudget'])->name('meta-ads.approve-budget');
+                        $router->post('paid-media/{campaign}/sync-paused', [MetaAdsController::class, 'syncPaused'])->name('meta-ads.sync-paused');
+                        $router->post('paid-media/{campaign}/preview', [MetaAdsController::class, 'preview'])->name('meta-ads.preview');
+                        $router->post('paid-media/{campaign}/activate', [MetaAdsController::class, 'activate'])->name('meta-ads.activate');
+                        $router->post('paid-media/{campaign}/pause', [MetaAdsController::class, 'pause'])->name('meta-ads.pause');
+                        $router->post('paid-media/{campaign}/insights', [MetaAdsController::class, 'insights'])->name('meta-ads.insights');
+
+                        $router->post('distribution/{item}/assisted/{destination}/prepare', [AssistedMarketplaceController::class, 'prepare'])->name('assisted.prepare');
+                        $router->post('distribution/{item}/assisted/{destination}/open', [AssistedMarketplaceController::class, 'open'])->name('assisted.open');
+                        $router->post('distribution/{item}/assisted/{destination}/complete', [AssistedMarketplaceController::class, 'complete'])->name('assisted.complete');
+                        $router->post('distribution/{item}/assisted/{destination}/renew', [AssistedMarketplaceController::class, 'renew'])->name('assisted.renew');
+                        $router->post('distribution/{item}/assisted/{destination}/enquiry-handoff', [AssistedMarketplaceController::class, 'enquiryHandoff'])->name('assisted.enquiry-handoff');
+                        $router->get('distribution/{item}/assisted/{destination}/status', [AssistedMarketplaceController::class, 'status'])->name('assisted.status');
                     });
 
                 $router
@@ -224,6 +258,24 @@ class SocialMediaServiceProvider extends ServiceProvider implements UninstallExt
             });
 
         return $this;
+    }
+
+    private function registerDefaultPaidMediaGates(): void
+    {
+        $approvalAbility = (string) config('social-media.meta_ads.approval_permission');
+        $activationAbility = (string) config('social-media.meta_ads.activation_permission');
+
+        if ($approvalAbility !== '' && ! Gate::has($approvalAbility)) {
+            Gate::define($approvalAbility, static function ($user, PaidMediaCampaign $campaign): bool {
+                return (int) $user->getKey() === (int) $campaign->user_id;
+            });
+        }
+
+        if ($activationAbility !== '' && ! Gate::has($activationAbility)) {
+            Gate::define($activationAbility, static function ($user, PaidMediaCampaign $campaign): bool {
+                return (int) $user->getKey() === (int) $campaign->user_id;
+            });
+        }
     }
 
     private function router(): Router|Route
