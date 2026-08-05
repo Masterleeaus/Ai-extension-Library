@@ -31,7 +31,7 @@ foreach ([
 }
 
 foreach ([
-    "scheme') !== 'https'",
+    "($parts['scheme'] ?? null) !== 'https'",
     "isset($parts['user'])",
     "isset($parts['pass'])",
     "($parts['port'] ?? 443) !== 443",
