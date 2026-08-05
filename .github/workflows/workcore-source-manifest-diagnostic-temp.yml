@@ -12,7 +12,7 @@ permissions:
 jobs:
   collect:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
     steps:
       - name: Checkout feature branch
         uses: actions/checkout@v4
@@ -31,11 +31,11 @@ jobs:
             find app/extensions/WorkCore_Platform -type f \( -name 'source-files.json' -o -iname '*source*manifest*.py' \) -print 2>/dev/null || true
             if [ -f app/extensions/WorkCore_Platform/tests/test_contract_source_manifest.py ]; then
               echo '===== TEST SOURCE ====='
-              sed -n '1,240p' app/extensions/WorkCore_Platform/tests/test_contract_source_manifest.py
+              sed -n '1,260p' app/extensions/WorkCore_Platform/tests/test_contract_source_manifest.py
             fi
             while IFS= read -r manifest; do
               echo "===== MANIFEST: ${manifest} ====="
-              sed -n '1,120p' "$manifest"
+              sed -n '1,180p' "$manifest"
             done < <(find app/extensions/WorkCore_Platform -type f -name 'source-files.json' -print 2>/dev/null)
           }
 
@@ -47,5 +47,14 @@ jobs:
           php packages/titan-interaction-engine/bin/verify.php
           probe interaction-verifier
 
+          rm -rf /tmp/workcore-checksum-trace
+          (
+            cd app/extensions/WorkCore_Platform
+            python tools/refresh_package_checksums.py --repo . --output-dir /tmp/workcore-checksum-trace
+          )
+          probe checksum-refresher
+
+          echo '===== GENERATED CHECKSUM OUTPUT ====='
+          find /tmp/workcore-checksum-trace -type f -maxdepth 2 -print | sort
           echo '===== GIT STATUS AFTER TRACE ====='
           git status --short
