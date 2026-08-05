@@ -30,7 +30,8 @@
   "scripts": {
     "test": [
       "php tests/run.php",
-      "php tests/vertical_context.php"
+      "php tests/vertical_context.php",
+      "php tests/vertical_ai_proposal.php"
     ],
     "verify": [
       "@test",
