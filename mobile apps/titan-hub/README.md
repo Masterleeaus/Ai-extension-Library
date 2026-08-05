@@ -14,7 +14,29 @@ Titan Hub is Titan Zero's customer-facing native Flutter application. It is buil
 - credential and personal-data redaction for retained logging
 - typed feature flags for retained QRPay flows
 - compact bottom navigation and medium/expanded navigation rail
+- Material 3 native design foundations with light and dark themes
+- accessible buttons, badges, cards, lists, forms, feedback states and typed action sheets
+- responsive component behaviour through 200-percent text scaling
 - Titan Hub Android, iOS and Flutter display identity
+
+## Native design system
+
+Production design-system code lives under:
+
+- `lib/shared/design_system/foundations/` for colours, typography, spacing, radii, motion and themes;
+- `lib/shared/design_system/components/` for reusable native Flutter controls;
+- `lib/features/design_system/titan_design_system_showcase.dart` for the internal component catalogue;
+- `test/shared/design_system/` and `test/features/design_system/` for accessibility and responsive contracts.
+
+The internal showcase route is `/design-system`. It is registered for development and review but is deliberately absent from the five-position customer navigation.
+
+MobileKit remains a licensed visual and interaction donor only. Titan Hub does not ship Bootstrap, MobileKit HTML or a production WebView compatibility layer.
+
+See:
+
+- [`MOBILEKIT_COMPONENT_MAP.md`](../../docs/titan-hub/MOBILEKIT_COMPONENT_MAP.md) for approved native translations and licence provenance;
+- [`DESIGN_SYSTEM_MIGRATION.md`](../../docs/titan-hub/DESIGN_SYSTEM_MIGRATION.md) for incremental screen and component migration guidance;
+- [`DONOR_MANIFEST.md`](../../docs/titan-hub/DONOR_MANIFEST.md) for the canonical donor inventory and archive hashes.
 
 ## Run locally
 
