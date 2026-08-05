@@ -60,6 +60,8 @@ class AssistedMarketplaceContractTest extends TestCase
         $this->assertStringContainsString('official_posting_url', $service);
         $this->assertStringContainsString('facebook.com/marketplace/create', $config);
         $this->assertStringContainsString('gumtree.com.au', $config);
+        $this->assertStringContainsString("'max_package_bytes' => 262144", $config);
+        $this->assertStringContainsString("'idempotency_history_limit' => 10", $config);
     }
 
     public function test_manual_completion_requires_human_confirmation_and_valid_external_url(): void
@@ -72,6 +74,8 @@ class AssistedMarketplaceContractTest extends TestCase
         $this->assertStringContainsString('external_url', $controller);
         $this->assertStringContainsString('FILTER_VALIDATE_URL', $service);
         $this->assertStringContainsString('allowed_external_hosts', $service);
+        $this->assertStringContainsString('normalisedPath', $service);
+        $this->assertStringContainsString('not the posting form URL', $service);
         $this->assertStringContainsString('manually_published', $service);
         $this->assertStringNotContainsString("\$item->update(['status' => 'published'])", $service);
         $this->assertStringContainsString('direct_publish_performed', $service);
@@ -89,7 +93,8 @@ class AssistedMarketplaceContractTest extends TestCase
         $this->assertStringContainsString('request_hash', $service);
         $this->assertStringContainsString('idempotency_key_conflict', $service);
         $this->assertStringContainsString('idempotencySlot', $service);
-        $this->assertStringContainsString('array_slice($operations, -50', $service);
+        $this->assertStringContainsString('idempotencyHistoryLimit', $service);
+        $this->assertStringContainsString('assertPackageSize', $service);
         $this->assertStringContainsString("DB::table('ext_social_media_distribution_audits')", $service);
         $this->assertStringContainsString('Cache::lock', $controller);
         $this->assertStringContainsString('$item->refresh()', $controller);
@@ -102,6 +107,8 @@ class AssistedMarketplaceContractTest extends TestCase
         $service = file_get_contents(__DIR__ . '/../../System/Services/AssistedMarketplaceService.php');
 
         $this->assertStringContainsString('stateExpired', $service);
+        $this->assertStringContainsString('persistExpiredState', $service);
+        $this->assertStringContainsString("'expired_at'", $service);
         $this->assertStringContainsString('The prepared marketplace package has expired', $service);
         $this->assertStringContainsString("'expires_at' => \$renewalDueAt->toIso8601String()", $service);
         $this->assertStringContainsString("'status' => 'renewal_ready_for_manual_post'", $service);
