@@ -62,6 +62,7 @@ jobs:
       - name: Validate Titan Create security PHP syntax
         run: |
           php -l app/Services/Security/RemoteImageFetcher.php
+          php -l app/Services/Security/SvgSanitizer.php
           php -l app/extensions/CreativeSuite/System/Http/Controllers/CreativeSuiteDocumentController.php
           php -l app/extensions/CreativeSuite/System/Http/Controllers/CreativeSuiteAIController.php
           php -l app/extensions/CreativeSuite/System/Http/Controllers/ImageUploadController.php
