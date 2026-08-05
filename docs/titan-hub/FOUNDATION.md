@@ -2,50 +2,63 @@
 
 ## Product boundary
 
-Titan Hub is the customer-facing Flutter application for Titan Zero. It combines discovery, catalogue, commerce, bookings, hire/rental, quotes, invoices, messaging, feedback, rebooking, support, and Titan Pay.
+Titan Hub is the customer-facing Flutter application for Titan Zero. It combines discovery, catalogue, commerce, bookings, hire and rental, quotes, invoices, messaging, feedback, rebooking, support, and Titan Pay.
 
-Titan Go remains the staff/operator-facing mobile experience. Shared Flutter packages may serve both apps.
+Titan Go remains the staff and operator-facing mobile experience. Shared Flutter packages may serve both apps, but customer and staff permissions, navigation, and workflows remain separate.
 
-## Donor systems
+## Donor and host systems
 
 ### QRPay Flutter
 
-Primary donor for authentication journeys, KYC, biometrics, QR scanning, wallet/payment presentation, payment links, money requests, transaction history, receipts, notifications, hosted provider checkout, localisation, and theming.
+Primary donor for authentication journeys, KYC, biometrics, QR scanning, wallet and payment presentation, payment links, money requests, transaction history, receipts, notifications, hosted provider checkout, localisation, and theming.
 
 ### MobileKit
 
-Visual and interaction reference only. Bootstrap HTML/CSS/JS must be translated into native Flutter components and Titan design tokens. Do not embed a WebView-based copy of the kit as the production interface.
+Visual and interaction reference only. Bootstrap HTML, CSS, and JavaScript must be translated into native Flutter components and Titan design tokens. Do not embed a WebView copy as the production interface.
 
 ### QRPay Laravel
 
-Primary donor for merchant/customer/agent workflows, gateway integrations, QR payment concepts, payment links, money requests, transaction limits, KYC administration, remittance/provider knowledge, and Flutter API behaviour.
+Primary donor for merchant, customer, and agent workflows; gateway integrations; QR payment concepts; payment links; money requests; transaction limits; KYC administration; remittance and provider knowledge; and existing Flutter API behaviour.
 
 ### MagicAI
 
-Host Laravel application and authority for tenant identity, extension lifecycle, configuration, plans, permissions, and core AI capabilities.
+Host Laravel application and authority for tenant identity, extension lifecycle, configuration, plans, permissions, authentication, and core AI capabilities.
+
+### E-commerce extension
+
+Laravel authority for catalogue, product and service definitions, variants, inventory, carts, order construction, booking and rental source data, fulfilment rules, and commerce-specific policies. It remains a backend extension and is not converted into Flutter code.
+
+### Chatbot extension
+
+The existing Laravel Chatbot extension is the base conversational system for Titan Hub. It owns conversations, messages, attachments, knowledge sources, model/provider integration, human handoff, tool routing, and agent orchestration. Commerce-aware tools must call the same Titan application services used by visual Flutter screens.
 
 ### WorkCore
 
-Operational integration target for customers, products, services, quotes, invoices, jobs, bookings, inventory, rentals, accounting, and receivables.
+Operational authority and integration target for customers, contacts, products and services, estimates and quotes, jobs, projects, tasks, bookings, inventory, expenses, operational invoices, accounting references, and receivables workflows.
+
+### Titan Pay
+
+Financial authority for payment intents, attempts, invoices as financial obligations, wallet and ledger events, receipts, refunds, credits, bonds, deposits, milestones, splits, payment plans, provider reconciliation, and financial audit history.
 
 ## Target architecture
 
 ```text
 Titan Hub Flutter
-  -> Titan API facade
+  -> /api/titan-hub/v1
      -> MagicAI identity and tenancy
-     -> Titan Hub catalogue/commerce APIs
-     -> Titan Pay domain
-     -> WorkCore operational adapters
-     -> Chatbot and agent orchestration
+     -> Titan Hub application services
+        -> E-commerce adapter
+        -> Booking / hire / rental adapters
+        -> Chatbot adapter
+        -> WorkCore adapter
+        -> Titan Pay adapter
 
-Titan Pay commands
-  -> domain validation
-  -> immutable event
-  -> ledger posting
-  -> projection update
-  -> integration outbox
+Chatbot and agents
+  -> the same Titan Hub application services
+  -> the same permissions, validation, pricing, availability, and approvals
 ```
+
+Flutter never calls extension-specific controllers, tables, or routes directly. The Titan Hub API facade is the only supported mobile contract.
 
 ## Dual-overlay composition model
 
@@ -59,16 +72,14 @@ Titan Hub Core
 = resolved customer application
 ```
 
-The overlays are independent:
-
 - **Vertical Profile** answers: what kind of business is this?
 - **Commerce Mode** answers: how does this business sell, schedule, reserve, hire, or deliver value?
 
-A business may activate several Commerce Modes at the same time. For example, a field-service business can use `service`, `booking`, `quote_first`, and `sales` without requiring separate apps or duplicated domain logic.
+A field-service business may use `service`, `booking`, `quote_first`, and `sales` together. A hotel may use `accommodation`, `reservation`, `booking`, `service`, `sales`, and `hire` together.
 
-### Titan Hub Core
+## Titan Hub Core
 
-The core remains industry-neutral and supplies capabilities shared by all configurations:
+The core supplies industry-neutral capabilities:
 
 - authentication, identity, KYC, account security, and consent;
 - customer and business switching;
@@ -76,30 +87,16 @@ The core remains industry-neutral and supplies capabilities shared by all config
 - QR scanning and signed deep links;
 - quotes, invoices, receipts, wallet, payments, credits, and disputes;
 - files, documents, feedback, preferences, and communication permissions;
-- feature registry, navigation registry, route registry, design system, error states, and analytics;
+- feature, navigation, route, and design-system registries;
 - chatbot shell, human handoff, tool approval, and conversation history.
 
 The core must not contain field-service, hotel, salon, automotive, rental, or other vertical assumptions.
 
 ## Vertical Profiles
 
-A Vertical Profile contributes domain vocabulary and specialist behaviour without owning general commerce, payment, or identity functions.
+A Vertical Profile contributes terminology, fields, specialist validation, templates, evidence requirements, workflow metadata, and chatbot domain tools. It does not directly create orders, bookings, payments, or wallet entries.
 
-A profile may contribute:
-
-- terminology and labels;
-- business-object aliases;
-- required and optional fields;
-- form fragments and validation metadata;
-- home cards and activity summaries;
-- specialist filters and catalogue metadata;
-- workflow templates;
-- document and feedback templates;
-- chatbot knowledge domains and specialist tools;
-- risk, compliance, evidence, and approval requirements;
-- presentation metadata for existing Flutter components.
-
-Initial profiles include:
+Initial profiles:
 
 - `field_service`
 - `hotel_bnb`
@@ -113,33 +110,9 @@ Initial profiles include:
 - `hire_rental`
 - `booking_capacity`
 
-Examples of profile-specific contributions:
-
-### Field service
-
-- service address, site contact, service zone, travel zone;
-- technician preference, access instructions, site photos;
-- before/after evidence, materials, variations, completion approval;
-- service-area and job-site chatbot tools.
-
-### Hotel and BnB
-
-- property, room type, guest, check-in/check-out, occupancy;
-- amenities, incidentals, stay services, housekeeping requests;
-- reservation and guest-service terminology.
-
-### Automotive
-
-- vehicle, registration, VIN, odometer, workshop bay;
-- service history, inspection report, labour and parts metadata.
-
-A Vertical Profile must not directly create orders, bookings, payments, or wallet entries. It supplies configuration and domain-specific validation to the authoritative backend service.
-
 ## Commerce Modes
 
-Commerce Modes are reusable transaction patterns that can be enabled independently or together.
-
-Initial modes:
+Initial reusable transaction modes:
 
 - `service`
 - `booking`
@@ -155,129 +128,316 @@ Initial modes:
 - `accommodation`
 - `order_ahead`
 
-### Service mode
-
-Contributes service catalogue, scope intake, location, duration, service options, completion, and rebooking.
-
-### Booking mode
-
-Contributes availability, time slots, duration, capacity, staff/resource selection, rescheduling, and cancellation.
-
-### Quote-first mode
-
-Contributes structured requirements, measurements, attachments, quote requests, revisions, acceptance, and deposits.
-
-### Sales mode
-
-Contributes products, variants, stock, cart, checkout, fulfilment, shipping, returns, and reorder.
-
-### Hire and rental modes
-
-Contribute date ranges, item availability, collection/delivery, bond, condition evidence, extension, return, late fees, and bond-release status.
-
-### Membership and subscription modes
-
-Contribute plans, recurring billing, entitlements, usage limits, renewal, pause, upgrade, downgrade, and cancellation.
-
-Each mode registers capabilities against shared Titan contracts rather than introducing its own customer, payment, invoice, or notification authority.
+Each mode contributes capabilities and presentation metadata against shared Titan contracts. It does not introduce a separate customer, invoice, payment, or notification authority.
 
 ## Resolved application manifest
 
-Laravel is responsible for resolving overlays, tenant policy, permissions, branding, connected extensions, and provider capabilities into one signed manifest.
-
-Recommended endpoint:
+Laravel resolves overlays, tenant policy, permissions, branding, connected extensions, and provider capabilities into one signed manifest.
 
 ```text
-GET /api/titan-hub/app-manifest
+GET /api/titan-hub/v1/app-manifest
 ```
 
-Representative manifest:
+Representative response:
 
 ```json
 {
-  "schema_version": 1,
-  "business": {
-    "id": "business_42",
-    "name": "Titan Plumbing"
+  "data": {
+    "schema_version": 1,
+    "business": {
+      "id": "business_42",
+      "name": "Titan Plumbing"
+    },
+    "vertical_profile": "field_service",
+    "commerce_modes": ["service", "booking", "quote_first", "sales"],
+    "features": {
+      "chatbot": true,
+      "wallet": true,
+      "bnpl": true,
+      "milestones": true,
+      "bonds": false,
+      "rebooking": true
+    },
+    "navigation": [],
+    "routes": [],
+    "home_widgets": [],
+    "catalogue_types": [],
+    "activity_types": [],
+    "chatbot_tools": [],
+    "payment_methods": [],
+    "terminology": {},
+    "permissions": {},
+    "branding": {}
   },
-  "vertical_profile": "field_service",
-  "commerce_modes": ["service", "booking", "quote_first", "sales"],
-  "features": {
-    "chatbot": true,
-    "wallet": true,
-    "bnpl": true,
-    "milestones": true,
-    "bonds": false,
-    "rebooking": true
-  },
-  "navigation": [],
-  "routes": [],
-  "home_widgets": [],
-  "catalogue_types": [],
-  "activity_types": [],
-  "chatbot_tools": [],
-  "payment_methods": [],
-  "terminology": {},
-  "permissions": {},
-  "branding": {},
-  "cache": {
+  "meta": {
+    "request_id": "req_...",
     "etag": "manifest-version",
+    "generated_at": "ISO-8601",
     "expires_at": "ISO-8601"
   }
 }
 ```
 
-Flutter must not infer a vertical or enable a Commerce Mode from local assumptions. It renders the backend-resolved manifest and may cache the last valid signed configuration for controlled offline use.
+Flutter renders the backend-resolved manifest. It must not infer verticals, commerce modes, permissions, prices, availability, or payment eligibility locally.
+
+## API facade contract
+
+### Namespace and versioning
+
+All mobile-facing endpoints use:
+
+```text
+/api/titan-hub/v1/*
+```
+
+Extension routes remain internal. Breaking contract changes require a new major API namespace. Additive fields are permitted within a version when clients ignore unknown fields.
+
+### Core endpoint groups
+
+```text
+/api/titan-hub/v1/app-manifest
+/api/titan-hub/v1/session
+/api/titan-hub/v1/businesses
+/api/titan-hub/v1/catalogue
+/api/titan-hub/v1/cart
+/api/titan-hub/v1/checkout
+/api/titan-hub/v1/quotes
+/api/titan-hub/v1/bookings
+/api/titan-hub/v1/rentals
+/api/titan-hub/v1/orders
+/api/titan-hub/v1/activity
+/api/titan-hub/v1/invoices
+/api/titan-hub/v1/payments
+/api/titan-hub/v1/wallet
+/api/titan-hub/v1/conversations
+/api/titan-hub/v1/feedback
+/api/titan-hub/v1/support
+```
+
+These are stable facade resources, not promises about underlying extension tables or controllers.
+
+### Success envelope
+
+```json
+{
+  "data": {},
+  "meta": {
+    "request_id": "req_...",
+    "correlation_id": "corr_...",
+    "version": "v1"
+  }
+}
+```
+
+### Error envelope
+
+```json
+{
+  "error": {
+    "code": "BOOKING_SLOT_UNAVAILABLE",
+    "message": "The selected time is no longer available.",
+    "field_errors": {},
+    "retryable": false
+  },
+  "meta": {
+    "request_id": "req_...",
+    "correlation_id": "corr_..."
+  }
+}
+```
+
+Error codes are stable machine-readable identifiers. Flutter may localise approved user-facing messages but must not derive business decisions from message text.
+
+### Pagination
+
+Collection endpoints use cursor pagination:
+
+```json
+{
+  "data": [],
+  "meta": {
+    "next_cursor": "...",
+    "has_more": true
+  }
+}
+```
+
+Offset pagination may be used internally but must not leak extension-specific pagination assumptions into Flutter.
+
+### Idempotency
+
+Every command that may create financial or operational value accepts:
+
+```text
+Idempotency-Key: client-generated-unique-key
+```
+
+Required for checkout, booking creation, rental creation, quote acceptance, invoice payment, refunds, wallet transfers, bond actions, milestone actions, and agent tool commands that create or alter records.
+
+The server stores the key against tenant, actor, command type, and canonical request hash. Reusing the key with different data is rejected.
+
+### Correlation and tracing
+
+Clients send or receive:
+
+```text
+X-Request-ID
+X-Correlation-ID
+```
+
+The correlation ID follows a workflow across Flutter, the API facade, extensions, WorkCore, Titan Pay, queues, webhooks, chatbot tools, and notifications.
+
+### Optimistic concurrency
+
+Mutable resources expose a version or ETag. Commands that depend on prior state supply:
+
+```text
+If-Match: resource-version
+```
+
+Stale writes return `409 CONFLICT` with the current resource summary. Flutter must refresh rather than silently overwrite newer bookings, carts, quotes, invoices, rentals, or profile data.
+
+### Authentication and tenant scope
+
+MagicAI remains identity and tenancy authority. Every request resolves:
+
+- authenticated customer;
+- selected tenant and business;
+- membership and relationship to that business;
+- allowed vertical profile and commerce modes;
+- feature entitlement;
+- resource-level permission.
+
+Tenant or business identifiers supplied by the client are selectors, never trusted authority. Every backend query is tenant-scoped server-side.
+
+### Offline behaviour
+
+The manifest declares per-route offline behaviour:
+
+- `read_cached`
+- `queue_safe_command`
+- `online_required`
+- `blocked_offline`
+
+Financial commands, availability confirmation, checkout, refunds, bond release, and final booking creation remain online-required unless a specific safe offline protocol is implemented.
+
+## Domain authority matrix
+
+| Domain | Authoritative owner | Titan Hub API role |
+|---|---|---|
+| Authentication, tenant, plans, permissions | MagicAI | Resolve actor, tenant, business, entitlements |
+| App manifest and overlay resolution | Titan Hub application layer | Compose signed mobile experience |
+| Catalogue definitions and variants | E-commerce extension or configured commerce source | Normalise into Titan catalogue contracts |
+| Inventory and availability | Configured commerce/booking source | Query and validate; never cache as permanent truth |
+| Cart and checkout orchestration | Titan Hub application services | Coordinate commerce, pricing, tax, availability, and payment intent |
+| Orders and fulfilment | E-commerce extension / WorkCore according to configured ownership | Expose one stable order/activity representation |
+| Bookings and reservations | Configured booking authority | Validate slots, capacity, resources, cancellation and rescheduling |
+| Hire and rental | Configured rental authority | Validate dates, stock, bonds, condition and return lifecycle |
+| Quotes and estimates | WorkCore or configured quote authority | Normalise intake, revisions, acceptance, and downstream commands |
+| Jobs, projects, tasks, field operations | WorkCore | Expose customer-safe status and actions |
+| Financial invoices, payments, wallet, refunds, bonds | Titan Pay | Execute financial commands and return projections |
+| Conversations, messages, handoff | Chatbot extension | Expose tenant-safe conversation APIs |
+| Agent orchestration and tools | Chatbot extension + Titan governance | Authorise tools and invoke Titan application commands |
+| Notifications and lifecycle communication | Titan notification/lifecycle services | Deliver state-aware messages using authoritative events |
+
+No domain may maintain two independent write authorities. When an existing extension currently writes overlapping data, the adapter must select one authority and make the other a projection or integration consumer.
+
+## Adapter rules
+
+Each backend extension is wrapped by an adapter that translates between stable Titan contracts and extension internals.
+
+An adapter must:
+
+- use existing extension services before controllers or direct table access;
+- preserve tenant scoping and permissions;
+- translate extension identifiers into opaque Titan resource identifiers or mapped references;
+- translate extension exceptions into stable Titan error codes;
+- emit correlation IDs and domain events;
+- implement idempotency where commands create value;
+- avoid exposing extension class names, route names, table names, or payload shapes;
+- remain replaceable without a Flutter release.
+
+Controllers remain thin. Business rules stay in application/domain services.
+
+## E-commerce integration rule
+
+The e-commerce extension remains Laravel code. Flutter receives native screens and invokes Titan APIs.
+
+```text
+Flutter product or booking screen
+  -> Titan Hub API command/query
+     -> Titan commerce application service
+        -> e-commerce / booking / rental adapter
+```
+
+The backend remains authoritative for:
+
+- current price and tax;
+- variants and stock;
+- booking and rental availability;
+- deposits, bonds, cancellation, extension, and return policies;
+- checkout eligibility and payment-method availability.
+
+Flutter may display estimates but final confirmation always comes from an authoritative server response.
+
+## Chatbot extension integration rule
+
+The Chatbot extension is the base extension for Titan Echo inside Titan Hub. It owns conversation state and tool orchestration, but it does not own commerce or financial rules.
+
+```text
+Flutter visual action ─┐
+                       ├─> Titan application service -> authoritative adapter
+Chatbot tool action ───┘
+```
+
+A chatbot tool must not call e-commerce, WorkCore, or Titan Pay tables directly. It invokes the same application command used by the visual app.
+
+Examples:
+
+- `catalogue.search`
+- `availability.check`
+- `cart.add_item`
+- `quote_request.create`
+- `booking_draft.create`
+- `booking.confirm`
+- `rental_draft.create`
+- `invoice.get_status`
+- `payment_intent.create`
+- `rebooking.options`
+- `support_case.create`
+
+Tool definitions declare:
+
+- required tenant capability;
+- required actor permission;
+- input schema;
+- confirmation requirement;
+- idempotency requirement;
+- approval policy;
+- audit event;
+- safe retry behaviour.
+
+Agents cannot silently move money, issue refunds, release bonds, cancel paid bookings, override prices, or change obligations. Those commands require explicit configured authority and, where applicable, human approval.
 
 ## Composition and conflict rules
 
-Overlay resolution must be deterministic.
-
 1. Titan Hub Core registers immutable base capabilities.
 2. The Vertical Profile contributes terminology, fields, specialist validation, templates, and presentation metadata.
-3. Commerce Modes contribute transaction capabilities, routes, actions, and workflow metadata.
-4. Business configuration enables, disables, renames, orders, or restricts allowed contributions.
+3. Commerce Modes contribute transaction capabilities and workflow metadata.
+4. Business configuration enables, disables, renames, orders, or restricts contributions.
 5. Permissions and provider capabilities remove unavailable actions.
-6. The resolver validates the final graph and rejects unresolved collisions.
+6. The resolver rejects unresolved route, capability, or authority collisions.
 
-### Navigation rules
-
-- Merge semantically equivalent entries instead of displaying duplicates.
-- Use the most specific approved business or vertical label.
-- One route owner controls each canonical destination.
-- Multiple modes may contribute actions inside one destination.
-- Core payment, account, activity, and messaging destinations remain shared.
-- Business configuration may reorder or hide optional destinations but cannot bypass permissions.
-
-Example: `service`, `booking`, and `reservation` may all request booking-related navigation. The resolver should expose one canonical `Book` destination with mode-specific flows inside it, not separate `Book Service`, `Bookings`, `Schedule`, and `Appointments` tabs.
-
-### Capability conflict rules
-
-Resolve collisions in this order:
+Resolve conflicts in this order:
 
 1. security, legal, and permission restrictions;
 2. authoritative backend capability;
-3. explicit business override;
+3. explicit business configuration;
 4. Vertical Profile specificity;
 5. Commerce Mode priority;
 6. Titan Hub Core default.
 
-Conflicting price, inventory, availability, deposit, bond, refund, or cancellation data must never be resolved in Flutter. The authoritative Laravel service returns the final allowed state.
-
-### Route rules
-
-Every manifest route declares:
-
-- canonical route key;
-- owning feature;
-- required capabilities;
-- required permissions;
-- supported item types;
-- deep-link patterns;
-- offline behaviour;
-- fallback destination.
-
-Flutter registers only routes present in the resolved manifest and maps them to existing or duplicated native screen patterns.
+Conflicting price, inventory, availability, deposit, bond, refund, cancellation, or eligibility data is never resolved in Flutter or chatbot language-model output.
 
 ## Example compositions
 
@@ -290,9 +450,7 @@ Flutter registers only routes present in the resolved manifest and maps them to 
 }
 ```
 
-Customer capabilities include service discovery, job-detail intake, appointment selection, larger-work quote requests, parts/product purchase, deposits, invoices, rebooking, and site communication.
-
-### Hotel or BnB
+### Hotel and BnB
 
 ```json
 {
@@ -300,8 +458,6 @@ Customer capabilities include service discovery, job-detail intake, appointment 
   "commerce_modes": ["accommodation", "reservation", "booking", "service", "sales", "hire"]
 }
 ```
-
-Customer capabilities include stays, room selection, guest services, amenity sales, spa/dining bookings, equipment hire, incidentals, checkout, and stay feedback.
 
 ### Salon
 
@@ -341,84 +497,32 @@ Customer capabilities include stays, room selection, guest services, amenity sal
 
 ## Flutter implementation boundary
 
-Flutter is the native presentation and interaction layer.
+Flutter owns native presentation, local view state, accessibility, secure device storage, deep-link handling, controlled offline presentation, manifest rendering, and invoking stable Titan commands and queries.
 
-It owns:
+Flutter does not own authoritative pricing, inventory, availability, orders, bookings, rentals, quotes, invoices, wallet state, payments, eligibility, refunds, bonds, discounts, or approvals.
 
-- native screens, widgets, navigation rendering, local view state, accessibility, secure device storage, deep-link handling, and controlled offline presentation;
-- rendering the resolved manifest;
-- invoking stable Titan commands and queries;
-- presenting chatbot cards and approved actions.
-
-Flutter does not own:
-
-- authoritative pricing;
-- inventory or availability truth;
-- order, booking, rental, quote, invoice, wallet, or payment state;
-- eligibility, refund, bond, discount, or approval decisions;
-- chatbot business tools.
-
-When adding screens or UI elements, first locate the closest existing QRPay or later Titan Hub screen. Duplicate and adapt that implementation so route, state, component, theme, validation, and interaction styles remain consistent. Create new UI structures only when no suitable donor exists.
-
-## Laravel implementation boundary
-
-Laravel remains the authority for:
-
-- tenant and business configuration;
-- overlay resolution and manifest signing;
-- catalogue, pricing, inventory, availability, carts, orders, bookings, rentals, and quotes;
-- Titan Pay, invoices, receivables, wallets, bonds, milestones, BNPL, and reconciliation;
-- chatbot tools, agents, permissions, approvals, audit, and WorkCore integration.
-
-The e-commerce and chatbot extensions remain Laravel modules. They are not converted into Flutter code. A Titan API facade protects Flutter from extension-specific routes, models, and version changes.
-
-## Chatbot and agent composition
-
-The chatbot receives the same resolved context as the visual app:
-
-```text
-Core chatbot tools
-+ Vertical Profile tools
-+ Commerce Mode tools
-+ business permissions and policy
-= authorised Titan Echo tool set
-```
-
-The chatbot and Flutter screens must call the same backend application services. Chat must never create alternative pricing, availability, booking, order, payment, or refund logic.
-
-Example for field service with service and booking modes:
-
-- profile tools: collect service address, site details, photos, service-zone checks;
-- service tools: search services, collect scope, create service draft;
-- booking tools: check availability, propose slots, create booking draft;
-- quote-first tools: create quote request and collect measurements;
-- Titan Pay tools: present an approved deposit or invoice payment action.
-
-Sensitive actions remain permissioned and approval-controlled.
+When adding UI, first locate the closest existing QRPay or Titan Hub screen. Duplicate and adapt it so routes, state management, components, theming, validation, and interaction styles remain consistent. Create a new structure only when no suitable donor exists.
 
 ## Security gate
 
-Before donor import:
+Before donor import and production use:
 
-- remove `.env` files and secrets;
-- remove OAuth private keys;
-- remove Android signing keys and signing properties;
-- replace Firebase and iOS service configurations;
-- remove build artefacts and caches;
+- remove `.env` files, credentials, signing keys, OAuth private keys, and packaged Firebase configurations;
+- remove generated builds, caches, logs, and dependency vendor artefacts;
 - replace insecure mobile token storage;
-- redact request/response logs;
+- redact sensitive request and response logging;
 - audit direct wallet balance mutation and concurrency;
-- add webhook signature verification and idempotency.
+- add signed webhooks, replay protection, idempotency, and tenant isolation tests.
 
 ## Delivery sequence
 
 1. Import and sanitise licensed donor sources.
 2. Establish Flutter feature-module architecture and Titan design system.
-3. Build Titan API compatibility facade and dual-overlay manifest resolver.
-4. Convert QRPay mobile shell into Titan Hub navigation and identity.
-5. Integrate catalogue, services, sales, bookings, rentals, and hire through Commerce Modes.
+3. Implement the Titan Hub API facade and dual-overlay resolver.
+4. Convert the QRPay mobile shell into Titan Hub navigation and identity.
+5. Integrate catalogue, services, sales, bookings, rentals, and hire through adapters and Commerce Modes.
 6. Integrate Titan Pay invoicing, wallets, QR, rails, BNPL, milestones, bonds, and split payments.
 7. Integrate WorkCore operational and accounting domains.
-8. Add customer messaging, chatbot, and task-oriented agents using the resolved overlay tool set.
+8. Add customer messaging, chatbot, and task-oriented agents through the shared application-command layer.
 9. Add rebooking, feedback, service recovery, loyalty, and lifecycle automation.
 10. Harden, test, migrate, and release.
