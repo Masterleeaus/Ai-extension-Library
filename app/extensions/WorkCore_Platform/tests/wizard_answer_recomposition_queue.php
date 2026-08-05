@@ -26,6 +26,7 @@ spl_autoload_register(static function (string $class) use ($repoRoot): void {
 
 use App\Domains\WorkCore\System\Modules\Wizards\Events\WizardAnswerChanged;
 use App\Domains\WorkCore\System\Modules\Wizards\Jobs\EnrichWizardAnswerProposal;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
 $event = new WizardAnswerChanged(
@@ -47,19 +48,21 @@ $first = EnrichWizardAnswerProposal::fromEvent($event);
 $second = EnrichWizardAnswerProposal::fromEvent($event);
 
 $checks = [
-    $first instanceof ShouldQueue => 'Job does not implement ShouldQueue.',
-    $first->afterCommit === true => 'Job is not constrained to after-commit dispatch.',
-    $first->tries === 3 => 'Job retry policy is missing.',
-    $first->uniqueId() === $second->uniqueId() => 'Job identity is not deterministic.',
-    !array_key_exists('value', $first->event) => 'Raw answer value leaked into the job payload.',
-    $first->event['company_id'] === 10 => 'Server-derived tenant is missing.',
-    $first->event['answer_revision'] === 4 => 'Answer revision is missing.',
+    [$first instanceof ShouldQueue, 'Job does not implement ShouldQueue.'],
+    [$first instanceof ShouldBeUnique, 'Job is not queue-unique.'],
+    [$first->afterCommit === true, 'Job is not constrained to after-commit dispatch.'],
+    [$first->tries === 3, 'Job retry policy is missing.'],
+    [$first->uniqueFor === 3600, 'Job uniqueness window is missing.'],
+    [$first->uniqueId() === $second->uniqueId(), 'Job identity is not deterministic.'],
+    [!array_key_exists('value', $first->event), 'Raw answer value leaked into the job payload.'],
+    [$first->event['company_id'] === 10, 'Server-derived tenant is missing.'],
+    [$first->event['answer_revision'] === 4, 'Answer revision is missing.'],
 ];
-foreach ($checks as $passed => $message) {
+foreach ($checks as [$passed, $message]) {
     if (!$passed) {
         fwrite(STDERR, "FAIL {$message}\n");
         exit(1);
     }
 }
 
-echo "PASS enrichment job is after-commit, deterministic and value-free\n";
+echo "PASS enrichment job is after-commit, queue-unique, deterministic and value-free\n";
