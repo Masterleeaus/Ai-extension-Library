@@ -36,7 +36,7 @@ if (! str_contains($controller, 'app(RemoteImageFetcher::class)->fetch($url)')) 
     failCreativeSuiteAnnotationsFinalizationContract('controller does not fetch async results through the shared safe fetcher');
 }
 
-if (! str_contains($controller, "$download['extension']")) {
+if (! str_contains($controller, '$download[\'extension\']')) {
     failCreativeSuiteAnnotationsFinalizationContract('plain async results do not preserve the verified MIME-derived extension');
 }
 
