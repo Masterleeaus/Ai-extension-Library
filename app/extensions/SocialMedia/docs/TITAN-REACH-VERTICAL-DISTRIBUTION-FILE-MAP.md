@@ -32,13 +32,16 @@ Facilities maintenance is a subtype and capability under `field-home-services`. 
   - Does not change the table, migration history or canonical social-post mapping.
 
 - `System/Services/DistributionCapabilityService.php`
-  - Resolves canonical profiles and old-name aliases.
-  - Optionally consumes a configured Titan Vertical Context resolver.
+  - Resolves canonical profiles, business subtypes and old-name aliases.
+  - Optionally consumes a configured resolver returning an array or Titan `VerticalContextSnapshot`-compatible object.
+  - Reads shared snapshot values from `resolved.capabilities.vertical_family` and `resolved.capabilities.subtype`.
+  - Retains `context_id` and `context_hash` as vertical decision provenance.
   - Falls back to `generic-business` when no vertical context is available.
   - Combines provider availability with vertical/content suitability.
-  - Supports governed tenant refinement of existing families only.
-  - Prevents tenant configuration from adding a new top-level vertical.
-  - Adds profile version and provenance to capability audit snapshots.
+  - Caches provider and vertical catalogues per service instance and reuses one destination definition per capability decision.
+  - Supports governed tenant narrowing of existing families only.
+  - Prevents tenant configuration from adding a top-level vertical, enabling a canonical `not-applicable` destination, or inventing an authority target.
+  - Adds profile version, profile provenance and context provenance to capability audit snapshots.
 
 ## Authority boundaries
 
@@ -59,7 +62,21 @@ Facilities maintenance is a subtype and capability under `field-home-services`. 
 - `special-case`: allowed only when the content and destination rules genuinely fit.
 - `not-applicable`: fail closed unless the canonical catalogue is changed in a reviewed release.
 
-Tenant overrides may refine an existing profile but cannot convert provider-unavailable functionality into an available capability or add a tenth vertical family.
+Unknown suitability values are normalised to `not-applicable`.
+
+Tenant overrides may:
+
+- narrow content types by intersection;
+- downgrade or refine an existing destination suitability;
+- add required fields, guidance, calls to action and warnings;
+- add only recognised authoritative handoff targets.
+
+Tenant overrides may not:
+
+- add a tenth vertical family;
+- enable a canonical `not-applicable` destination;
+- make an unavailable provider capability available;
+- create a new source-of-truth system.
 
 ## Compatibility
 
@@ -68,3 +85,4 @@ Tenant overrides may refine an existing profile but cannot convert provider-unav
 - Existing callers of `forDestination()` are unchanged.
 - New vertical-aware callers use `forVerticalDestination()`.
 - Installations with no vertical profile receive the generic-business fallback.
+- The resolver bridge is optional; Titan Reach remains functional when the shared interaction package is absent.
