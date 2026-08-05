@@ -55,6 +55,7 @@ use App\Extensions\Announcement\System\AnnouncementServiceProvider;
 use App\Extensions\AzureOpenai\System\AzureOpenaiServiceProvider;
 use App\Extensions\AzureTTS\System\AzureTTSServiceProvider;
 use App\Extensions\BlogPilot\System\BlogPilotServiceProvider;
+use App\Extensions\TitanNova\System\TitanNovaServiceProvider;
 use App\Extensions\Canvas\System\CanvasServiceProvider;
 use App\Extensions\Chatbot\System\ChatbotServiceProvider;
 use App\Extensions\ChatbotAgent\System\ChatbotAgentServiceProvider;
@@ -183,6 +184,7 @@ class MarketplaceServiceProvider extends ServiceProvider
         'social-media-agent'            => SocialMediaAgentServiceProvider::class,
         'social-media-automation'       => SocialMediaAutomationServiceProvider::class,
         'blogpilot'                     => BlogPilotServiceProvider::class,
+        'titan-nova'                    => TitanNovaServiceProvider::class,
         'chatbot-agent'                 => ChatbotAgentServiceProvider::class,
         'chatbot-booking'               => ChatbotBookingServiceProvider::class,
         'chatbot-ecommerce'             => ChatbotEcommerceServiceProvider::class,
