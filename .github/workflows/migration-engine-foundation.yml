@@ -1,0 +1,30 @@
+name: Migration Engine Foundation
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/migration-engine-foundation.yml'
+      - 'app/extensions/Migration/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: migration-engine-foundation-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  connector-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: none
+      - name: Validate Migration extension PHP syntax
+        run: find app/extensions/Migration -name '*.php' -print0 | xargs -0 -n1 php -l
+      - name: Run connector registry contract
+        run: php app/extensions/Migration/tests/ConnectorRegistryTest.php

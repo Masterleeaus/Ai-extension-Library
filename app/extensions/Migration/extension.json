@@ -1,0 +1,7 @@
+{
+    "name": "Titan Migration Engine",
+    "type": "extension",
+    "version": "2.0.0-foundation",
+    "description": "Secure, extensible migration infrastructure for Titan Zero with preserved legacy Migration compatibility.",
+    "support_telegram": "heew_support"
+}
