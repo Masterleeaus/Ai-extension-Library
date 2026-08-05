@@ -10,6 +10,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use InvalidArgumentException;
+use RuntimeException;
 use Throwable;
 
 class EbayListingController extends Controller
@@ -98,7 +100,7 @@ class EbayListingController extends Controller
     public function buyerQuestionHandoff(Request $request, DistributionItem $item): JsonResponse
     {
         $validated = $request->validate([
-            'account_id'          => 'required|integer',
+            'account_id'           => 'required|integer',
             'question.question_id' => 'required|string|max:255',
             'question.buyer_alias' => 'nullable|string|max:255',
             'question.subject'     => 'nullable|string|max:500',
@@ -139,13 +141,18 @@ class EbayListingController extends Controller
                 'status' => 'success',
                 'data'   => $callback(),
             ]);
+        } catch (InvalidArgumentException|RuntimeException $exception) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => $exception->getMessage(),
+            ], 422);
         } catch (Throwable $exception) {
             report($exception);
 
             return response()->json([
                 'status'  => 'error',
-                'message' => $exception->getMessage(),
-            ], 422);
+                'message' => trans('The eBay operation could not be completed.'),
+            ], 500);
         }
     }
 }
