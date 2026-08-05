@@ -296,7 +296,7 @@ final class EloquentWizardRepository implements WizardRepositoryContract
 
     private function runRow(string $publicId, int $companyId): object
     {
-        $row = $this->db->table('tz_wizard_runs')->where('company_id', $companyId)->where('public_id', $publicId)->first();
+        $row = $this->db->table('tz_wizard_runs')->where('company_id', $companyId)->where('public_id', $publicId)->lockForUpdate()->first();
         if (!$row) {
             throw new InvalidArgumentException('Wizard run does not belong to the active company.');
         }
