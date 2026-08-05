@@ -114,6 +114,7 @@ return [
         'Catalogue, quoting, invoicing, payments and operational finance.',
         [
             'catalogue' => $section('workcore_commercial_catalogue', 'Service Catalogue', 'tabler-list-details', 'dashboard.user.workcore.commercial.catalogue.index', 'commercial/catalogue', 10, ['workcore.catalogue'], 'Services, variants, pricing context and reusable scope definitions.'),
+            'pricing' => $section('workcore_commercial_pricing', 'Dynamic Pricing', 'tabler-adjustments-dollar', 'dashboard.user.workcore.commercial.pricing', 'commercial/pricing', 15, ['workcore.finance'], 'Demand, seasonal, occupancy and competitor-aware price decisions.'),
             'quotes' => $section('workcore_commercial_quotes', 'Quotes and Estimates', 'tabler-calculator', 'dashboard.user.workcore.commercial.quotes.index', 'commercial/quotes', 20, ['workcore.finance'], 'Versioned quotes, estimates, approvals and acceptance evidence.'),
             'invoices' => $section('workcore_commercial_invoices', 'Invoices', 'tabler-file-invoice', 'dashboard.user.workcore.commercial.invoices.index', 'commercial/invoices', 30, ['workcore.finance'], 'Customer invoices, lifecycle state and immutable snapshots.'),
             'receivables' => $section('workcore_commercial_receivables', 'Payments and Receivables', 'tabler-cash', 'dashboard.user.workcore.commercial.receivables.index', 'commercial/receivables', 40, ['workcore.finance'], 'Payments, allocations, evidence, receipts and collections.'),

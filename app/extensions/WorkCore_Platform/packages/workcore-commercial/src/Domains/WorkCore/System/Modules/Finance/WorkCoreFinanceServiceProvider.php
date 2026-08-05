@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domains\WorkCore\System\Modules\Finance;
 
+use App\Domains\WorkCore\System\Modules\Finance\Pricing\WorkPricingServiceProvider;
 use App\Domains\WorkCore\System\Modules\Finance\Application\ActionRegistry;
 use App\Domains\WorkCore\System\Modules\Finance\Automation\Collections\CollectionSequence;
 use App\Domains\WorkCore\System\Modules\Finance\Automation\Invoicing\InvoiceEligibilityEvaluator;
@@ -164,6 +165,7 @@ final class WorkCoreFinanceServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom(__DIR__ . '/config/titan-money.php', 'titan-money');
         $this->mergeConfigFrom(__DIR__ . '/config/automation.php', 'titan-money-automation');
+        $this->app->register(WorkPricingServiceProvider::class);
 
         /** @var list<string> $defaultPermissions */
         $defaultPermissions = require __DIR__ . '/config/permissions.php';

@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Domains\WorkCore\System\Contracts\TenantContextContract;
 use App\Domains\WorkCore\System\Entitlements\CompanyEntitlementRefreshService;
 use App\Extensions\WorkCore\System\Navigation\MagicAIMenuSynchronizer;
+use App\Extensions\WorkCore\System\Navigation\WorkCoreWorkspaceCatalogue;
 use App\Extensions\WorkCore\System\Navigation\WorkCoreWorkspaceManifest;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Database\Schema\Blueprint;
@@ -32,6 +33,7 @@ $assert = static function (bool $condition, string $message): void {
 try {
     foreach ([
         MagicAIMenuSynchronizer::class,
+        WorkCoreWorkspaceCatalogue::class,
         WorkCoreWorkspaceManifest::class,
         TenantContextContract::class,
         CompanyEntitlementRefreshService::class,
@@ -104,7 +106,19 @@ try {
     $assert((bool) $commercialMenu->is_active === false, 'Administrator-disabled menu state was not preserved.');
     $assert($retiredMenu !== null && (bool) $retiredMenu->is_active === false, 'Retired WorkCore menu was not disabled.');
     $assert($second_sync['created'] === 0 && $second_sync['updated'] === 0, 'The second menu synchronization was not idempotent.');
-    $assert((int) DB::table('menus')->where('extension', 'workcore')->count() === 43, 'Unexpected WorkCore menu count after synchronization.');
+
+    /** @var WorkCoreWorkspaceCatalogue $catalogue */
+    $catalogue = $app->make(WorkCoreWorkspaceCatalogue::class);
+    $currentMenuKeys = array_column($catalogue->menuDefinitions(), 'key');
+    $currentMenuCount = (int) DB::table('menus')
+        ->where('extension', 'workcore')
+        ->whereIn('key', $currentMenuKeys)
+        ->count();
+    $assert($currentMenuCount === count($currentMenuKeys), 'One or more current WorkCore menu definitions were not synchronized.');
+    $assert(
+        (int) DB::table('menus')->where('extension', 'workcore')->count() === count($currentMenuKeys) + 1,
+        'Unexpected retained WorkCore menu count after synchronization.',
+    );
 
     foreach ([
         'dashboard.user.workcore.crm.index',
@@ -170,7 +184,8 @@ try {
     echo json_encode([
         'first_sync' => $first_sync,
         'second_sync' => $second_sync,
-        'menu_count' => DB::table('menus')->where('extension', 'workcore')->count(),
+        'current_menu_count' => $currentMenuCount,
+        'retained_menu_count' => DB::table('menus')->where('extension', 'workcore')->count(),
         'resources_with_commercial_only' => $resources_with_commercial_only,
         'commercial_before_expiry' => $commercial_before_expiry,
         'commercial_after_expiry' => $commercial_after_expiry,
