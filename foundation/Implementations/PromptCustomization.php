@@ -6,6 +6,7 @@ namespace Foundation\Implementations;
 
 use Foundation\Contracts\PromptCustomizationContract;
 use PDO;
+use Foundation\Support\JsonHelper;
 
 class PromptCustomization implements PromptCustomizationContract
 {
@@ -55,7 +56,7 @@ class PromptCustomization implements PromptCustomizationContract
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($result) {
-            $result['metadata'] = json_decode($result['metadata'], true);
+            $result['metadata'] = JsonHelper::decode($result['metadata']);
         }
 
         return $result ?: null;

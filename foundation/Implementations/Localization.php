@@ -6,6 +6,7 @@ namespace Foundation\Implementations;
 
 use Foundation\Contracts\LocalizationContract;
 use PDO;
+use Foundation\Support\JsonHelper;
 
 class Localization implements LocalizationContract
 {
@@ -153,7 +154,7 @@ class Localization implements LocalizationContract
         string $format
     ): bool {
         if ($format === 'json') {
-            $translations = json_decode($content, true);
+            $translations = JsonHelper::decode($content);
 
             if (!is_array($translations)) {
                 return false;

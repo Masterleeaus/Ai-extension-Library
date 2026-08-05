@@ -7,9 +7,11 @@ namespace Foundation\Implementations;
 use Foundation\Exceptions\DatabaseException;
 use Foundation\Support\DatabaseHelper;
 use Foundation\Contracts\ExtensionLifecycleContract;
+use Foundation\Support\InputValidator;
+use Foundation\Support\ValidationException;
 use Foundation\Support\TransactionHelper;
 use PDO;
-use Foundation\Contracts\DatabaseRepositoryContract;
+use Foundation\Support\JsonHelper;
 
 class ExtensionLifecycle implements ExtensionLifecycleContract
 {
@@ -20,7 +22,7 @@ class ExtensionLifecycle implements ExtensionLifecycleContract
 
     public function __construct(PDO $db, ?TransactionHelper $transactions = null)
     {
-        $this->repository = $repository;
+        $this->db = $db;
         $this->transactions = $transactions ?? new TransactionHelper($db);
     }
 
@@ -29,6 +31,11 @@ class ExtensionLifecycle implements ExtensionLifecycleContract
         string $extensionName,
         array $extensionMetadata
     ): string {
+        // Validate inputs
+        InputValidator::validateTenantId($tenantId);
+        InputValidator::validateNonEmptyString($extensionName, 'extensionName', 255);
+        InputValidator::validateArray($extensionMetadata, 'extensionMetadata', false, 1000);
+
         $extensionId = bin2hex(random_bytes(16));
 
         $stmt = $this->helper->safePrepare(
@@ -70,7 +77,7 @@ class ExtensionLifecycle implements ExtensionLifecycleContract
         $result = $this->repository->fetch($stmt, PDO::FETCH_ASSOC);
 
         if ($result) {
-            $result['metadata'] = json_decode($result['metadata'], true);
+            $result['metadata'] = JsonHelper::decode($result['metadata']);
         }
 
         return $result ?: null;
@@ -90,22 +97,17 @@ class ExtensionLifecycle implements ExtensionLifecycleContract
                      VALUES (?, ?, ?, ?, ?)"
                 );
 
-                try {
-                    if (!$this->helper->safeExecute($stmt, [
-                                        $extensionId,
-                                        $tenantId,
-                                        $version,
-                                        json_encode($releaseNotes, 'EXECUTE'),
-                                        date('c'),
-                                    ])) {
-                                        throw new \Exception('Failed to insert version record');
-                } catch (DatabaseException $e) {
-                    error_log("Database error: " . $e->getMessage());
-                    throw $e;
-                }
+                if (!$stmt->execute([
+                    $extensionId,
+                    $tenantId,
+                    $version,
+                    json_encode($releaseNotes),
+                    date('c'),
+                ])) {
+                    throw new \Exception('Failed to insert version record');
                 }
 
-                // Step 2: Update extension status (atomic - must both succeed or both rollback)
+                // Step 2: Update extension status
                 $updateStmt = $db->prepare(
                     "UPDATE {$this->tablePrefix}extensions SET status = ?, published_version = ?, updated_at = ? WHERE id = ? AND tenant_id = ?"
                 );

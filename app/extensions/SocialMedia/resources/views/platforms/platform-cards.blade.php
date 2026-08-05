@@ -3,27 +3,32 @@
         @php
             $image = 'vendor/social-media/icons/' . $platform->value . '.svg';
             $image_dark_version = 'vendor/social-media/icons/' . $platform->value . '-light.svg';
-
+            $image_exists = file_exists(public_path($image));
+            $image_dark_exists = file_exists(public_path($image_dark_version));
         @endphp
         <x-card
             class="lqd-social-media-card flex flex-col text-heading-foreground transition-all hover:scale-105 hover:border-heading-foreground/10 hover:shadow-lg hover:shadow-black/5"
             class:body="flex flex-col "
         >
-            <figure class="mb-8 w-9 transition-all group-hover/card:scale-125">
-                <img
-                    @class([
-                        'w-full h-auto',
-                        'dark:hidden' => file_exists($image_dark_version),
-                    ])
-                    src="{{ asset($image) }}"
-                    alt="{{ $platform->label() }}"
-                />
-                @if (file_exists($image_dark_version))
+            <figure class="mb-8 flex h-9 w-9 items-center justify-center overflow-hidden rounded-lg bg-foreground/5 text-xs font-semibold transition-all group-hover/card:scale-125">
+                @if ($image_exists)
                     <img
-                        class="hidden h-auto w-full dark:block"
-                        src="{{ asset($image_dark_version) }}"
+                        @class([
+                            'w-full h-auto',
+                            'dark:hidden' => $image_dark_exists,
+                        ])
+                        src="{{ asset($image) }}"
                         alt="{{ $platform->label() }}"
                     />
+                    @if ($image_dark_exists)
+                        <img
+                            class="hidden h-auto w-full dark:block"
+                            src="{{ asset($image_dark_version) }}"
+                            alt="{{ $platform->label() }}"
+                        />
+                    @endif
+                @else
+                    <span aria-hidden="true">{{ str($platform->label())->substr(0, 2)->upper() }}</span>
                 @endif
             </figure>
             <h4 class="mb-2 text-lg text-inherit">

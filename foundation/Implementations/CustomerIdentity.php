@@ -6,6 +6,7 @@ namespace Foundation\Implementations;
 
 use Foundation\Contracts\CustomerIdentityContract;
 use PDO;
+use Foundation\Support\JsonHelper;
 
 class CustomerIdentity implements CustomerIdentityContract
 {
@@ -72,7 +73,7 @@ class CustomerIdentity implements CustomerIdentityContract
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         foreach ($results as &$result) {
-            $result['identifiers'] = json_decode($result['identifiers'], true);
+            $result['identifiers'] = JsonHelper::decode($result['identifiers']);
         }
 
         return $results;
@@ -104,7 +105,7 @@ class CustomerIdentity implements CustomerIdentityContract
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($result) {
-            $result['data'] = json_decode($result['data'], true);
+            $result['data'] = JsonHelper::decode($result['data']);
         }
 
         return $result ?: null;

@@ -6,6 +6,7 @@ namespace Foundation\Implementations;
 
 use Foundation\Contracts\MediaQuarantineContract;
 use PDO;
+use Foundation\Support\JsonHelper;
 
 class MediaQuarantine implements MediaQuarantineContract
 {
@@ -71,7 +72,7 @@ class MediaQuarantine implements MediaQuarantineContract
         return [
             'quarantine_id' => $quarantineId,
             'status' => $record['status'],
-            'scan_results' => json_decode($record['scan_results'] ?? '{}', true),
+            'scan_results' => JsonHelper::decode($record['scan_results'] ?? '{}'),
             'scanned_at' => $record['scanned_at'],
         ];
     }

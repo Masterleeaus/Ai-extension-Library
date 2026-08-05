@@ -6,6 +6,7 @@ namespace Foundation\Implementations;
 
 use Foundation\Contracts\ConnectorRuntimeContract;
 use PDO;
+use Foundation\Support\JsonHelper;
 
 class ConnectorRuntime implements ConnectorRuntimeContract
 {
@@ -121,7 +122,7 @@ class ConnectorRuntime implements ConnectorRuntimeContract
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($result) {
-            $result['config'] = json_decode($result['config'], true);
+            $result['config'] = JsonHelper::decode($result['config']);
         }
 
         return $result ?: null;

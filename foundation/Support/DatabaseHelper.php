@@ -32,6 +32,7 @@ class DatabaseHelper
     private const RETRY_DELAY_MS = 100;
 
     private PDO $db;
+    private int $retries = 0;
 
     public function __construct(PDO $db)
     {

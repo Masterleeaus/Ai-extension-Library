@@ -6,6 +6,7 @@ namespace Foundation\Implementations;
 
 use Foundation\Contracts\BehaviorConfigurationContract;
 use PDO;
+use Foundation\Support\JsonHelper;
 
 class BehaviorConfiguration implements BehaviorConfigurationContract
 {
@@ -52,7 +53,7 @@ class BehaviorConfiguration implements BehaviorConfigurationContract
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($result) {
-            $result['behaviors'] = json_decode($result['behaviors'], true);
+            $result['behaviors'] = JsonHelper::decode($result['behaviors']);
         }
 
         return $result ?: null;
@@ -123,7 +124,7 @@ class BehaviorConfiguration implements BehaviorConfigurationContract
             return ['passed' => false, 'error' => 'Rule not found'];
         }
 
-        $conditions = json_decode($rule['conditions'], true);
+        $conditions = JsonHelper::decode($rule['conditions']);
         $conditionsMet = true;
 
         foreach ($conditions as $condition) {

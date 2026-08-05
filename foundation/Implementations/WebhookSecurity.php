@@ -6,6 +6,7 @@ namespace Foundation\Implementations;
 
 use Foundation\Contracts\WebhookSecurityContract;
 use PDO;
+use Foundation\Support\JsonHelper;
 
 class WebhookSecurity implements WebhookSecurityContract
 {
@@ -94,7 +95,7 @@ class WebhookSecurity implements WebhookSecurityContract
         $dispatchResults = [];
 
         foreach ($endpoints as $endpoint) {
-            $events = json_decode($endpoint['events'], true);
+            $events = JsonHelper::decode($endpoint['events']);
 
             if (in_array($eventType, $events)) {
                 $signature = hash_hmac('sha256', json_encode($payload), $endpoint['secret']);
@@ -175,7 +176,7 @@ class WebhookSecurity implements WebhookSecurityContract
         $delivery = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($delivery) {
-            $delivery['payload'] = json_decode($delivery['payload'], true);
+            $delivery['payload'] = JsonHelper::decode($delivery['payload']);
         }
 
         return $delivery ?: null;
@@ -201,7 +202,7 @@ class WebhookSecurity implements WebhookSecurityContract
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         foreach ($results as &$result) {
-            $result['events'] = json_decode($result['events'], true);
+            $result['events'] = JsonHelper::decode($result['events']);
             unset($result['secret']);
         }
 

@@ -6,6 +6,7 @@ namespace Foundation\Implementations;
 
 use Foundation\Contracts\WorkCoreCommercialContract;
 use PDO;
+use Foundation\Support\JsonHelper;
 
 class WorkCoreCommercial implements WorkCoreCommercialContract
 {
@@ -50,7 +51,7 @@ class WorkCoreCommercial implements WorkCoreCommercialContract
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($result) {
-            $result['data'] = json_decode($result['data'], true);
+            $result['data'] = JsonHelper::decode($result['data']);
         }
 
         return $result ?: null;
@@ -90,7 +91,7 @@ class WorkCoreCommercial implements WorkCoreCommercialContract
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($result) {
-            $result['data'] = json_decode($result['data'], true);
+            $result['data'] = JsonHelper::decode($result['data']);
         }
 
         return $result ?: null;

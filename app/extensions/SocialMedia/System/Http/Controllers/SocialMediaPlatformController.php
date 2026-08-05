@@ -4,6 +4,7 @@ namespace App\Extensions\SocialMedia\System\Http\Controllers;
 
 use App\Extensions\SocialMedia\System\Enums\PlatformEnum;
 use App\Extensions\SocialMedia\System\Models\SocialMediaPlatform;
+use App\Extensions\SocialMedia\System\Services\SocialMediaChannelEntitlementService;
 use App\Helpers\Classes\Helper;
 use App\Http\Controllers\Controller;
 use Exception;
@@ -12,10 +13,16 @@ use Illuminate\Support\Facades\Auth;
 
 class SocialMediaPlatformController extends Controller
 {
+    public function __construct(
+        private readonly SocialMediaChannelEntitlementService $entitlements,
+    ) {}
+
     public function __invoke()
     {
+        $user = Auth::user();
+
         return view('social-media::platforms', [
-            'platforms'     => PlatformEnum::all(),
+            'platforms'     => PlatformEnum::channels(),
             'userPlatforms' => SocialMediaPlatform::query()
                 ->when(request('active') === 'on', function ($query) {
                     return $query->where('expires_at', '>', now());
@@ -27,6 +34,7 @@ class SocialMediaPlatformController extends Controller
                     return $query->where('credentials', 'like', "%{$search}%");
                 })
                 ->where('user_id', Auth::id())->get(),
+            'channelUsage' => $this->entitlements->usage($user),
         ]);
     }
 
@@ -39,17 +47,26 @@ class SocialMediaPlatformController extends Controller
             ]);
         }
 
+        if ((int) $platform->user_id !== (int) Auth::id()) {
+            return back()->with([
+                'type'    => 'error',
+                'message' => trans('You are not authorized to disconnect this channel.'),
+            ]);
+        }
+
         try {
             $platform->delete();
 
             return back()->with([
                 'type'    => 'success',
-                'message' => trans('Platform has been disconnected.'),
+                'message' => trans('Channel has been disconnected.'),
             ]);
         } catch (Exception $exception) {
+            report($exception);
+
             return back()->with([
                 'type'    => 'error',
-                'message' => $exception->getMessage(),
+                'message' => trans('The channel could not be disconnected.'),
             ]);
         }
     }

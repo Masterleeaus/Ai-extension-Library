@@ -28,7 +28,10 @@
     }
   },
   "scripts": {
-    "test": "php tests/run.php",
+    "test": [
+      "php tests/run.php",
+      "php tests/vertical_context.php"
+    ],
     "verify": [
       "@test",
       "php bin/verify.php"
@@ -45,7 +48,8 @@
   "extra": {
     "laravel": {
       "providers": [
-        "TitanZero\\Interaction\\Providers\\InteractionServiceProvider"
+        "TitanZero\\Interaction\\Providers\\InteractionServiceProvider",
+        "TitanZero\\Interaction\\Vertical\\VerticalInteractionServiceProvider"
       ],
       "aliases": {
         "Interaction": "TitanZero\\Interaction\\Facades\\Interaction"

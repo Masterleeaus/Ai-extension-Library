@@ -14,6 +14,7 @@ use App\Extensions\SocialMedia\System\Services\SocialMediaShareService;
 use App\Helpers\Classes\Helper;
 use App\Http\Controllers\Controller;
 use App\Models\Company;
+use DomainException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -113,11 +114,8 @@ class SocialMediaPostController extends Controller
         ]);
 
         $replicate = $post->replicate();
-
         $replicate->status = 'draft';
-
         $replicate->social_media_platform_id = $request->platform_id;
-
         $replicate->save();
 
         return response()->json([
@@ -137,17 +135,22 @@ class SocialMediaPostController extends Controller
         }
 
         $validated = $request->validated();
-
         $posts = $this->service->storeBulk($validated);
 
         if ($request->get('post_now')) {
-            foreach ($posts as $post) {
-                $driver = app(PublisherDriver::class)->setPost($post)
-                    ->getDriver();
+            try {
+                foreach ($posts as $post) {
+                    $driver = app(PublisherDriver::class)->setPost($post)->getDriver();
 
-                if ($driver instanceof BasePublisherService) {
-                    $driver->publish();
+                    if ($driver instanceof BasePublisherService) {
+                        $driver->publish();
+                    }
                 }
+            } catch (DomainException $exception) {
+                return response()->json([
+                    'status'  => 'error',
+                    'message' => $exception->getMessage(),
+                ], 422);
             }
         }
 
@@ -164,13 +167,19 @@ class SocialMediaPostController extends Controller
         }
 
         $validated = $request->validated();
-
         $this->service->update($post, $validated);
 
         if ($request->get('post_now')) {
-            app(PublisherDriver::class)->setPost($post)
-                ->getDriver()
-                ->publish();
+            try {
+                app(PublisherDriver::class)->setPost($post)
+                    ->getDriver()
+                    ?->publish();
+            } catch (DomainException $exception) {
+                return response()->json([
+                    'status'  => 'error',
+                    'message' => $exception->getMessage(),
+                ], 422);
+            }
         }
 
         return response()->json(['status' => 'success', 'message' => trans('Post updated successfully')]);
