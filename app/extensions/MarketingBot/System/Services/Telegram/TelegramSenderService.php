@@ -114,16 +114,15 @@ class TelegramSenderService
 
         $receiver = $receiver ?: $this->telegramBot->getAttribute('group_id');
 
-        $url = "https://api.telegram.org/bot{$token}/sendMessage";
-
         $data = [
-            'chat_id'    => $receiver,
-            'text'       => $message,
+            'chat_id' => $receiver,
+            'text'    => $message,
         ];
 
-        $url .= '?' . http_build_query($data);
-
-        $http = Http::get($url);
+        // SECURITY: Use POST with Authorization header instead of GET with token in URL
+        // This prevents tokens from being logged, exposed in browser history, or leaked via referer headers
+        $http = Http::withToken($token)
+            ->post('https://api.telegram.org/bot/sendMessage', $data);
 
         if ($http->failed()) {
             throw new Exception('Failed to send message: ' . $http->body());

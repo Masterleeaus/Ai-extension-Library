@@ -21,5 +21,6 @@ class TelegramBot extends Model
 
     protected $casts = [
         'scopes' => 'array',
+        'access_token' => 'encrypted',
     ];
 }
