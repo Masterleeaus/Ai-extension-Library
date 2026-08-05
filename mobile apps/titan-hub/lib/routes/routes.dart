@@ -24,6 +24,7 @@ class Routes {
 
   //!dashboard
   static const String bottomNavBarScreen = '/bottomNavBarScreen';
+  static const String designSystemShowcase = '/design-system';
   static const String dashboardScreen = '/dashboardScreen';
   static const String qRCodeScreen = '/qRCodeScreen';
   static const String notificationScreen = '/notificationScreen';
