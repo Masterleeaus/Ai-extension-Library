@@ -147,7 +147,7 @@ class GoogleBusinessProfile
         string $locationName,
         ?string $pageToken = null
     ): Response {
-        $query = ['pageSize' => 50, 'orderBy' => 'updateTime desc'];
+        $query = ['pageSize' => 50, 'orderBy' => 'update_time desc'];
 
         if ($pageToken) {
             $query['pageToken'] = $pageToken;
@@ -185,23 +185,24 @@ class GoogleBusinessProfile
     ): Response {
         [$startYear, $startMonth, $startDay] = array_map('intval', explode('-', $startDate));
         [$endYear, $endMonth, $endDay] = array_map('intval', explode('-', $endDate));
-
-        return $this->request(
-            $platform,
-            'GET',
-            $this->requiredConfig('performance_api_root')
-                . '/' . $this->performanceLocationName($locationName)
-                . ':fetchMultiDailyMetricsTimeSeries',
-            query: [
-                'dailyMetrics' => array_values($metrics),
-                'dailyRange.startDate.year' => $startYear,
-                'dailyRange.startDate.month' => $startMonth,
-                'dailyRange.startDate.day' => $startDay,
-                'dailyRange.endDate.year' => $endYear,
-                'dailyRange.endDate.month' => $endMonth,
-                'dailyRange.endDate.day' => $endDay,
-            ]
+        $queryParts = array_map(
+            static fn (string $metric): string => 'dailyMetrics=' . rawurlencode($metric),
+            array_values($metrics)
         );
+        $queryParts[] = http_build_query([
+            'dailyRange.start_date.year' => $startYear,
+            'dailyRange.start_date.month' => $startMonth,
+            'dailyRange.start_date.day' => $startDay,
+            'dailyRange.end_date.year' => $endYear,
+            'dailyRange.end_date.month' => $endMonth,
+            'dailyRange.end_date.day' => $endDay,
+        ], '', '&', PHP_QUERY_RFC3986);
+        $url = $this->requiredConfig('performance_api_root')
+            . '/' . $this->performanceLocationName($locationName)
+            . ':fetchMultiDailyMetricsTimeSeries?'
+            . implode('&', $queryParts);
+
+        return $this->request($platform, 'GET', $url);
     }
 
     public function rateLimit(Response $response): array
