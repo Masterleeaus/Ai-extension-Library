@@ -77,16 +77,10 @@ class SeeDreamV4ServiceProvider extends ServiceProvider implements ExtensionRegi
 
     private function registerRoutes(): static
     {
-
-        $this->router()
-            ->group([
-                'middleware' => ['web', 'auth'],
-            ], function (Router $router) {
-                $router->any('generator/webhook/fal-ai', FalAIWebhookController::class)
-                    ->name('generator.webhook.fal-ai')
-                    ->withoutMiddleware(['web', 'auth']);
-
-            });
+        // NOTE: FAL webhook route is now consolidated in FluxProServiceProvider
+        // Unified endpoint: POST /api/webhooks/fal/{provider}
+        // This prevents route collisions and ensures proper signature verification
+        // SeeDreamV4 no longer registers the colliding 'generator/webhook/fal-ai' route
 
         return $this;
     }

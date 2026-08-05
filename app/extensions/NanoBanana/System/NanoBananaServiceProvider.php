@@ -84,16 +84,10 @@ class NanoBananaServiceProvider extends ServiceProvider implements ExtensionRegi
 
     private function registerRoutes(): static
     {
-
-        $this->router()
-            ->group([
-                'middleware' => ['web', 'auth'],
-            ], function (Router $router) {
-                $router->any('generator/webhook/fal-ai', FalAIWebhookController::class)
-                    ->name('generator.webhook.fal-ai')
-                    ->withoutMiddleware(['web', 'auth']);
-
-            });
+        // NOTE: FAL webhook route is now consolidated in FluxProServiceProvider
+        // Unified endpoint: POST /api/webhooks/fal/{provider}
+        // This prevents route collisions and ensures proper signature verification
+        // NanoBanana no longer registers the colliding 'generator/webhook/fal-ai' route
 
         return $this;
     }
@@ -105,17 +99,7 @@ class NanoBananaServiceProvider extends ServiceProvider implements ExtensionRegi
 
     public static function uninstall(): void
     {
-<<<<<<< HEAD
-<<<<<<< HEAD
         $path = public_path("vendor/nanobanana");
-=======
-        $path = public_path("vendor/chatbot");
-=======
-        $path = public_path("vendor/chatbot");
-=======
-        $path = public_path("vendor/nanobanana");
->>>>>>> update-extensions-review-upgrade-nvbncq
->>>>>>> update-ai-suite-extensions-issues-cvrb3y
         if (is_dir($path)) {
             array_map(static fn ($f) => @unlink($f), glob("$path/*.*"));
             @rmdir($path);
