@@ -6,6 +6,7 @@ use App\Extensions\SocialMedia\System\Enums\StatusEnum;
 use App\Extensions\SocialMedia\System\Models\SocialMediaPost;
 use App\Extensions\SocialMedia\System\Services\Publisher\Contracts\BasePublisherService;
 use App\Extensions\SocialMedia\System\Services\Publisher\PublisherDriver;
+use DomainException;
 use Illuminate\Console\Command;
 
 class PublishedCommand extends Command
@@ -25,12 +26,16 @@ class PublishedCommand extends Command
         $service = app(PublisherDriver::class);
 
         foreach ($posts as $post) {
-            $driver = $service
-                ->setPost($post)
-                ->getDriver();
+            try {
+                $driver = $service
+                    ->setPost($post)
+                    ->getDriver();
 
-            if ($driver instanceof BasePublisherService) {
-                $driver->publish();
+                if ($driver instanceof BasePublisherService) {
+                    $driver->publish();
+                }
+            } catch (DomainException $exception) {
+                $this->warn("Post {$post->getKey()} skipped: {$exception->getMessage()}");
             }
         }
     }
