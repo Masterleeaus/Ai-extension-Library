@@ -18,14 +18,14 @@ class CanvasController extends Controller
     {
         $validated = $request->validate([
             'content'    => 'required|nullable|string',
-            'type'       => 'required|string',
-            'message_id' => 'required',
+            'type'       => 'required|string|in:input,output',
+            'message_id' => 'required|integer',
         ]);
 
-        try {
-            $message = UserOpenaiChatMessage::find($validated['message_id']);
+        $message = $this->ownedMessage($validated['message_id']);
 
-            if ($validated['type'] == 'input') {
+        try {
+            if ($validated['type'] === 'input') {
                 $message->tiptapContent()->updateOrCreate([], [
                     'input'   => $validated['content'],
                     'user_id' => auth()->id(),
@@ -47,14 +47,15 @@ class CanvasController extends Controller
     public function saveTitle(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'message_id' => 'required',
+            'message_id' => 'required|integer',
             'title'      => 'sometimes|nullable|string',
         ]);
 
+        $message = $this->ownedMessage($validated['message_id']);
+
         try {
-            $message = UserOpenaiChatMessage::find($validated['message_id']);
             $message->tiptapContent()->updateOrCreate([], [
-                'title'   => $validated['title'],
+                'title'   => $validated['title'] ?? null,
                 'user_id' => auth()->id(),
             ]);
 
@@ -64,5 +65,12 @@ class CanvasController extends Controller
         } catch (Throwable $th) {
             return $this->exceptionRes($th, 'Error happen while save canvas title');
         }
+    }
+
+    private function ownedMessage(int|string $id): UserOpenaiChatMessage
+    {
+        return UserOpenaiChatMessage::query()
+            ->where('user_id', auth()->id())
+            ->findOrFail($id);
     }
 }
