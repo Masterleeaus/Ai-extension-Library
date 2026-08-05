@@ -25,6 +25,7 @@ class AssistedMarketplaceController extends Controller
         DistributionItem $item,
         string $destination
     ): JsonResponse {
+        $this->assertOwned($item);
         $validated = $request->validate([
             'idempotency_key' => 'required|string|max:128',
             'listing' => 'required|array',
@@ -33,7 +34,7 @@ class AssistedMarketplaceController extends Controller
             'listing.title' => 'required|string|max:255',
             'listing.description' => 'required|string|max:20000',
             'listing.category' => 'required|string|max:255',
-            'listing.condition' => 'required|string|max:255',
+            'listing.condition' => 'nullable|string|max:255',
             'listing.price_minor' => 'required|integer|min:0',
             'listing.currency' => 'required|string|size:3',
             'listing.location' => 'required|string|max:500',
@@ -68,6 +69,7 @@ class AssistedMarketplaceController extends Controller
         DistributionItem $item,
         string $destination
     ): JsonResponse {
+        $this->assertOwned($item);
         $validated = $request->validate([
             'idempotency_key' => 'required|string|max:128',
         ]);
@@ -89,6 +91,7 @@ class AssistedMarketplaceController extends Controller
         DistributionItem $item,
         string $destination
     ): JsonResponse {
+        $this->assertOwned($item);
         $validated = $request->validate([
             'human_confirmed' => 'required|accepted',
             'external_url' => 'required|string|max:2048',
@@ -116,6 +119,7 @@ class AssistedMarketplaceController extends Controller
         DistributionItem $item,
         string $destination
     ): JsonResponse {
+        $this->assertOwned($item);
         $validated = $request->validate([
             'idempotency_key' => 'required|string|max:128',
         ]);
@@ -137,6 +141,7 @@ class AssistedMarketplaceController extends Controller
         DistributionItem $item,
         string $destination
     ): JsonResponse {
+        $this->assertOwned($item);
         $validated = $request->validate([
             'enquiry.enquiry_id' => 'required|string|max:255',
             'enquiry.buyer_alias' => 'nullable|string|max:255',
@@ -162,11 +167,20 @@ class AssistedMarketplaceController extends Controller
         DistributionItem $item,
         string $destination
     ): JsonResponse {
+        $this->assertOwned($item);
+
         return $this->respond(fn () => $this->service->status(
             $request->user(),
             $item,
             $destination
         ));
+    }
+
+    private function assertOwned(DistributionItem $item): void
+    {
+        if ((int) $item->user_id !== (int) Auth::id()) {
+            abort(404);
+        }
     }
 
     private function locked(
