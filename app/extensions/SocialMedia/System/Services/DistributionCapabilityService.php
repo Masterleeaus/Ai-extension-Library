@@ -6,6 +6,7 @@ use App\Extensions\SocialMedia\System\Models\DistributionItem;
 use App\Extensions\SocialMedia\System\Models\SocialMediaPlatform;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class DistributionCapabilityService
 {
@@ -130,6 +131,10 @@ class DistributionCapabilityService
         ?SocialMediaPlatform $account,
         array $snapshot
     ): void {
+        if (! Schema::hasTable('ext_social_media_distribution_audits')) {
+            return;
+        }
+
         DB::table('ext_social_media_distribution_audits')->insert([
             'user_id'                  => $user->getKey(),
             'social_media_platform_id' => $account && (int) $account->user_id === (int) $user->getKey()
