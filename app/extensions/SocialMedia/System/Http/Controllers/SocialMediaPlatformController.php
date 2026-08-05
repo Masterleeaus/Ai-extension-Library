@@ -4,6 +4,7 @@ namespace App\Extensions\SocialMedia\System\Http\Controllers;
 
 use App\Extensions\SocialMedia\System\Enums\PlatformEnum;
 use App\Extensions\SocialMedia\System\Models\SocialMediaPlatform;
+use App\Extensions\SocialMedia\System\Services\SocialMediaChannelEntitlementService;
 use App\Helpers\Classes\Helper;
 use App\Http\Controllers\Controller;
 use Exception;
@@ -12,8 +13,14 @@ use Illuminate\Support\Facades\Auth;
 
 class SocialMediaPlatformController extends Controller
 {
+    public function __construct(
+        private readonly SocialMediaChannelEntitlementService $entitlements,
+    ) {}
+
     public function __invoke()
     {
+        $user = Auth::user();
+
         return view('social-media::platforms', [
             'platforms'     => PlatformEnum::all(),
             'userPlatforms' => SocialMediaPlatform::query()
@@ -27,6 +34,7 @@ class SocialMediaPlatformController extends Controller
                     return $query->where('credentials', 'like', "%{$search}%");
                 })
                 ->where('user_id', Auth::id())->get(),
+            'channelUsage' => $this->entitlements->usage($user),
         ]);
     }
 
@@ -44,7 +52,7 @@ class SocialMediaPlatformController extends Controller
 
             return back()->with([
                 'type'    => 'success',
-                'message' => trans('Platform has been disconnected.'),
+                'message' => trans('Channel has been disconnected.'),
             ]);
         } catch (Exception $exception) {
             return back()->with([
