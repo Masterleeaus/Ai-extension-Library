@@ -33,7 +33,7 @@ class WorkCoreCommercial implements WorkCoreCommercialContract
             $transactionId,
             $tenantId,
             json_encode($transactionData),
-            date('c'),
+            gmdate('c'),
         ]);
 
         return $transactionId;
@@ -73,7 +73,7 @@ class WorkCoreCommercial implements WorkCoreCommercialContract
             $tenantId,
             json_encode($payrollData),
             'processing',
-            date('c'),
+            gmdate('c'),
         ]);
 
         return $payrollId;
@@ -109,7 +109,7 @@ class WorkCoreCommercial implements WorkCoreCommercialContract
 
         $sku = $inventoryData['sku_id'] ?? null;
         $quantity = $inventoryData['quantity'] ?? 0;
-        $now = date('c');
+        $now = gmdate('c');
 
         return $stmt->execute([
             $tenantId,
@@ -154,7 +154,7 @@ class WorkCoreCommercial implements WorkCoreCommercialContract
             $tenantId,
             $reportType,
             json_encode($parameters),
-            date('c'),
+            gmdate('c'),
         ]);
 
         return $reportId;
@@ -171,7 +171,7 @@ class WorkCoreCommercial implements WorkCoreCommercialContract
         );
 
         $configJson = json_encode($gatewayConfig);
-        $now = date('c');
+        $now = gmdate('c');
 
         return $stmt->execute([
             $tenantId,

@@ -37,7 +37,7 @@ class ConnectorRuntime implements ConnectorRuntimeContract
             $connectorName,
             $connectorType,
             json_encode($config),
-            date('c'),
+            gmdate('c'),
         ]);
 
         return $connectorId;
@@ -57,7 +57,7 @@ class ConnectorRuntime implements ConnectorRuntimeContract
         return $stmt->execute([
             'connected',
             json_encode($credentials),
-            date('c'),
+            gmdate('c'),
             $connectorId,
             $tenantId,
         ]);
@@ -75,7 +75,7 @@ class ConnectorRuntime implements ConnectorRuntimeContract
 
         return $stmt->execute([
             'disconnected',
-            date('c'),
+            gmdate('c'),
             $connectorId,
             $tenantId,
         ]);
@@ -101,7 +101,7 @@ class ConnectorRuntime implements ConnectorRuntimeContract
             $operation,
             json_encode($params),
             'running',
-            date('c'),
+            gmdate('c'),
         ]);
 
         return [

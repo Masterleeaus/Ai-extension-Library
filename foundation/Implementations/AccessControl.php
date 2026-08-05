@@ -36,7 +36,7 @@ class AccessControl implements AccessControlContract
             $resourceType,
             $resourceId,
             $permission,
-            date('c'),
+            gmdate('c'),
         ]);
     }
 
@@ -145,7 +145,7 @@ class AccessControl implements AccessControlContract
                  VALUES (?, ?, ?, ?)"
             );
 
-            return $this->helper->safeExecute($stmt, [$tenantId, $userId, $role, date('c')], 'INSERT');
+            return $this->helper->safeExecute($stmt, [$tenantId, $userId, $role, gmdate('c')], 'INSERT');
         } catch (DatabaseException $e) {
             error_log("Database error in assignRole: {$e->getMessage()}");
             throw $e;

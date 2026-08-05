@@ -343,7 +343,7 @@ class InputValidator
     private static function logValidationFailure(string $fieldName, string $reason): void
     {
         $entry = [
-            'timestamp' => date('c'),
+            'timestamp' => gmdate('c'),
             'field' => $fieldName,
             'reason' => $reason,
             'trace' => debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3)[1] ?? [],

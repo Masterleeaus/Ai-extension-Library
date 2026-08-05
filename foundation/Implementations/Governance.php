@@ -36,7 +36,7 @@ class Governance implements GovernanceContract
             $policyName,
             json_encode($rules),
             1,
-            date('c'),
+            gmdate('c'),
         ]);
 
         return $policyId;
@@ -86,7 +86,7 @@ class Governance implements GovernanceContract
         return $updateStmt->execute([
             json_encode($rules),
             $newVersion,
-            date('c'),
+            gmdate('c'),
             $policyId,
             $tenantId,
         ]);
@@ -136,7 +136,7 @@ class Governance implements GovernanceContract
             $policyId,
             $resourceType,
             json_encode($violations),
-            date('c'),
+            gmdate('c'),
         ]);
 
         return [

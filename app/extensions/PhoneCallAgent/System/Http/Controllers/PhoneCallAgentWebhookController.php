@@ -326,23 +326,41 @@ XML;
 
     /**
      * Validate the X-Twilio-Signature using the resolved agent's auth token.
-     * Skips when the agent has no per-agent token (legacy / global-creds setups).
+     * SECURITY: Fails closed when verification credentials are missing or invalid.
      */
     private function verifyTwilioSignature(Request $request, ExtPhoneCallAgent $agent): bool
     {
         $token = $agent->twilio_auth_token;
 
+        // CRITICAL SECURITY: Require active credentials - fail closed when missing
         if (empty($token)) {
-            return true; // verification disabled when no per-agent token is configured
+            Log::error('[Twilio] Webhook rejected: no auth token configured for agent', [
+                'agent_id' => $agent->id,
+                'call_sid' => $request->input('CallSid'),
+            ]);
+            return false;
         }
 
         $signature = $request->header('X-Twilio-Signature', '');
 
         if (empty($signature)) {
+            Log::warning('[Twilio] Webhook rejected: missing X-Twilio-Signature header', [
+                'agent_id' => $agent->id,
+                'call_sid' => $request->input('CallSid'),
+            ]);
             return false;
         }
 
-        return (new RequestValidator($token))->validate($signature, $request->fullUrl(), $request->post());
+        $isValid = (new RequestValidator($token))->validate($signature, $request->fullUrl(), $request->post());
+
+        if (!$isValid) {
+            Log::warning('[Twilio] Webhook rejected: invalid signature', [
+                'agent_id' => $agent->id,
+                'call_sid' => $request->input('CallSid'),
+            ]);
+        }
+
+        return $isValid;
     }
 
     private function verifyElevenLabsSignature(Request $request): bool

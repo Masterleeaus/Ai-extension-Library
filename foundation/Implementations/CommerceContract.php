@@ -73,7 +73,7 @@ class CommerceContract implements CommerceContractContract
              ON DUPLICATE KEY UPDATE quantity = ?, updated_at = ?"
         );
 
-        $now = date('c');
+        $now = gmdate('c');
         return $stmt->execute([
             $tenantId,
             $productId,
@@ -146,13 +146,13 @@ class CommerceContract implements CommerceContractContract
             $tenantId,
             json_encode($paymentDetails),
             'processing',
-            date('c'),
+            gmdate('c'),
         ]);
 
         return [
             'payment_id' => $paymentId,
             'status' => 'processing',
-            'processed_at' => date('c'),
+            'processed_at' => gmdate('c'),
         ];
     }
 
@@ -182,7 +182,7 @@ class CommerceContract implements CommerceContractContract
             $tenantId,
             json_encode($order),
             'pending',
-            date('c'),
+            gmdate('c'),
         ]);
 
         return $orderId;
@@ -274,7 +274,7 @@ class CommerceContract implements CommerceContractContract
             $orderId,
             json_encode($refundDetails),
             'pending',
-            date('c'),
+            gmdate('c'),
         ]);
     }
 }
