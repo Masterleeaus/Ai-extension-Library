@@ -26,7 +26,7 @@ final class WizardDefinitionRegistry
             foreach ($this->db->table('tz_wizard_definitions')
                 ->where('company_id', $companyId)
                 ->where('status', 'published')
-                ->orderByDesc('version')
+                ->orderBy('version')
                 ->get() as $row) {
                 $definition = $this->decodeDefinition((string) $row->definition);
                 $all[(string) $definition['key']] = $definition;
@@ -62,8 +62,7 @@ final class WizardDefinitionRegistry
         if ($companyId && $this->hasTable()) {
             $query = $this->db->table('tz_wizard_definitions')
                 ->where('company_id', $companyId)
-                ->where('definition_key', $key)
-                ->where('status', 'published');
+                ->where('definition_key', $key);
 
             $row = (clone $query)->where('version', $version)->first();
             if ($row) {
