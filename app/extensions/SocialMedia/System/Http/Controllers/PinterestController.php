@@ -63,19 +63,22 @@ class PinterestController extends Controller
             'payload.board_id' => 'required|string|max:255',
         ]);
         $account = $this->account((int) $validated['account_id']);
-        $payload = (array) $validated['payload'];
-        $this->boards->assertWritableBoard($account, (string) $payload['board_id']);
 
-        return $this->respond(fn () => $this->locked(
-            $item,
-            fn () => $this->service->publish(
-                $request->user(),
+        return $this->respond(function () use ($request, $item, $account, $validated) {
+            $payload = (array) $validated['payload'];
+            $this->boards->assertWritableBoard($account, (string) $payload['board_id']);
+
+            return $this->locked(
                 $item,
-                $account,
-                $payload,
-                (string) $validated['idempotency_key']
-            )
-        ));
+                fn () => $this->service->publish(
+                    $request->user(),
+                    $item,
+                    $account,
+                    $payload,
+                    (string) $validated['idempotency_key']
+                )
+            );
+        });
     }
 
     public function reconcile(Request $request, DistributionItem $item): JsonResponse
