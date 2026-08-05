@@ -79,7 +79,7 @@ if (! str_contains($webhookController, "query('token')")) {
     failAdvancedImageWebhookSignatureContract('webhook controller does not require the signed task token');
 }
 
-if (! str_contains($webhookController, "where('payload->webhookToken', $token)")) {
+if (! str_contains($webhookController, "where('payload->webhookToken', \$token)")) {
     failAdvancedImageWebhookSignatureContract('task lookup is not bound to the signed task token');
 }
 
