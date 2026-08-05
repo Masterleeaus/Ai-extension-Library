@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - feature/titan-vertical-context-composer
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
 
 permissions:
