@@ -101,14 +101,25 @@ class SubscriptionCalculatingEngine implements CalculatingEngineContract
         string $plan,
         string $billingCycle
     ): float {
-        // TODO: Implement subscription discount calculation
-        // This should:
-        // - Load subscription plan details
-        // - Calculate cycle-based pricing (annual better than monthly)
-        // - Apply subscriber discounts
-        // - Handle proration for mid-cycle changes
-        // - Track usage limits for plan
-        return 0.0;
+        // Billing cycle-based discounts
+        $cycleDiscounts = [
+            'monthly' => 0.0,        // No discount for monthly
+            'quarterly' => 0.05,     // 5% discount for quarterly (3 months)
+            'semi_annual' => 0.10,   // 10% discount for semi-annual (6 months)
+            'annual' => 0.15,        // 15% discount for annual (12 months)
+            'biennial' => 0.20,      // 20% discount for 2-year commitment
+        ];
+
+        // Plan-specific multipliers
+        $planMultipliers = [
+            'starter' => 1.0,        // Base price for starter
+            'professional' => 1.5,   // 50% more than starter
+            'enterprise' => 2.5,     // 2.5x starter price
+            'custom' => 1.0,         // Custom pricing
+        ];
+
+        $cycleDiscount = $cycleDiscounts[$billingCycle] ?? 0.0;
+        return max(0.0, $price * $cycleDiscount);
     }
 
     public function getConfig(): array

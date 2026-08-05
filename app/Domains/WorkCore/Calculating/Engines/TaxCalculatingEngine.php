@@ -94,12 +94,33 @@ class TaxCalculatingEngine implements CalculatingEngineContract
 
     protected function getTaxRate(string $country, ?string $state = null): float
     {
-        // TODO: Implement tax rate lookup from database or config
-        // This is a placeholder - actual implementation should reference:
-        // - TaxRate model for regional tax rates
-        // - Product tax class
-        // - Special tax rules (food, medicine, etc.)
-        return 0.0;
+        // Standard tax rates by country (in percentage)
+        // These are default values - should be customized per implementation
+        $countryTaxRates = [
+            'US' => 7.5,  // US average sales tax
+            'CA' => 5.0,  // Canada GST
+            'GB' => 20.0, // UK VAT
+            'DE' => 19.0, // Germany VAT
+            'FR' => 20.0, // France VAT
+            'JP' => 10.0, // Japan consumption tax
+            'AU' => 10.0, // Australia GST
+            'NZ' => 15.0, // New Zealand GST
+        ];
+
+        // State-specific rates for US
+        if ($country === 'US' && !empty($state)) {
+            $stateRates = [
+                'CA' => 7.25, // California
+                'TX' => 6.25, // Texas
+                'NY' => 8.875, // New York
+                'FL' => 6.0, // Florida
+            ];
+            if (isset($stateRates[$state])) {
+                return $stateRates[$state];
+            }
+        }
+
+        return $countryTaxRates[$country] ?? 0.0;
     }
 
     public function getConfig(): array

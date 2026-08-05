@@ -159,7 +159,9 @@
                                     if (this.isOriginTrusted(referrerOrigin)) {
                                         this.parentOrigin = referrerOrigin;
                                     }
-                                } catch {}
+                                } catch (err) {
+                                    console.warn('Failed to extract parent origin from referrer:', err);
+                                }
                             }
 
                             if (this.parentOrigin) {

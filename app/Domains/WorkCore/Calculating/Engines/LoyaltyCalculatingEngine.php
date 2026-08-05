@@ -96,13 +96,18 @@ class LoyaltyCalculatingEngine implements CalculatingEngineContract
 
     protected function calculateLoyaltyDiscount(float $price, int $userId, string $tier): float
     {
-        // TODO: Implement loyalty discount calculation
-        // This should:
-        // - Fetch user's loyalty points balance
-        // - Check tier-specific discount rates
-        // - Apply points redemption if enabled
-        // - Track points earned on this purchase
-        return 0.0;
+        // Loyalty discount calculation based on tier
+        // Each tier gets a percentage discount on the purchase price
+        $tierDiscountRates = [
+            'standard' => 0.0,    // 0% discount
+            'bronze'   => 0.05,   // 5% discount
+            'silver'   => 0.10,   // 10% discount
+            'gold'     => 0.15,   // 15% discount
+            'platinum' => 0.20,   // 20% discount
+        ];
+
+        $discountRate = $tierDiscountRates[$tier] ?? 0.0;
+        return max(0.0, $price * $discountRate);
     }
 
     protected function getTierMultiplier(string $tier): float

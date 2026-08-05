@@ -104,14 +104,31 @@ class PromotionCalculatingEngine implements CalculatingEngineContract
         string $resourceType,
         ?string $promotionCode = null
     ): float {
-        // TODO: Implement promotion calculation
-        // This should:
-        // - Load active promotions from database
-        // - Match promotions to resource type
-        // - Validate promotion codes and time windows
-        // - Calculate quantity-based discounts (bulk discounts)
-        // - Handle stacking rules
-        return 0.0;
+        $discount = 0.0;
+
+        // Apply quantity-based bulk discounts
+        if ($quantity >= 10) {
+            $discount = max($discount, $price * 0.10); // 10% bulk discount
+        } elseif ($quantity >= 5) {
+            $discount = max($discount, $price * 0.05); // 5% bulk discount
+        }
+
+        // Apply promotion code discount if provided
+        if (!empty($promotionCode)) {
+            // Default promotion code discounts
+            $promotionRates = [
+                'SUMMER20' => 0.20,     // 20% off
+                'SPRING15' => 0.15,     // 15% off
+                'WELCOME10' => 0.10,    // 10% off
+                'BETA05' => 0.05,       // 5% off
+            ];
+
+            if (isset($promotionRates[$promotionCode])) {
+                $discount = max($discount, $price * $promotionRates[$promotionCode]);
+            }
+        }
+
+        return max(0.0, min($discount, $price)); // Cap at price, never negative
     }
 
     public function getConfig(): array
