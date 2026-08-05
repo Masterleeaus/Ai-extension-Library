@@ -13,44 +13,40 @@ This branch implements the Dynamic Pricing Engine inside the existing WorkCore C
 - Money representation: integer minor units
 - Governed writes: WorkCore `BusinessActionRegistry`
 - Governed reads: WorkCore `ReadModelRegistry`
-- Installable output: existing six-extension WorkCore release, with no seventh package
+- Installable output: the existing six-extension WorkCore release; no seventh package was introduced
 
 ## Implemented behavior
 
-- Deterministic pricing-rule priority
+- Deterministic priority-based pricing rules
 - Fixed-minor, percentage and multiplier adjustments
-- Seasonal pricing multiplier
-- Occupancy-tier pricing
+- Seasonal rate windows and governed seasonal-rate writes
+- Occupancy-tier pricing with neutral behavior when occupancy is unknown
 - Demand-score pricing
-- Minimum and maximum bounds
-- Explainable factor output and deterministic decision hash
-- Tenant-scoped rules, seasonal rates, demand indicators, occupancy snapshots, competitor snapshots and immutable price history
-- Preview, apply, rule-upsert, signal-record and analytics operations
-- Finance-gated API and MagicAI dashboard routes
-- Pricing analytics and revenue-impact summaries
+- Minimum and maximum price bounds
+- Explainable factors and deterministic decision hashes
+- Tenant-scoped rules, demand indicators, occupancy snapshots, competitor snapshots and immutable price history
+- Target-scoped competitor analytics and revenue-impact summaries
+- Preview, apply, rule, seasonal-rate, signal and analytics operations
+- Finance-entitled API routes and catalogue-driven MagicAI dashboard navigation
+- Domain validation shared by HTTP, AI, CLI and governed-action callers
 
-## Verified branch evidence
+## Verified evidence
 
-The finalized branch was merged with the latest `main` before this record was created.
+Final workflow run `30994047447` passed every required stage on a tree first merged with current `main`:
 
-Passed in the one-shot verification workflow:
+- Source patch SHA-256 verification
+- Ownership/checksum regeneration from the merged tree
+- 32 focused Pricing, workspace and integrity tests
+- Repository validator with 6 packages, 35 modules and 2,178 owned files
+- Complete package PHP lint
+- Six deterministic MagicAI installer builds and extension validation
+- Generated PHP lint
+- Real Laravel 10 host creation and full WorkCore installation
+- Fresh database migration including all six pricing tables
+- Entitlement-projection database fixture
+- Workspace/menu synchronization fixture, including retained disabled legacy rows
+- Direct pricing database exercise proving neutral missing occupancy, seasonal persistence, target-isolated competitor analytics, one dashboard route and rejection of invalid non-HTTP payloads
 
-- Focused Dynamic Pricing tests: 8 passed
-- Repository integrity tests: passed
-- Deterministic checksum check: passed
-- WorkCore repository validator: `packages=6 modules=35 owned_files=2177 errors=0`
-- Complete package PHP lint: passed
-- Six MagicAI installer builds: passed
-- Generated extension validation: passed
-- Generated PHP lint: passed
+## Repository-wide CI note
 
-The ownership-manifest change was reduced from an accidental whole-file reordering to a minimal update containing one file-count change, one modified provider hash and nineteen new ownership records.
-
-## Merge gate
-
-Issue #353 must remain open until:
-
-1. Standard repository PR checks pass on this exact branch head.
-2. PR #364 is reviewed and merged into `main` using its expected head SHA.
-3. The merged `main` commit is verified.
-4. Issue #353 is closed with the merged commit and validation evidence.
+The repository's separate `Materialize AI extensions` workflow currently fails before WorkCore validation because its external base-library Parquet transport returns HTTP 404. The focused WorkCore workflow does not depend on that unavailable transport and completed all source, package, installer and real-host checks.
