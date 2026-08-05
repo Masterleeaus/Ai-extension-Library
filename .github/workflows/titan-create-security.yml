@@ -8,10 +8,19 @@ on:
     paths:
       - .github/workflows/titan-create-security.yml
       - app/extensions/CreativeSuite/System/Http/Controllers/CreativeSuiteDocumentController.php
+      - app/extensions/CreativeSuite/System/Http/Controllers/CreativeSuiteAIController.php
+      - app/extensions/AdvancedImage/System/Http/Controllers/AdvancedImageStatusController.php
+      - app/extensions/AdvancedImage/System/Http/Controllers/AdvancedImageWebhookController.php
       - app/extensions/Canvas/System/Http/Controllers/CanvasController.php
       - tests/contracts/creative_suite_document_ownership.php
+      - tests/contracts/creative_suite_ai_task_ownership.php
+      - tests/contracts/advanced_image_task_ownership.php
+      - tests/contracts/advanced_image_webhook_signature.php
       - tests/contracts/canvas_message_ownership.php
       - tests/Feature/Extensions/CreativeSuite/CreativeSuiteDocumentOwnershipTest.php
+      - tests/Feature/Extensions/CreativeSuite/CreativeSuiteAITaskOwnershipTest.php
+      - tests/Feature/Extensions/AdvancedImage/AdvancedImageTaskOwnershipTest.php
+      - tests/Feature/Extensions/AdvancedImage/AdvancedImageWebhookSignatureTest.php
       - tests/Feature/Extensions/Canvas/CanvasMessageOwnershipTest.php
   workflow_dispatch:
 
@@ -38,12 +47,24 @@ jobs:
       - name: Validate Titan Create security PHP syntax
         run: |
           php -l app/extensions/CreativeSuite/System/Http/Controllers/CreativeSuiteDocumentController.php
+          php -l app/extensions/CreativeSuite/System/Http/Controllers/CreativeSuiteAIController.php
+          php -l app/extensions/AdvancedImage/System/Http/Controllers/AdvancedImageStatusController.php
+          php -l app/extensions/AdvancedImage/System/Http/Controllers/AdvancedImageWebhookController.php
           php -l app/extensions/Canvas/System/Http/Controllers/CanvasController.php
           php -l tests/contracts/creative_suite_document_ownership.php
+          php -l tests/contracts/creative_suite_ai_task_ownership.php
+          php -l tests/contracts/advanced_image_task_ownership.php
+          php -l tests/contracts/advanced_image_webhook_signature.php
           php -l tests/contracts/canvas_message_ownership.php
           php -l tests/Feature/Extensions/CreativeSuite/CreativeSuiteDocumentOwnershipTest.php
+          php -l tests/Feature/Extensions/CreativeSuite/CreativeSuiteAITaskOwnershipTest.php
+          php -l tests/Feature/Extensions/AdvancedImage/AdvancedImageTaskOwnershipTest.php
+          php -l tests/Feature/Extensions/AdvancedImage/AdvancedImageWebhookSignatureTest.php
           php -l tests/Feature/Extensions/Canvas/CanvasMessageOwnershipTest.php
       - name: Run Titan Create ownership contracts
         run: |
           php tests/contracts/creative_suite_document_ownership.php
+          php tests/contracts/creative_suite_ai_task_ownership.php
+          php tests/contracts/advanced_image_task_ownership.php
+          php tests/contracts/advanced_image_webhook_signature.php
           php tests/contracts/canvas_message_ownership.php
