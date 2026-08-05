@@ -1,17 +1,43 @@
-# qrpay
+# Titan Hub Flutter
 
-A new Flutter project.
+Titan Hub is Titan Zero's customer-facing native Flutter application. It is built from the sanitised QRPay Flutter v5.1.0 donor and composes one customer app from a business manifest rather than creating separate vertical app forks.
 
-## Getting Started
+## Current foundation
 
-This project is a starting point for a Flutter application.
+- Flutter 3.27.0 and Dart 3.6+
+- GetX routing and state retained from the donor
+- five-position responsive shell: Home, Explore, Hub QR, Activity, Account
+- nine canonical vertical profiles
+- one primary plus multiple supporting App Modes
+- deterministic manifest-driven capability navigation
+- encrypted session storage through `flutter_secure_storage`
+- credential and personal-data redaction for retained logging
+- typed feature flags for retained QRPay flows
+- compact bottom navigation and medium/expanded navigation rail
+- Titan Hub Android, iOS and Flutter display identity
 
-A few resources to get you started if this is your first Flutter project:
+## Run locally
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+```bash
+flutter pub get
+flutter analyze
+flutter test
+flutter run
+```
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Signing files, Firebase service configuration and live environment credentials are intentionally absent. Supply deployment configuration outside Git before building signed Android or iOS releases.
 
+## Architecture
+
+See [`docs/titan-hub/FLUTTER_ARCHITECTURE.md`](../../docs/titan-hub/FLUTTER_ARCHITECTURE.md) for module boundaries, manifest composition, backend authority, navigation resolution, session security and testing requirements.
+
+## Important boundaries
+
+- Flutter presents governed backend capabilities; it is not the financial or operational source of truth.
+- Titan Pay owns immutable financial events and ledger truth.
+- WorkCore owns operational execution state.
+- Commerce extensions own product, service, booking and order rules.
+- Chatbot and agents own conversational tool invocation.
+- MobileKit is a design reference only; production UI must remain native Flutter.
+
+The technical Dart package remains `qrpay` until a dedicated import and native bundle migration is implemented with automated coverage.
