@@ -45,7 +45,13 @@ final class VerticalAIProposalBridge
                     'context_hash' => $snapshot->contextHash(),
                     'attempt' => $attempt,
                 ]);
-                $responseHash = hash('sha256', $response);
+            } catch (Throwable $providerException) {
+                $errors[] = 'provider_error: ' . $providerException::class;
+                continue;
+            }
+
+            $responseHash = hash('sha256', $response);
+            try {
                 $raw = $this->validator->decodeAndValidateRaw($response);
                 $sanitized = $this->sanitizer->sanitize($raw);
                 $validated = $this->validator->validateProposal($sanitized);
@@ -67,8 +73,8 @@ final class VerticalAIProposalBridge
                         'validation_errors' => $errors,
                     ],
                 );
-            } catch (Throwable $exception) {
-                $errors[] = $this->safeError($exception);
+            } catch (Throwable $validationException) {
+                $errors[] = $this->safeValidationError($validationException);
             }
         }
 
@@ -105,7 +111,7 @@ final class VerticalAIProposalBridge
         ]);
     }
 
-    private function safeError(Throwable $exception): string
+    private function safeValidationError(Throwable $exception): string
     {
         $message = trim(strip_tags($exception->getMessage()));
         $message = preg_replace('/\s+/', ' ', $message) ?? '';
