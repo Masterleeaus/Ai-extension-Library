@@ -504,6 +504,12 @@ class AssistedMarketplaceService
             $condition = 'not_applicable';
         }
 
+        $callToAction = trim((string) data_get($input, 'call_to_action', ''));
+
+        if ($callToAction === '') {
+            $callToAction = (string) data_get($capability, 'calls_to_action.0', 'Contact us');
+        }
+
         $verticalFields = (array) data_get($input, 'vertical_fields', []);
         $baseAliases = [
             'title' => data_get($input, 'title'),
@@ -515,7 +521,7 @@ class AssistedMarketplaceService
             'images' => $imageUrls,
             'media' => $imageUrls,
             'location' => data_get($input, 'location'),
-            'call_to_action' => data_get($input, 'call_to_action'),
+            'call_to_action' => $callToAction,
         ];
 
         foreach ((array) ($capability['required_fields'] ?? []) as $field) {
@@ -537,12 +543,6 @@ class AssistedMarketplaceService
                 'Please confirm your preferred collection, delivery, appointment or booking time.',
                 'The price, condition and terms are as shown in the listing package.',
             ];
-        }
-
-        $callToAction = trim((string) data_get($input, 'call_to_action', ''));
-
-        if ($callToAction === '') {
-            $callToAction = (string) data_get($capability, 'calls_to_action.0', 'Contact us');
         }
 
         return [
@@ -750,16 +750,15 @@ class AssistedMarketplaceService
     ): ?array {
         $stored = data_get(
             $item->payload,
-            "assisted_marketplaces.{$destination}.operations.{$operation}"
+            "assisted_marketplaces.{$destination}.operations.{$operation}.{$this->idempotencySlot($idempotencyKey)}"
         );
 
-        if (! is_array($stored)
-            || ($stored['status'] ?? null) !== 'succeeded'
-            || ! hash_equals((string) ($stored['idempotency_key'] ?? ''), $idempotencyKey)) {
+        if (! is_array($stored) || ($stored['status'] ?? null) !== 'succeeded') {
             return null;
         }
 
-        if (! hash_equals((string) ($stored['request_hash'] ?? ''), $requestHash)) {
+        if (! hash_equals((string) ($stored['idempotency_key'] ?? ''), $idempotencyKey)
+            || ! hash_equals((string) ($stored['request_hash'] ?? ''), $requestHash)) {
             throw new RuntimeException('idempotency_key_conflict: the key was already used for different input.');
         }
 
@@ -792,15 +791,24 @@ class AssistedMarketplaceService
         array $result
     ): void {
         $payload = (array) $item->payload;
-        data_set($payload, "assisted_marketplaces.{$destination}.operations.{$operation}", [
+        $path = "assisted_marketplaces.{$destination}.operations.{$operation}";
+        $operations = (array) data_get($payload, $path, []);
+        $operations[$this->idempotencySlot($idempotencyKey)] = [
             'idempotency_key' => $idempotencyKey,
             'request_hash' => $requestHash,
             'status' => 'succeeded',
             'result' => $result,
             'completed_at' => now()->toIso8601String(),
-        ]);
+        ];
+        $operations = array_slice($operations, -50, null, true);
+        data_set($payload, $path, $operations);
         $item->update(['payload' => $payload]);
         $item->refresh();
+    }
+
+    private function idempotencySlot(string $idempotencyKey): string
+    {
+        return hash('sha256', $idempotencyKey);
     }
 
     private function audit(
