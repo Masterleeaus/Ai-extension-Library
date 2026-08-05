@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use InvalidArgumentException;
 use RuntimeException;
+use Throwable;
 
 class AssistedMarketplaceService
 {
@@ -87,8 +88,14 @@ class AssistedMarketplaceService
             'distribution_item_id' => $item->getKey(),
             'idempotency_key' => $idempotencyKey,
             'request_hash' => $requestHash,
-            'capability' => $capability,
-            'result' => $result,
+            'capability' => [
+                'vertical' => $capability['vertical'],
+                'business_subtype' => $capability['business_subtype'],
+                'suitability' => $capability['suitability'],
+                'profile_version' => $capability['profile_version'],
+                'profile_provenance' => $capability['profile_provenance'],
+            ],
+            'result' => $this->auditResult($result),
         ]);
 
         return $result;
@@ -100,6 +107,7 @@ class AssistedMarketplaceService
         string $destination,
         string $idempotencyKey
     ): array {
+        $this->assertOwner($user, $item);
         $state = $this->requiredState($item, $destination);
         [$definition] = $this->assertContext(
             $user,
@@ -163,6 +171,7 @@ class AssistedMarketplaceService
         string $idempotencyKey,
         ?string $externalListingId = null
     ): array {
+        $this->assertOwner($user, $item);
         $state = $this->requiredState($item, $destination);
         [$definition] = $this->assertContext(
             $user,
@@ -182,9 +191,7 @@ class AssistedMarketplaceService
         }
 
         $externalUrl = $this->validatedExternalUrl($definition, $externalUrl);
-        $externalListingId = $externalListingId !== null
-            ? trim($externalListingId)
-            : null;
+        $externalListingId = $this->stringOrNull($externalListingId);
         $requestHash = $this->requestHash([
             'destination' => $destination,
             'package_hash' => $state['package_hash'],
@@ -242,6 +249,7 @@ class AssistedMarketplaceService
         string $destination,
         string $idempotencyKey
     ): array {
+        $this->assertOwner($user, $item);
         $state = $this->requiredState($item, $destination);
         [$definition] = $this->assertContext(
             $user,
@@ -263,7 +271,7 @@ class AssistedMarketplaceService
         $requestHash = $this->requestHash([
             'destination' => $destination,
             'package_hash' => $state['package_hash'],
-            'renewal_count' => ((int) ($state['renewal_count'] ?? 0)) + 1,
+            'operation' => 'renew',
         ]);
 
         if ($cached = $this->cachedOperation(
@@ -309,7 +317,7 @@ class AssistedMarketplaceService
             'distribution_item_id' => $item->getKey(),
             'idempotency_key' => $idempotencyKey,
             'request_hash' => $requestHash,
-            'result' => $result,
+            'result' => $this->auditResult($result),
         ]);
 
         return $result;
@@ -321,6 +329,7 @@ class AssistedMarketplaceService
         string $destination,
         array $enquiry
     ): array {
+        $this->assertOwner($user, $item);
         $state = $this->requiredState($item, $destination);
         $this->assertContext(
             $user,
@@ -376,6 +385,7 @@ class AssistedMarketplaceService
 
     public function status(User $user, DistributionItem $item, string $destination): array
     {
+        $this->assertOwner($user, $item);
         $state = $this->requiredState($item, $destination);
         $this->assertContext(
             $user,
@@ -402,10 +412,7 @@ class AssistedMarketplaceService
         ?string $subtype,
         bool $requiresApproval
     ): array {
-        if ((int) $item->user_id !== (int) $user->getKey()) {
-            throw new RuntimeException('The assisted marketplace listing is outside the current tenant.');
-        }
-
+        $this->assertOwner($user, $item);
         $definition = $this->operationalDefinition($destination);
         $capability = $this->capabilities->forVerticalDestination(
             $user,
@@ -438,13 +445,20 @@ class AssistedMarketplaceService
         return [$definition, $capability];
     }
 
+    private function assertOwner(User $user, DistributionItem $item): void
+    {
+        if ((int) $item->user_id !== (int) $user->getKey()) {
+            throw new RuntimeException('The assisted marketplace listing is outside the current tenant.');
+        }
+    }
+
     private function validatedPackage(
         DistributionItem $item,
         array $definition,
         array $capability,
         array $input
     ): array {
-        foreach (['title', 'description', 'category', 'condition', 'price_minor', 'currency', 'location', 'image_urls'] as $field) {
+        foreach (['title', 'description', 'category', 'price_minor', 'currency', 'location', 'image_urls'] as $field) {
             $value = data_get($input, $field);
 
             if ($value === null || $value === '' || $value === []) {
@@ -480,11 +494,23 @@ class AssistedMarketplaceService
             }
         }
 
+        $condition = trim((string) data_get($input, 'condition', ''));
+
+        if ($condition === '' && $this->requiresCondition($item->content_type)) {
+            throw new InvalidArgumentException('Marketplace condition is required for tangible listings.');
+        }
+
+        if ($condition === '') {
+            $condition = 'not_applicable';
+        }
+
         $verticalFields = (array) data_get($input, 'vertical_fields', []);
         $baseAliases = [
             'title' => data_get($input, 'title'),
             'content' => data_get($input, 'description'),
             'description' => data_get($input, 'description'),
+            'category' => data_get($input, 'category'),
+            'condition' => $condition,
             'price' => $priceMinor,
             'images' => $imageUrls,
             'media' => $imageUrls,
@@ -524,7 +550,7 @@ class AssistedMarketplaceService
             'title' => trim((string) data_get($input, 'title')),
             'description' => trim((string) data_get($input, 'description')),
             'category' => trim((string) data_get($input, 'category')),
-            'condition' => trim((string) data_get($input, 'condition')),
+            'condition' => $condition,
             'price_minor' => $priceMinor,
             'currency' => $currency,
             'location' => trim((string) data_get($input, 'location')),
@@ -630,17 +656,39 @@ class AssistedMarketplaceService
 
     private function verticalFrom(DistributionItem $item, array $input): ?string
     {
-        return data_get($input, 'vertical')
-            ?? data_get($item->payload, 'vertical')
-            ?? data_get($item->payload, 'vertical_context.vertical');
+        return $this->stringOrNull(data_get($item->payload, 'vertical'))
+            ?? $this->stringOrNull(data_get($item->payload, 'vertical_context.vertical'))
+            ?? $this->stringOrNull(data_get($input, 'vertical'));
     }
 
     private function subtypeFrom(DistributionItem $item, array $input): ?string
     {
-        return data_get($input, 'business_subtype')
-            ?? data_get($input, 'subtype')
-            ?? data_get($item->payload, 'business_subtype')
-            ?? data_get($item->payload, 'vertical_context.business_subtype');
+        return $this->stringOrNull(data_get($item->payload, 'business_subtype'))
+            ?? $this->stringOrNull(data_get($item->payload, 'vertical_context.business_subtype'))
+            ?? $this->stringOrNull(data_get($input, 'business_subtype'))
+            ?? $this->stringOrNull(data_get($input, 'subtype'));
+    }
+
+    private function stringOrNull(mixed $value): ?string
+    {
+        if (! is_scalar($value)) {
+            return null;
+        }
+
+        $value = trim((string) $value);
+
+        return $value === '' ? null : $value;
+    }
+
+    private function requiresCondition(string $contentType): bool
+    {
+        return in_array($contentType, [
+            DistributionItem::TYPE_MARKETPLACE_LISTING,
+            DistributionItem::TYPE_CLASSIFIED_LISTING,
+            DistributionItem::TYPE_PRODUCT_OFFER,
+            DistributionItem::TYPE_VEHICLE_LISTING,
+            DistributionItem::TYPE_HIRE_RENTAL_LISTING,
+        ], true);
     }
 
     private function requiredState(DistributionItem $item, string $destination): array
@@ -660,7 +708,11 @@ class AssistedMarketplaceService
             return false;
         }
 
-        return Carbon::parse((string) $state['expires_at'])->isPast();
+        try {
+            return Carbon::parse((string) $state['expires_at'])->isPast();
+        } catch (Throwable) {
+            return true;
+        }
     }
 
     private function validatedExternalUrl(array $definition, string $externalUrl): string
@@ -769,6 +821,13 @@ class AssistedMarketplaceService
             'snapshot' => json_encode($snapshot, JSON_THROW_ON_ERROR),
             'created_at' => now(),
         ]);
+    }
+
+    private function auditResult(array $result): array
+    {
+        unset($result['package'], $result['export_manifest']);
+
+        return $result;
     }
 
     private function hostAllowed(string $host, array $allowedHosts): bool
