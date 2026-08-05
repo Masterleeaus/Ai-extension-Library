@@ -97,7 +97,7 @@ class AuthorizationPolicy implements AuthorizationPolicyContract
             $resource,
             (int)$approved,
             json_encode($attributes),
-            date('c'),
+            gmdate('c'),
         ]);
     }
 }

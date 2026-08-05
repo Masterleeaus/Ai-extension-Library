@@ -34,7 +34,7 @@ class WorkCoreOperations implements WorkCoreOperationsContract
             $tenantId,
             json_encode($jobData),
             'scheduled',
-            date('c'),
+            gmdate('c'),
         ]);
 
         return $jobId;
@@ -73,7 +73,7 @@ class WorkCoreOperations implements WorkCoreOperationsContract
             $routeId,
             $tenantId,
             json_encode($routeData),
-            date('c'),
+            gmdate('c'),
         ]);
 
         return $routeId;
@@ -100,7 +100,7 @@ class WorkCoreOperations implements WorkCoreOperationsContract
             $routeId,
             $tenantId,
             json_encode(['algorithm' => 'tsp', 'improvement_percentage' => 15]),
-            date('c'),
+            gmdate('c'),
         ]);
 
         return [
@@ -141,7 +141,7 @@ class WorkCoreOperations implements WorkCoreOperationsContract
 
         return $stmt->execute([
             json_encode($statusData),
-            date('c'),
+            gmdate('c'),
             $vehicleId,
             $tenantId,
         ]);
@@ -156,7 +156,7 @@ class WorkCoreOperations implements WorkCoreOperationsContract
             "UPDATE {$this->tablePrefix}fleet_vehicles SET driver_id = ?, assigned_at = ? WHERE id = ? AND tenant_id = ?"
         );
 
-        return $stmt->execute([$driverId, date('c'), $vehicleId, $tenantId]);
+        return $stmt->execute([$driverId, gmdate('c'), $vehicleId, $tenantId]);
     }
 
     public function getOperationalMetrics(

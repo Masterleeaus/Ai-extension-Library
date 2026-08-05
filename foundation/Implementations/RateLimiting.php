@@ -48,7 +48,7 @@ class RateLimiting implements RateLimitingContract
              VALUES (?, ?, ?, ?)"
         );
 
-        $stmt->execute([$tenantId, $identifier, $bucket, date('c')]);
+        $stmt->execute([$tenantId, $identifier, $bucket, gmdate('c')]);
 
         return $this->getCurrentRequestCount($tenantId, $identifier, $bucket);
     }
@@ -98,7 +98,7 @@ class RateLimiting implements RateLimitingContract
         );
 
         $limitsJson = json_encode($limits);
-        $now = date('c');
+        $now = gmdate('c');
 
         return $stmt->execute([
             $tenantId,

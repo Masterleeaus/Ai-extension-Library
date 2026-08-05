@@ -28,7 +28,7 @@ class Localization implements LocalizationContract
              ON DUPLICATE KEY UPDATE locale = ?, updated_at = ?"
         );
 
-        $now = date('c');
+        $now = gmdate('c');
 
         return $stmt->execute([$tenantId, $locale, $now, $locale, $now]);
     }
@@ -101,7 +101,7 @@ class Localization implements LocalizationContract
              ON DUPLICATE KEY UPDATE translation = ?, updated_at = ?"
         );
 
-        $now = date('c');
+        $now = gmdate('c');
 
         return $stmt->execute([
             $tenantId,

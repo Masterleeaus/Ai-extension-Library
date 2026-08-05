@@ -36,7 +36,7 @@ class HostIntegration implements HostIntegrationContract
             $hostEnvironment,
             json_encode($hostConfig),
             'active',
-            date('c'),
+            gmdate('c'),
         ]);
 
         return $deploymentId;
@@ -60,7 +60,7 @@ class HostIntegration implements HostIntegrationContract
             $deploymentId,
             json_encode($releaseConfig),
             'in_progress',
-            date('c'),
+            gmdate('c'),
         ]);
 
         return $releaseId;
@@ -102,7 +102,7 @@ class HostIntegration implements HostIntegrationContract
             $deploymentId,
             json_encode($gateConfig),
             'pending',
-            date('c'),
+            gmdate('c'),
         ]);
 
         return $gateId;
@@ -146,7 +146,7 @@ class HostIntegration implements HostIntegrationContract
             "UPDATE {$this->tablePrefix}pilot_gates SET status = ?, approver_id = ?, approved_at = ? WHERE id = ? AND tenant_id = ?"
         );
 
-        return $stmt->execute(['approved', $approver, date('c'), $gateId, $tenantId]);
+        return $stmt->execute(['approved', $approver, gmdate('c'), $gateId, $tenantId]);
     }
 
     public function rolloutRelease(
@@ -157,7 +157,7 @@ class HostIntegration implements HostIntegrationContract
             "UPDATE {$this->tablePrefix}deployments SET status = ?, rolled_out_at = ? WHERE id = ? AND tenant_id = ?"
         );
 
-        return $stmt->execute(['rolled_out', date('c'), $deploymentId, $tenantId]);
+        return $stmt->execute(['rolled_out', gmdate('c'), $deploymentId, $tenantId]);
     }
 
     public function rollbackDeployment(
@@ -168,6 +168,6 @@ class HostIntegration implements HostIntegrationContract
             "UPDATE {$this->tablePrefix}deployments SET status = ?, rolled_back_at = ? WHERE id = ? AND tenant_id = ?"
         );
 
-        return $stmt->execute(['rolled_back', date('c'), $deploymentId, $tenantId]);
+        return $stmt->execute(['rolled_back', gmdate('c'), $deploymentId, $tenantId]);
     }
 }

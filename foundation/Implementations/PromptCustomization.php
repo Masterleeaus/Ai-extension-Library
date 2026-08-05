@@ -38,7 +38,7 @@ class PromptCustomization implements PromptCustomizationContract
             $systemPrompt,
             json_encode($metadata),
             1,
-            date('c'),
+            gmdate('c'),
         ]);
 
         return $promptId;
@@ -71,7 +71,7 @@ class PromptCustomization implements PromptCustomizationContract
             "UPDATE {$this->tablePrefix}prompts SET system_prompt = ?, version = version + 1, updated_at = ? WHERE id = ? AND tenant_id = ?"
         );
 
-        return $stmt->execute([$systemPrompt, date('c'), $promptId, $tenantId]);
+        return $stmt->execute([$systemPrompt, gmdate('c'), $promptId, $tenantId]);
     }
 
     public function testPrompt(
@@ -92,7 +92,7 @@ class PromptCustomization implements PromptCustomizationContract
         );
 
         $mockOutput = "Test output for: {$userInput}";
-        $stmt->execute([$testId, $promptId, $tenantId, $userInput, $mockOutput, date('c')]);
+        $stmt->execute([$testId, $promptId, $tenantId, $userInput, $mockOutput, gmdate('c')]);
 
         return [
             'success' => true,
@@ -111,7 +111,7 @@ class PromptCustomization implements PromptCustomizationContract
             "UPDATE {$this->tablePrefix}prompts SET published = 1, published_version = ?, published_at = ? WHERE id = ? AND tenant_id = ?"
         );
 
-        return $stmt->execute([$version, date('c'), $promptId, $tenantId]);
+        return $stmt->execute([$version, gmdate('c'), $promptId, $tenantId]);
     }
 
     public function listPrompts(

@@ -35,7 +35,7 @@ class FormsBuilder implements FormsBuilderContract
             $tenantId,
             $formName,
             json_encode($formSchema),
-            date('c'),
+            gmdate('c'),
         ]);
 
         return $formId;
@@ -68,7 +68,7 @@ class FormsBuilder implements FormsBuilderContract
             "UPDATE {$this->tablePrefix}forms SET schema = ?, updated_at = ? WHERE id = ? AND tenant_id = ?"
         );
 
-        return $stmt->execute([json_encode($formSchema), date('c'), $formId, $tenantId]);
+        return $stmt->execute([json_encode($formSchema), gmdate('c'), $formId, $tenantId]);
     }
 
     public function addField(

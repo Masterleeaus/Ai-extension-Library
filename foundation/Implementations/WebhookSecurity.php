@@ -38,7 +38,7 @@ class WebhookSecurity implements WebhookSecurityContract
             json_encode($events),
             hash('sha256', $secret),
             1,
-            date('c'),
+            gmdate('c'),
         ]);
 
         return $endpointId;
@@ -53,7 +53,7 @@ class WebhookSecurity implements WebhookSecurityContract
              WHERE id = ? AND tenant_id = ?"
         );
 
-        return $stmt->execute([date('c'), $endpointId, $tenantId]);
+        return $stmt->execute([gmdate('c'), $endpointId, $tenantId]);
     }
 
     public function validateSignature(
@@ -115,7 +115,7 @@ class WebhookSecurity implements WebhookSecurityContract
                     $signature,
                     'pending',
                     0,
-                    date('c'),
+                    gmdate('c'),
                 ]);
 
                 $dispatchResults[] = [

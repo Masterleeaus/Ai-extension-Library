@@ -53,7 +53,7 @@ class ConnectorMigration implements ConnectorMigrationContract
             $connectorId,
             $targetRuntime,
             'draft',
-            date('c'),
+            gmdate('c'),
         ]);
 
         return [
@@ -93,7 +93,7 @@ class ConnectorMigration implements ConnectorMigrationContract
             count($conformanceRules),
             count($failures),
             json_encode($failures),
-            date('c'),
+            gmdate('c'),
         ]);
 
         return [
@@ -123,7 +123,7 @@ class ConnectorMigration implements ConnectorMigrationContract
             $connectorId,
             json_encode($testData),
             $isValid ? 'passed' : 'failed',
-            date('c'),
+            gmdate('c'),
         ]);
 
         return $isValid;
@@ -144,7 +144,7 @@ class ConnectorMigration implements ConnectorMigrationContract
             $connectorId,
             $targetRuntime,
             'completed',
-            date('c'),
+            gmdate('c'),
         ]);
     }
 
@@ -159,7 +159,7 @@ class ConnectorMigration implements ConnectorMigrationContract
             $results[] = [
                 'capability' => $capability,
                 'supported' => true,
-                'tested_at' => date('c'),
+                'tested_at' => gmdate('c'),
             ];
         }
 
@@ -183,7 +183,7 @@ class ConnectorMigration implements ConnectorMigrationContract
             $tenantId,
             $connectorId,
             json_encode($migrationPath),
-            date('c'),
+            gmdate('c'),
         ]);
     }
 

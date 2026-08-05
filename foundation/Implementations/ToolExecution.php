@@ -40,13 +40,13 @@ class ToolExecution implements ToolExecutionContract
             json_encode($params),
             json_encode($context),
             'running',
-            date('c'),
+            gmdate('c'),
         ]);
 
         return [
             'execution_id' => $executionId,
             'status' => 'running',
-            'started_at' => date('c'),
+            'started_at' => gmdate('c'),
         ];
     }
 
@@ -99,7 +99,7 @@ class ToolExecution implements ToolExecutionContract
             $toolId,
             json_encode($execution),
             $costEstimate,
-            date('c'),
+            gmdate('c'),
         ]);
     }
 

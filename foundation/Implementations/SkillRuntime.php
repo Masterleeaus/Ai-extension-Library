@@ -35,7 +35,7 @@ class SkillRuntime implements SkillRuntimeContract
             $skillId,
             $className,
             $metadataJson,
-            date('c'),
+            gmdate('c'),
             $metadataJson,
         ]);
     }
@@ -60,7 +60,7 @@ class SkillRuntime implements SkillRuntimeContract
             json_encode($input),
             json_encode($context),
             'running',
-            date('c'),
+            gmdate('c'),
         ]);
 
         return [
@@ -136,7 +136,7 @@ class SkillRuntime implements SkillRuntimeContract
             $skillId,
             $version,
             json_encode($metadata),
-            date('c'),
+            gmdate('c'),
         ]);
     }
 }

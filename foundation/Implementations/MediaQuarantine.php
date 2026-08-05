@@ -48,7 +48,7 @@ class MediaQuarantine implements MediaQuarantineContract
             $destinationPath,
             json_encode($metadata),
             'quarantined',
-            date('c'),
+            gmdate('c'),
         ]);
 
         return $quarantineId;
@@ -97,7 +97,7 @@ class MediaQuarantine implements MediaQuarantineContract
             "UPDATE {$this->tablePrefix}records SET status = ?, released_at = ? WHERE id = ? AND tenant_id = ?"
         );
 
-        return $updateStmt->execute(['released', date('c'), $quarantineId, $tenantId]);
+        return $updateStmt->execute(['released', gmdate('c'), $quarantineId, $tenantId]);
     }
 
     public function reject(
@@ -111,7 +111,7 @@ class MediaQuarantine implements MediaQuarantineContract
              WHERE id = ? AND tenant_id = ?"
         );
 
-        return $stmt->execute(['rejected', $reason, date('c'), $quarantineId, $tenantId]);
+        return $stmt->execute(['rejected', $reason, gmdate('c'), $quarantineId, $tenantId]);
     }
 
     public function getStatus(

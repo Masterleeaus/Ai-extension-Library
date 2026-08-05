@@ -39,7 +39,7 @@ class TemplateManagement implements TemplateManagementContract
             $templateType,
             $content,
             json_encode($metadata),
-            date('c'),
+            gmdate('c'),
         ]);
 
         return $templateId;
@@ -72,7 +72,7 @@ class TemplateManagement implements TemplateManagementContract
             "UPDATE {$this->tablePrefix}templates SET content = ?, updated_at = ? WHERE id = ? AND tenant_id = ?"
         );
 
-        return $stmt->execute([$content, date('c'), $templateId, $tenantId]);
+        return $stmt->execute([$content, gmdate('c'), $templateId, $tenantId]);
     }
 
     public function renderTemplate(

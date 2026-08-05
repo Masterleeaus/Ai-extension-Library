@@ -43,7 +43,7 @@ class AuditTrail implements AuditTrailContract
             json_encode($changes),
             $userId,
             json_encode($metadata),
-            date('c'),
+            gmdate('c'),
         ]);
 
         return $entryId;

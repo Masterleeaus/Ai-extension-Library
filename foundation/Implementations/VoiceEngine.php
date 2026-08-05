@@ -38,13 +38,13 @@ class VoiceEngine implements VoiceEngineContract
             $voice,
             $language,
             'processing',
-            date('c'),
+            gmdate('c'),
         ]);
 
         return [
             'synthesis_id' => $synthesisId,
             'status' => 'processing',
-            'created_at' => date('c'),
+            'created_at' => gmdate('c'),
         ];
     }
 
@@ -67,7 +67,7 @@ class VoiceEngine implements VoiceEngineContract
             $audioPath,
             $language,
             'processing',
-            date('c'),
+            gmdate('c'),
         ]);
 
         return [
@@ -92,7 +92,7 @@ class VoiceEngine implements VoiceEngineContract
             $tenantId,
             json_encode($sessionConfig),
             'active',
-            date('c'),
+            gmdate('c'),
         ]);
 
         return $sessionId;
@@ -107,7 +107,7 @@ class VoiceEngine implements VoiceEngineContract
              WHERE id = ? AND tenant_id = ?"
         );
 
-        return $stmt->execute(['closed', date('c'), $sessionId, $tenantId]);
+        return $stmt->execute(['closed', gmdate('c'), $sessionId, $tenantId]);
     }
 
     public function getSessionState(
@@ -137,7 +137,7 @@ class VoiceEngine implements VoiceEngineContract
             $profileId,
             $tenantId,
             json_encode($profileData),
-            date('c'),
+            gmdate('c'),
         ]);
     }
 }
