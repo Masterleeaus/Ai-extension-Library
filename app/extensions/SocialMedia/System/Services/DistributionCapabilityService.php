@@ -21,6 +21,12 @@ class DistributionCapabilityService
 
     public const SUITABILITY_NOT_APPLICABLE = 'not-applicable';
 
+    private ?array $destinationCatalogueCache = null;
+
+    private ?array $verticalCatalogueCache = null;
+
+    private ?array $verticalProfilesCache = null;
+
     public function __construct(
         private readonly SocialMediaChannelEntitlementService $entitlements
     ) {}
@@ -31,49 +37,16 @@ class DistributionCapabilityService
         ?SocialMediaPlatform $account = null,
         bool $audit = true
     ): array {
-        $definition = $this->destinations()[$destination] ?? $this->unsupportedDefinition();
-        $mode = (string) ($definition['mode'] ?? DistributionItem::MODE_EXPORT_ONLY);
-        $expectedPlatform = $definition['platform'] ?? null;
-        $declaredCapabilities = (array) ($definition['capabilities'] ?? []);
-        $tenantAllowed = ! $account || (int) $account->user_id === (int) $user->getKey();
-        $accountMatchesDestination = ! $expectedPlatform
-            || ($account && (string) $account->platform === (string) $expectedPlatform);
-        $requiresAccount = in_array($mode, [DistributionItem::MODE_DIRECT, DistributionItem::MODE_PARTNER], true);
-        $adapterAvailable = (bool) ($definition['adapter_available'] ?? false);
-        $accountConnected = $account?->isConnected() ?? false;
-        $withinAllowance = $account && $tenantAllowed && $accountMatchesDestination
-            ? $this->entitlements->canPublish($user, $account)
-            : false;
-
-        $available = $tenantAllowed
-            && $accountMatchesDestination
-            && $adapterAvailable
-            && (! $requiresAccount || ($accountConnected && $withinAllowance));
-
-        $effectiveCapabilities = $available
-            ? $declaredCapabilities
-            : array_map(static fn () => false, $declaredCapabilities);
-
-        $result = [
-            'destination'            => $destination,
-            'mode'                   => $mode,
-            'available'              => $available,
-            'reason'                 => $this->reason(
-                $tenantAllowed,
-                $accountMatchesDestination,
-                $adapterAvailable,
-                $requiresAccount,
-                $accountConnected,
-                $withinAllowance
-            ),
-            'account_id'             => $tenantAllowed ? $account?->getKey() : null,
-            'content_types'          => array_values((array) ($definition['content_types'] ?? [])),
-            'required_fields'        => array_values((array) ($definition['required_fields'] ?? [])),
-            'media_rules'            => (array) ($definition['media_rules'] ?? []),
-            'declared_capabilities'  => $declaredCapabilities,
-            'effective_capabilities' => $effectiveCapabilities,
-            'approval_required'      => (bool) ($definition['approval_required'] ?? false),
-        ];
+        $destinations = $this->destinations();
+        $destinationExists = array_key_exists($destination, $destinations);
+        $definition = $destinations[$destination] ?? $this->unsupportedDefinition();
+        $result = $this->capabilityForDefinition(
+            $user,
+            $destination,
+            $definition,
+            $destinationExists,
+            $account
+        );
 
         if ($audit) {
             $this->audit($user, $destination, $account, $result);
@@ -91,13 +64,23 @@ class DistributionCapabilityService
         ?SocialMediaPlatform $account = null,
         bool $audit = true
     ): array {
-        $base = $this->forDestination($user, $destination, $account, false);
-        $suitability = $this->suitabilityFor(
+        $destinations = $this->destinations();
+        $destinationExists = array_key_exists($destination, $destinations);
+        $definition = $destinations[$destination] ?? $this->unsupportedDefinition();
+        $base = $this->capabilityForDefinition(
+            $user,
+            $destination,
+            $definition,
+            $destinationExists,
+            $account
+        );
+        $suitability = $this->suitabilityForDefinition(
             $vertical,
             $destination,
             $contentType,
             $subtype,
-            $user
+            $user,
+            $destinationExists ? $definition : null
         );
         $available = $base['available'] && $suitability['available'];
         $result = [
@@ -120,6 +103,8 @@ class DistributionCapabilityService
             'compliance_warnings' => $suitability['compliance_warnings'],
             'profile_version' => $suitability['profile_version'],
             'profile_provenance' => $suitability['profile_provenance'],
+            'vertical_context_id' => $suitability['vertical_context_id'],
+            'vertical_context_hash' => $suitability['vertical_context_hash'],
             'effective_capabilities' => $available
                 ? $base['effective_capabilities']
                 : array_map(static fn () => false, $base['declared_capabilities']),
@@ -145,8 +130,155 @@ class DistributionCapabilityService
         ?string $subtype = null,
         ?User $user = null
     ): array {
+        $destinations = $this->destinations();
+
+        return $this->suitabilityForDefinition(
+            $vertical,
+            $destination,
+            $contentType,
+            $subtype,
+            $user,
+            $destinations[$destination] ?? null
+        );
+    }
+
+    public function resolveVerticalProfile(
+        ?string $vertical = null,
+        ?string $subtype = null,
+        ?User $user = null
+    ): array {
+        $context = $this->resolveVerticalContext($vertical, $subtype, $user);
+        $profiles = $this->verticalProfiles();
+        $rawVertical = $this->normaliseSlug($context['vertical'] ?? null);
+        $slug = $this->canonicalVerticalSlug($context['vertical'] ?? null, $profiles);
+        $provenance = array_values((array) ($context['provenance'] ?? []));
+
+        if (! $slug) {
+            $profile = $this->genericProfile();
+            $profile['resolved_subtype'] = $this->normaliseSlug($context['subtype'] ?? null);
+            $profile['subtype_known'] = false;
+            $profile['profile_version'] = $this->profileVersion();
+            $profile['profile_provenance'] = array_values(array_unique([
+                ...$provenance,
+                'generic_fallback',
+            ]));
+            $profile['vertical_context_id'] = $context['context_id'] ?? null;
+            $profile['vertical_context_hash'] = $context['context_hash'] ?? null;
+
+            return $profile;
+        }
+
+        $profile = $profiles[$slug];
+        $resolvedSubtype = $this->normaliseSlug($context['subtype'] ?? null)
+            ?? $this->inferredSubtype($rawVertical, $profile);
+        $profile['resolved_subtype'] = $resolvedSubtype;
+        $profile['subtype_known'] = $resolvedSubtype
+            ? in_array($resolvedSubtype, (array) ($profile['subtypes'] ?? []), true)
+            : false;
+        $profile['profile_version'] = $this->profileVersion();
+        $profile['profile_provenance'] = array_values(array_unique([
+            ...$provenance,
+            'canonical_catalogue',
+        ]));
+        $profile['vertical_context_id'] = $context['context_id'] ?? null;
+        $profile['vertical_context_hash'] = $context['context_hash'] ?? null;
+
+        $tenantOverride = $this->tenantOverride($user, $slug);
+
+        if ($tenantOverride !== []) {
+            $profile = $this->applyTenantOverride($profile, $tenantOverride);
+            $profile['profile_provenance'][] = 'tenant_override';
+            $profile['profile_provenance'] = array_values(array_unique($profile['profile_provenance']));
+        }
+
+        return $profile;
+    }
+
+    public function canonicalVerticalSlugs(): array
+    {
+        return array_keys($this->verticalProfiles());
+    }
+
+    public function matrixForUser(User $user, bool $audit = false): array
+    {
+        return collect($this->destinations())
+            ->mapWithKeys(function (array $definition, string $destination) use ($user, $audit) {
+                $platform = $definition['platform'] ?? null;
+                $account = $platform
+                    ? SocialMediaPlatform::query()
+                        ->where('user_id', $user->getKey())
+                        ->where('platform', $platform)
+                        ->orderByDesc('expires_at')
+                        ->first()
+                    : null;
+
+                return [
+                    $destination => $this->forDestination($user, $destination, $account, $audit),
+                ];
+            })
+            ->all();
+    }
+
+    private function capabilityForDefinition(
+        User $user,
+        string $destination,
+        array $definition,
+        bool $destinationExists,
+        ?SocialMediaPlatform $account
+    ): array {
+        $mode = (string) ($definition['mode'] ?? DistributionItem::MODE_EXPORT_ONLY);
+        $expectedPlatform = $definition['platform'] ?? null;
+        $declaredCapabilities = (array) ($definition['capabilities'] ?? []);
+        $tenantAllowed = ! $account || (int) $account->user_id === (int) $user->getKey();
+        $accountMatchesDestination = ! $expectedPlatform
+            || ($account && (string) $account->platform === (string) $expectedPlatform);
+        $requiresAccount = in_array($mode, [DistributionItem::MODE_DIRECT, DistributionItem::MODE_PARTNER], true);
+        $adapterAvailable = $destinationExists && (bool) ($definition['adapter_available'] ?? false);
+        $accountConnected = $account?->isConnected() ?? false;
+        $withinAllowance = $account && $tenantAllowed && $accountMatchesDestination
+            ? $this->entitlements->canPublish($user, $account)
+            : false;
+
+        $available = $tenantAllowed
+            && $accountMatchesDestination
+            && $adapterAvailable
+            && (! $requiresAccount || ($accountConnected && $withinAllowance));
+
+        return [
+            'destination' => $destination,
+            'mode' => $mode,
+            'available' => $available,
+            'reason' => $destinationExists
+                ? $this->reason(
+                    $tenantAllowed,
+                    $accountMatchesDestination,
+                    $adapterAvailable,
+                    $requiresAccount,
+                    $accountConnected,
+                    $withinAllowance
+                )
+                : 'destination_unknown',
+            'account_id' => $tenantAllowed ? $account?->getKey() : null,
+            'content_types' => array_values((array) ($definition['content_types'] ?? [])),
+            'required_fields' => array_values((array) ($definition['required_fields'] ?? [])),
+            'media_rules' => (array) ($definition['media_rules'] ?? []),
+            'declared_capabilities' => $declaredCapabilities,
+            'effective_capabilities' => $available
+                ? $declaredCapabilities
+                : array_map(static fn () => false, $declaredCapabilities),
+            'approval_required' => (bool) ($definition['approval_required'] ?? false),
+        ];
+    }
+
+    private function suitabilityForDefinition(
+        ?string $vertical,
+        string $destination,
+        string $contentType,
+        ?string $subtype,
+        ?User $user,
+        ?array $definition
+    ): array {
         $profile = $this->resolveVerticalProfile($vertical, $subtype, $user);
-        $definition = $this->destinations()[$destination] ?? null;
         $suitability = $this->normaliseSuitability((string) data_get(
             $profile,
             "destination_suitability.{$destination}",
@@ -188,107 +320,54 @@ class DistributionCapabilityService
             'compliance_warnings' => array_values((array) ($profile['compliance_warnings'] ?? [])),
             'profile_version' => (string) ($profile['profile_version'] ?? $this->profileVersion()),
             'profile_provenance' => array_values((array) ($profile['profile_provenance'] ?? [])),
+            'vertical_context_id' => $profile['vertical_context_id'] ?? null,
+            'vertical_context_hash' => $profile['vertical_context_hash'] ?? null,
         ];
-    }
-
-    public function resolveVerticalProfile(
-        ?string $vertical = null,
-        ?string $subtype = null,
-        ?User $user = null
-    ): array {
-        $context = $this->resolveVerticalContext($vertical, $subtype, $user);
-        $profiles = $this->verticalProfiles();
-        $rawVertical = $this->normaliseSlug($context['vertical'] ?? null);
-        $slug = $this->canonicalVerticalSlug($context['vertical'] ?? null, $profiles);
-        $provenance = array_values((array) ($context['provenance'] ?? []));
-
-        if (! $slug) {
-            $profile = $this->genericProfile();
-            $profile['resolved_subtype'] = $this->normaliseSlug($context['subtype'] ?? null);
-            $profile['subtype_known'] = false;
-            $profile['profile_version'] = $this->profileVersion();
-            $profile['profile_provenance'] = array_values(array_unique([
-                ...$provenance,
-                'generic_fallback',
-            ]));
-
-            return $profile;
-        }
-
-        $profile = $profiles[$slug];
-        $resolvedSubtype = $this->normaliseSlug($context['subtype'] ?? null)
-            ?? $this->inferredSubtype($rawVertical, $profile);
-        $profile['resolved_subtype'] = $resolvedSubtype;
-        $profile['subtype_known'] = $resolvedSubtype
-            ? in_array($resolvedSubtype, (array) ($profile['subtypes'] ?? []), true)
-            : false;
-        $profile['profile_version'] = $this->profileVersion();
-        $profile['profile_provenance'] = array_values(array_unique([
-            ...$provenance,
-            'canonical_catalogue',
-        ]));
-
-        $tenantOverride = $this->tenantOverride($user, $slug);
-
-        if ($tenantOverride !== []) {
-            $profile = $this->applyTenantOverride($profile, $tenantOverride);
-            $profile['profile_provenance'][] = 'tenant_override';
-            $profile['profile_provenance'] = array_values(array_unique($profile['profile_provenance']));
-        }
-
-        return $profile;
-    }
-
-    public function canonicalVerticalSlugs(): array
-    {
-        return array_keys($this->verticalProfiles());
-    }
-
-    public function matrixForUser(User $user, bool $audit = false): array
-    {
-        return collect($this->destinations())
-            ->mapWithKeys(function (array $definition, string $destination) use ($user, $audit) {
-                $platform = $definition['platform'] ?? null;
-                $account = $platform
-                    ? SocialMediaPlatform::query()
-                        ->where('user_id', $user->getKey())
-                        ->where('platform', $platform)
-                        ->orderByDesc('expires_at')
-                        ->first()
-                    : null;
-
-                return [
-                    $destination => $this->forDestination($user, $destination, $account, $audit),
-                ];
-            })
-            ->all();
     }
 
     private function destinations(): array
     {
+        if ($this->destinationCatalogueCache !== null) {
+            return $this->destinationCatalogueCache;
+        }
+
         $catalogue = require dirname(__DIR__, 2) . '/config/distribution.php';
         $baseDestinations = (array) ($catalogue['destinations'] ?? []);
         $configuredDestinations = (array) config('social-media.distribution.destinations', []);
 
-        return array_replace_recursive($baseDestinations, $configuredDestinations);
+        return $this->destinationCatalogueCache = array_replace_recursive(
+            $baseDestinations,
+            $configuredDestinations
+        );
     }
 
     private function verticalCatalogue(): array
     {
+        if ($this->verticalCatalogueCache !== null) {
+            return $this->verticalCatalogueCache;
+        }
+
         $catalogue = require dirname(__DIR__, 2) . '/config/vertical-distribution.php';
         $configured = (array) config('social-media.vertical_distribution', []);
 
-        return array_replace_recursive($catalogue, Arr::except($configured, ['verticals']));
+        return $this->verticalCatalogueCache = array_replace_recursive(
+            $catalogue,
+            Arr::except($configured, ['verticals', 'tenant_overrides'])
+        );
     }
 
     private function verticalProfiles(): array
     {
+        if ($this->verticalProfilesCache !== null) {
+            return $this->verticalProfilesCache;
+        }
+
         $catalogue = require dirname(__DIR__, 2) . '/config/vertical-distribution.php';
         $baseProfiles = (array) ($catalogue['verticals'] ?? []);
         $configuredProfiles = (array) config('social-media.vertical_distribution.verticals', []);
         $overrides = array_intersect_key($configuredProfiles, $baseProfiles);
 
-        return array_replace_recursive($baseProfiles, $overrides);
+        return $this->verticalProfilesCache = array_replace_recursive($baseProfiles, $overrides);
     }
 
     private function genericProfile(): array
@@ -318,6 +397,8 @@ class DistributionCapabilityService
             return [
                 'vertical' => $vertical,
                 'subtype' => $subtype,
+                'context_id' => null,
+                'context_hash' => null,
                 'provenance' => ['explicit_context'],
             ];
         }
@@ -349,6 +430,8 @@ class DistributionCapabilityService
                             ?? $resolved['business_subtype']
                             ?? data_get($resolved, 'resolved.capabilities.subtype')
                             ?? $subtype,
+                        'context_id' => $resolved['context_id'] ?? null,
+                        'context_hash' => $resolved['context_hash'] ?? null,
                         'provenance' => ['vertical_context_resolver'],
                     ];
                 }
@@ -360,6 +443,8 @@ class DistributionCapabilityService
         return [
             'vertical' => null,
             'subtype' => $subtype,
+            'context_id' => null,
+            'context_hash' => null,
             'provenance' => ['generic_context'],
         ];
     }
