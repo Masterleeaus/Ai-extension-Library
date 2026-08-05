@@ -29,7 +29,7 @@ Future<void> _pumpShowcase(
       ),
     ),
   );
-  await tester.pumpAndSettle();
+  await tester.pump();
 }
 
 void main() {
@@ -83,7 +83,8 @@ void main() {
     final trigger = find.text('Show action sheet');
     await tester.ensureVisible(trigger);
     await tester.tap(trigger);
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
 
     expect(find.text('Showcase actions'), findsOneWidget);
     expect(find.text('Archive sample'), findsOneWidget);
