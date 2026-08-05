@@ -1,9 +1,6 @@
 name: Apply verified WorkCore issue 353 patch
 
 on:
-  push:
-    branches:
-      - feature/workcore-dynamic-pricing-353
   pull_request:
     branches:
       - main
@@ -13,7 +10,7 @@ permissions:
 
 concurrency:
   group: workcore-353-apply
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   apply-and-verify:
