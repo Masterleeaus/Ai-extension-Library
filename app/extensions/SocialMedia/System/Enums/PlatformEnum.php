@@ -23,17 +23,23 @@ enum PlatformEnum: string
 
     case ebay = 'ebay';
 
+    case google_business_profile = 'google-business-profile';
+
+    case pinterest = 'pinterest';
+
     public function contentCharacterLength(): int
     {
         return match ($this) {
-            self::facebook       => 63206,
-            self::instagram      => 2200,
-            self::x              => 280,
-            self::linkedin       => 2900,
-            self::tiktok         => 2900,
-            self::youtube        => 5000,
-            self::youtube_shorts => 150,
-            self::ebay           => 500000,
+            self::facebook                => 63206,
+            self::instagram               => 2200,
+            self::x                       => 280,
+            self::linkedin                => 2900,
+            self::tiktok                  => 2900,
+            self::youtube                 => 5000,
+            self::youtube_shorts          => 150,
+            self::ebay                    => 500000,
+            self::google_business_profile => 1500,
+            self::pinterest               => 800,
         };
     }
 
@@ -57,7 +63,12 @@ enum PlatformEnum: string
 
     public static function channels(): array
     {
-        return [...self::all(), self::ebay];
+        return [
+            ...self::all(),
+            self::ebay,
+            self::google_business_profile,
+            self::pinterest,
+        ];
     }
 
     public static function channelValues(): array
@@ -74,14 +85,16 @@ enum PlatformEnum: string
             ->get();
 
         return match ($this) {
-            self::facebook       => $platforms->where('platform', self::facebook->value)->first(),
-            self::instagram      => $platforms->where('platform', self::instagram->value)->first(),
-            self::x              => $platforms->where('platform', self::x->value)->first(),
-            self::linkedin       => $platforms->where('platform', self::linkedin->value)->first(),
-            self::tiktok         => $platforms->where('platform', self::tiktok->value)->first(),
-            self::youtube        => $platforms->where('platform', self::youtube->value)->first(),
-            self::youtube_shorts => $platforms->where('platform', self::youtube_shorts->value)->first(),
-            self::ebay           => $platforms->where('platform', self::ebay->value)->first(),
+            self::facebook                => $platforms->where('platform', self::facebook->value)->first(),
+            self::instagram               => $platforms->where('platform', self::instagram->value)->first(),
+            self::x                       => $platforms->where('platform', self::x->value)->first(),
+            self::linkedin                => $platforms->where('platform', self::linkedin->value)->first(),
+            self::tiktok                  => $platforms->where('platform', self::tiktok->value)->first(),
+            self::youtube                 => $platforms->where('platform', self::youtube->value)->first(),
+            self::youtube_shorts          => $platforms->where('platform', self::youtube_shorts->value)->first(),
+            self::ebay                    => $platforms->where('platform', self::ebay->value)->first(),
+            self::google_business_profile => $platforms->where('platform', self::google_business_profile->value)->first(),
+            self::pinterest               => $platforms->where('platform', self::pinterest->value)->first(),
         };
     }
 
@@ -128,6 +141,16 @@ enum PlatformEnum: string
                 'ebay_client_secret' => setting('EBAY_CLIENT_SECRET'),
                 'ebay_redirect_uri'  => setting('EBAY_REDIRECT_URI'),
             ],
+            self::google_business_profile => [
+                'google_business_profile_client_id' => setting('GOOGLE_BUSINESS_PROFILE_CLIENT_ID'),
+                'google_business_profile_client_secret' => setting('GOOGLE_BUSINESS_PROFILE_CLIENT_SECRET'),
+                'google_business_profile_redirect_uri' => setting('GOOGLE_BUSINESS_PROFILE_REDIRECT_URI'),
+            ],
+            self::pinterest => [
+                'pinterest_client_id' => setting('PINTEREST_CLIENT_ID'),
+                'pinterest_client_secret' => setting('PINTEREST_CLIENT_SECRET'),
+                'pinterest_redirect_uri' => setting('PINTEREST_REDIRECT_URI'),
+            ],
         };
     }
 
@@ -145,14 +168,16 @@ enum PlatformEnum: string
     public function label(): string
     {
         return match ($this) {
-            self::facebook       => 'Facebook',
-            self::instagram      => 'Instagram',
-            self::x              => 'X',
-            self::linkedin       => 'LinkedIn',
-            self::tiktok         => 'TikTok',
-            self::youtube        => 'YouTube',
-            self::youtube_shorts => 'YouTube Shorts',
-            self::ebay           => 'eBay',
+            self::facebook                => 'Facebook',
+            self::instagram               => 'Instagram',
+            self::x                       => 'X',
+            self::linkedin                => 'LinkedIn',
+            self::tiktok                  => 'TikTok',
+            self::youtube                 => 'YouTube',
+            self::youtube_shorts          => 'YouTube Shorts',
+            self::ebay                    => 'eBay',
+            self::google_business_profile => 'Google Business Profile',
+            self::pinterest               => 'Pinterest',
         };
     }
 }
