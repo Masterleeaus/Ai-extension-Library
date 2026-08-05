@@ -18,8 +18,7 @@ class TitanHubApp extends StatefulWidget {
   State<TitanHubApp> createState() => _TitanHubAppState();
 }
 
-class _TitanHubAppState extends State<TitanHubApp>
-    with WidgetsBindingObserver {
+class _TitanHubAppState extends State<TitanHubApp> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
