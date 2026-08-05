@@ -78,6 +78,7 @@ class _TitanTextFieldState extends State<TitanTextField> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final suffixes = <Widget>[];
     if (widget.showClear && widget.controller.text.isNotEmpty) {
       suffixes.add(
@@ -143,9 +144,9 @@ class _TitanTextFieldState extends State<TitanTextField> {
           padding: const EdgeInsets.symmetric(horizontal: TitanSpacing.md),
           child: Text(
             widget.helperText!,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
           ),
         ),
       ],
