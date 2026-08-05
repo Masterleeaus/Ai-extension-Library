@@ -4,6 +4,8 @@ namespace App\Extensions\SocialMedia\System\Services\Publisher;
 
 use App\Extensions\SocialMedia\System\Models\SocialMediaPost;
 use App\Extensions\SocialMedia\System\Services\Publisher\Contracts\BasePublisherService;
+use App\Extensions\SocialMedia\System\Services\SocialMediaChannelEntitlementService;
+use DomainException;
 
 class PublisherDriver
 {
@@ -24,8 +26,14 @@ class PublisherDriver
     public function getDriver(): ?BasePublisherService
     {
         if ($this->post->platform) {
+            $platform = $this->post->platform;
+            $user = $platform->user;
 
-            $driver = match ($this->post->platform?->platform ?: 'default') {
+            if (! $user || ! app(SocialMediaChannelEntitlementService::class)->canPublish($user, $platform)) {
+                throw new DomainException(trans('This channel is paused because it is outside your Titan Reach channel allowance.'));
+            }
+
+            $driver = match ($platform->platform ?: 'default') {
                 'instagram'      => app(InstagramService::class),
                 'facebook'       => app(FacebookService::class),
                 'linkedin'       => app(LinkedinService::class),
@@ -39,7 +47,7 @@ class PublisherDriver
             if ($driver instanceof BasePublisherService) {
                 $driver
                     ->setPost($this->post)
-                    ->setPlatform($this->post->platform);
+                    ->setPlatform($platform);
             }
 
             return $driver;
