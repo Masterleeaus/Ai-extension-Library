@@ -40,7 +40,7 @@ foreach ([
     'FILTER_FLAG_NO_RES_RANGE',
     'CURLOPT_RESOLVE',
     "'allow_redirects' => false",
-    "'progress' =>",
+    "'progress'",
     'MAX_BYTES',
     'FILEINFO_MIME_TYPE',
     "'image/png'",
@@ -84,6 +84,42 @@ foreach ([
     if (str_contains($contents, 'Http::get($url)')) {
         failRemoteImageFetcherSecurityContract("{$file} still performs an unrestricted remote GET");
     }
+}
+
+require_once $fetcherPath;
+
+$policy = new App\Services\Security\RemoteImageFetcher;
+
+foreach ([
+    'http://example.com/image.png',
+    'https://user:secret@example.com/image.png',
+    'https://example.com:8443/image.png',
+    'https://localhost/image.png',
+    'https://127.0.0.1/image.png',
+    'https://10.0.0.1/image.png',
+    'https://172.16.0.1/image.png',
+    'https://192.168.1.1/image.png',
+    'https://100.64.0.1/image.png',
+    'https://169.254.169.254/latest/meta-data',
+    'https://192.0.2.10/image.png',
+    'https://198.51.100.10/image.png',
+    'https://203.0.113.10/image.png',
+    'https://[::1]/image.png',
+    'https://[fc00::1]/image.png',
+    'https://[fe80::1]/image.png',
+    'https://[2001:db8::1]/image.png',
+] as $unsafeUrl) {
+    try {
+        $policy->resolveTarget($unsafeUrl);
+        failRemoteImageFetcherSecurityContract("unsafe target was accepted: {$unsafeUrl}");
+    } catch (RuntimeException) {
+        // Expected: unsafe targets fail before any outbound request.
+    }
+}
+
+$publicTarget = $policy->resolveTarget('https://1.1.1.1/image.png');
+if (($publicTarget['host'] ?? null) !== '1.1.1.1' || ($publicTarget['ip'] ?? null) !== '1.1.1.1') {
+    failRemoteImageFetcherSecurityContract('public HTTPS IP did not pass the URL policy');
 }
 
 echo "Remote image fetcher security contract passed.\n";
