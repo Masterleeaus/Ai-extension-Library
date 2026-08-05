@@ -144,17 +144,34 @@ final class VerticalContextComposer
         foreach ($incoming as $key => $value) {
             $leafPointer = $pointer . '/' . $this->escapePointer((string) $key);
             if (is_array($value) && !array_is_list($value)) {
-                $existing = isset($current[$key]) && is_array($current[$key]) && !array_is_list($current[$key])
-                    ? $current[$key]
-                    : [];
+                $existingIsObject = isset($current[$key])
+                    && is_array($current[$key])
+                    && !array_is_list($current[$key]);
+                if (!$existingIsObject) {
+                    $this->removeSourceSubtree($sources, $leafPointer);
+                } else {
+                    unset($sources[$leafPointer]);
+                }
+                $existing = $existingIsObject ? $current[$key] : [];
                 $current[$key] = $this->mergeWithProvenance($existing, $value, $leafPointer, $layer, $sources);
                 continue;
             }
 
+            $this->removeSourceSubtree($sources, $leafPointer);
             $current[$key] = $value;
             $sources[$leafPointer] = $layer->provenance->toArray();
         }
         return $current;
+    }
+
+    private function removeSourceSubtree(array &$sources, string $pointer): void
+    {
+        $prefix = $pointer . '/';
+        foreach (array_keys($sources) as $sourcePointer) {
+            if ($sourcePointer === $pointer || str_starts_with($sourcePointer, $prefix)) {
+                unset($sources[$sourcePointer]);
+            }
+        }
     }
 
     private function escapePointer(string $segment): string
