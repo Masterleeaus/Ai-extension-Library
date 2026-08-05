@@ -1,4 +1,4 @@
-name: Layered Wizard Composer Boundary Diagnostic
+name: Layered Wizard Composer Temporary Verification
 
 on:
   pull_request:
@@ -9,42 +9,33 @@ permissions:
   contents: read
 
 jobs:
-  inspect:
+  verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
         with:
-          ref: feature/layered-wizard-question-composer
+          php-version: '8.2'
+          extensions: pdo_sqlite, sqlite3
+          coverage: none
 
-      - name: Inspect wizard definition and run snapshot boundaries
-        shell: bash
+      - name: Install isolated Illuminate dependencies
         run: |
-          set -euo pipefail
-          root='app/extensions/WorkCore_Platform/packages/workcore-business-network/src/Domains/WorkCore/System/Modules/Wizards'
+          rm -rf /tmp/workcore-layered-wizard-test
+          mkdir -p /tmp/workcore-layered-wizard-test
+          cd /tmp/workcore-layered-wizard-test
+          printf '%s\n' '{"require":{"php":"^8.2","illuminate/database":"^10.0","illuminate/events":"^10.0","illuminate/support":"^10.0","symfony/uid":"^6.0"}}' > composer.json
+          composer install --no-interaction --no-progress --prefer-dist
 
-          echo '===== DEFINITION REGISTRY AND RUNTIME ====='
-          for file in \
-            "$root/Services/WizardDefinitionRegistry.php" \
-            "$root/Services/WizardRuntime.php" \
-            "$root/Repositories/EloquentWizardRepository.php" \
-            "$root/Services/WizardBranchEvaluator.php" \
-            "$root/Services/WizardAnswerValidator.php"; do
-            echo "--- ${file} ---"
-            sed -n '1,420p' "$file"
-          done
+      - name: Run focused layered wizard contract
+        env:
+          AI_EXTENSIONS_REPO_ROOT: ${{ github.workspace }}
+          WORKCORE_TEST_VENDOR_AUTOLOAD: /tmp/workcore-layered-wizard-test/vendor/autoload.php
+        run: php app/extensions/WorkCore_Platform/tests/layered_wizard_questions.php
 
-          echo '===== WIZARD RESOURCES ====='
-          find "$root" app/extensions/WorkCore_Platform/packages/workcore-business-network/resources packages/titan-interaction-engine/resources \
-            -type f \( -name '*.json' -o -name '*.php' -o -name '*.yaml' -o -name '*.yml' \) 2>/dev/null \
-            | grep -E 'wizard|definition|question|onboard|vertical' | sort | head -180
-
-          echo '===== QUESTION SCHEMA PATTERNS ====='
-          grep -RIn --exclude-dir=.git -E 'response_type|mandatory|extension_slot|depends_on|affects|question_key|definition_version|definition_snapshot|snapshot' \
-            "$root" app/extensions/WorkCore_Platform/packages/workcore-business-network/resources packages/titan-interaction-engine 2>/dev/null | head -420 || true
-
-          echo '===== CONFIGURED DEFINITIONS ====='
-          find "$root" -type f -name '*.json' -print | while read -r file; do
-            echo "--- ${file} ---"
-            sed -n '1,520p' "$file"
-          done
+      - name: Lint focused test
+        if: always()
+        run: php -l app/extensions/WorkCore_Platform/tests/layered_wizard_questions.php
