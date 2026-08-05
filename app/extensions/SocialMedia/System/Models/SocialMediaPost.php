@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class SocialMediaPost extends Model
 {
@@ -144,6 +145,11 @@ class SocialMediaPost extends Model
     public function platform(): BelongsTo
     {
         return $this->belongsTo(SocialMediaPlatform::class, 'social_media_platform_id', 'id');
+    }
+
+    public function distributionItem(): HasOne
+    {
+        return $this->hasOne(DistributionItem::class, 'social_media_post_id');
     }
 
     public function logs(): HasMany
