@@ -95,7 +95,7 @@ class GoogleBusinessProfileController extends Controller
             $accessExpiresAt = now()->addSeconds((int) $tokenResponse->json('expires_in', 3600));
             $authorizedScopes = $this->normaliseScopes(
                 (string) $tokenResponse->json('scope', ''),
-                (array) config('social-media.google_business_profile.scopes', [])
+                (array) ($existingCredentials['authorized_scopes'] ?? [])
             );
 
             $temporaryCredentials = [
@@ -251,12 +251,12 @@ class GoogleBusinessProfileController extends Controller
             ->first();
     }
 
-    private function normaliseScopes(string $returned, array $fallback): array
+    private function normaliseScopes(string $returned, array $verifiedFallback): array
     {
         $scopes = preg_split('/[\s,]+/', trim($returned)) ?: [];
 
         return array_values(array_unique(array_filter(
-            $scopes !== [] ? $scopes : $fallback,
+            $scopes !== [] ? $scopes : $verifiedFallback,
             static fn ($scope): bool => is_string($scope) && trim($scope) !== ''
         )));
     }
