@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Extensions\SocialMedia\System;
 
 use App\Domains\Marketplace\Contracts\UninstallExtensionServiceProviderInterface;
+use App\Extensions\SocialMedia\System\Http\Controllers\AssistedMarketplaceController;
 use App\Extensions\SocialMedia\System\Http\Controllers\Common\DemoDataController;
 use App\Extensions\SocialMedia\System\Http\Controllers\Common\SocialMediaCampaignCommonController;
 use App\Extensions\SocialMedia\System\Http\Controllers\Common\SocialMediaCompanyCommonController;
@@ -94,6 +95,10 @@ class SocialMediaServiceProvider extends ServiceProvider implements UninstallExt
     {
         $this->mergeConfigFrom(__DIR__ . '/../config/social-media.php', 'social-media');
         $this->mergeConfigFrom(__DIR__ . '/../config/ebay.php', 'social-media.ebay');
+        $this->mergeConfigFrom(
+            __DIR__ . '/../config/assisted-marketplaces.php',
+            'social-media.assisted_marketplaces'
+        );
         config()->set('social-media.distribution.destinations.ebay', config('social-media.ebay.destination'));
 
         return $this;
@@ -195,6 +200,13 @@ class SocialMediaServiceProvider extends ServiceProvider implements UninstallExt
                         $router->post('distribution/{item}/ebay/withdraw', [EbayListingController::class, 'withdraw'])->name('ebay.withdraw');
                         $router->post('distribution/{item}/ebay/reconcile', [EbayListingController::class, 'reconcile'])->name('ebay.reconcile');
                         $router->post('distribution/{item}/ebay/buyer-question-handoff', [EbayListingController::class, 'buyerQuestionHandoff'])->name('ebay.buyer-question-handoff');
+
+                        $router->post('distribution/{item}/assisted/{destination}/prepare', [AssistedMarketplaceController::class, 'prepare'])->name('assisted.prepare');
+                        $router->post('distribution/{item}/assisted/{destination}/open', [AssistedMarketplaceController::class, 'open'])->name('assisted.open');
+                        $router->post('distribution/{item}/assisted/{destination}/complete', [AssistedMarketplaceController::class, 'complete'])->name('assisted.complete');
+                        $router->post('distribution/{item}/assisted/{destination}/renew', [AssistedMarketplaceController::class, 'renew'])->name('assisted.renew');
+                        $router->post('distribution/{item}/assisted/{destination}/enquiry-handoff', [AssistedMarketplaceController::class, 'enquiryHandoff'])->name('assisted.enquiry-handoff');
+                        $router->get('distribution/{item}/assisted/{destination}/status', [AssistedMarketplaceController::class, 'status'])->name('assisted.status');
                     });
 
                 $router
