@@ -1,122 +1,136 @@
 # Titan Hub Donor Manifest
 
-This file is the authoritative inventory for the licensed donor systems used to build Titan Hub and Titan Pay.
+Generated from the supplied licensed archives while working on issue #254.
 
-## Donor archives
+## Repository status
 
-| Donor | Target | Archive size | SHA-256 | Intended authority |
-|---|---|---:|---|---|
-| QRPay Flutter User App v5.1.0 | `mobile apps/titan-hub/` | ~2.8 MB | `77d00027b7771e219ac1a74fbea4b7e1029e905d36afe3fcb97d1b2f557f6ec8` | Titan Hub customer-facing mobile shell and reusable payment journeys |
-| QRPay Laravel Web v5.1.0 | `integrations/qrpay-web/` | ~54 MB | `412765575258c3c17f9da652d225306b5cbab3cd69f4953b65e02a4980693037` | Donor for payment, wallet, QR, merchant, agent, KYC and gateway workflows |
-| MobileKit Bootstrap 4 UI Kit | `mobile apps/mobilekit-reference/` | ~3.9 MB | `a2f9bda06a35a2d82217692bdff736a8b901cef795422fc98f5816f667c6a736` | Visual and interaction reference only; components must be recreated natively in Flutter |
-| Cryptomus extension | future Titan Pay crypto adapter | archive supplied | `5ad8aa0794438070f1c550cbaf8f2bba0935950bda3126d64488b14475e17bb4` | Optional crypto rail only; not wallet, invoice or ledger authority |
+`Masterleeaus/Ai-extensions` is private as of 2026-08-05. Licensed donor source may be imported into this repository after sanitisation and secret/signing-material removal.
 
-## Verified source inventory
+Private repository visibility reduces public-disclosure risk but does not remove licence, access-control, secret-management, or least-privilege requirements.
 
-### QRPay Flutter user app
+## Verified donor archives
 
-- Flutter 3.27 / Dart 3.6 generation.
-- 387 Dart files.
-- 102 `*_screen.dart` files.
-- 89 registered GetX routes.
-- 60 controllers.
-- 118 views.
-- Existing product areas include wallet, QR scan/display, send/receive money, merchant payment, payment requests, payment links, add money, withdrawals, remittance, agent cash-out, KYC, 2FA, biometrics, receipts, notifications, gift cards, bill payment, mobile top-up and virtual cards.
-- Current source layout is organised by technical layers (`controller`, `backend`, `model`, `views`, `routes`, `bindings`) rather than isolated feature packages.
-- Existing screens and widgets are donors. New Titan UI must first duplicate the closest existing implementation and edit the duplicate rather than introducing visually disconnected files.
+| Donor | Intended target | SHA-256 |
+|---|---|---|
+| QRPay Flutter User App v5.1.0 | `mobile apps/titan-hub/` | `77d00027b7771e219ac1a74fbea4b7e1029e905d36afe3fcb97d1b2f557f6ec8` |
+| QRPay Laravel Web v5.1.0 | `integrations/qrpay-web/` | `412765575258c3c17f9da652d225306b5cbab3cd69f4953b65e02a4980693037` |
+| MobileKit Bootstrap 4 UI Kit | `mobile apps/mobilekit-reference/` | `a2f9bda06a35a2d82217692bdff736a8b901cef795422fc98f5816f667c6a736` |
+| Cryptomus extension | future Titan Pay crypto adapter | `5ad8aa0794438070f1c550cbaf8f2bba0935950bda3126d64488b14475e17bb4` |
 
-### QRPay Laravel web system
+## Source inventory
 
-- Laravel 9.52.18 and PHP 8+.
-- 1,438 PHP files.
-- 130 migrations.
-- 93 models.
-- 179 controllers.
-- User, merchant, agent and admin application areas.
-- Existing product areas include wallets, transfers, merchant payment, payment links, money requests, add money, withdrawals, remittance, agent cash flows, transaction limits, fees, KYC, 2FA, gateway configuration, merchant APIs, virtual cards, gift cards, bill payments and mobile top-up.
-- Gateway/provider code includes PayPal, Stripe, Paystack, Razorpay, Flutterwave, Bkash, Pagadito, SSLCommerz, Perfect Money, CoinGate and Tatum patterns.
-- The donor currently mutates wallet balances directly and is not event-sourced. These mechanisms must not become Titan Pay financial authority.
+### QRPay Flutter user application
+
+Known structure and capabilities from the inspected archive:
+
+- Flutter 3.27 / Dart 3.6+ application
+- approximately 387 Dart files
+- approximately 102 screen files
+- approximately 89 registered GetX routes
+- approximately 60 controllers
+- wallet, QR, send/receive money, merchant payment, payment request, payment link, add-money, withdrawal, remittance, agent cash-out, transaction history, KYC, 2FA, biometrics, notifications, gift cards, bill payment, top-up, and virtual-card workflows
+
+Target role:
+
+- native Titan Hub customer application
+- Titan Pay customer surface
+- future vertical profile and commerce-mode overlays
+- reusable QRPay screens should be duplicated and adapted rather than replaced with unrelated new UI
+
+### QRPay Laravel web application
+
+Known structure and capabilities from the inspected archive:
+
+- Laravel 9.52.18 / PHP 8+
+- approximately 1,438 PHP files
+- approximately 130 migrations
+- approximately 93 models
+- approximately 179 controllers
+- user, merchant, agent, admin, wallet, QR, payment link, money request, add-money, withdrawal, remittance, KYC, gateway, transaction limits, merchant API, and cash-agent workflows
+
+Target role:
+
+- donor integration under the MagicAI Laravel base
+- payment-product, gateway, wallet-interface, merchant, agent, QR, and transaction-workflow donor
+- must not remain the final financial source of truth because direct mutable wallet updates were found
 
 ### MobileKit
 
-- Bootstrap 4 mobile web UI kit.
-- Intended for component and interaction reference only.
-- HTML, CSS and Bootstrap runtime code must not be embedded as the production Flutter interface.
-- Useful pages should be mapped to the closest existing Flutter page, duplicated, and then adapted into native Flutter components.
+Target role:
 
-## Ownership boundaries
+- UI and interaction reference only
+- selected HTML/Bootstrap patterns should be recreated as native Flutter widgets by duplicating the closest existing QRPay Flutter pages/components
+- do not embed Bootstrap runtime or production WebViews merely to reuse the template
 
-| Capability | Authoritative Titan owner | Donor contribution |
-|---|---|---|
-| Customer-facing app | Titan Hub Flutter | QRPay navigation, screens, QR, wallet and payment journeys |
-| Identity and tenancy | MagicAI / Titan Zero core | QRPay user, merchant and agent concepts mapped through adapters |
-| Products, services, booking, rental and hire | Titan commerce APIs / WorkCore | Existing Laravel commerce extensions |
-| Quotes and pricing | Titan Commercial Engine | DiscountManager rules and calculation patterns |
-| Invoices and receivables | Titan Pay / WorkCore authority map | QRPay payment presentation and transaction views |
-| Wallet and payment state | Titan Pay event streams and ledger | QRPay workflows and provider integration knowledge |
-| Crypto | Cryptomus adapter | Hosted crypto checkout and verified provider events |
-| UI styling | Existing Flutter app plus native Titan design system | MobileKit as reference only |
+### Cryptomus
 
-## Confirmed sensitive and generated paths
+Target role:
+
+- optional crypto rail behind Titan Pay's provider-neutral adapter contract
+- must not own Titan invoices, wallet balances, ledgers, or customer entitlements
+
+## Confirmed sensitive/generated paths requiring exclusion or replacement
 
 ### QRPay Flutter
-
-Remove and replace before commit or build:
 
 - `android/key.properties`
 - `android/app/key.jks`
 - `android/app/google-services.json`
 - `ios/Runner/GoogleService-Info.plist`
 - `__MACOSX/` metadata
-- `.DS_Store`
-- generated `build/` and `.dart_tool/` directories
 
 New Titan-owned Android/iOS signing and Firebase configuration must be generated outside Git.
 
 ### QRPay Laravel
 
-Remove and replace before commit or deployment:
-
 - `.env`
 - `storage/oauth-private.key`
 - `storage/oauth-public.key`
-- generated logs, cache and session data
-- root Composer `vendor/`
 
-`.env.example` may remain only after confirming it contains placeholders. Published framework view overrides under `resources/views/vendor/` are source files and must not be confused with root Composer dependencies.
+`.env.example` may be retained only after confirming it contains placeholders rather than live values. Published framework view overrides under `resources/views/vendor/` are source files and are not equivalent to Composer's root `vendor/` directory.
 
-## Required security corrections after import
+## Required post-extraction scans
 
-- Replace mobile bearer-token storage with secure platform storage.
-- Remove or redact sensitive request and response logging.
-- Replace direct wallet balance mutation with event-sourced commands, ledger postings and projections.
-- Add optimistic concurrency and row-safe transaction handling during migration.
-- Authenticate, store and deduplicate provider webhooks before domain processing.
-- Replace simple payment QR identifiers with signed, scoped and expiring payment sessions.
-- Rotate every credential found in a donor archive, even if it appears to be demo data.
-- Verify tenant isolation across customer, merchant, agent and administrator operations.
+Before committing extracted donor source, scan for:
+
+- `.env*` files containing values rather than placeholders
+- private/public signing keys and certificates
+- Android keystores and key properties
+- Firebase/Google service configuration
+- API tokens, bearer tokens, client secrets, passwords, and webhook secrets
+- hard-coded domains and vendor callback URLs
+- request/response logging of authentication, KYC, payment, or personal data
+- direct wallet-balance mutation
+- provider callbacks that mutate financial or entitlement state before authentication and idempotency checks
+- generated build directories, caches, logs, sessions, dependencies, and IDE metadata
+- files exceeding GitHub's size limit
+
+Recommended tools where available:
+
+- `gitleaks`
+- `trufflehog filesystem`
+- `git grep` with high-risk patterns
+- Flutter static analysis
+- Composer audit
+- PHPStan/Psalm where compatible
 
 ## Import policy
 
-1. Verify every archive hash before extraction.
-2. Require a clean Git working tree.
-3. Extract into temporary staging directories.
-4. Remove credentials, signing material, generated output, caches, logs, macOS metadata and root dependency directories.
-5. Scan source for hard-coded credentials, private keys, API tokens and sensitive logging.
-6. Preserve meaningful donor structure; flatten only a single archive wrapper directory.
-7. Copy sanitised source into the requested repository folders.
-8. Review the generated audit summary and `git diff` before commit.
-9. Commit donor source separately from later Titan modifications.
-10. Do not close issue #254 until the sanitised source trees are present and independently inspectable on GitHub.
+1. Confirm the repository remains private and access is restricted to authorised project participants.
+2. Verify each archive hash before extraction.
+3. Extract into a temporary directory.
+4. Remove credentials, signing material, generated output, caches, logs, macOS metadata, and root dependency directories.
+5. Scan for hard-coded secrets, domains, tokens, API keys, and sensitive request/response logging.
+6. Copy only sanitised source into the requested repository folders.
+7. Preserve meaningful source structure.
+8. Prefer editing existing files; create new code files only when a separate responsibility requires them.
+9. For new UI files, duplicate the closest existing QRPay Flutter screen/component and adapt the duplicate.
+10. Commit the scan report and source import separately where practical.
+11. Rotate every credential contained in an archive before deployment, regardless of whether it appears to be demo data.
+12. Keep purchase codes, licence keys, invoices, and account credentials out of Git and issue discussions.
 
 ## Transport status
 
-MiniUp publishes static web projects and datasets; it is not a Git transport. The connected GitHub API can create branches, issues and text commits but cannot stream the mounted 54 MB donor archive from this session.
+The repository is now private, resolving the public-disclosure blocker.
 
-The source import therefore still requires one of:
-
-- authenticated local Git push;
-- Git LFS where a retained binary genuinely requires it; or
-- a future connector action capable of uploading repository files from mounted paths.
-
-Issue #254 remains open until that source import is completed and verified.
+The current connected GitHub action set can create branches, issues, pull requests, and text commits, but it cannot stream the mounted 54 MB donor archive or its extracted multi-thousand-file source tree from this session. Completion of issue #254 therefore still requires an authenticated local Git import or a future connector action that accepts mounted file paths.
