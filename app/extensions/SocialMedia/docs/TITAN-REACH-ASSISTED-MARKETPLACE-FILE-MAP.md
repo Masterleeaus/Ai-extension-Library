@@ -15,7 +15,7 @@ Both destinations are implemented as `assisted` workflows. Titan Reach prepares 
 
 | New file | Existing source/template | Why it is necessary |
 |---|---|---|
-| `config/assisted-marketplaces.php` | `config/distribution.php` | Holds operational metadata not represented by provider capabilities: official handoff URLs, allowed completion hosts, expiry/image limits and destination-specific manual posting guidance. It does not duplicate publishing modes or provider capabilities. |
+| `config/assisted-marketplaces.php` | `config/distribution.php` | Holds operational metadata not represented by provider capabilities: official handoff URLs, allowed completion hosts, expiry/image/package limits, idempotency-history limits and destination-specific manual posting guidance. It does not duplicate publishing modes or provider capabilities. |
 | `System/Services/AssistedMarketplaceService.php` | `System/Services/EbayListingService.php` and `System/Services/DistributionCapabilityService.php` | A provider-neutral application service is required for package preparation, manual handoff, completion confirmation, renewal and enquiry handoff. |
 | `System/Http/Controllers/AssistedMarketplaceController.php` | `System/Http/Controllers/EbayListingController.php` | Governed HTTP actions are required for the future native Listings UI and other approved clients. |
 | `tests/Unit/AssistedMarketplaceContractTest.php` | `tests/Unit/VerticalDistributionProfilesContractTest.php` and `tests/Unit/EbayListingIntegrationContractTest.php` | Prevents regression into simulated publishing, browser automation, non-vertical packages, unsafe URL completion or ungoverned actions. |
@@ -55,18 +55,23 @@ Facilities maintenance resolves to the `field-home-services` family and `facilit
 - No browser automation, scraping, form simulation or credential collection is used.
 - `open` returns the official destination URL; it does not operate the marketplace account.
 - Completion requires explicit human confirmation and a valid HTTPS listing URL on an allowed marketplace host.
-- The posting form URL itself is not accepted as proof of completion.
+- Posting-form paths are rejected across every allowed host variant, not only the exact configured URL.
 - Titan Reach records `manually_published`; it does not change the canonical `DistributionItem` status to provider-published.
-- Renewals create a reviewed manual package and never repost automatically.
+- Expired packages are persisted as `expired` and cannot be opened or completed until renewed.
+- Renewal is allowed only from `manually_published` or persisted `expired` state, receives a fresh expiry, clears the previous external listing identifiers and requires copy review.
+- A second renewal cycle cannot be prepared while the current renewal remains incomplete.
 - Enquiries are deduplicated and handed to a human/authoritative workflow; no automated reply is sent.
 
 ## Governance and data authority
 
-- Tenant ownership and `DistributionItem` approval are required before preparation or external handoff.
+- Tenant ownership is checked at the HTTP boundary with a 404 and again in the application service.
+- `DistributionItem` approval is required before preparation or external handoff.
 - Destination suitability and provider capability fail closed.
 - A per-tenant/item/destination lock serialises mutations.
 - Every idempotent action stores a request hash; reuse of a key with different input fails with `idempotency_key_conflict`.
-- Distribution audits record package, completion, renewal and enquiry events.
+- Hashed idempotency records retain a bounded configurable history rather than only the latest action key.
+- Prepared packages have a configurable encoded-size limit to prevent uncontrolled payload growth.
+- Distribution audits record package, completion, renewal and enquiry events; bulky package/export bodies are omitted from duplicate audit snapshots.
 - Titan Commerce, WorkCore, Bookings, Property, Automotive, Hire and CRM remain authoritative for source records.
 - Titan Reach stores the approved listing snapshot and external URL only.
 
