@@ -43,7 +43,8 @@ class GoogleBusinessProfileController extends Controller
         $resources = $this->resources->resolveLocation(
             $account,
             (string) $payload['account_name'],
-            (string) $payload['location_name']
+            (string) $payload['location_name'],
+            true
         );
         $payload['location_name'] = $resources['account_location_name'];
 
@@ -87,8 +88,21 @@ class GoogleBusinessProfileController extends Controller
     public function reconcile(Request $request, DistributionItem $item): JsonResponse
     {
         $this->assertOwnedItem($item);
-        $validated = $request->validate(['account_id' => 'required|integer']);
+        $validated = $request->validate([
+            'account_id' => 'required|integer',
+            'account_name' => 'required|string|max:255',
+            'location_name' => 'required|string|max:500',
+        ]);
         $account = $this->account((int) $validated['account_id']);
+        $resources = $this->resources->resolveLocation(
+            $account,
+            (string) $validated['account_name'],
+            (string) $validated['location_name']
+        );
+        $this->resources->assertLocalPostName(
+            $resources,
+            (string) data_get($item->payload, 'google_business_profile.local_post_name', '')
+        );
 
         return $this->respond(fn () => $this->locked(
             $item,
