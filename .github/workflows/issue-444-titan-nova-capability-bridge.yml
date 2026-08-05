@@ -1,0 +1,519 @@
+name: Issue 444 - Titan Nova governed capability bridge
+
+on:
+  push:
+    branches:
+      - feature/444-titan-nova-governed-capability-bridge
+    paths:
+      - .github/workflows/issue-444-titan-nova-capability-bridge.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: issue-444-titan-nova-capability-bridge
+  cancel-in-progress: false
+
+jobs:
+  red-green:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out stacked branch
+        uses: actions/checkout@v4
+        with:
+          ref: feature/444-titan-nova-governed-capability-bridge
+          fetch-depth: 0
+
+      - name: Write contract test first
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p app/extensions/TitanNova/tests/Contract
+          cat > app/extensions/TitanNova/tests/Contract/GovernedCapabilityBridgeContractTest.php <<'PHP'
+          <?php
+
+          declare(strict_types=1);
+
+          use App\Domains\WorkCore\System\Actions\ActionDefinition;
+          use App\Domains\WorkCore\System\Actions\BusinessActionRegistry;
+          use App\Domains\WorkCore\System\Capabilities\CapabilityDefinition;
+          use App\Domains\WorkCore\System\Capabilities\CapabilityRegistry;
+          use App\Extensions\TitanAIGovernance\System\Tools\GovernedToolDefinition;
+          use App\Extensions\TitanNova\System\Capabilities\Contracts\GovernedExecutionContract;
+          use App\Extensions\TitanNova\System\Capabilities\Contracts\NativeToolMappingContract;
+          use App\Extensions\TitanNova\System\Capabilities\GovernedWorkCoreCapabilityBridge;
+
+          $root = dirname(__DIR__, 5);
+
+          require_once $root.'/app/extensions/WorkCore_Platform/packages/workcore-shared-foundation/src/Domains/WorkCore/System/Actions/ActionDefinition.php';
+          require_once $root.'/app/extensions/WorkCore_Platform/packages/workcore-shared-foundation/src/Domains/WorkCore/System/Actions/BusinessActionRegistry.php';
+          require_once $root.'/app/extensions/WorkCore_Platform/packages/workcore-shared-foundation/src/Domains/WorkCore/System/Capabilities/CapabilityDefinition.php';
+          require_once $root.'/app/extensions/WorkCore_Platform/packages/workcore-shared-foundation/src/Domains/WorkCore/System/Capabilities/CapabilityRegistry.php';
+          require_once $root.'/app/extensions/Chatbot/System/TitanAI/governance/System/Tools/GovernedToolDefinition.php';
+          require_once $root.'/app/extensions/TitanNova/System/Capabilities/Contracts/GovernedExecutionContract.php';
+          require_once $root.'/app/extensions/TitanNova/System/Capabilities/Contracts/NativeToolMappingContract.php';
+          require_once $root.'/app/extensions/TitanNova/System/Capabilities/GovernedCapabilityPlan.php';
+          require_once $root.'/app/extensions/TitanNova/System/Capabilities/GovernedWorkCoreCapabilityBridge.php';
+
+          final class FakeNativeToolMapping implements NativeToolMappingContract
+          {
+              /** @param array<string,bool> $mapped */
+              public function __construct(private array $mapped = []) {}
+
+              public function has(string $domain, string $operation): bool
+              {
+                  return $this->mapped[$domain.'.'.$operation] ?? false;
+              }
+          }
+
+          final class FakeGovernedExecution implements GovernedExecutionContract
+          {
+              public ?GovernedToolDefinition $definition = null;
+              public array $payload = [];
+              public array $context = [];
+
+              /** @param array<string,mixed> $result */
+              public function __construct(private array $result = [
+                  'id' => 101,
+                  '_action_receipt' => ['receiptId' => 'receipt-101', 'status' => 'executed'],
+              ]) {}
+
+              public function execute(GovernedToolDefinition $definition, array $payload, array $context): array
+              {
+                  $this->definition = $definition;
+                  $this->payload = $payload;
+                  $this->context = $context;
+
+                  return $this->result;
+              }
+          }
+
+          function assertTrue(bool $condition, string $message): void
+          {
+              if (! $condition) {
+                  throw new RuntimeException($message);
+              }
+          }
+
+          function assertSameValue(mixed $expected, mixed $actual, string $message): void
+          {
+              if ($expected !== $actual) {
+                  throw new RuntimeException($message.' Expected '.var_export($expected, true).' got '.var_export($actual, true));
+              }
+          }
+
+          function expectRuntimeException(callable $callback, string $messageContains): void
+          {
+              try {
+                  $callback();
+              } catch (RuntimeException $exception) {
+                  assertTrue(str_contains($exception->getMessage(), $messageContains), 'Unexpected exception: '.$exception->getMessage());
+                  return;
+              }
+
+              throw new RuntimeException('Expected RuntimeException containing: '.$messageContains);
+          }
+
+          function bridgeWith(
+              BusinessActionRegistry $actions,
+              CapabilityRegistry $capabilities,
+              NativeToolMappingContract $mappings,
+              GovernedExecutionContract $execution,
+          ): GovernedWorkCoreCapabilityBridge {
+              return new GovernedWorkCoreCapabilityBridge($actions, $capabilities, $mappings, $execution);
+          }
+
+          $emptyActions = new BusinessActionRegistry();
+          $emptyCapabilities = new CapabilityRegistry();
+          $execution = new FakeGovernedExecution();
+          $bridge = bridgeWith($emptyActions, $emptyCapabilities, new FakeNativeToolMapping(), $execution);
+          expectRuntimeException(fn () => $bridge->planFor('crm.create_contact'), 'not registered');
+
+          $actionsWithoutCapability = new BusinessActionRegistry();
+          $actionsWithoutCapability->register(new ActionDefinition(
+              key: 'crm.create_contact',
+              handler: stdClass::class,
+              risk: 'low',
+              capability: 'workcore.crm',
+              permission: 'customers.create',
+          ));
+          $bridge = bridgeWith($actionsWithoutCapability, new CapabilityRegistry(), new FakeNativeToolMapping(['crm.create_contact' => true]), $execution);
+          expectRuntimeException(fn () => $bridge->planFor('crm.create_contact'), 'capability [workcore.crm]');
+
+          $capabilities = new CapabilityRegistry();
+          $capabilities->register(new CapabilityDefinition('workcore.crm', 'WorkCore', '1.0.0'));
+          $bridge = bridgeWith($actionsWithoutCapability, $capabilities, new FakeNativeToolMapping(), $execution);
+          expectRuntimeException(fn () => $bridge->planFor('crm.create_contact'), 'native WorkCore tool mapping');
+
+          $actions = new BusinessActionRegistry();
+          $actions->register(new ActionDefinition(
+              key: 'crm.create_contact',
+              handler: stdClass::class,
+              risk: 'medium',
+              requiresConfirmation: true,
+              capability: 'workcore.crm',
+              permission: 'customers.create',
+              metadata: ['rollback_supported' => true, 'timeout_seconds' => 45],
+          ));
+          $mapping = new FakeNativeToolMapping(['crm.create_contact' => true]);
+          $execution = new FakeGovernedExecution();
+          $bridge = bridgeWith($actions, $capabilities, $mapping, $execution);
+          $plan = $bridge->planFor('crm.create_contact');
+
+          assertSameValue('crm.create_contact', $plan->actionKey, 'Plan action key mismatch.');
+          assertSameValue('workcore.crm', $plan->capability, 'Plan capability mismatch.');
+          assertTrue($plan->requiresConfirmation, 'Confirmation requirement was not preserved.');
+          assertSameValue('crm', $plan->definition->domain, 'Governed domain mismatch.');
+          assertSameValue('create_contact', $plan->definition->operation, 'Governed operation mismatch.');
+          assertSameValue('medium', $plan->definition->riskLevel, 'Risk level mismatch.');
+          assertSameValue(['customers.create'], $plan->definition->permissions, 'Permission mismatch.');
+          assertTrue($plan->definition->rollbackSupported, 'Rollback support mismatch.');
+          assertSameValue(45, $plan->definition->timeoutSeconds, 'Timeout mismatch.');
+
+          expectRuntimeException(
+              fn () => $bridge->execute('crm.create_contact', ['name' => 'Ada'], []),
+              'tenant, actor and idempotency',
+          );
+
+          $result = $bridge->execute(
+              'crm.create_contact',
+              ['name' => 'Ada'],
+              [
+                  'tenant_id' => 7,
+                  'user_id' => 9,
+                  'idempotency_key' => 'nova-mission-7-9-1',
+                  'constraints' => ['source' => 'titan-nova'],
+              ],
+          );
+
+          assertSameValue('receipt-101', $result['_action_receipt']['receiptId'] ?? null, 'Receipt was not returned.');
+          assertSameValue('crm.create_contact', $execution->definition?->domain.'.'.$execution->definition?->operation, 'Execution definition mismatch.');
+          assertSameValue('workcore.crm', $execution->context['constraints']['workcore_capability'] ?? null, 'Capability constraint missing.');
+          assertSameValue(true, $execution->context['constraints']['workcore_confirmation_required'] ?? null, 'Confirmation constraint missing.');
+          assertSameValue('nova-mission-7-9-1', $execution->context['idempotency_key'] ?? null, 'Idempotency context missing.');
+
+          $receiptless = bridgeWith(
+              $actions,
+              $capabilities,
+              $mapping,
+              new FakeGovernedExecution(['id' => 202]),
+          );
+          expectRuntimeException(
+              fn () => $receiptless->execute('crm.create_contact', ['name' => 'Grace'], [
+                  'tenant_id' => 7,
+                  'user_id' => 9,
+                  'idempotency_key' => 'nova-mission-7-9-2',
+              ]),
+              'without an action receipt',
+          );
+
+          echo "Governed capability bridge contract tests passed.\n";
+          PHP
+
+      - name: Verify RED state
+        shell: bash
+        run: |
+          set -euo pipefail
+          set +e
+          php app/extensions/TitanNova/tests/Contract/GovernedCapabilityBridgeContractTest.php > /tmp/titan-nova-red.log 2>&1
+          status=$?
+          set -e
+          cat /tmp/titan-nova-red.log
+          if [ "$status" -eq 0 ]; then
+            echo 'RED verification failed: the contract test unexpectedly passed before implementation.' >&2
+            exit 1
+          fi
+          grep -Fq 'GovernedExecutionContract.php' /tmp/titan-nova-red.log
+
+      - name: Implement minimal governed bridge
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p \
+            app/extensions/TitanNova/System/Capabilities/Contracts \
+            app/extensions/TitanNova/System/Capabilities
+
+          cat > app/extensions/TitanNova/System/Capabilities/Contracts/GovernedExecutionContract.php <<'PHP'
+          <?php
+
+          declare(strict_types=1);
+
+          namespace App\Extensions\TitanNova\System\Capabilities\Contracts;
+
+          use App\Extensions\TitanAIGovernance\System\Tools\GovernedToolDefinition;
+
+          interface GovernedExecutionContract
+          {
+              /** @param array<string,mixed> $payload @param array<string,mixed> $context @return array<string,mixed> */
+              public function execute(GovernedToolDefinition $definition, array $payload, array $context): array;
+          }
+          PHP
+
+          cat > app/extensions/TitanNova/System/Capabilities/Contracts/NativeToolMappingContract.php <<'PHP'
+          <?php
+
+          declare(strict_types=1);
+
+          namespace App\Extensions\TitanNova\System\Capabilities\Contracts;
+
+          interface NativeToolMappingContract
+          {
+              public function has(string $domain, string $operation): bool;
+          }
+          PHP
+
+          cat > app/extensions/TitanNova/System/Capabilities/TitanAIGovernedExecutionAdapter.php <<'PHP'
+          <?php
+
+          declare(strict_types=1);
+
+          namespace App\Extensions\TitanNova\System\Capabilities;
+
+          use App\Extensions\TitanAIGovernance\System\Tools\GovernedToolDefinition;
+          use App\Extensions\TitanAIGovernance\System\Tools\GovernedToolExecutor;
+          use App\Extensions\TitanNova\System\Capabilities\Contracts\GovernedExecutionContract;
+
+          final class TitanAIGovernedExecutionAdapter implements GovernedExecutionContract
+          {
+              public function __construct(private GovernedToolExecutor $executor) {}
+
+              public function execute(GovernedToolDefinition $definition, array $payload, array $context): array
+              {
+                  return $this->executor->execute($definition, $payload, $context);
+              }
+          }
+          PHP
+
+          cat > app/extensions/TitanNova/System/Capabilities/TitanAINativeToolMappingAdapter.php <<'PHP'
+          <?php
+
+          declare(strict_types=1);
+
+          namespace App\Extensions\TitanNova\System\Capabilities;
+
+          use App\Extensions\Chatbot\System\TitanAI\Runtime\WorkCoreToolMappingRegistry;
+          use App\Extensions\TitanNova\System\Capabilities\Contracts\NativeToolMappingContract;
+
+          final class TitanAINativeToolMappingAdapter implements NativeToolMappingContract
+          {
+              public function __construct(private WorkCoreToolMappingRegistry $mappings) {}
+
+              public function has(string $domain, string $operation): bool
+              {
+                  return $this->mappings->has($domain, $operation);
+              }
+          }
+          PHP
+
+          cat > app/extensions/TitanNova/System/Capabilities/GovernedCapabilityPlan.php <<'PHP'
+          <?php
+
+          declare(strict_types=1);
+
+          namespace App\Extensions\TitanNova\System\Capabilities;
+
+          use App\Extensions\TitanAIGovernance\System\Tools\GovernedToolDefinition;
+
+          final readonly class GovernedCapabilityPlan
+          {
+              public function __construct(
+                  public string $actionKey,
+                  public string $capability,
+                  public bool $requiresConfirmation,
+                  public GovernedToolDefinition $definition,
+              ) {}
+
+              /** @return array<string,mixed> */
+              public function toArray(): array
+              {
+                  return [
+                      'action_key' => $this->actionKey,
+                      'capability' => $this->capability,
+                      'requires_confirmation' => $this->requiresConfirmation,
+                      'governed_tool' => [
+                          'name' => $this->definition->name,
+                          'domain' => $this->definition->domain,
+                          'operation' => $this->definition->operation,
+                          'risk_level' => $this->definition->riskLevel,
+                          'permissions' => $this->definition->permissions,
+                          'audited' => $this->definition->audited,
+                          'idempotent' => $this->definition->idempotent,
+                          'rollback_supported' => $this->definition->rollbackSupported,
+                          'timeout_seconds' => $this->definition->timeoutSeconds,
+                      ],
+                  ];
+              }
+          }
+          PHP
+
+          cat > app/extensions/TitanNova/System/Capabilities/GovernedWorkCoreCapabilityBridge.php <<'PHP'
+          <?php
+
+          declare(strict_types=1);
+
+          namespace App\Extensions\TitanNova\System\Capabilities;
+
+          use App\Domains\WorkCore\System\Actions\ActionDefinition;
+          use App\Domains\WorkCore\System\Actions\BusinessActionRegistry;
+          use App\Domains\WorkCore\System\Capabilities\CapabilityRegistry;
+          use App\Extensions\TitanAIGovernance\System\Tools\GovernedToolDefinition;
+          use App\Extensions\TitanNova\System\Capabilities\Contracts\GovernedExecutionContract;
+          use App\Extensions\TitanNova\System\Capabilities\Contracts\NativeToolMappingContract;
+          use RuntimeException;
+
+          final class GovernedWorkCoreCapabilityBridge
+          {
+              public function __construct(
+                  private BusinessActionRegistry $actions,
+                  private CapabilityRegistry $capabilities,
+                  private NativeToolMappingContract $mappings,
+                  private GovernedExecutionContract $execution,
+              ) {}
+
+              public function planFor(string $actionKey): GovernedCapabilityPlan
+              {
+                  $actionKey = trim($actionKey);
+                  $action = $this->actions->get($actionKey);
+                  if (! $action instanceof ActionDefinition) {
+                      throw new RuntimeException("WorkCore action [{$actionKey}] is not registered.");
+                  }
+
+                  $capability = trim((string) $action->capability);
+                  if ($capability === '' || ! $this->capabilities->has($capability)) {
+                      $display = $capability === '' ? 'undefined' : $capability;
+                      throw new RuntimeException("WorkCore capability [{$display}] is not registered for action [{$actionKey}].");
+                  }
+
+                  [$domain, $operation] = $this->splitActionKey($actionKey);
+                  if (! $this->mappings->has($domain, $operation)) {
+                      throw new RuntimeException("No native WorkCore tool mapping exists for [{$actionKey}].");
+                  }
+
+                  $permission = trim((string) $action->permission);
+                  $timeout = max(1, (int) ($action->metadata['timeout_seconds'] ?? 30));
+
+                  return new GovernedCapabilityPlan(
+                      actionKey: $actionKey,
+                      capability: $capability,
+                      requiresConfirmation: $action->requiresConfirmation,
+                      definition: new GovernedToolDefinition(
+                          name: 'titan-nova.'.$actionKey,
+                          domain: $domain,
+                          operation: $operation,
+                          riskLevel: $action->risk,
+                          permissions: $permission === '' ? [] : [$permission],
+                          audited: true,
+                          idempotent: true,
+                          rollbackSupported: (bool) ($action->metadata['rollback_supported'] ?? false),
+                          timeoutSeconds: $timeout,
+                      ),
+                  );
+              }
+
+              /** @param array<string,mixed> $payload @param array<string,mixed> $context @return array<string,mixed> */
+              public function execute(string $actionKey, array $payload, array $context): array
+              {
+                  $tenantId = (int) ($context['tenant_id'] ?? 0);
+                  $actorId = (int) ($context['user_id'] ?? 0);
+                  $idempotencyKey = trim((string) ($context['idempotency_key'] ?? ''));
+                  if ($tenantId < 1 || $actorId < 1 || $idempotencyKey === '') {
+                      throw new RuntimeException('Governed WorkCore execution requires tenant, actor and idempotency context.');
+                  }
+
+                  $plan = $this->planFor($actionKey);
+                  $constraints = (array) ($context['constraints'] ?? []);
+                  $context['constraints'] = [
+                      ...$constraints,
+                      'workcore_action' => $plan->actionKey,
+                      'workcore_capability' => $plan->capability,
+                      'workcore_confirmation_required' => $plan->requiresConfirmation,
+                  ];
+                  $context['tenant_id'] = $tenantId;
+                  $context['user_id'] = $actorId;
+                  $context['idempotency_key'] = $idempotencyKey;
+
+                  $result = $this->execution->execute($plan->definition, $payload, $context);
+                  if (! isset($result['_action_receipt']) || ! is_array($result['_action_receipt'])) {
+                      throw new RuntimeException('Governed WorkCore execution returned without an action receipt.');
+                  }
+
+                  return $result;
+              }
+
+              /** @return array{0:string,1:string} */
+              private function splitActionKey(string $actionKey): array
+              {
+                  $segments = explode('.', $actionKey, 2);
+                  if (count($segments) !== 2 || trim($segments[0]) === '' || trim($segments[1]) === '') {
+                      throw new RuntimeException("WorkCore action [{$actionKey}] must use domain.operation format.");
+                  }
+
+                  return [trim($segments[0]), trim($segments[1])];
+              }
+          }
+          PHP
+
+      - name: Register bridge bindings
+        shell: python
+        run: |
+          from pathlib import Path
+
+          path = Path('app/extensions/TitanNova/System/TitanNovaServiceProvider.php')
+          source = path.read_text(encoding='utf-8')
+
+          import_marker = 'use App\\Extensions\\TitanNova\\System\\Console\\Commands\\CreateAgentTasksCommand;'
+          imports = """use App\\Extensions\\TitanNova\\System\\Capabilities\\Contracts\\GovernedExecutionContract;
+          use App\\Extensions\\TitanNova\\System\\Capabilities\\Contracts\\NativeToolMappingContract;
+          use App\\Extensions\\TitanNova\\System\\Capabilities\\GovernedWorkCoreCapabilityBridge;
+          use App\\Extensions\\TitanNova\\System\\Capabilities\\TitanAIGovernedExecutionAdapter;
+          use App\\Extensions\\TitanNova\\System\\Capabilities\\TitanAINativeToolMappingAdapter;
+          """
+          if 'GovernedWorkCoreCapabilityBridge' not in source:
+              if import_marker not in source:
+                  raise SystemExit('Titan Nova service-provider import marker was not found.')
+              source = source.replace(import_marker, imports + import_marker, 1)
+
+          old_register = '    public function register(): void {}'
+          new_register = """    public function register(): void
+              {
+                  $this->app->bind(GovernedExecutionContract::class, TitanAIGovernedExecutionAdapter::class);
+                  $this->app->bind(NativeToolMappingContract::class, TitanAINativeToolMappingAdapter::class);
+                  $this->app->singleton(GovernedWorkCoreCapabilityBridge::class);
+              }"""
+          if old_register not in source:
+              raise SystemExit('Titan Nova empty register method was not found.')
+          source = source.replace(old_register, new_register, 1)
+          path.write_text(source, encoding='utf-8')
+
+      - name: Verify GREEN state and regression checks
+        shell: bash
+        run: |
+          set -euo pipefail
+          php app/extensions/TitanNova/tests/Contract/GovernedCapabilityBridgeContractTest.php
+
+          while IFS= read -r -d '' file; do
+            php -l "$file" >/dev/null
+          done < <(find app/extensions/TitanNova/System/Capabilities -type f -name '*.php' -print0)
+
+          php -l app/extensions/TitanNova/System/TitanNovaServiceProvider.php >/dev/null
+          php app/extensions/TitanNova/tests/titan_nova_verify.php
+          ! grep -R -n -E '^(<<<<<<<|=======|>>>>>>>)' app/extensions/TitanNova
+          git diff --check
+
+      - name: Commit issue 444 implementation
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add \
+            app/extensions/TitanNova/System/Capabilities \
+            app/extensions/TitanNova/System/TitanNovaServiceProvider.php \
+            app/extensions/TitanNova/tests/Contract/GovernedCapabilityBridgeContractTest.php
+          if git diff --cached --quiet; then
+            echo 'No issue 444 implementation changes were generated.'
+            exit 0
+          fi
+          git commit -m 'feat(titan-nova): add governed WorkCore capability bridge'
+          git push origin HEAD:feature/444-titan-nova-governed-capability-bridge
