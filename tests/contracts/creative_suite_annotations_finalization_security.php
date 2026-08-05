@@ -3,7 +3,8 @@
 declare(strict_types=1);
 
 $root = dirname(__DIR__, 2);
-$controllerPath = $root . '/app/extensions/CreativeSuiteAnnotations/System/Http/Controllers/CreativeSuiteAnnotationsAIController.php';
+$controllerPath = $root . '/app/extensions/CreativeSuiteAnnotations/System/Http/Controllers/CreativeSuiteAnnotationsSecureAIController.php';
+$providerPath = $root . '/app/extensions/CreativeSuiteAnnotations/System/CreativeSuiteAnnotationsServiceProvider.php';
 $jobPath = $root . '/app/extensions/CreativeSuiteAnnotations/System/Jobs/ProcessAnnotationEditJob.php';
 
 function failCreativeSuiteAnnotationsFinalizationContract(string $message): never
@@ -13,10 +14,12 @@ function failCreativeSuiteAnnotationsFinalizationContract(string $message): neve
 }
 
 $controller = file_get_contents($controllerPath);
+$provider = file_get_contents($providerPath);
 $job = file_get_contents($jobPath);
 
 foreach ([
-    'CreativeSuiteAnnotationsAIController.php' => $controller,
+    'CreativeSuiteAnnotationsSecureAIController.php' => $controller,
+    'CreativeSuiteAnnotationsServiceProvider.php' => $provider,
     'ProcessAnnotationEditJob.php' => $job,
 ] as $file => $contents) {
     if ($contents === false) {
@@ -24,16 +27,30 @@ foreach ([
     }
 }
 
+if (! str_contains($provider, 'use App\\Extensions\\CreativeSuiteAnnotations\\System\\Http\\Controllers\\CreativeSuiteAnnotationsSecureAIController;')) {
+    failCreativeSuiteAnnotationsFinalizationContract('service provider does not import the secure controller');
+}
+
+foreach (['edit', 'status', 'analyze'] as $action) {
+    if (! str_contains($provider, "[CreativeSuiteAnnotationsSecureAIController::class, '{$action}']")) {
+        failCreativeSuiteAnnotationsFinalizationContract("{$action} route does not use the secure compatibility controller");
+    }
+}
+
+if (! str_contains($controller, 'extends CreativeSuiteAnnotationsAIController')) {
+    failCreativeSuiteAnnotationsFinalizationContract('secure controller does not preserve donor edit/analyse compatibility');
+}
+
 if (! str_contains($controller, 'use App\\Services\\Security\\RemoteImageFetcher;')) {
-    failCreativeSuiteAnnotationsFinalizationContract('controller does not import the shared RemoteImageFetcher');
+    failCreativeSuiteAnnotationsFinalizationContract('secure controller does not import the shared RemoteImageFetcher');
 }
 
 if (str_contains($controller, 'Http::get($url)')) {
-    failCreativeSuiteAnnotationsFinalizationContract('controller still performs an unrestricted remote GET');
+    failCreativeSuiteAnnotationsFinalizationContract('active finalisation controller performs an unrestricted remote GET');
 }
 
 if (! str_contains($controller, 'app(RemoteImageFetcher::class)->fetch($url)')) {
-    failCreativeSuiteAnnotationsFinalizationContract('controller does not fetch async results through the shared safe fetcher');
+    failCreativeSuiteAnnotationsFinalizationContract('active finalisation controller does not use the shared safe fetcher');
 }
 
 if (! str_contains($controller, '$download[\'extension\']')) {
@@ -49,20 +66,21 @@ if (preg_match($claimPattern, $controller) !== 1) {
 }
 
 foreach ([
-    'dispatchAfterResponse' => <<<'REGEX'
-/ProcessAnnotationEditJob::dispatchAfterResponse\(\s*\$userOpenai->getKey\(\),\s*\(int\) Auth::id\(\),/s
-REGEX,
-    'queued constructor' => <<<'REGEX'
-/new ProcessAnnotationEditJob\(\s*\$userOpenai->getKey\(\),\s*\(int\) Auth::id\(\),/s
-REGEX,
-] as $path => $pattern) {
-    if (preg_match($pattern, $controller) !== 1) {
-        failCreativeSuiteAnnotationsFinalizationContract("{$path} does not bind the task owner into the queued job");
+    'public int $userId;',
+    '?int $ownerId = null,',
+    '$this->userId = $ownerId ?? (int) Auth::id();',
+] as $requiredJobControl) {
+    if (! str_contains($job, $requiredJobControl)) {
+        failCreativeSuiteAnnotationsFinalizationContract("queued job is missing owner control: {$requiredJobControl}");
     }
 }
 
-if (! str_contains($job, 'public int $userId,')) {
-    failCreativeSuiteAnnotationsFinalizationContract('queued job does not persist the expected owner ID');
+$compatibleConstructor = <<<'REGEX'
+/public int \$userOpenaiId,\s*public string \$prompt,\s*public string \$modelSlug,\s*public string \$imageDiskPath,\s*public \?string \$maskDiskPath = null,\s*public int \$creditCost = 0,\s*\?int \$ownerId = null,/s
+REGEX;
+
+if (preg_match($compatibleConstructor, $job) !== 1) {
+    failCreativeSuiteAnnotationsFinalizationContract('queued job changed the existing constructor argument order');
 }
 
 $ownerScopedReload = <<<'REGEX'
