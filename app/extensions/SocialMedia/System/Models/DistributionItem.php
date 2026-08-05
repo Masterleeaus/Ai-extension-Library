@@ -8,6 +8,7 @@ use BackedEnum;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use InvalidArgumentException;
 
 class DistributionItem extends Model
 {
@@ -87,6 +88,19 @@ class DistributionItem extends Model
             self::MODE_ASSISTED,
             self::MODE_EXPORT_ONLY,
         ];
+    }
+
+    public static function createForUser(User $user, array $attributes): self
+    {
+        $contentType = (string) ($attributes['content_type'] ?? '');
+
+        if (! in_array($contentType, self::contentTypes(), true)) {
+            throw new InvalidArgumentException('Unsupported Titan Reach distribution content type.');
+        }
+
+        $attributes['user_id'] = $user->getKey();
+
+        return self::query()->create($attributes);
     }
 
     public static function fromSocialMediaPost(SocialMediaPost $post): self
