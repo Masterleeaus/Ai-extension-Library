@@ -25,7 +25,8 @@ class TitanLogRedactor {
   };
 
   static final RegExp _bearerPattern = RegExp(
-    r'(?i)\bBearer\s+[A-Za-z0-9._~+\-/]+=*',
+    r'\bBearer\s+[A-Za-z0-9._~+\-/]+=*',
+    caseSensitive: false,
   );
   static final RegExp _emailPattern = RegExp(
     r'\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b',
