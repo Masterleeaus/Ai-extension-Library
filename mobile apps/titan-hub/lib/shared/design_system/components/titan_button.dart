@@ -63,7 +63,10 @@ class TitanButton extends StatelessWidget {
       child: ExcludeSemantics(
         child: ConstrainedBox(
           constraints: const BoxConstraints(minHeight: 48, minWidth: 48),
-          child: SizedBox(width: expand ? double.infinity : null, child: button),
+          child: SizedBox(
+            width: expand ? double.infinity : null,
+            child: button,
+          ),
         ),
       ),
     );
