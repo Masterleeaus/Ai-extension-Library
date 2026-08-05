@@ -7,9 +7,11 @@ use App\Extensions\SocialMedia\System\Models\DistributionItem;
 use App\Extensions\SocialMedia\System\Models\SocialMediaPlatform;
 use App\Extensions\SocialMedia\System\Services\EbayListingService;
 use App\Http\Controllers\Controller;
+use Illuminate\Contracts\Cache\LockTimeoutException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use InvalidArgumentException;
 use RuntimeException;
 use Throwable;
@@ -34,12 +36,17 @@ class EbayListingController extends Controller
     {
         $validated = $this->validateListingAction($request);
 
-        return $this->respond(fn () => $this->service->syncDraft(
-            $request->user(),
+        return $this->respond(fn () => $this->locked(
             $item,
-            $this->account((int) $validated['account_id']),
-            (array) $validated['listing'],
-            (string) $validated['idempotency_key']
+            'draft',
+            (string) $validated['idempotency_key'],
+            fn () => $this->service->syncDraft(
+                $request->user(),
+                $item,
+                $this->account((int) $validated['account_id']),
+                (array) $validated['listing'],
+                (string) $validated['idempotency_key']
+            )
         ));
     }
 
@@ -47,12 +54,17 @@ class EbayListingController extends Controller
     {
         $validated = $this->validateListingAction($request);
 
-        return $this->respond(fn () => $this->service->publish(
-            $request->user(),
+        return $this->respond(fn () => $this->locked(
             $item,
-            $this->account((int) $validated['account_id']),
-            (array) $validated['listing'],
-            (string) $validated['idempotency_key']
+            'publish',
+            (string) $validated['idempotency_key'],
+            fn () => $this->service->publish(
+                $request->user(),
+                $item,
+                $this->account((int) $validated['account_id']),
+                (array) $validated['listing'],
+                (string) $validated['idempotency_key']
+            )
         ));
     }
 
@@ -60,12 +72,17 @@ class EbayListingController extends Controller
     {
         $validated = $this->validateListingAction($request);
 
-        return $this->respond(fn () => $this->service->revise(
-            $request->user(),
+        return $this->respond(fn () => $this->locked(
             $item,
-            $this->account((int) $validated['account_id']),
-            (array) $validated['listing'],
-            (string) $validated['idempotency_key']
+            'revise',
+            (string) $validated['idempotency_key'],
+            fn () => $this->service->revise(
+                $request->user(),
+                $item,
+                $this->account((int) $validated['account_id']),
+                (array) $validated['listing'],
+                (string) $validated['idempotency_key']
+            )
         ));
     }
 
@@ -76,11 +93,16 @@ class EbayListingController extends Controller
             'idempotency_key' => 'required|string|max:128',
         ]);
 
-        return $this->respond(fn () => $this->service->withdraw(
-            $request->user(),
+        return $this->respond(fn () => $this->locked(
             $item,
-            $this->account((int) $validated['account_id']),
-            (string) $validated['idempotency_key']
+            'withdraw',
+            (string) $validated['idempotency_key'],
+            fn () => $this->service->withdraw(
+                $request->user(),
+                $item,
+                $this->account((int) $validated['account_id']),
+                (string) $validated['idempotency_key']
+            )
         ));
     }
 
@@ -132,6 +154,28 @@ class EbayListingController extends Controller
             ->where('user_id', Auth::id())
             ->where('platform', PlatformEnum::ebay->value)
             ->firstOrFail();
+    }
+
+    private function locked(
+        DistributionItem $item,
+        string $operation,
+        string $idempotencyKey,
+        callable $callback
+    ): mixed {
+        $lockName = implode(':', [
+            'titan-reach',
+            'ebay',
+            Auth::id(),
+            $item->getKey(),
+            $operation,
+            hash('sha256', $idempotencyKey),
+        ]);
+
+        try {
+            return Cache::lock($lockName, 120)->block(5, $callback);
+        } catch (LockTimeoutException $exception) {
+            throw new RuntimeException('Another request is already processing this eBay operation.', previous: $exception);
+        }
     }
 
     private function respond(callable $callback): JsonResponse
