@@ -62,22 +62,22 @@ class SocialMediaChannelEntitlementService
     private function includedChannels(User $user): int
     {
         $plan = method_exists($user, 'activePlan') ? $user->activePlan() : null;
-        $field = (string) config('social-media.channels.plan_included_field', 'titan_reach_included_channels');
+        $field = (string) env('TITAN_REACH_PLAN_INCLUDED_FIELD', 'titan_reach_included_channels');
         $value = $plan?->{$field};
 
-        return max(0, (int) ($value ?? config('social-media.channels.included', 3)));
+        return max(0, (int) ($value ?? env('TITAN_REACH_INCLUDED_CHANNELS', 3)));
     }
 
     private function purchasedExtraChannels(User $user): int
     {
         $plan = method_exists($user, 'activePlan') ? $user->activePlan() : null;
-        $field = (string) config('social-media.channels.plan_extra_field', 'titan_reach_extra_channels');
+        $field = (string) env('TITAN_REACH_PLAN_EXTRA_FIELD', 'titan_reach_extra_channels');
 
         return max(0, (int) ($plan?->{$field} ?? 0));
     }
 
     private function extraChannelRate(): float
     {
-        return max(0, (float) config('social-media.channels.extra_monthly_rate', 10));
+        return max(0, (float) env('TITAN_REACH_EXTRA_CHANNEL_MONTHLY_RATE', 10));
     }
 }
