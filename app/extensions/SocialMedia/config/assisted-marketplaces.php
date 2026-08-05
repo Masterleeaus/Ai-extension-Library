@@ -3,6 +3,8 @@
 return [
     'default_expiry_days' => 30,
     'max_images' => 20,
+    'max_package_bytes' => 262144,
+    'idempotency_history_limit' => 10,
     'destinations' => [
         'facebook-marketplace' => [
             'label' => 'Facebook Marketplace',
