@@ -98,6 +98,11 @@ class DistributionItem extends Model
             throw new InvalidArgumentException('Unsupported Titan Reach distribution content type.');
         }
 
+        if ($contentType === self::TYPE_SOCIAL_POST) {
+            throw new InvalidArgumentException('Use fromSocialMediaPost() for canonical social post mappings.');
+        }
+
+        unset($attributes['social_media_post_id']);
         $attributes['user_id'] = $user->getKey();
 
         return self::query()->create($attributes);
@@ -105,6 +110,10 @@ class DistributionItem extends Model
 
     public static function fromSocialMediaPost(SocialMediaPost $post): self
     {
+        if (! $post->user_id) {
+            throw new InvalidArgumentException('A canonical social post owner is required.');
+        }
+
         $status = $post->status instanceof BackedEnum
             ? (string) $post->status->value
             : (string) $post->status;
