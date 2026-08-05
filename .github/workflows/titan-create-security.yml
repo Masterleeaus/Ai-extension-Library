@@ -8,8 +8,10 @@ on:
     paths:
       - .github/workflows/titan-create-security.yml
       - app/Services/Security/RemoteImageFetcher.php
+      - app/Services/Security/SvgSanitizer.php
       - app/extensions/CreativeSuite/System/Http/Controllers/CreativeSuiteDocumentController.php
       - app/extensions/CreativeSuite/System/Http/Controllers/CreativeSuiteAIController.php
+      - app/extensions/CreativeSuite/System/Http/Controllers/ImageUploadController.php
       - app/extensions/CreativeSuiteAnnotations/System/CreativeSuiteAnnotationsServiceProvider.php
       - app/extensions/CreativeSuiteAnnotations/System/Http/Controllers/CreativeSuiteAnnotationsAIController.php
       - app/extensions/CreativeSuiteAnnotations/System/Http/Controllers/CreativeSuiteAnnotationsSecureAIController.php
@@ -22,12 +24,14 @@ on:
       - tests/contracts/creative_suite_document_ownership.php
       - tests/contracts/creative_suite_ai_task_ownership.php
       - tests/contracts/creative_suite_annotations_finalization_security.php
+      - tests/contracts/creative_suite_svg_sanitization.php
       - tests/contracts/advanced_image_task_ownership.php
       - tests/contracts/advanced_image_webhook_signature.php
       - tests/contracts/remote_image_fetcher_security.php
       - tests/contracts/canvas_message_ownership.php
       - tests/Feature/Extensions/CreativeSuite/CreativeSuiteDocumentOwnershipTest.php
       - tests/Feature/Extensions/CreativeSuite/CreativeSuiteAITaskOwnershipTest.php
+      - tests/Feature/Extensions/CreativeSuite/CreativeSuiteSvgUploadSecurityTest.php
       - tests/Feature/Extensions/CreativeSuiteAnnotations/CreativeSuiteAnnotationsFinalizationSecurityTest.php
       - tests/Feature/Extensions/AdvancedImage/AdvancedImageTaskOwnershipTest.php
       - tests/Feature/Extensions/AdvancedImage/AdvancedImageWebhookSignatureTest.php
@@ -58,8 +62,10 @@ jobs:
       - name: Validate Titan Create security PHP syntax
         run: |
           php -l app/Services/Security/RemoteImageFetcher.php
+          php -l app/Services/Security/SvgSanitizer.php
           php -l app/extensions/CreativeSuite/System/Http/Controllers/CreativeSuiteDocumentController.php
           php -l app/extensions/CreativeSuite/System/Http/Controllers/CreativeSuiteAIController.php
+          php -l app/extensions/CreativeSuite/System/Http/Controllers/ImageUploadController.php
           php -l app/extensions/CreativeSuiteAnnotations/System/CreativeSuiteAnnotationsServiceProvider.php
           php -l app/extensions/CreativeSuiteAnnotations/System/Http/Controllers/CreativeSuiteAnnotationsAIController.php
           php -l app/extensions/CreativeSuiteAnnotations/System/Http/Controllers/CreativeSuiteAnnotationsSecureAIController.php
@@ -72,12 +78,14 @@ jobs:
           php -l tests/contracts/creative_suite_document_ownership.php
           php -l tests/contracts/creative_suite_ai_task_ownership.php
           php -l tests/contracts/creative_suite_annotations_finalization_security.php
+          php -l tests/contracts/creative_suite_svg_sanitization.php
           php -l tests/contracts/advanced_image_task_ownership.php
           php -l tests/contracts/advanced_image_webhook_signature.php
           php -l tests/contracts/remote_image_fetcher_security.php
           php -l tests/contracts/canvas_message_ownership.php
           php -l tests/Feature/Extensions/CreativeSuite/CreativeSuiteDocumentOwnershipTest.php
           php -l tests/Feature/Extensions/CreativeSuite/CreativeSuiteAITaskOwnershipTest.php
+          php -l tests/Feature/Extensions/CreativeSuite/CreativeSuiteSvgUploadSecurityTest.php
           php -l tests/Feature/Extensions/CreativeSuiteAnnotations/CreativeSuiteAnnotationsFinalizationSecurityTest.php
           php -l tests/Feature/Extensions/AdvancedImage/AdvancedImageTaskOwnershipTest.php
           php -l tests/Feature/Extensions/AdvancedImage/AdvancedImageWebhookSignatureTest.php
@@ -88,6 +96,7 @@ jobs:
           php tests/contracts/creative_suite_document_ownership.php
           php tests/contracts/creative_suite_ai_task_ownership.php
           php tests/contracts/creative_suite_annotations_finalization_security.php
+          php tests/contracts/creative_suite_svg_sanitization.php
           php tests/contracts/advanced_image_task_ownership.php
           php tests/contracts/advanced_image_webhook_signature.php
           php tests/contracts/remote_image_fetcher_security.php
