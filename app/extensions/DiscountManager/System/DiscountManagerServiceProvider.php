@@ -21,6 +21,12 @@ use Illuminate\Support\ServiceProvider;
  */
 class DiscountManagerServiceProvider extends ServiceProvider implements ExtensionRegisterKeyProviderInterface, UninstallExtensionServiceProviderInterface
 {
+    public function register(): void
+    {
+        // Register the DiscountCalculatingEngine
+        $this->registerDiscountCalculatingEngine();
+    }
+
     public function boot(Kernel $kernel): void
     {
         $this->registerViews()
@@ -84,6 +90,23 @@ class DiscountManagerServiceProvider extends ServiceProvider implements Extensio
     private function router(): Router|Route
     {
         return $this->app['router'];
+    }
+
+    /**
+     * Register the DiscountCalculatingEngine with the CalculatingEngineService
+     */
+    private function registerDiscountCalculatingEngine(): void
+    {
+        $this->app->afterResolving(
+            \App\Domains\WorkCore\Calculating\Services\CalculatingEngineService::class,
+            function ($service) {
+                // Register the discount engine
+                $service->registerEngine(
+                    'discount_engine',
+                    \App\Domains\WorkCore\Calculating\Engines\DiscountCalculatingEngine::class
+                );
+            }
+        );
     }
 
     public static function uninstall(): void
