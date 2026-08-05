@@ -24,7 +24,10 @@ class PinterestBoardGuard
         SocialMediaPlatform $account,
         array $result
     ): array {
-        $boards = $this->filterVisibleBoards((array) ($result['boards'] ?? []));
+        $boards = $this->mergeBoards(
+            (array) data_get($account->credentials, 'boards', []),
+            (array) ($result['boards'] ?? [])
+        );
         $providerCapabilities = (array) ($result['provider_capabilities'] ?? []);
         $providerCapabilities['publish'] = (bool) ($providerCapabilities['publish'] ?? false)
             && $boards !== [];
@@ -47,7 +50,10 @@ class PinterestBoardGuard
         SocialMediaPlatform $account,
         array $result
     ): array {
-        $boards = $this->filterVisibleBoards((array) ($result['boards'] ?? []));
+        $boards = $this->mergeBoards(
+            (array) data_get($account->credentials, 'boards', []),
+            (array) ($result['boards'] ?? [])
+        );
         $result['boards'] = $boards;
         $credentials = (array) $account->credentials;
         $credentials['boards'] = $boards;
@@ -56,6 +62,17 @@ class PinterestBoardGuard
         $account->refresh();
 
         return $result;
+    }
+
+    private function mergeBoards(array $existing, array $incoming): array
+    {
+        $merged = [];
+
+        foreach ($this->filterVisibleBoards([...$existing, ...$incoming]) as $board) {
+            $merged[(string) $board['id']] = $board;
+        }
+
+        return array_values($merged);
     }
 
     public function assertWritableBoard(
