@@ -103,7 +103,7 @@ class VerticalDistributionProfilesContractTest extends TestCase
         $this->assertStringContainsString('forVerticalDestination', $service);
         $this->assertStringContainsString('vertical_context_resolver', $service);
         $this->assertStringContainsString('generic-business', $service);
-        $this->assertStringContainsString("$profile['content_types'] = DistributionItem::contentTypes()", $service);
+        $this->assertStringContainsString("\$profile['content_types'] = DistributionItem::contentTypes()", $service);
         $this->assertStringContainsString('normaliseSuitability', $service);
     }
 
@@ -117,10 +117,10 @@ class VerticalDistributionProfilesContractTest extends TestCase
         $this->assertStringContainsString('applyTenantOverride', $service);
         $this->assertStringContainsString('array_intersect', $service);
         $this->assertStringContainsString('SUITABILITY_NOT_APPLICABLE', $service);
-        $this->assertStringContainsString("data_get($resolved, 'resolved.capabilities.vertical_family')", $service);
-        $this->assertStringContainsString("data_get($resolved, 'resolved.capabilities.subtype')", $service);
-        $this->assertStringContainsString("'context_id' => $resolved['context_id'] ?? null", $service);
-        $this->assertStringContainsString("'context_hash' => $resolved['context_hash'] ?? null", $service);
+        $this->assertStringContainsString("data_get(\$resolved, 'resolved.capabilities.vertical_family')", $service);
+        $this->assertStringContainsString("data_get(\$resolved, 'resolved.capabilities.subtype')", $service);
+        $this->assertStringContainsString("'context_id' => \$resolved['context_id'] ?? null", $service);
+        $this->assertStringContainsString("'context_hash' => \$resolved['context_hash'] ?? null", $service);
         $this->assertStringContainsString('vertical_context_id', $service);
         $this->assertStringContainsString('vertical_context_hash', $service);
     }
