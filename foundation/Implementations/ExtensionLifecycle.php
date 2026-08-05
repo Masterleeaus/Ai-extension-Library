@@ -54,7 +54,7 @@ class ExtensionLifecycle implements ExtensionLifecycleContract
                         $extensionName,
                         json_encode($extensionMetadata, 'EXECUTE'),
                         'draft',
-                        date('c'),
+                        DateTimeHelper::now(),
                     ]);
         } catch (DatabaseException $e) {
             error_log("Database error: " . $e->getMessage());
@@ -106,7 +106,7 @@ class ExtensionLifecycle implements ExtensionLifecycleContract
                     $tenantId,
                     $version,
                     json_encode($releaseNotes),
-                    date('c'),
+                    DateTimeHelper::now(),
                 ])) {
                     throw new \Exception('Failed to insert version record');
                 }
@@ -116,7 +116,7 @@ class ExtensionLifecycle implements ExtensionLifecycleContract
                     "UPDATE " . self::TABLE_EXTENSIONS . " SET status = ?, published_version = ?, updated_at = ? WHERE id = ? AND tenant_id = ?"
                 );
 
-                if (!$updateStmt->execute(['published', $version, date('c'), $extensionId, $tenantId])) {
+                if (!$updateStmt->execute(['published', $version, DateTimeHelper::now(), $extensionId, $tenantId])) {
                     throw new \Exception('Failed to update extension status');
                 }
 

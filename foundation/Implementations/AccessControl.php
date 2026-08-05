@@ -40,7 +40,7 @@ class AccessControl implements AccessControlContract
             $resourceType,
             $resourceId,
             $permission,
-            date('c'),
+            DateTimeHelper::now(),
         ]);
     }
 
@@ -149,7 +149,7 @@ class AccessControl implements AccessControlContract
                  VALUES (?, ?, ?, ?)"
             );
 
-            return $this->helper->safeExecute($stmt, [$tenantId, $userId, $role, date('c')], 'INSERT');
+            return $this->helper->safeExecute($stmt, [$tenantId, $userId, $role, DateTimeHelper::now()], 'INSERT');
         } catch (DatabaseException $e) {
             error_log("Database error in assignRole: {$e->getMessage()}");
             throw $e;

@@ -80,7 +80,7 @@ class CommerceContract implements CommerceContractContract
              ON DUPLICATE KEY UPDATE quantity = ?, updated_at = ?"
         );
 
-        $now = date('c');
+        $now = DateTimeHelper::now();
         return $stmt->execute([
             $tenantId,
             $productId,
@@ -153,13 +153,13 @@ class CommerceContract implements CommerceContractContract
             $tenantId,
             json_encode($paymentDetails),
             'processing',
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return [
             'payment_id' => $paymentId,
             'status' => 'processing',
-            'processed_at' => date('c'),
+            'processed_at' => DateTimeHelper::now(),
         ];
     }
 
@@ -189,7 +189,7 @@ class CommerceContract implements CommerceContractContract
             $tenantId,
             json_encode($order),
             'pending',
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return $orderId;
@@ -281,7 +281,7 @@ class CommerceContract implements CommerceContractContract
             $orderId,
             json_encode($refundDetails),
             'pending',
-            date('c'),
+            DateTimeHelper::now(),
         ]);
     }
 }
