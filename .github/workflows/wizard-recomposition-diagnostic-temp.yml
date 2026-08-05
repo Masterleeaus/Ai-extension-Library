@@ -11,7 +11,7 @@ permissions:
 jobs:
   verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
 
@@ -30,12 +30,19 @@ jobs:
           printf '%s\n' '{"require":{"php":"^8.2","illuminate/database":"^10.0","illuminate/events":"^10.0","illuminate/support":"^10.0","symfony/uid":"^6.0"}}' > composer.json
           composer install --no-interaction --no-progress --prefer-dist
 
-      - name: Run focused wizard recomposition contract
+      - name: Run focused wizard recomposition contracts
         env:
           AI_EXTENSIONS_REPO_ROOT: ${{ github.workspace }}
           WORKCORE_TEST_VENDOR_AUTOLOAD: /tmp/workcore-recomposition-test/vendor/autoload.php
-        run: php app/extensions/WorkCore_Platform/tests/wizard_answer_recomposition.php
+        run: |
+          php app/extensions/WorkCore_Platform/tests/wizard_answer_recomposition.php
+          php app/extensions/WorkCore_Platform/tests/wizard_answer_recomposition_queue.php
 
-      - name: Lint focused test
+      - name: Lint focused implementation
         if: always()
-        run: php -l app/extensions/WorkCore_Platform/tests/wizard_answer_recomposition.php
+        run: |
+          php -l app/extensions/WorkCore_Platform/tests/wizard_answer_recomposition.php
+          php -l app/extensions/WorkCore_Platform/tests/wizard_answer_recomposition_queue.php
+          find app/extensions/WorkCore_Platform/packages/workcore-business-network/src/Domains/WorkCore/System/Modules/Wizards \
+            \( -name '*Recomposition*.php' -o -name '*Enrichment*.php' -o -name 'WizardAnswerChanged.php' -o -name 'WizardDependencyResolver.php' -o -name 'SaveWizardAnswer.php' \) \
+            -print0 | xargs -0 -r -n1 php -l
