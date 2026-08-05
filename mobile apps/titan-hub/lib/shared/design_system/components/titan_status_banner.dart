@@ -7,6 +7,7 @@ import 'titan_button.dart';
 
 enum TitanStatusTone { success, warning, danger, info }
 
+/// Accessible operational banner for success, warning, error and info states.
 class TitanStatusBanner extends StatelessWidget {
   const TitanStatusBanner({
     required this.tone,
