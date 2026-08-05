@@ -1,0 +1,44 @@
+name: WorkCore Source Manifest Diagnostic Temporary
+
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout feature branch
+        uses: actions/checkout@v4
+        with:
+          ref: feature/workcore-wizard-vertical-context
+
+      - name: Collect manifest contract sources
+        working-directory: app/extensions/WorkCore_Platform
+        run: |
+          rm -rf /tmp/workcore-source-manifest-diagnostics
+          mkdir -p /tmp/workcore-source-manifest-diagnostics
+          {
+            find . -type f \( -name 'source-files.json' -o -name '*source*manifest*.py' \) -print
+            grep -RIl --exclude-dir='__pycache__' -E 'source-files\.json|test_contract_manifest_matches_canonical_tree' tests tools contracts .github 2>/dev/null || true
+          } | sort -u | while read -r file; do
+            [ -f "$file" ] || continue
+            target="/tmp/workcore-source-manifest-diagnostics/${file#./}"
+            mkdir -p "$(dirname "$target")"
+            cp "$file" "$target"
+          done
+          find /tmp/workcore-source-manifest-diagnostics -type f -print
+
+      - name: Upload diagnostics
+        uses: actions/upload-artifact@v4
+        with:
+          name: workcore-source-manifest-diagnostics
+          path: /tmp/workcore-source-manifest-diagnostics
+          if-no-files-found: error
+          retention-days: 1
