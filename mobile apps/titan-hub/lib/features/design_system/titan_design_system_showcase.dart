@@ -46,7 +46,7 @@ class _TitanDesignSystemShowcaseState extends State<TitanDesignSystemShowcase> {
         child: Wrap(
           spacing: TitanSpacing.sm,
           runSpacing: TitanSpacing.sm,
-          children: const [
+          children: [
             _ColourSwatch(label: 'Primary', color: TitanColors.primary),
             _ColourSwatch(label: 'Success', color: TitanColors.success),
             _ColourSwatch(label: 'Warning', color: TitanColors.warning),
