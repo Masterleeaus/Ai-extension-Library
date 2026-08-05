@@ -1,21 +1,350 @@
 <?php
 
 declare(strict_types=1);
+
 namespace App\Domains\WorkCore\System\Modules\Wizards\Services;
-use App\Domains\WorkCore\System\Modules\Wizards\Contracts\WizardRepositoryContract;use InvalidArgumentException;
+
+use App\Domains\WorkCore\System\Modules\Wizards\Contracts\WizardRepositoryContract;
+use InvalidArgumentException;
+
 final class WizardRuntime
 {
     private WizardDependencyResolver $dependencies;
-    public function __construct(private WizardDefinitionRegistry $definitions,private WizardRepositoryContract $repository,private WizardBranchEvaluator $branches,private WizardAnswerValidator $validator,private WizardRiskPolicy $risk,?WizardDependencyResolver $dependencies=null){$this->dependencies=$dependencies??new WizardDependencyResolver();}
-    public function definition(string $key,int $companyId):array{return $this->definitions->get($key,$companyId);}
-    public function start(string $key,array $data,int $companyId,int $actorId):array{return $this->repository->startRun($this->definition($key,$companyId),$data,$companyId,$actorId);}
-    public function save(string $runPublicId,string $questionKey,mixed $value,array $provenance,int $companyId,int $actorId):array{$run=$this->repository->run($runPublicId,$companyId);$q=$this->question((string)$run['definition_key'],$questionKey,$companyId);$this->validator->validate($q,$value);if($this->risk->decision((string)($q['risk']??'low'))==='blocked')throw new InvalidArgumentException('This critical setting cannot be changed through a wizard.');if(($provenance['source']??'user_entered')!=='user_entered'&&!$this->risk->canAiExecute((string)($q['risk']??'low')))$provenance['is_confirmed']=false;return $this->repository->saveAnswer($runPublicId,$q,$value,$provenance,$companyId,$actorId);}
-    public function next(string $runPublicId,int $companyId):array{$run=$this->repository->run($runPublicId,$companyId);$definition=$this->definition((string)$run['definition_key'],$companyId);$answers=$this->repository->answers($runPublicId,$companyId);$applicable=$this->applicableQuestions($definition,$answers);$answered=0;foreach($applicable as [$section,$q]){if(array_key_exists($q['key'],$answers)){$answered++;continue;}return ['run'=>$run,'section'=>['key'=>$section['key'],'title'=>$section['title']],'question'=>$q,'progress'=>['answered'=>$answered,'total'=>count($applicable),'percent'=>count($applicable)?round($answered/count($applicable)*100,1):100]];}return ['run'=>$run,'question'=>null,'progress'=>['answered'=>$answered,'total'=>count($applicable),'percent'=>100],'ready_for_review'=>true];}
-    public function review(string $runPublicId,int $companyId):array{$run=$this->repository->run($runPublicId,$companyId);$definition=$this->definition((string)$run['definition_key'],$companyId);$answers=$this->repository->answers($runPublicId,$companyId);$approved=$this->repository->approvedSections($runPublicId,$companyId);$sections=[];foreach($definition['sections'] as $section){$rows=[];$max='low';foreach(($section['questions']??[]) as $q){if(!$this->branches->matches((array)($q['when']??[]),$answers))continue;$risk=(string)($q['risk']??'low');if($this->rank($risk)>$this->rank($max))$max=$risk;$rows[]=['key'=>$q['key'],'question'=>$q['question'],'value'=>$answers[$q['key']]??null,'risk'=>$risk,'required'=>$q['required']??false,'source'=>$q['target_owner']??null];}$sections[]=['key'=>$section['key'],'title'=>$section['title'],'risk'=>$max,'approval_decision'=>$this->risk->decision($max),'approved'=>in_array($section['key'],$approved,true),'answers'=>$rows];}return ['run'=>$run,'definition'=>['key'=>$definition['key'],'title'=>$definition['title'],'version'=>$definition['version']],'sections'=>$sections];}
-    public function approve(string $runPublicId,string $sectionKey,array $summary,int $companyId,int $actorId):array{$review=$this->review($runPublicId,$companyId);$section=null;foreach($review['sections'] as $candidate)if($candidate['key']===$sectionKey){$section=$candidate;break;}if(!$section)throw new InvalidArgumentException('Wizard section was not found.');foreach($section['answers'] as $answer)if(($answer['required']??false)&&($answer['value']===null||$answer['value']===''))throw new InvalidArgumentException('Required section answers must be completed before approval.');return $this->repository->approveSection($runPublicId,$sectionKey,$summary?:$section,$companyId,$actorId);}
-    public function complete(string $runPublicId,int $companyId,int $actorId):array{$next=$this->next($runPublicId,$companyId);if(!($next['ready_for_review']??false))throw new InvalidArgumentException('All applicable wizard questions must be answered before completion.');$review=$this->review($runPublicId,$companyId);foreach($review['sections'] as $section){if(in_array($section['approval_decision'],['section_approval','explicit_approval'],true)&&!$section['approved'])throw new InvalidArgumentException("Section [{$section['title']}] requires approval before completion.");}$record=$this->repository->changeStatus($runPublicId,'completed',$companyId,$actorId);$record['action_plan']=$this->actionPlan($review);return $record;}
-    private function applicableQuestions(array $definition,array $answers):array{$out=[];foreach($definition['sections'] as $section)foreach(($section['questions']??[]) as $q)if($this->branches->matches((array)($q['when']??[]),$answers))$out[]=[$section,$q];return $out;}
-    private function question(string $definitionKey,string $questionKey,int $companyId):array{return $this->dependencies->question($this->definition($definitionKey,$companyId),$questionKey);}
-    private function rank(string $risk):int{return array_search($risk,['low','medium','high','critical'],true)?:0;}
-    private function actionPlan(array $review):array{$owners=[];foreach($review['sections'] as $section)foreach($section['answers'] as $a)if($a['value']!==null)$owners[(string)($a['source']?:'Wizard runtime')][]=$a['key'];$plan=[];foreach($owners as $owner=>$keys)$plan[]=['target_owner'=>$owner,'answer_keys'=>array_values(array_unique($keys)),'status'=>'draft','execution'=>'canonical_workcore_action_adapter_required'];return $plan;}
+    private ?LayeredWizardQuestionComposer $composer;
+    private ?WizardQuestionPlanner $planner;
+
+    public function __construct(
+        private WizardDefinitionRegistry $definitions,
+        private WizardRepositoryContract $repository,
+        private WizardBranchEvaluator $branches,
+        private WizardAnswerValidator $validator,
+        private WizardRiskPolicy $risk,
+        ?WizardDependencyResolver $dependencies = null,
+        ?LayeredWizardQuestionComposer $composer = null,
+        ?WizardQuestionPlanner $planner = null,
+    ) {
+        $this->dependencies = $dependencies ?? new WizardDependencyResolver();
+        $this->composer = $composer;
+        $this->planner = $planner;
+    }
+
+    public function definition(string $key, int $companyId): array
+    {
+        return $this->definitions->get($key, $companyId);
+    }
+
+    public function start(string $key, array $data, int $companyId, int $actorId): array
+    {
+        $definition = $this->definitionForStart($key, $data, $companyId);
+        $metadata = (array) ($data['metadata'] ?? []);
+        $definitionHash = (string) ($definition['composition_hash'] ?? $this->definitionHash($definition));
+        $metadata['definition_snapshot'] = $definition;
+        $metadata['definition_schema_version'] = (string) ($definition['schema_version'] ?? 'legacy-1');
+        $metadata['definition_hash'] = $definitionHash;
+        $metadata['composition'] = (array) ($definition['composition'] ?? []);
+        $data['metadata'] = $metadata;
+
+        $record = $this->repository->startRun($definition, $data, $companyId, $actorId);
+        $record['definition_hash'] = $definitionHash;
+        $record['definition_schema_version'] = $metadata['definition_schema_version'];
+
+        return $record;
+    }
+
+    public function save(
+        string $runPublicId,
+        string $questionKey,
+        mixed $value,
+        array $provenance,
+        int $companyId,
+        int $actorId,
+    ): array {
+        $run = $this->repository->run($runPublicId, $companyId);
+        $definition = $this->definitionForRun($run, $companyId);
+        $question = $this->dependencies->question($definition, $questionKey);
+        $this->validator->validate($question, $value);
+        if ($this->risk->decision((string) ($question['risk'] ?? 'low')) === 'blocked') {
+            throw new InvalidArgumentException('This critical setting cannot be changed through a wizard.');
+        }
+        if (($provenance['source'] ?? 'user_entered') !== 'user_entered'
+            && !$this->risk->canAiExecute((string) ($question['risk'] ?? 'low'))) {
+            $provenance['is_confirmed'] = false;
+        }
+
+        return $this->repository->saveAnswer(
+            $runPublicId,
+            $question,
+            $value,
+            $provenance,
+            $companyId,
+            $actorId,
+        );
+    }
+
+    public function next(string $runPublicId, int $companyId): array
+    {
+        $run = $this->repository->run($runPublicId, $companyId);
+        $definition = $this->definitionForRun($run, $companyId);
+        $answers = $this->repository->answers($runPublicId, $companyId);
+        $applicable = $this->applicableQuestions($definition, $answers);
+        $answered = 0;
+        foreach ($applicable as [$section, $question]) {
+            if (array_key_exists($question['key'], $answers)) {
+                $answered++;
+                continue;
+            }
+
+            return [
+                'run' => $run,
+                'definition_hash' => $this->definitionHashFromRun($run, $definition),
+                'section' => ['key' => $section['key'], 'title' => $section['title']],
+                'question' => $question,
+                'progress' => [
+                    'answered' => $answered,
+                    'total' => count($applicable),
+                    'percent' => count($applicable) ? round($answered / count($applicable) * 100, 1) : 100,
+                ],
+            ];
+        }
+
+        return [
+            'run' => $run,
+            'definition_hash' => $this->definitionHashFromRun($run, $definition),
+            'question' => null,
+            'progress' => ['answered' => $answered, 'total' => count($applicable), 'percent' => 100],
+            'ready_for_review' => true,
+        ];
+    }
+
+    public function review(string $runPublicId, int $companyId): array
+    {
+        $run = $this->repository->run($runPublicId, $companyId);
+        $definition = $this->definitionForRun($run, $companyId);
+        $answers = $this->repository->answers($runPublicId, $companyId);
+        $approved = $this->repository->approvedSections($runPublicId, $companyId);
+        $sections = [];
+        foreach ($definition['sections'] as $section) {
+            $rows = [];
+            $max = 'low';
+            foreach (($section['questions'] ?? []) as $question) {
+                if (!$this->branches->matches((array) ($question['when'] ?? []), $answers)) {
+                    continue;
+                }
+                $questionRisk = (string) ($question['risk'] ?? 'low');
+                if ($this->rank($questionRisk) > $this->rank($max)) {
+                    $max = $questionRisk;
+                }
+                $rows[] = [
+                    'key' => $question['key'],
+                    'question' => $question['question'],
+                    'value' => $answers[$question['key']] ?? null,
+                    'risk' => $questionRisk,
+                    'required' => $question['required'] ?? false,
+                    'source' => $question['target_owner'] ?? null,
+                    'source_layer' => $question['source_layer'] ?? null,
+                ];
+            }
+            $sections[] = [
+                'key' => $section['key'],
+                'title' => $section['title'],
+                'risk' => $max,
+                'approval_decision' => $this->risk->decision($max),
+                'approved' => in_array($section['key'], $approved, true),
+                'answers' => $rows,
+            ];
+        }
+
+        return [
+            'run' => $run,
+            'definition' => [
+                'key' => $definition['key'],
+                'title' => $definition['title'],
+                'version' => $definition['version'],
+                'schema_version' => $definition['schema_version'] ?? 'legacy-1',
+                'hash' => $this->definitionHashFromRun($run, $definition),
+            ],
+            'sections' => $sections,
+        ];
+    }
+
+    public function approve(
+        string $runPublicId,
+        string $sectionKey,
+        array $summary,
+        int $companyId,
+        int $actorId,
+    ): array {
+        $review = $this->review($runPublicId, $companyId);
+        $section = null;
+        foreach ($review['sections'] as $candidate) {
+            if ($candidate['key'] === $sectionKey) {
+                $section = $candidate;
+                break;
+            }
+        }
+        if (!$section) {
+            throw new InvalidArgumentException('Wizard section was not found.');
+        }
+        foreach ($section['answers'] as $answer) {
+            if (($answer['required'] ?? false) && ($answer['value'] === null || $answer['value'] === '')) {
+                throw new InvalidArgumentException('Required section answers must be completed before approval.');
+            }
+        }
+
+        return $this->repository->approveSection(
+            $runPublicId,
+            $sectionKey,
+            $summary ?: $section,
+            $companyId,
+            $actorId,
+        );
+    }
+
+    public function complete(string $runPublicId, int $companyId, int $actorId): array
+    {
+        $next = $this->next($runPublicId, $companyId);
+        if (!($next['ready_for_review'] ?? false)) {
+            throw new InvalidArgumentException('All applicable wizard questions must be answered before completion.');
+        }
+        $review = $this->review($runPublicId, $companyId);
+        foreach ($review['sections'] as $section) {
+            if (in_array($section['approval_decision'], ['section_approval', 'explicit_approval'], true)
+                && !$section['approved']) {
+                throw new InvalidArgumentException("Section [{$section['title']}] requires approval before completion.");
+            }
+        }
+        $record = $this->repository->changeStatus($runPublicId, 'completed', $companyId, $actorId);
+        $record['action_plan'] = $this->actionPlan($review);
+
+        return $record;
+    }
+
+    private function definitionForStart(string $key, array $data, int $companyId): array
+    {
+        if ($key !== LayeredWizardQuestionComposer::DEFINITION_KEY) {
+            return $this->definition($key, $companyId);
+        }
+        if ($this->composer === null) {
+            throw new InvalidArgumentException('Layered wizard question composition is unavailable.');
+        }
+
+        return $this->composer->compose((array) ($data['composition'] ?? []));
+    }
+
+    private function definitionForRun(array $run, int $companyId): array
+    {
+        $metadata = $this->decodeMetadata($run['metadata'] ?? null);
+        $snapshot = $metadata['definition_snapshot'] ?? null;
+        if (is_array($snapshot)) {
+            $expected = (string) ($metadata['definition_hash'] ?? '');
+            $actual = (string) ($snapshot['composition_hash'] ?? $this->definitionHash($snapshot));
+            if ($expected === '' || !hash_equals($expected, $actual)) {
+                throw new InvalidArgumentException('Wizard run definition snapshot failed integrity validation.');
+            }
+
+            return $snapshot;
+        }
+
+        return $this->definitions->getVersion(
+            (string) $run['definition_key'],
+            (int) $run['definition_version'],
+            $companyId,
+        );
+    }
+
+    /** @return list<array{0:array<string,mixed>,1:array<string,mixed>}> */
+    private function applicableQuestions(array $definition, array $answers): array
+    {
+        if ($this->planner !== null && isset($definition['dependency_graph'])) {
+            return array_map(
+                static fn (array $row): array => [[
+                    'key' => $row['section_key'],
+                    'title' => $row['section_title'],
+                ], $row['question']],
+                $this->planner->plan($definition, $answers),
+            );
+        }
+
+        $out = [];
+        foreach ($definition['sections'] as $section) {
+            foreach (($section['questions'] ?? []) as $question) {
+                if ($this->branches->matches((array) ($question['when'] ?? []), $answers)) {
+                    $out[] = [$section, $question];
+                }
+            }
+        }
+
+        return $out;
+    }
+
+    private function rank(string $risk): int
+    {
+        return array_search($risk, ['low', 'medium', 'high', 'critical'], true) ?: 0;
+    }
+
+    private function actionPlan(array $review): array
+    {
+        $owners = [];
+        foreach ($review['sections'] as $section) {
+            foreach ($section['answers'] as $answer) {
+                if ($answer['value'] !== null) {
+                    $owners[(string) ($answer['source'] ?: 'Wizard runtime')][] = $answer['key'];
+                }
+            }
+        }
+        $plan = [];
+        foreach ($owners as $owner => $keys) {
+            $plan[] = [
+                'target_owner' => $owner,
+                'answer_keys' => array_values(array_unique($keys)),
+                'status' => 'draft',
+                'execution' => 'canonical_workcore_action_adapter_required',
+            ];
+        }
+
+        return $plan;
+    }
+
+    private function decodeMetadata(mixed $metadata): array
+    {
+        if (is_array($metadata)) {
+            return $metadata;
+        }
+        if ($metadata === null || $metadata === '') {
+            return [];
+        }
+
+        return (array) json_decode((string) $metadata, true, 512, JSON_THROW_ON_ERROR);
+    }
+
+    private function definitionHashFromRun(array $run, array $definition): string
+    {
+        $metadata = $this->decodeMetadata($run['metadata'] ?? null);
+
+        return (string) ($metadata['definition_hash'] ?? $definition['composition_hash'] ?? $this->definitionHash($definition));
+    }
+
+    private function definitionHash(array $definition): string
+    {
+        return hash(
+            'sha256',
+            json_encode($this->canonicalize($definition), JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES),
+        );
+    }
+
+    private function canonicalize(mixed $value): mixed
+    {
+        if (!is_array($value)) {
+            return $value;
+        }
+        if (array_is_list($value)) {
+            return array_map($this->canonicalize(...), $value);
+        }
+        ksort($value, SORT_STRING);
+        foreach ($value as $key => $item) {
+            $value[$key] = $this->canonicalize($item);
+        }
+
+        return $value;
+    }
 }
