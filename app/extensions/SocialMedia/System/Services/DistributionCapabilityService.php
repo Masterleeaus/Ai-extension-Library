@@ -147,11 +147,11 @@ class DistributionCapabilityService
     ): array {
         $profile = $this->resolveVerticalProfile($vertical, $subtype, $user);
         $definition = $this->destinations()[$destination] ?? null;
-        $suitability = (string) data_get(
+        $suitability = $this->normaliseSuitability((string) data_get(
             $profile,
             "destination_suitability.{$destination}",
             self::SUITABILITY_NOT_APPLICABLE
-        );
+        ));
         $validContentType = in_array($contentType, DistributionItem::contentTypes(), true);
         $profileSupportsContent = in_array(
             $contentType,
@@ -198,6 +198,7 @@ class DistributionCapabilityService
     ): array {
         $context = $this->resolveVerticalContext($vertical, $subtype, $user);
         $profiles = $this->verticalProfiles();
+        $rawVertical = $this->normaliseSlug($context['vertical'] ?? null);
         $slug = $this->canonicalVerticalSlug($context['vertical'] ?? null, $profiles);
         $provenance = array_values((array) ($context['provenance'] ?? []));
 
@@ -215,7 +216,8 @@ class DistributionCapabilityService
         }
 
         $profile = $profiles[$slug];
-        $resolvedSubtype = $this->normaliseSlug($context['subtype'] ?? null);
+        $resolvedSubtype = $this->normaliseSlug($context['subtype'] ?? null)
+            ?? $this->inferredSubtype($rawVertical, $profile);
         $profile['resolved_subtype'] = $resolvedSubtype;
         $profile['subtype_known'] = $resolvedSubtype
             ? in_array($resolvedSubtype, (array) ($profile['subtypes'] ?? []), true)
@@ -229,8 +231,7 @@ class DistributionCapabilityService
         $tenantOverride = $this->tenantOverride($user, $slug);
 
         if ($tenantOverride !== []) {
-            $profile = array_replace_recursive($profile, $tenantOverride);
-            $profile['slug'] = $slug;
+            $profile = $this->applyTenantOverride($profile, $tenantOverride);
             $profile['profile_provenance'][] = 'tenant_override';
             $profile['profile_provenance'] = array_values(array_unique($profile['profile_provenance']));
         }
@@ -294,11 +295,13 @@ class DistributionCapabilityService
     {
         $catalogue = $this->verticalCatalogue();
         $configured = (array) config('social-media.vertical_distribution.generic_profile', []);
-
-        return array_replace_recursive(
+        $profile = array_replace_recursive(
             (array) ($catalogue['generic_profile'] ?? []),
             $configured
         );
+        $profile['content_types'] = DistributionItem::contentTypes();
+
+        return $profile;
     }
 
     private function profileVersion(): string
@@ -324,16 +327,28 @@ class DistributionCapabilityService
             $this->verticalCatalogue()['vertical_context_resolver'] ?? null
         );
 
-        if ($user && is_string($resolver) && $resolver !== '' && class_exists($resolver)) {
+        if ($user && is_string($resolver) && $resolver !== ''
+            && (class_exists($resolver) || interface_exists($resolver) || app()->bound($resolver))) {
             try {
                 $instance = app($resolver);
 
                 if (method_exists($instance, 'resolve')) {
-                    $resolved = (array) $instance->resolve($user);
+                    $resolved = $instance->resolve($user);
+
+                    if (is_object($resolved) && method_exists($resolved, 'toArray')) {
+                        $resolved = $resolved->toArray();
+                    }
+
+                    $resolved = (array) $resolved;
 
                     return [
-                        'vertical' => $resolved['vertical'] ?? $resolved['vertical_slug'] ?? null,
-                        'subtype' => $resolved['subtype'] ?? $resolved['business_subtype'] ?? $subtype,
+                        'vertical' => $resolved['vertical']
+                            ?? $resolved['vertical_slug']
+                            ?? data_get($resolved, 'resolved.capabilities.vertical_family'),
+                        'subtype' => $resolved['subtype']
+                            ?? $resolved['business_subtype']
+                            ?? data_get($resolved, 'resolved.capabilities.subtype')
+                            ?? $subtype,
                         'provenance' => ['vertical_context_resolver'],
                     ];
                 }
@@ -392,6 +407,26 @@ class DistributionCapabilityService
         ];
     }
 
+    private function inferredSubtype(?string $rawVertical, array $profile): ?string
+    {
+        if (! $rawVertical) {
+            return null;
+        }
+
+        $candidate = $this->subtypeAliases()[$rawVertical] ?? $rawVertical;
+
+        return in_array($candidate, (array) ($profile['subtypes'] ?? []), true)
+            ? $candidate
+            : null;
+    }
+
+    private function subtypeAliases(): array
+    {
+        return [
+            'facilities-management' => 'facilities-maintenance',
+        ];
+    }
+
     private function tenantOverride(?User $user, string $slug): array
     {
         if (! $user) {
@@ -413,6 +448,78 @@ class DistributionCapabilityService
             'handoff_targets',
             'compliance_warnings',
         ]);
+    }
+
+    private function applyTenantOverride(array $profile, array $override): array
+    {
+        if (array_key_exists('content_types', $override)) {
+            $profile['content_types'] = array_values(array_intersect(
+                (array) ($profile['content_types'] ?? []),
+                (array) $override['content_types']
+            ));
+        }
+
+        foreach ((array) ($override['destination_suitability'] ?? []) as $destination => $requested) {
+            if (! array_key_exists($destination, (array) ($profile['destination_suitability'] ?? []))) {
+                continue;
+            }
+
+            $current = $this->normaliseSuitability(
+                (string) $profile['destination_suitability'][$destination]
+            );
+            $requested = $this->normaliseSuitability((string) $requested);
+
+            if ($current === self::SUITABILITY_NOT_APPLICABLE
+                && $requested !== self::SUITABILITY_NOT_APPLICABLE) {
+                continue;
+            }
+
+            $profile['destination_suitability'][$destination] = $requested;
+        }
+
+        foreach (['required_fields', 'media_guidance', 'calls_to_action', 'compliance_warnings'] as $field) {
+            if (! array_key_exists($field, $override)) {
+                continue;
+            }
+
+            $profile[$field] = array_values(array_unique([
+                ...(array) ($profile[$field] ?? []),
+                ...(array) $override[$field],
+            ]));
+        }
+
+        foreach ((array) ($override['handoff_targets'] ?? []) as $handoff => $targets) {
+            $targets = array_values(array_intersect(
+                (array) $targets,
+                $this->allowedHandoffTargets()
+            ));
+
+            if ($targets === []) {
+                continue;
+            }
+
+            $profile['handoff_targets'][$handoff] = array_values(array_unique([
+                ...(array) data_get($profile, "handoff_targets.{$handoff}", []),
+                ...$targets,
+            ]));
+        }
+
+        return $profile;
+    }
+
+    private function allowedHandoffTargets(): array
+    {
+        return [
+            'crm',
+            'workcore',
+            'commerce',
+            'bookings',
+            'property',
+            'automotive',
+            'hire',
+            'memberships',
+            'marketing',
+        ];
     }
 
     private function destinationSupportsContent(array $definition, string $contentType): bool
@@ -459,6 +566,16 @@ class DistributionCapabilityService
                 DistributionItem::TYPE_CLASSIFIED_LISTING,
             ],
         ];
+    }
+
+    private function normaliseSuitability(string $value): string
+    {
+        return in_array($value, [
+            self::SUITABILITY_PRIMARY,
+            self::SUITABILITY_SUPPORTED,
+            self::SUITABILITY_SPECIAL_CASE,
+            self::SUITABILITY_NOT_APPLICABLE,
+        ], true) ? $value : self::SUITABILITY_NOT_APPLICABLE;
     }
 
     private function suitabilityReason(
