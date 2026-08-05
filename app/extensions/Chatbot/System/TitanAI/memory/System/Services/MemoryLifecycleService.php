@@ -20,6 +20,11 @@ final class MemoryLifecycleService
 
     public function decay(float $factor = 0.98): int
     {
-        return SystemAIChatMemory::query()->where('pinned', false)->update(['importance' => \DB::raw('importance * '.max(0.0, min(1.0, $factor)))]);
+        // Sanitize factor to valid range [0.0, 1.0]
+        $factor = max(0.0, min(1.0, $factor));
+
+        return SystemAIChatMemory::query()
+            ->where('pinned', false)
+            ->update(['importance' => \DB::raw('importance * ?', [$factor])]);
     }
 }
