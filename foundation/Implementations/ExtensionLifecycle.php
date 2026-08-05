@@ -4,17 +4,24 @@ declare(strict_types=1);
 
 namespace Foundation\Implementations;
 
+use Foundation\Exceptions\DatabaseException;
+use Foundation\Support\DatabaseHelper;
 use Foundation\Contracts\ExtensionLifecycleContract;
+use Foundation\Support\TransactionHelper;
 use PDO;
+use Foundation\Contracts\DatabaseRepositoryContract;
 
 class ExtensionLifecycle implements ExtensionLifecycleContract
 {
-    private PDO $db;
+    private DatabaseRepositoryContract $repository;
+    private DatabaseHelper $helper;
     private string $tablePrefix = 'extension_lifecycle_';
+    private TransactionHelper $transactions;
 
-    public function __construct(PDO $db)
+    public function __construct(PDO $db, ?TransactionHelper $transactions = null)
     {
-        $this->db = $db;
+        $this->repository = $repository;
+        $this->transactions = $transactions ?? new TransactionHelper($db);
     }
 
     public function registerExtension(
@@ -24,19 +31,24 @@ class ExtensionLifecycle implements ExtensionLifecycleContract
     ): string {
         $extensionId = bin2hex(random_bytes(16));
 
-        $stmt = $this->db->prepare(
+        $stmt = $this->helper->safePrepare(
             "INSERT INTO {$this->tablePrefix}extensions (id, tenant_id, name, metadata, status, registered_at)
              VALUES (?, ?, ?, ?, ?, ?)"
         );
 
-        $stmt->execute([
-            $extensionId,
-            $tenantId,
-            $extensionName,
-            json_encode($extensionMetadata),
-            'draft',
-            date('c'),
-        ]);
+        try {
+            $this->helper->safeExecute($stmt, [
+                        $extensionId,
+                        $tenantId,
+                        $extensionName,
+                        json_encode($extensionMetadata, 'EXECUTE'),
+                        'draft',
+                        date('c'),
+                    ]);
+        } catch (DatabaseException $e) {
+            error_log("Database error: " . $e->getMessage());
+            throw $e;
+        }
 
         return $extensionId;
     }
@@ -45,12 +57,17 @@ class ExtensionLifecycle implements ExtensionLifecycleContract
         string $tenantId,
         string $extensionId
     ): ?array {
-        $stmt = $this->db->prepare(
+        $stmt = $this->helper->safePrepare(
             "SELECT * FROM {$this->tablePrefix}extensions WHERE id = ? AND tenant_id = ?"
         );
 
-        $stmt->execute([$extensionId, $tenantId]);
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        try {
+            $this->helper->safeExecute($stmt, [$extensionId, $tenantId], 'EXECUTE');
+        } catch (DatabaseException $e) {
+            error_log("Database error: " . $e->getMessage());
+            throw $e;
+        }
+        $result = $this->repository->fetch($stmt, PDO::FETCH_ASSOC);
 
         if ($result) {
             $result['metadata'] = json_decode($result['metadata'], true);
@@ -65,39 +82,59 @@ class ExtensionLifecycle implements ExtensionLifecycleContract
         string $version,
         array $releaseNotes
     ): bool {
-        $stmt = $this->db->prepare(
-            "INSERT INTO {$this->tablePrefix}versions (extension_id, tenant_id, version, release_notes, published_at)
-             VALUES (?, ?, ?, ?, ?)"
+        return $this->transactions->executeInTransaction(
+            function (PDO $db) use ($tenantId, $extensionId, $version, $releaseNotes) {
+                // Step 1: Insert version record
+                $stmt = $db->prepare(
+                    "INSERT INTO {$this->tablePrefix}versions (extension_id, tenant_id, version, release_notes, published_at)
+                     VALUES (?, ?, ?, ?, ?)"
+                );
+
+                try {
+                    if (!$this->helper->safeExecute($stmt, [
+                                        $extensionId,
+                                        $tenantId,
+                                        $version,
+                                        json_encode($releaseNotes, 'EXECUTE'),
+                                        date('c'),
+                                    ])) {
+                                        throw new \Exception('Failed to insert version record');
+                } catch (DatabaseException $e) {
+                    error_log("Database error: " . $e->getMessage());
+                    throw $e;
+                }
+                }
+
+                // Step 2: Update extension status (atomic - must both succeed or both rollback)
+                $updateStmt = $db->prepare(
+                    "UPDATE {$this->tablePrefix}extensions SET status = ?, published_version = ?, updated_at = ? WHERE id = ? AND tenant_id = ?"
+                );
+
+                if (!$updateStmt->execute(['published', $version, date('c'), $extensionId, $tenantId])) {
+                    throw new \Exception('Failed to update extension status');
+                }
+
+                return true;
+            },
+            'publishExtensionVersion',
+            ['extension_id' => $extensionId, 'version' => $version]
         );
-
-        $result = $stmt->execute([
-            $extensionId,
-            $tenantId,
-            $version,
-            json_encode($releaseNotes),
-            date('c'),
-        ]);
-
-        if ($result) {
-            $updateStmt = $this->db->prepare(
-                "UPDATE {$this->tablePrefix}extensions SET status = ?, published_version = ?, updated_at = ? WHERE id = ? AND tenant_id = ?"
-            );
-
-            $updateStmt->execute(['published', $version, date('c'), $extensionId, $tenantId]);
-        }
-
-        return $result;
     }
 
     public function enableExtension(
         string $tenantId,
         string $extensionId
     ): bool {
-        $stmt = $this->db->prepare(
+        $stmt = $this->helper->safePrepare(
             "UPDATE {$this->tablePrefix}extensions SET status = ?, enabled_at = ? WHERE id = ? AND tenant_id = ?"
         );
 
-        return $stmt->execute(['enabled', date('c'), $extensionId, $tenantId]);
+        try {
+            return $this->helper->safeExecute($stmt, ['enabled', date('c', 'EXECUTE'), $extensionId, $tenantId]);
+        } catch (DatabaseException $e) {
+            error_log("Database error: " . $e->getMessage());
+            throw $e;
+        }
     }
 
     public function disableExtension(
@@ -105,11 +142,16 @@ class ExtensionLifecycle implements ExtensionLifecycleContract
         string $extensionId,
         string $reason
     ): bool {
-        $stmt = $this->db->prepare(
+        $stmt = $this->helper->safePrepare(
             "UPDATE {$this->tablePrefix}extensions SET status = ?, disabled_reason = ?, disabled_at = ? WHERE id = ? AND tenant_id = ?"
         );
 
-        return $stmt->execute(['disabled', $reason, date('c'), $extensionId, $tenantId]);
+        try {
+            return $this->helper->safeExecute($stmt, ['disabled', $reason, date('c', 'EXECUTE'), $extensionId, $tenantId]);
+        } catch (DatabaseException $e) {
+            error_log("Database error: " . $e->getMessage());
+            throw $e;
+        }
     }
 
     public function grantExtensionPass(
@@ -122,19 +164,24 @@ class ExtensionLifecycle implements ExtensionLifecycleContract
 
         $expiresAt = date('c', strtotime("+{$durationDays} days"));
 
-        $stmt = $this->db->prepare(
+        $stmt = $this->helper->safePrepare(
             "INSERT INTO {$this->tablePrefix}passes (id, extension_id, tenant_id, type, expires_at, granted_at)
              VALUES (?, ?, ?, ?, ?, ?)"
         );
 
-        $stmt->execute([
-            $passId,
-            $extensionId,
-            $tenantId,
-            $passType,
-            $expiresAt,
-            date('c'),
-        ]);
+        try {
+            $this->helper->safeExecute($stmt, [
+                        $passId,
+                        $extensionId,
+                        $tenantId,
+                        $passType,
+                        $expiresAt,
+                        date('c', 'EXECUTE'),
+                    ]);
+        } catch (DatabaseException $e) {
+            error_log("Database error: " . $e->getMessage());
+            throw $e;
+        }
 
         return $passId;
     }
@@ -143,12 +190,17 @@ class ExtensionLifecycle implements ExtensionLifecycleContract
         string $tenantId,
         string $passId
     ): bool {
-        $stmt = $this->db->prepare(
+        $stmt = $this->helper->safePrepare(
             "SELECT expires_at FROM {$this->tablePrefix}passes WHERE id = ? AND tenant_id = ?"
         );
 
-        $stmt->execute([$passId, $tenantId]);
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        try {
+            $this->helper->safeExecute($stmt, [$passId, $tenantId], 'EXECUTE');
+        } catch (DatabaseException $e) {
+            error_log("Database error: " . $e->getMessage());
+            throw $e;
+        }
+        $result = $this->repository->fetch($stmt, PDO::FETCH_ASSOC);
 
         if (!$result) {
             return false;
@@ -171,9 +223,14 @@ class ExtensionLifecycle implements ExtensionLifecycleContract
 
         $query .= " ORDER BY registered_at DESC";
 
-        $stmt = $this->db->prepare($query);
-        $stmt->execute($params);
+        $stmt = $this->helper->safePrepare($query);
+        try {
+            $this->helper->safeExecute($stmt, $params, 'EXECUTE');
+        } catch (DatabaseException $e) {
+            error_log("Database error: " . $e->getMessage());
+            throw $e;
+        }
 
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $this->repository->fetchAll($stmt, PDO::FETCH_ASSOC);
     }
 }
