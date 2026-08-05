@@ -20,6 +20,8 @@ class UniversalDistributionContractTest extends TestCase
         $this->assertStringContainsString("'job_listing'", $model);
         $this->assertStringContainsString('socialMediaPost(): BelongsTo', $model);
         $this->assertStringContainsString('distributionItem(): HasOne', $post);
+        $this->assertStringContainsString('Use fromSocialMediaPost() for canonical social post mappings.', $model);
+        $this->assertStringContainsString("unset(\$attributes['social_media_post_id'])", $model);
         $this->assertStringContainsString("Schema::create('ext_social_media_distribution_items'", $migration);
         $this->assertStringNotContainsString("Schema::dropIfExists('ext_social_media_posts')", $migration);
     }
