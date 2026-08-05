@@ -186,9 +186,11 @@ class Ebay
         array $payload = [],
         array $query = []
     ): Response {
+        $method = strtoupper($method);
+        $maxAttempts = in_array($method, ['GET', 'PUT'], true) ? 2 : 1;
         $response = null;
 
-        for ($attempt = 1; $attempt <= 2; $attempt++) {
+        for ($attempt = 1; $attempt <= $maxAttempts; $attempt++) {
             $options = [];
 
             if ($payload !== []) {
@@ -200,12 +202,13 @@ class Ebay
             }
 
             $response = $this->apiClient($platform)->send(
-                strtoupper($method),
+                $method,
                 $this->apiRoot() . $path,
                 $options
             );
 
-            if (! in_array($response->status(), [429, 500, 502, 503, 504], true) || $attempt === 2) {
+            if (! in_array($response->status(), [429, 500, 502, 503, 504], true)
+                || $attempt === $maxAttempts) {
                 return $response;
             }
 
