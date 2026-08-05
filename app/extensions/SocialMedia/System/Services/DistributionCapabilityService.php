@@ -22,16 +22,20 @@ class DistributionCapabilityService
     ): array {
         $definition = $this->destinations()[$destination] ?? $this->unsupportedDefinition();
         $mode = (string) ($definition['mode'] ?? DistributionItem::MODE_EXPORT_ONLY);
+        $expectedPlatform = $definition['platform'] ?? null;
         $declaredCapabilities = (array) ($definition['capabilities'] ?? []);
         $tenantAllowed = ! $account || (int) $account->user_id === (int) $user->getKey();
+        $accountMatchesDestination = ! $expectedPlatform
+            || ($account && (string) $account->platform === (string) $expectedPlatform);
         $requiresAccount = in_array($mode, [DistributionItem::MODE_DIRECT, DistributionItem::MODE_PARTNER], true);
         $adapterAvailable = (bool) ($definition['adapter_available'] ?? false);
         $accountConnected = $account?->isConnected() ?? false;
-        $withinAllowance = $account && $tenantAllowed
+        $withinAllowance = $account && $tenantAllowed && $accountMatchesDestination
             ? $this->entitlements->canPublish($user, $account)
             : false;
 
         $available = $tenantAllowed
+            && $accountMatchesDestination
             && $adapterAvailable
             && (! $requiresAccount || ($accountConnected && $withinAllowance));
 
@@ -45,6 +49,7 @@ class DistributionCapabilityService
             'available'              => $available,
             'reason'                 => $this->reason(
                 $tenantAllowed,
+                $accountMatchesDestination,
                 $adapterAvailable,
                 $requiresAccount,
                 $accountConnected,
@@ -101,6 +106,7 @@ class DistributionCapabilityService
 
     private function reason(
         bool $tenantAllowed,
+        bool $accountMatchesDestination,
         bool $adapterAvailable,
         bool $requiresAccount,
         bool $accountConnected,
@@ -108,6 +114,10 @@ class DistributionCapabilityService
     ): ?string {
         if (! $tenantAllowed) {
             return 'tenant_scope_denied';
+        }
+
+        if (! $accountMatchesDestination) {
+            return 'account_destination_mismatch';
         }
 
         if (! $adapterAvailable) {
@@ -152,6 +162,7 @@ class DistributionCapabilityService
         return [
             'mode'              => DistributionItem::MODE_EXPORT_ONLY,
             'adapter_available' => false,
+            'platform'          => null,
             'content_types'     => [],
             'required_fields'   => [],
             'media_rules'       => [],
