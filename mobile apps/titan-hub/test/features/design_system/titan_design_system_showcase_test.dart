@@ -9,6 +9,7 @@ import 'package:qrpay/shared/design_system/foundations/titan_theme.dart';
 // The showcase is internal tooling and must never become primary navigation.
 // Its route exists for developers without adding a sixth customer destination.
 // This contract protects that boundary as new component families are added.
+// Exactly one route also prevents accidental duplicate developer registration.
 Future<void> _pumpShowcase(
   WidgetTester tester, {
   required Size size,
