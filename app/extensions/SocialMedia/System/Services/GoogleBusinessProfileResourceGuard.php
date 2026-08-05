@@ -43,7 +43,7 @@ class GoogleBusinessProfileResourceGuard
         }
 
         if ($requireLocalPost
-            && data_get($location, 'metadata.canOperateLocalPost') === false) {
+            && data_get($location, 'metadata.canOperateLocalPost') !== true) {
             throw new RuntimeException('location_cannot_publish_local_posts');
         }
 
