@@ -6,6 +6,11 @@ namespace App\Extensions\TitanNova\System;
 
 use App\Domains\Marketplace\Contracts\ExtensionRegisterKeyProviderInterface;
 use App\Domains\Marketplace\Contracts\UninstallExtensionServiceProviderInterface;
+use App\Extensions\TitanNova\System\Capabilities\Contracts\GovernedExecutionContract;
+use App\Extensions\TitanNova\System\Capabilities\Contracts\NativeToolMappingContract;
+use App\Extensions\TitanNova\System\Capabilities\GovernedWorkCoreCapabilityBridge;
+use App\Extensions\TitanNova\System\Capabilities\TitanAIGovernedExecutionAdapter;
+use App\Extensions\TitanNova\System\Capabilities\TitanAINativeToolMappingAdapter;
 use App\Extensions\TitanNova\System\Console\Commands\CreateAgentTasksCommand;
 use App\Extensions\TitanNova\System\Console\Commands\RunScheduledTasksCommand;
 use App\Extensions\TitanNova\System\Console\Commands\SeedDemoDataCommand;
@@ -21,7 +26,12 @@ use Illuminate\Support\ServiceProvider;
 
 class TitanNovaServiceProvider extends ServiceProvider implements ExtensionRegisterKeyProviderInterface, UninstallExtensionServiceProviderInterface
 {
-    public function register(): void {}
+    public function register(): void
+    {
+        $this->app->bind(GovernedExecutionContract::class, TitanAIGovernedExecutionAdapter::class);
+        $this->app->bind(NativeToolMappingContract::class, TitanAINativeToolMappingAdapter::class);
+        $this->app->singleton(GovernedWorkCoreCapabilityBridge::class);
+    }
 
     public function boot(Kernel $kernel): void
     {
