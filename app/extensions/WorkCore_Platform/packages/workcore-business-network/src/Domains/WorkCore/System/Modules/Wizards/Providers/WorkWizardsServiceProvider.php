@@ -14,22 +14,32 @@ use App\Domains\WorkCore\System\Modules\Wizards\Actions\PublishWizardDefinition;
 use App\Domains\WorkCore\System\Modules\Wizards\Actions\ResumeWizardRun;
 use App\Domains\WorkCore\System\Modules\Wizards\Actions\SaveWizardAnswer;
 use App\Domains\WorkCore\System\Modules\Wizards\Actions\StartWizardRun;
+use App\Domains\WorkCore\System\Modules\Wizards\Contracts\WizardAIEnrichmentDispatcherContract;
+use App\Domains\WorkCore\System\Modules\Wizards\Contracts\WizardRecompositionRepositoryContract;
 use App\Domains\WorkCore\System\Modules\Wizards\Contracts\WizardRepositoryContract;
 use App\Domains\WorkCore\System\Modules\Wizards\Contracts\WizardVerticalContextRepositoryContract;
 use App\Domains\WorkCore\System\Modules\Wizards\ReadModels\GetNextWizardQuestion;
 use App\Domains\WorkCore\System\Modules\Wizards\ReadModels\GetWizardRun;
 use App\Domains\WorkCore\System\Modules\Wizards\ReadModels\ListWizardDefinitions;
+use App\Domains\WorkCore\System\Modules\Wizards\Repositories\DatabaseWizardRecompositionRepository;
 use App\Domains\WorkCore\System\Modules\Wizards\Repositories\DatabaseWizardVerticalContextRepository;
 use App\Domains\WorkCore\System\Modules\Wizards\Repositories\EloquentWizardRepository;
+use App\Domains\WorkCore\System\Modules\Wizards\Services\LaravelWizardAIEnrichmentDispatcher;
+use App\Domains\WorkCore\System\Modules\Wizards\Services\LayeredWizardQuestionCatalogue;
+use App\Domains\WorkCore\System\Modules\Wizards\Services\LayeredWizardQuestionComposer;
+use App\Domains\WorkCore\System\Modules\Wizards\Services\WizardAnswerRecompositionService;
 use App\Domains\WorkCore\System\Modules\Wizards\Services\WizardAnswerValidator;
 use App\Domains\WorkCore\System\Modules\Wizards\Services\WizardBranchEvaluator;
 use App\Domains\WorkCore\System\Modules\Wizards\Services\WizardDefinitionRegistry;
+use App\Domains\WorkCore\System\Modules\Wizards\Services\WizardDependencyResolver;
+use App\Domains\WorkCore\System\Modules\Wizards\Services\WizardQuestionPlanner;
 use App\Domains\WorkCore\System\Modules\Wizards\Services\WizardRiskPolicy;
 use App\Domains\WorkCore\System\Modules\Wizards\Services\WizardRuntime;
 use App\Domains\WorkCore\System\Modules\Wizards\Services\WizardVerticalContextAdapter;
 use App\Domains\WorkCore\System\ReadModels\ReadModelDefinition;
 use App\Domains\WorkCore\System\ReadModels\ReadModelRegistry;
 use Illuminate\Support\ServiceProvider;
+use TitanZero\Interaction\Vertical\AI\VerticalAIProposalBridge;
 use TitanZero\Interaction\Vertical\VerticalContextComposer;
 
 final class WorkWizardsServiceProvider extends ServiceProvider
@@ -40,6 +50,14 @@ final class WorkWizardsServiceProvider extends ServiceProvider
         $this->app->singleton(WizardBranchEvaluator::class);
         $this->app->singleton(WizardRiskPolicy::class);
         $this->app->singleton(WizardAnswerValidator::class);
+        $this->app->singleton(WizardDependencyResolver::class);
+        $this->app->singleton(
+            LayeredWizardQuestionComposer::class,
+            static fn (): LayeredWizardQuestionComposer => new LayeredWizardQuestionComposer(
+                LayeredWizardQuestionCatalogue::defaults(),
+            ),
+        );
+        $this->app->singleton(WizardQuestionPlanner::class);
         $this->app->bind(WizardRepositoryContract::class, EloquentWizardRepository::class);
         $this->app->scoped(WizardRuntime::class);
 
@@ -49,6 +67,18 @@ final class WorkWizardsServiceProvider extends ServiceProvider
                 DatabaseWizardVerticalContextRepository::class,
             );
             $this->app->scoped(WizardVerticalContextAdapter::class);
+        }
+
+        if (class_exists(VerticalContextComposer::class) && class_exists(VerticalAIProposalBridge::class)) {
+            $this->app->bind(
+                WizardRecompositionRepositoryContract::class,
+                DatabaseWizardRecompositionRepository::class,
+            );
+            $this->app->bind(
+                WizardAIEnrichmentDispatcherContract::class,
+                LaravelWizardAIEnrichmentDispatcher::class,
+            );
+            $this->app->scoped(WizardAnswerRecompositionService::class);
         }
 
         $actions = $this->app->make(BusinessActionRegistry::class);
