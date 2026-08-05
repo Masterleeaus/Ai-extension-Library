@@ -40,7 +40,7 @@ class FileOwnership implements FileOwnershipContract
             "UPDATE {$this->tablePrefix}registry SET owner_id = ?, transferred_at = ? WHERE tenant_id = ? AND file_path = ? AND owner_id = ?"
         );
 
-        return $stmt->execute([$toUserId, date('c'), $tenantId, $filePath, $fromUserId]);
+        return $stmt->execute([$toUserId, DateTimeHelper::now(), $tenantId, $filePath, $fromUserId]);
     }
 
     public function getOwner(
@@ -100,7 +100,7 @@ class FileOwnership implements FileOwnershipContract
              VALUES (?, ?, ?, ?, ?)"
         );
 
-        return $stmt->execute([$tenantId, $filePath, $userId, $permission, date('c')]);
+        return $stmt->execute([$tenantId, $filePath, $userId, $permission, DateTimeHelper::now()]);
     }
 
     public function revokeAccess(

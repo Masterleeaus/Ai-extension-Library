@@ -76,7 +76,7 @@ class DataEncryption implements DataEncryptionContract
             $keySize,
             base64_encode($keyMaterial),
             'active',
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return $keyId;
@@ -103,7 +103,7 @@ class DataEncryption implements DataEncryptionContract
             "UPDATE {$this->tablePrefix}keys SET status = 'rotated', rotated_at = ? WHERE id = ?"
         );
 
-        $updateOldStmt->execute([date('c'), $keyId]);
+        $updateOldStmt->execute([DateTimeHelper::now(), $keyId]);
 
         return true;
     }

@@ -91,7 +91,7 @@ class SecureRemoteFetcher implements SecureRemoteFetcherContract
              ON DUPLICATE KEY UPDATE requests_per_minute = ?"
         );
 
-        return $stmt->execute([$tenantId, $requestsPerMinute, date('c'), $requestsPerMinute]);
+        return $stmt->execute([$tenantId, $requestsPerMinute, DateTimeHelper::now(), $requestsPerMinute]);
     }
 
     public function getRateLimit(string $tenantId): ?int {
@@ -123,7 +123,7 @@ class SecureRemoteFetcher implements SecureRemoteFetcherContract
             $statusCode,
             $bytesTransferred,
             $duration,
-            date('c'),
+            DateTimeHelper::now(),
         ]);
     }
 
@@ -143,7 +143,7 @@ class SecureRemoteFetcher implements SecureRemoteFetcherContract
             "INSERT IGNORE INTO {$this->tablePrefix}blocked (domain, added_at) VALUES (?, ?)"
         );
 
-        return $stmt->execute([$domain, date('c')]);
+        return $stmt->execute([$domain, DateTimeHelper::now()]);
     }
 
     public function removeBlockedDomain(string $domain): bool {

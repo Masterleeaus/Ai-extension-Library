@@ -32,7 +32,7 @@ class WorkCoreWorkforce implements WorkCoreWorkforceContract
             $employeeId,
             $tenantId,
             json_encode($employeeData),
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return $employeeId;
@@ -73,7 +73,7 @@ class WorkCoreWorkforce implements WorkCoreWorkforceContract
             "UPDATE {$this->tablePrefix}employees SET data = ?, updated_at = ? WHERE id = ? AND tenant_id = ?"
         );
 
-        return $stmt->execute([json_encode($mergedData), date('c'), $employeeId, $tenantId]);
+        return $stmt->execute([json_encode($mergedData), DateTimeHelper::now(), $employeeId, $tenantId]);
     }
 
     public function trackCompliance(
@@ -90,7 +90,7 @@ class WorkCoreWorkforce implements WorkCoreWorkforceContract
             $employeeId,
             $tenantId,
             json_encode($complianceData),
-            date('c'),
+            DateTimeHelper::now(),
         ]);
     }
 
@@ -109,7 +109,7 @@ class WorkCoreWorkforce implements WorkCoreWorkforceContract
              VALUES (?, ?, ?, ?)"
         );
 
-        return $stmt->execute([$employeeId, $tenantId, 1, date('c')]);
+        return $stmt->execute([$employeeId, $tenantId, 1, DateTimeHelper::now()]);
     }
 
     public function recordTraining(
@@ -129,7 +129,7 @@ class WorkCoreWorkforce implements WorkCoreWorkforceContract
             $employeeId,
             $tenantId,
             json_encode($trainingData),
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return $trainingId;
@@ -154,7 +154,7 @@ class WorkCoreWorkforce implements WorkCoreWorkforceContract
             'tenant_id' => $tenantId,
             'total_employees' => $stats['total_employees'] ?? 0,
             'verified_employees' => $stats['verified'] ?? 0,
-            'generated_at' => date('c'),
+            'generated_at' => DateTimeHelper::now(),
         ];
 
         return json_encode($reportData, JSON_PRETTY_PRINT);
@@ -172,7 +172,7 @@ class WorkCoreWorkforce implements WorkCoreWorkforceContract
         );
 
         $rolesJson = json_encode($roles);
-        $now = date('c');
+        $now = DateTimeHelper::now();
 
         return $stmt->execute([
             $employeeId,

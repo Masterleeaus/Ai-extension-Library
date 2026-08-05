@@ -33,7 +33,7 @@ class BookingEngine implements BookingEngineContract
             $tenantId,
             json_encode($booking),
             'pending',
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return $bookingId;
@@ -68,7 +68,7 @@ class BookingEngine implements BookingEngineContract
 
         return $stmt->execute([
             json_encode($updates),
-            date('c'),
+            DateTimeHelper::now(),
             $bookingId,
             $tenantId,
         ]);
@@ -88,7 +88,7 @@ class BookingEngine implements BookingEngineContract
         return $stmt->execute([
             'cancelled',
             $reason,
-            date('c'),
+            DateTimeHelper::now(),
             $bookingId,
             $tenantId,
         ]);

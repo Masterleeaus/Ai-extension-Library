@@ -55,7 +55,7 @@ class CustomerIdentity implements CustomerIdentityContract
             $customerId,
             $providerId,
             json_encode($providerIdentity),
-            date('c'),
+            DateTimeHelper::now(),
         ]);
     }
 
@@ -127,9 +127,9 @@ class CustomerIdentity implements CustomerIdentityContract
             $tenantId,
             $customerId,
             $profileJson,
-            date('c'),
+            DateTimeHelper::now(),
             $profileJson,
-            date('c'),
+            DateTimeHelper::now(),
         ]);
     }
 }

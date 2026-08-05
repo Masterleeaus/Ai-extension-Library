@@ -90,7 +90,7 @@ class BookingMigration implements BookingMigrationContract
             $bookingId,
             json_encode($mapped),
             'completed',
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return $migrationId;
@@ -122,7 +122,7 @@ class BookingMigration implements BookingMigrationContract
             "UPDATE {$this->tablePrefix}records SET status = ?, rolled_back_at = ? WHERE tenant_id = ? AND legacy_booking_id = ?"
         );
 
-        return $stmt->execute(['rolled_back', date('c'), $tenantId, $bookingId]);
+        return $stmt->execute(['rolled_back', DateTimeHelper::now(), $tenantId, $bookingId]);
     }
 
     public function getBulkMigrationProgress(
@@ -161,7 +161,7 @@ class BookingMigration implements BookingMigrationContract
             $tenantId,
             count($legacyBookings),
             'processing',
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return $batchId;

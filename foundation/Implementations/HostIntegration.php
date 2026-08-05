@@ -35,7 +35,7 @@ class HostIntegration implements HostIntegrationContract
             $hostEnvironment,
             json_encode($hostConfig),
             'active',
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return $deploymentId;
@@ -59,7 +59,7 @@ class HostIntegration implements HostIntegrationContract
             $deploymentId,
             json_encode($releaseConfig),
             'in_progress',
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return $releaseId;
@@ -101,7 +101,7 @@ class HostIntegration implements HostIntegrationContract
             $deploymentId,
             json_encode($gateConfig),
             'pending',
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return $gateId;
@@ -145,7 +145,7 @@ class HostIntegration implements HostIntegrationContract
             "UPDATE {$this->tablePrefix}pilot_gates SET status = ?, approver_id = ?, approved_at = ? WHERE id = ? AND tenant_id = ?"
         );
 
-        return $stmt->execute(['approved', $approver, date('c'), $gateId, $tenantId]);
+        return $stmt->execute(['approved', $approver, DateTimeHelper::now(), $gateId, $tenantId]);
     }
 
     public function rolloutRelease(
@@ -156,7 +156,7 @@ class HostIntegration implements HostIntegrationContract
             "UPDATE {$this->tablePrefix}deployments SET status = ?, rolled_out_at = ? WHERE id = ? AND tenant_id = ?"
         );
 
-        return $stmt->execute(['rolled_out', date('c'), $deploymentId, $tenantId]);
+        return $stmt->execute(['rolled_out', DateTimeHelper::now(), $deploymentId, $tenantId]);
     }
 
     public function rollbackDeployment(
@@ -167,6 +167,6 @@ class HostIntegration implements HostIntegrationContract
             "UPDATE {$this->tablePrefix}deployments SET status = ?, rolled_back_at = ? WHERE id = ? AND tenant_id = ?"
         );
 
-        return $stmt->execute(['rolled_back', date('c'), $deploymentId, $tenantId]);
+        return $stmt->execute(['rolled_back', DateTimeHelper::now(), $deploymentId, $tenantId]);
     }
 }

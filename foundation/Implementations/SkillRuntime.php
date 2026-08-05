@@ -34,7 +34,7 @@ class SkillRuntime implements SkillRuntimeContract
             $skillId,
             $className,
             $metadataJson,
-            date('c'),
+            DateTimeHelper::now(),
             $metadataJson,
         ]);
     }
@@ -59,7 +59,7 @@ class SkillRuntime implements SkillRuntimeContract
             json_encode($input),
             json_encode($context),
             'running',
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return [
@@ -135,7 +135,7 @@ class SkillRuntime implements SkillRuntimeContract
             $skillId,
             $version,
             json_encode($metadata),
-            date('c'),
+            DateTimeHelper::now(),
         ]);
     }
 }

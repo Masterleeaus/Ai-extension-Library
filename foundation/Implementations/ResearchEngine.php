@@ -35,7 +35,7 @@ class ResearchEngine implements ResearchEngineContract
             $topic,
             json_encode($parameters),
             'active',
-            date('c'),
+            DateTimeHelper::now(),
         ]);
 
         return $researchId;
@@ -106,7 +106,7 @@ class ResearchEngine implements ResearchEngineContract
             "UPDATE {$this->tablePrefix}sessions SET status = ?, paused_at = ? WHERE id = ? AND tenant_id = ?"
         );
 
-        return $stmt->execute(['paused', date('c'), $researchId, $tenantId]);
+        return $stmt->execute(['paused', DateTimeHelper::now(), $researchId, $tenantId]);
     }
 
     public function resumeResearch(
@@ -117,7 +117,7 @@ class ResearchEngine implements ResearchEngineContract
             "UPDATE {$this->tablePrefix}sessions SET status = ?, resumed_at = ? WHERE id = ? AND tenant_id = ?"
         );
 
-        return $stmt->execute(['active', date('c'), $researchId, $tenantId]);
+        return $stmt->execute(['active', DateTimeHelper::now(), $researchId, $tenantId]);
     }
 
     public function cancelResearch(
@@ -128,7 +128,7 @@ class ResearchEngine implements ResearchEngineContract
             "UPDATE {$this->tablePrefix}sessions SET status = ?, cancelled_at = ? WHERE id = ? AND tenant_id = ?"
         );
 
-        return $stmt->execute(['cancelled', date('c'), $researchId, $tenantId]);
+        return $stmt->execute(['cancelled', DateTimeHelper::now(), $researchId, $tenantId]);
     }
 
     public function exportFindings(
@@ -159,7 +159,7 @@ class ResearchEngine implements ResearchEngineContract
 
         return $stmt->execute([
             json_encode($evidence),
-            date('c'),
+            DateTimeHelper::now(),
             $findingId,
             $tenantId,
             $researchId,
