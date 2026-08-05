@@ -256,11 +256,11 @@
     <script>
         function campaignData() {
             return {
-                content: `{!! old('content', $item?->content) !!}`,
+                content: {{ json_encode(old('content', $item?->content ?? '')) }},
                 prompt: '',
                 generatingContent: false,
                 modalOpen: false,
-                isScheduled: {!! $item?->scheduled_at ? 'true' : 'false' !!},
+                isScheduled: {{ $item?->scheduled_at ? 'true' : 'false' }},
                 generateContent() {
 
                     let route = '{{ route('dashboard.user.marketing-bot.generate.content') }}';

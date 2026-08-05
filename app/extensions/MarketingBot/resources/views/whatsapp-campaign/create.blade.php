@@ -437,18 +437,18 @@
             return {
                 segments: [],
                 contacts: [],
-                content: `{!! old('content', $item?->content) !!}`,
+                content: {{ json_encode(old('content', $item?->content ?? '')) }},
                 prompt: '',
                 generatingContent: false,
                 modalOpen: false,
                 generatingImage: false,
-                image: '{{ old('image', $item?->image) }}',
-                isScheduled: {!! $item?->scheduled_at ? 'true' : 'false' !!},
-				aiReply: {!! $item?->ai_reply ? 'true' : 'false' !!},
+                image: {{ json_encode(old('image', $item?->image ?? '')) }},
+                isScheduled: {{ $item?->scheduled_at ? 'true' : 'false' }},
+				aiReply: {{ $item?->ai_reply ? 'true' : 'false' }},
                 templates: [],
-                templateName: '{{ old('meta_template_name', $item?->meta_template_name) }}',
-                templateLanguage: '{{ old('meta_template_language', $item?->meta_template_language) }}',
-                bodyVariables: {!! json_encode(old('meta_body_variables', $item?->meta_body_variables ?? [])) !!},
+                templateName: {{ json_encode(old('meta_template_name', $item?->meta_template_name ?? '')) }},
+                templateLanguage: {{ json_encode(old('meta_template_language', $item?->meta_template_language ?? '')) }},
+                bodyVariables: {{ json_encode(old('meta_body_variables', $item?->meta_body_variables ?? [])) }},
 
                 async init() {
                     @if ($whatsapp?->isMeta() && $whatsapp->meta_waba_id)
