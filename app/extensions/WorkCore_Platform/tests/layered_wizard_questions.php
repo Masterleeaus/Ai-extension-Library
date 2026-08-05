@@ -47,7 +47,6 @@ use App\Domains\WorkCore\System\Modules\Wizards\Services\WizardRiskPolicy;
 use App\Domains\WorkCore\System\Modules\Wizards\Services\WizardRuntime;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Database\Schema\Blueprint;
-use InvalidArgumentException;
 
 $tests = [];
 $test = static function (string $name, callable $callback) use (&$tests): void { $tests[$name] = $callback; };
