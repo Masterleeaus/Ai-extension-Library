@@ -88,7 +88,9 @@ class CreativeSuiteAIController extends Controller
 
     public function status(int $id): JsonResponse
     {
-        $task = UserOpenai::findOrFail($id);
+        $task = UserOpenai::query()
+            ->where('user_id', Auth::id())
+            ->findOrFail($id);
 
         if (in_array($task->status, self::PENDING_STATUSES, true)) {
             $entity = EntityEnum::fromSlug(data_get($task->payload, 'model')) ?? $this->getEntity();
