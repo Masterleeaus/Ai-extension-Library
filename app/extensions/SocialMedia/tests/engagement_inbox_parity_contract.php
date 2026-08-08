@@ -32,7 +32,8 @@ $verticals = $source('config/vertical-distribution.php');
 $provider = $source('System/SocialMediaServiceProvider.php');
 $service = $source('System/Services/EngagementGovernanceService.php');
 $controller = $source('System/Http/Controllers/EngagementController.php');
-$automation = (string) @file_get_contents($extensions . '/SocialMediaAutomation/System/Services/AutomationExecutionService.php');
+$automation = (string) @file_get_contents($extensions . '/SocialMediaAutomation/System/Services/GovernedAutomationExecutionService.php');
+$automationProvider = (string) @file_get_contents($extensions . '/SocialMediaAutomation/System/SocialMediaAutomationServiceProvider.php');
 $webhook = (string) @file_get_contents($extensions . '/SocialMediaAutomation/System/Services/WebhookProcessor.php');
 $facebookOauth = $source('System/Http/Controllers/Oauth/FacebookController.php');
 
@@ -81,11 +82,16 @@ foreach (['engagement/{account}/capabilities', 'engagement/{account}/inbox', 'en
     $assertContains($route, $provider, "Missing governed route {$route}.");
 }
 
-$assertContains('stageGovernedProposal', $automation, 'Automation must stage governed proposals instead of auto-sending replies.');
-$assertNotContains('https://open.tiktokapis.com/v2/comment/reply/create/', $automation, 'Bogus TikTok commercial reply endpoint must be removed.');
+$assertContains('stageGovernedProposal', $automation, 'Bound automation must stage governed proposals.');
+$assertContains('function sendPublicReply', $automation, 'Bound automation must override the legacy public-send entry point.');
+$assertContains('function sendDm', $automation, 'Bound automation must override the legacy private-send entry point.');
+$assertContains('Direct automation replies are disabled', $automation, 'Bound automation public sends must fail closed.');
+$assertContains('Direct automation private messages are disabled', $automation, 'Bound automation private sends must fail closed.');
+$assertNotContains('https://open.tiktokapis.com/v2/comment/reply/create/', $automation, 'Governed automation must not implement a synthetic TikTok reply endpoint.');
+$assertContains('AutomationExecutionService::class, GovernedAutomationExecutionService::class', $automationProvider, 'AutomationExecutionService must resolve to the governed implementation.');
 $assertNotContains("'payload' => \$request->json()->all()", $facebookOauth, 'Facebook webhook must not log raw payloads.');
-$assertNotContains("'text'       => \$payload['text']", $automation, 'Automation debug logs must not write raw engagement text.');
 $assertNotContains("Log::debug('Facebook comment event extracted', \$commentData)", $webhook, 'Webhook processor must not log raw normalized comment payloads.');
+$assertNotContains("'comment_text' => \$commenterData['text']", $automation, 'Governed automation logs must not persist raw comment text.');
 
 if ($failures !== []) {
     fwrite(STDERR, "Issue #273 contract failed:\n - " . implode("\n - ", $failures) . "\n");
