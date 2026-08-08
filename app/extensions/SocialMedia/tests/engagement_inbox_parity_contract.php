@@ -43,6 +43,8 @@ foreach (['facebook', 'instagram', 'youtube', 'linkedin', 'x', 'tiktok'] as $pla
 }
 $assertNotContains("'comment.list'", $config, 'TikTok commercial OAuth must not request unsupported comment.list.');
 $assertNotContains("'comment.create'", $config, 'TikTok commercial OAuth must not request unsupported comment.create.');
+$assertNotContains("'dm.read'", $config, 'X engagement must not request unused dm.read permission.');
+$assertNotContains("'dm.write'", $config, 'X engagement must not request unused dm.write permission.');
 $assertContains('commercial_comment_management_unavailable', $engagement, 'TikTok engagement must fail closed with an explicit reason.');
 
 $assertContains("'generic-business' => [", $engagement, 'Missing generic engagement policy fallback.');
