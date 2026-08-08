@@ -17,7 +17,6 @@ class Youtube
         protected ?string $refreshToken = null,
     ) {
         $this->config = $config ?? config('social-media.' . $this->platform->value, []);
-
         $this->config['client_id'] = setting('YOUTUBE_CLIENT_ID', $this->config['client_id'] ?? null);
         $this->config['client_secret'] = setting('YOUTUBE_CLIENT_SECRET', $this->config['client_secret'] ?? null);
         $this->config['redirect_uri'] = secure_url($this->config['redirect_uri'] ?? url('/social-media/oauth/callback/' . $this->platform->value));
@@ -31,7 +30,6 @@ class Youtube
     public function authorizationUrl(?string $state = null): string
     {
         $scopes = trim(collect($this->config['scope'] ?? [])->join(' '));
-
         $params = array_filter([
             'client_id'              => $this->config['client_id'],
             'redirect_uri'           => $this->config['redirect_uri'],
@@ -69,11 +67,66 @@ class Youtube
 
     public function getChannelInfo(array $parts = ['snippet', 'statistics']): Response
     {
-        return Http::withToken($this->accessToken ?? '')
-            ->get(($this->config['api_url'] ?? 'https://www.googleapis.com/youtube/v3') . '/channels', [
-                'part' => implode(',', $parts),
-                'mine' => 'true',
-            ]);
+        return $this->api()->get($this->apiRoot() . '/channels', [
+            'part' => implode(',', $parts),
+            'mine' => 'true',
+        ]);
+    }
+
+    public function commentThreads(
+        ?string $videoId = null,
+        ?string $channelId = null,
+        int $limit = 50,
+        ?string $pageToken = null
+    ): Response {
+        $filters = $videoId
+            ? ['videoId' => trim($videoId)]
+            : ['allThreadsRelatedToChannelId' => trim((string) $channelId)];
+
+        return $this->api()->get($this->apiRoot() . '/commentThreads', array_filter([
+            'part' => 'snippet,replies',
+            ...$filters,
+            'maxResults' => max(1, min(100, $limit)),
+            'order' => 'time',
+            'textFormat' => 'plainText',
+            'pageToken' => $pageToken,
+        ], static fn ($value) => $value !== null && $value !== ''));
+    }
+
+    public function comments(string $parentId, int $limit = 50, ?string $pageToken = null): Response
+    {
+        return $this->api()->get($this->apiRoot() . '/comments', array_filter([
+            'part' => 'snippet',
+            'parentId' => trim($parentId),
+            'maxResults' => max(1, min(100, $limit)),
+            'textFormat' => 'plainText',
+            'pageToken' => $pageToken,
+        ], static fn ($value) => $value !== null && $value !== ''));
+    }
+
+    public function replyToComment(string $parentCommentId, string $text): Response
+    {
+        return $this->api()->post($this->apiRoot() . '/comments?part=snippet', [
+            'snippet' => [
+                'parentId' => trim($parentCommentId),
+                'textOriginal' => $text,
+            ],
+        ]);
+    }
+
+    public function updateComment(string $commentId, string $text): Response
+    {
+        return $this->api()->put($this->apiRoot() . '/comments?part=snippet', [
+            'id' => trim($commentId),
+            'snippet' => ['textOriginal' => $text],
+        ]);
+    }
+
+    public function deleteComment(string $commentId): Response
+    {
+        return $this->api()->delete($this->apiRoot() . '/comments', [
+            'id' => trim($commentId),
+        ]);
     }
 
     public function setAccessToken(?string $accessToken): static
@@ -93,5 +146,15 @@ class Youtube
     public function configs(): array
     {
         return $this->config;
+    }
+
+    private function api()
+    {
+        return Http::withToken($this->accessToken ?? '')->acceptJson()->asJson();
+    }
+
+    private function apiRoot(): string
+    {
+        return rtrim($this->config['api_url'] ?? 'https://www.googleapis.com/youtube/v3', '/');
     }
 }
