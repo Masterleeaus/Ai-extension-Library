@@ -10,6 +10,7 @@ use App\Extensions\SocialMedia\System\Http\Controllers\Common\DemoDataController
 use App\Extensions\SocialMedia\System\Http\Controllers\Common\SocialMediaCampaignCommonController;
 use App\Extensions\SocialMedia\System\Http\Controllers\Common\SocialMediaCompanyCommonController;
 use App\Extensions\SocialMedia\System\Http\Controllers\EbayListingController;
+use App\Extensions\SocialMedia\System\Http\Controllers\EngagementController;
 use App\Extensions\SocialMedia\System\Http\Controllers\GoogleBusinessProfileController;
 use App\Extensions\SocialMedia\System\Http\Controllers\ImageStatusController;
 use App\Extensions\SocialMedia\System\Http\Controllers\Oauth\EbayController;
@@ -98,6 +99,7 @@ class SocialMediaServiceProvider extends ServiceProvider implements UninstallExt
     public function registerConfig(): static
     {
         $this->mergeConfigFrom(__DIR__ . '/../config/social-media.php', 'social-media');
+        $this->mergeConfigFrom(__DIR__ . '/../config/engagement.php', 'social-media.engagement');
         $this->mergeConfigFrom(__DIR__ . '/../config/ebay.php', 'social-media.ebay');
         $this->mergeConfigFrom(
             __DIR__ . '/../config/assisted-marketplaces.php',
@@ -218,6 +220,15 @@ class SocialMediaServiceProvider extends ServiceProvider implements UninstallExt
                         $router->get('calendar', SocialMediaCalendarController::class)->name('calendar');
                         $router->post('video/generate', SocialMediaVideoController::class)->name('video.generate');
                         $router->get('video/status', [SocialMediaVideoController::class, 'status'])->name('video.status');
+
+                        $router->get('engagement/{account}/capabilities', [EngagementController::class, 'capabilities'])->name('engagement.capabilities');
+                        $router->get('engagement/{account}/inbox', [EngagementController::class, 'inbox'])->name('engagement.inbox');
+                        $router->post('engagement/{account}/proposal', [EngagementController::class, 'proposal'])->name('engagement.proposal');
+                        $router->post('engagement/{account}/reply', [EngagementController::class, 'reply'])->name('engagement.reply');
+                        $router->post('engagement/{account}/private-reply', [EngagementController::class, 'privateReply'])->name('engagement.private-reply');
+                        $router->post('engagement/{account}/edit', [EngagementController::class, 'edit'])->name('engagement.edit');
+                        $router->post('engagement/{account}/delete', [EngagementController::class, 'delete'])->name('engagement.delete');
+                        $router->post('engagement/{account}/handoff', [EngagementController::class, 'handoff'])->name('engagement.handoff');
 
                         $router->post('ebay/readiness', [EbayListingController::class, 'readiness'])->name('ebay.readiness');
                         $router->post('distribution/{item}/ebay/draft', [EbayListingController::class, 'draft'])->name('ebay.draft');
