@@ -41,6 +41,7 @@ assert.deepStrictEqual(Array.from(serialised.workspace_templates), ['workspace-c
 const chatbot = { shell_builder_config: { stale: true } };
 context.window.TitanShellBuilder.stageShellConfig(chatbot, verticalConfig);
 assert.strictEqual(Object.prototype.hasOwnProperty.call(chatbot, 'shell_builder_config'), false);
+assert.strictEqual(Object.keys(chatbot).includes('_titan_shell_builder_config'), false);
 assert.deepStrictEqual(
   Array.from(chatbot['shell_builder_config[workspace_templates]']),
   recommendations,
