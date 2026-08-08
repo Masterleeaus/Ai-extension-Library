@@ -1,0 +1,21 @@
+name: Titan Reach Engagement Verification
+
+on:
+  pull_request:
+    paths:
+      - 'app/extensions/SocialMedia/**'
+      - 'app/extensions/SocialMediaAutomation/**'
+      - '.github/workflows/titan-reach-engagement-verification.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run issue 273 engagement contract
+        run: php app/extensions/SocialMedia/tests/engagement_inbox_parity_contract.php
+      - name: Lint engagement contract
+        run: php -l app/extensions/SocialMedia/tests/engagement_inbox_parity_contract.php
