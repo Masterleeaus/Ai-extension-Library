@@ -87,6 +87,8 @@ $assertContains('function sendPublicReply', $automation, 'Bound automation must 
 $assertContains('function sendDm', $automation, 'Bound automation must override the legacy private-send entry point.');
 $assertContains('Direct automation replies are disabled', $automation, 'Bound automation public sends must fail closed.');
 $assertContains('Direct automation private messages are disabled', $automation, 'Bound automation private sends must fail closed.');
+$assertContains("if (\$accountId === '' || \$commentId === '')", $automation, 'Incomplete webhook provider identity must fail closed before tenant lookup.');
+$assertContains("->where('credentials->platform_id', \$accountId)", $automation, 'Webhook automation lookup must always bind to the provider account ID.');
 $assertNotContains('https://open.tiktokapis.com/v2/comment/reply/create/', $automation, 'Governed automation must not implement a synthetic TikTok reply endpoint.');
 $assertContains('AutomationExecutionService::class, GovernedAutomationExecutionService::class', $automationProvider, 'AutomationExecutionService must resolve to the governed implementation.');
 $assertNotContains("'payload' => \$request->json()->all()", $facebookOauth, 'Facebook webhook must not log raw payloads.');
