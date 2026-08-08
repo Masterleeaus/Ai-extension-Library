@@ -80,7 +80,14 @@
         if (!chatbot) return;
         const serialised = window.TitanShellBuilder.serialise(config);
 
-        chatbot._titan_shell_builder_config = serialised;
+        // Cache the structured form for component remounts without letting the
+        // generic Object.keys/FormData serializer send it as "[object Object]".
+        Object.defineProperty(chatbot, '_titan_shell_builder_config', {
+            value: serialised,
+            writable: true,
+            configurable: true,
+            enumerable: false,
+        });
         delete chatbot.shell_builder_config;
         clearFlattenedShellConfig(chatbot);
 
