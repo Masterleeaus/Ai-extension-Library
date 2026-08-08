@@ -1,0 +1,166 @@
+<?php
+
+declare(strict_types=1);
+
+return [
+    'duplicate_window_seconds' => 86400,
+    'proposal_ttl_seconds' => 86400,
+
+    'providers' => [
+        'facebook' => [
+            'mode' => 'direct',
+            'operations' => [
+                'inbox' => ['supported' => true, 'required_scopes' => ['pages_read_user_content', 'pages_read_engagement']],
+                'public_reply' => ['supported' => true, 'required_scopes' => ['pages_manage_engagement']],
+                'private_reply' => ['supported' => true, 'required_scopes' => ['pages_messaging']],
+                'edit' => ['supported' => false, 'required_scopes' => []],
+                'delete' => ['supported' => false, 'required_scopes' => []],
+            ],
+        ],
+        'instagram' => [
+            'mode' => 'direct',
+            'operations' => [
+                'inbox' => ['supported' => true, 'required_scopes' => ['instagram_manage_comments']],
+                'public_reply' => ['supported' => true, 'required_scopes' => ['instagram_manage_comments']],
+                'private_reply' => ['supported' => true, 'required_scopes' => ['instagram_manage_messages']],
+                'edit' => ['supported' => false, 'required_scopes' => []],
+                'delete' => ['supported' => false, 'required_scopes' => []],
+            ],
+        ],
+        'youtube' => [
+            'mode' => 'direct',
+            'operations' => [
+                'inbox' => ['supported' => true, 'required_scopes' => ['https://www.googleapis.com/auth/youtube.force-ssl']],
+                'public_reply' => ['supported' => true, 'required_scopes' => ['https://www.googleapis.com/auth/youtube.force-ssl']],
+                'private_reply' => ['supported' => false, 'required_scopes' => []],
+                'edit' => ['supported' => true, 'required_scopes' => ['https://www.googleapis.com/auth/youtube.force-ssl']],
+                'delete' => ['supported' => true, 'required_scopes' => ['https://www.googleapis.com/auth/youtube.force-ssl']],
+            ],
+        ],
+        'linkedin' => [
+            'mode' => 'direct',
+            'requires_product_access' => 'community_management',
+            'operations' => [
+                'inbox' => ['supported' => true, 'required_scopes' => ['r_organization_social_feed']],
+                'public_reply' => ['supported' => true, 'required_scopes' => ['w_organization_social_feed']],
+                'private_reply' => ['supported' => false, 'required_scopes' => []],
+                'edit' => ['supported' => true, 'required_scopes' => ['w_organization_social_feed']],
+                'delete' => ['supported' => true, 'required_scopes' => ['w_organization_social_feed']],
+            ],
+        ],
+        'x' => [
+            'mode' => 'direct',
+            'operations' => [
+                'inbox' => ['supported' => true, 'required_scopes' => ['tweet.read', 'users.read']],
+                'public_reply' => ['supported' => true, 'required_scopes' => ['tweet.read', 'tweet.write', 'users.read']],
+                'private_reply' => ['supported' => false, 'required_scopes' => []],
+                'edit' => ['supported' => false, 'required_scopes' => []],
+                'delete' => ['supported' => true, 'required_scopes' => ['tweet.write', 'users.read']],
+            ],
+        ],
+        'tiktok' => [
+            'mode' => 'unavailable',
+            'reason' => 'commercial_comment_management_unavailable',
+            'operations' => [
+                'inbox' => ['supported' => false, 'required_scopes' => []],
+                'public_reply' => ['supported' => false, 'required_scopes' => []],
+                'private_reply' => ['supported' => false, 'required_scopes' => []],
+                'edit' => ['supported' => false, 'required_scopes' => []],
+                'delete' => ['supported' => false, 'required_scopes' => []],
+            ],
+        ],
+    ],
+
+    'policies' => [
+        'generic-business' => [
+            'auto_send_allowed' => false,
+            'terminology' => 'enquiry',
+            'quiet_period' => ['enabled' => false, 'start' => '22:00', 'end' => '07:00'],
+            'suppression' => ['stop contacting me', 'do not contact me', 'do not contact', 'unsubscribe', 'remove me'],
+            'high_risk' => ['emergency', 'unsafe', 'injury', 'legal action', 'fraud', 'scam', 'threat', 'complaint'],
+            'human_handoff_categories' => ['emergency', 'safety', 'legal', 'fraud', 'complaint'],
+            'quiet_period_bypass_categories' => ['emergency', 'safety'],
+        ],
+        'field-home-services' => [
+            'auto_send_allowed' => false,
+            'terminology' => 'service enquiry',
+            'quiet_period' => ['enabled' => false, 'start' => '21:00', 'end' => '07:00'],
+            'suppression' => [],
+            'high_risk' => ['gas leak', 'electric shock', 'no power', 'flooding', 'fire', 'unsafe', 'injury', 'emergency'],
+            'human_handoff_categories' => ['emergency', 'safety', 'complaint'],
+            'quiet_period_bypass_categories' => ['emergency', 'safety'],
+        ],
+        'accommodation' => [
+            'auto_send_allowed' => false,
+            'terminology' => 'guest enquiry',
+            'quiet_period' => ['enabled' => false, 'start' => '22:00', 'end' => '07:00'],
+            'suppression' => [],
+            'high_risk' => ['locked out', 'lockout', 'fire', 'injury', 'unsafe', 'security', 'medical emergency'],
+            'human_handoff_categories' => ['emergency', 'safety', 'guest-support', 'complaint'],
+            'quiet_period_bypass_categories' => ['emergency', 'safety', 'guest-support'],
+        ],
+        'real-estate' => [
+            'auto_send_allowed' => false,
+            'terminology' => 'property enquiry',
+            'quiet_period' => ['enabled' => false, 'start' => '21:00', 'end' => '07:00'],
+            'suppression' => [],
+            'high_risk' => ['urgent repair', 'unsafe property', 'tenant safety', 'tribunal', 'legal', 'dispute', 'breach'],
+            'human_handoff_categories' => ['maintenance', 'safety', 'legal', 'complaint'],
+            'quiet_period_bypass_categories' => ['maintenance', 'safety'],
+        ],
+        'salons-personal-care' => [
+            'auto_send_allowed' => false,
+            'terminology' => 'appointment enquiry',
+            'quiet_period' => ['enabled' => false, 'start' => '21:00', 'end' => '07:00'],
+            'suppression' => [],
+            'high_risk' => ['allergic reaction', 'reaction', 'burn', 'injury', 'infection', 'medical'],
+            'human_handoff_categories' => ['safety', 'health', 'complaint'],
+            'quiet_period_bypass_categories' => ['safety', 'health'],
+        ],
+        'fitness-membership' => [
+            'auto_send_allowed' => false,
+            'terminology' => 'membership enquiry',
+            'quiet_period' => ['enabled' => false, 'start' => '21:00', 'end' => '06:00'],
+            'suppression' => [],
+            'high_risk' => ['injury', 'chest pain', 'fainted', 'medical emergency', 'unsafe equipment'],
+            'human_handoff_categories' => ['safety', 'health', 'membership', 'complaint'],
+            'quiet_period_bypass_categories' => ['safety', 'health'],
+        ],
+        'automotive-services' => [
+            'auto_send_allowed' => false,
+            'terminology' => 'vehicle enquiry',
+            'quiet_period' => ['enabled' => false, 'start' => '21:00', 'end' => '07:00'],
+            'suppression' => [],
+            'high_risk' => ['brake failure', 'stranded', 'roadside', 'unsafe vehicle', 'crash', 'accident', 'fire'],
+            'human_handoff_categories' => ['emergency', 'safety', 'roadside', 'complaint'],
+            'quiet_period_bypass_categories' => ['emergency', 'safety', 'roadside'],
+        ],
+        'ecommerce-retail' => [
+            'auto_send_allowed' => false,
+            'terminology' => 'order enquiry',
+            'quiet_period' => ['enabled' => false, 'start' => '22:00', 'end' => '07:00'],
+            'suppression' => [],
+            'high_risk' => ['fraud', 'stolen card', 'chargeback', 'account hacked', 'data breach', 'unsafe product', 'injury'],
+            'human_handoff_categories' => ['fraud', 'security', 'safety', 'order', 'complaint'],
+            'quiet_period_bypass_categories' => ['fraud', 'security', 'safety'],
+        ],
+        'hire-rental' => [
+            'auto_send_allowed' => false,
+            'terminology' => 'rental enquiry',
+            'quiet_period' => ['enabled' => false, 'start' => '21:00', 'end' => '07:00'],
+            'suppression' => [],
+            'high_risk' => ['damaged', 'injury', 'unsafe equipment', 'accident', 'stolen', 'breakdown'],
+            'human_handoff_categories' => ['safety', 'damage', 'loss', 'rental', 'complaint'],
+            'quiet_period_bypass_categories' => ['safety', 'damage', 'loss'],
+        ],
+        'booking-capacity' => [
+            'auto_send_allowed' => false,
+            'terminology' => 'reservation enquiry',
+            'quiet_period' => ['enabled' => false, 'start' => '22:00', 'end' => '07:00'],
+            'suppression' => [],
+            'high_risk' => ['accessibility', 'unsafe', 'injury', 'emergency', 'double booked', 'locked out'],
+            'human_handoff_categories' => ['safety', 'accessibility', 'booking', 'complaint'],
+            'quiet_period_bypass_categories' => ['safety', 'accessibility'],
+        ],
+    ],
+];
