@@ -17,10 +17,6 @@ class GovernedAutomationExecutionService extends AutomationExecutionService
 {
     public function __construct(private readonly EngagementGovernanceService $engagement) {}
 
-    /**
-     * Accept an inbound engagement, preserve existing automation trigger matching,
-     * and queue only governed proposal work. This method never changes provider state.
-     */
     public function processCommentEvent(string $platform, array $payload): void
     {
         $accountId = trim((string) ($payload['account_id'] ?? ''));
@@ -84,10 +80,6 @@ class GovernedAutomationExecutionService extends AutomationExecutionService
         }
     }
 
-    /**
-     * Execute delayed automation work by staging proposals/handoffs only.
-     * No provider-changing method on the legacy parent is called.
-     */
     public function executeActions(Automation $automation, array $commenterData): void
     {
         if (! $automation->platform instanceof SocialMediaPlatform) {
@@ -118,19 +110,9 @@ class GovernedAutomationExecutionService extends AutomationExecutionService
         ]);
 
         try {
-            $result = $this->stageGovernedProposal($automation, $commenterData);
-            $actions = ['proposal_staged'];
-
-            if ((bool) ($result['human_handoff_required'] ?? false)) {
-                $this->engagement->handoff(
-                    $automation->platform,
-                    $automation->platform,
-                    []
-                );
-            }
-
+            $this->stageGovernedProposal($automation, $commenterData);
             $log->update([
-                'actions_executed' => $actions,
+                'actions_executed' => ['proposal_staged'],
                 'error_message' => null,
             ]);
         } catch (Throwable $exception) {
@@ -146,9 +128,6 @@ class GovernedAutomationExecutionService extends AutomationExecutionService
         }
     }
 
-    /**
-     * Stage a single approval proposal from the existing automation reply/action rules.
-     */
     public function stageGovernedProposal(Automation $automation, array $commenterData): array
     {
         $platform = $automation->platform;
@@ -157,23 +136,34 @@ class GovernedAutomationExecutionService extends AutomationExecutionService
             throw new RuntimeException('The automation provider account is unavailable.');
         }
 
-        $suggestedText = $this->suggestedText($automation, $commenterData);
+        $owner = $platform->user()->firstOrFail();
+        $engagement = $this->normaliseEngagement((string) $platform->platform, $commenterData);
         $proposal = $this->engagement->proposeReply(
-            $platform->user()->firstOrFail(),
+            $owner,
             $platform,
-            $this->normaliseEngagement((string) $platform->platform, $commenterData),
-            $suggestedText
+            $engagement,
+            $this->suggestedText($automation, $commenterData)
         );
 
         if ((bool) ($proposal['human_handoff_required'] ?? false)) {
-            $this->engagement->handoff(
-                $platform->user()->firstOrFail(),
-                $platform,
-                $this->normaliseEngagement((string) $platform->platform, $commenterData)
-            );
+            $this->engagement->handoff($owner, $platform, $engagement);
         }
 
         return $proposal;
+    }
+
+    /**
+     * Legacy direct-send entry points are deliberately disabled on the bound service.
+     * A human-approved request must use EngagementGovernanceService instead.
+     */
+    public function sendPublicReply(SocialMediaPlatform $platform, string $commentId, string $replyText): void
+    {
+        throw new RuntimeException('Direct automation replies are disabled; stage a governed proposal.');
+    }
+
+    public function sendDm(SocialMediaPlatform $platform, array $commenterData, array $actions): void
+    {
+        throw new RuntimeException('Direct automation private messages are disabled; stage a governed proposal.');
     }
 
     private function suggestedText(Automation $automation, array $commenterData): ?string
