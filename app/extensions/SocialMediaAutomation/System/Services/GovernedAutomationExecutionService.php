@@ -28,13 +28,21 @@ class GovernedAutomationExecutionService extends AutomationExecutionService
             'comment_id_hash' => $commentId !== '' ? hash('sha256', $commentId) : null,
         ]);
 
+        if ($accountId === '' || $commentId === '') {
+            Log::warning('Governed comment event rejected due to incomplete provider identity', [
+                'platform' => $platform,
+                'has_account_id' => $accountId !== '',
+                'has_comment_id' => $commentId !== '',
+            ]);
+
+            return;
+        }
+
         $automations = Automation::query()
             ->where('status', 'live')
             ->whereHas('platform', function ($query) use ($platform, $accountId) {
-                $query->where('platform', $platform);
-                if ($accountId !== '') {
-                    $query->where('credentials->platform_id', $accountId);
-                }
+                $query->where('platform', $platform)
+                    ->where('credentials->platform_id', $accountId);
             })
             ->with(['actions', 'replies', 'platform'])
             ->get();
@@ -68,7 +76,7 @@ class GovernedAutomationExecutionService extends AutomationExecutionService
 
                 Log::debug('Governed proposal work queued', [
                     'automation_id' => $automation->id,
-                    'comment_id_hash' => $commentId !== '' ? hash('sha256', $commentId) : null,
+                    'comment_id_hash' => hash('sha256', $commentId),
                     'delay_seconds' => $delay,
                 ]);
             } catch (Throwable $exception) {
