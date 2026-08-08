@@ -41,7 +41,7 @@ class GovernedAutomationExecutionService extends AutomationExecutionService
 
         foreach ($automations as $automation) {
             if (! $automation->platform instanceof SocialMediaPlatform
-                || ! parent::matchesTrigger($automation, $payload)) {
+                || ! $this->matchesTrigger($automation, $payload)) {
                 continue;
             }
 
@@ -78,6 +78,43 @@ class GovernedAutomationExecutionService extends AutomationExecutionService
                 ]);
             }
         }
+    }
+
+    public function matchesTrigger(Automation $automation, array $commentData): bool
+    {
+        if ($automation->trigger_target === 'specific_post'
+            && ($commentData['post_id'] ?? null) !== $automation->trigger_post_id) {
+            return false;
+        }
+
+        if ($automation->keyword_mode !== 'specific') {
+            return true;
+        }
+
+        $commentText = mb_strtolower((string) ($commentData['text'] ?? ''));
+        $includeKeywords = (array) ($automation->include_keywords ?? []);
+
+        if ($includeKeywords !== []) {
+            $matched = false;
+            foreach ($includeKeywords as $keyword) {
+                if (str_contains($commentText, mb_strtolower((string) $keyword))) {
+                    $matched = true;
+                    break;
+                }
+            }
+
+            if (! $matched) {
+                return false;
+            }
+        }
+
+        foreach ((array) ($automation->exclude_keywords ?? []) as $keyword) {
+            if (str_contains($commentText, mb_strtolower((string) $keyword))) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public function executeActions(Automation $automation, array $commenterData): void
@@ -152,10 +189,6 @@ class GovernedAutomationExecutionService extends AutomationExecutionService
         return $proposal;
     }
 
-    /**
-     * Legacy direct-send entry points are deliberately disabled on the bound service.
-     * A human-approved request must use EngagementGovernanceService instead.
-     */
     public function sendPublicReply(SocialMediaPlatform $platform, string $commentId, string $replyText): void
     {
         throw new RuntimeException('Direct automation replies are disabled; stage a governed proposal.');
