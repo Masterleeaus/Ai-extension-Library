@@ -38,9 +38,24 @@ jobs:
 
       - name: Run vertical architecture contracts
         run: |
-          python -m pytest -q \
-            app/extensions/Chatbot/tests/architecture/test_vertical_template_catalogue.py \
-            app/extensions/Chatbot/tests/architecture/test_vertical_template_composition.py
+          python - <<'PY'
+          import runpy
+          from pathlib import Path
+
+          paths = [
+              Path('app/extensions/Chatbot/tests/architecture/test_vertical_template_catalogue.py'),
+              Path('app/extensions/Chatbot/tests/architecture/test_vertical_template_composition.py'),
+          ]
+
+          count = 0
+          for path in paths:
+              namespace = runpy.run_path(str(path))
+              for name, value in sorted(namespace.items()):
+                  if name.startswith('test_') and callable(value):
+                      value()
+                      count += 1
+          print(f'passed {count} vertical architecture contracts')
+          PY
 
       - name: PHP syntax
         run: |
