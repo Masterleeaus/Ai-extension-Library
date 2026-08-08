@@ -1,0 +1,46 @@
+name: Titan Reach Engagement Verification
+
+on:
+  pull_request:
+    paths:
+      - 'app/extensions/SocialMedia/**'
+      - 'app/extensions/SocialMediaAutomation/**'
+      - '.github/workflows/titan-reach-engagement-verification.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run issue 273 engagement contract
+        run: php app/extensions/SocialMedia/tests/engagement_inbox_parity_contract.php
+      - name: Lint engagement PHP files
+        shell: bash
+        run: |
+          set -euo pipefail
+          files=(
+            app/extensions/SocialMedia/config/social-media.php
+            app/extensions/SocialMedia/config/engagement.php
+            app/extensions/SocialMedia/System/Helpers/Contracts/BaseMetaHelper.php
+            app/extensions/SocialMedia/System/Helpers/Facebook.php
+            app/extensions/SocialMedia/System/Helpers/Instagram.php
+            app/extensions/SocialMedia/System/Helpers/Youtube.php
+            app/extensions/SocialMedia/System/Helpers/Linkedin.php
+            app/extensions/SocialMedia/System/Helpers/X.php
+            app/extensions/SocialMedia/System/Http/Controllers/Oauth/FacebookController.php
+            app/extensions/SocialMedia/System/Http/Controllers/Oauth/LinkedinController.php
+            app/extensions/SocialMedia/System/Http/Controllers/Oauth/XController.php
+            app/extensions/SocialMedia/System/Http/Controllers/EngagementController.php
+            app/extensions/SocialMedia/System/Services/EngagementGovernanceService.php
+            app/extensions/SocialMedia/System/SocialMediaServiceProvider.php
+            app/extensions/SocialMediaAutomation/System/Services/GovernedAutomationExecutionService.php
+            app/extensions/SocialMediaAutomation/System/Services/WebhookProcessor.php
+            app/extensions/SocialMediaAutomation/System/SocialMediaAutomationServiceProvider.php
+            app/extensions/SocialMedia/tests/engagement_inbox_parity_contract.php
+          )
+          for file in "${files[@]}"; do
+            php -l "$file"
+          done

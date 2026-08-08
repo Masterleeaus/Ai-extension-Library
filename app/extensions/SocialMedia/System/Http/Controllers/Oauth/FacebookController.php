@@ -33,7 +33,7 @@ class FacebookController extends Controller
     {
         if (Helper::appIsDemo()) {
             return back()->with([
-                'type'    => 'error',
+                'type' => 'error',
                 'message' => trans('This feature is disabled in demo mode.'),
             ]);
         }
@@ -41,11 +41,8 @@ class FacebookController extends Controller
         $this->setBackCacheRoute();
 
         if (setting('FACEBOOK_APP_ID') && setting('FACEBOOK_APP_SECRET')) {
-
-            if ($request->has('platform_id') && $request->get('platform_id')) {
-                Cache::remember($this->cacheKey(), 60, function () use ($request) {
-                    return $request->get('platform_id');
-                });
+            if ($request->filled('platform_id')) {
+                Cache::remember($this->cacheKey(), 60, fn () => $request->get('platform_id'));
             }
 
             return Facebook::authRedirect([
@@ -53,6 +50,7 @@ class FacebookController extends Controller
                 'pages_show_list',
                 'pages_read_user_content',
                 'pages_read_engagement',
+                'pages_manage_engagement',
                 'pages_messaging',
                 'pages_manage_metadata',
                 'read_insights',
@@ -60,143 +58,98 @@ class FacebookController extends Controller
         }
 
         return back()->with([
-            'type'    => 'error',
+            'type' => 'error',
             'message' => 'Facebook app id and secret not set. Please contact the administrator.',
         ]);
     }
 
     public function callback(Request $request): RedirectResponse
     {
-
         $fb = new Facebook;
-
         $code = $request->get('code');
 
         if (! $code) {
-            return redirect()->route($this->getBackCacheRoute())
-                ->with([
-                    'type'    => 'error',
-                    'message' => 'Something went wrong, please try again.',
-                ]);
+            return $this->failure();
         }
 
         try {
-
             $token = $fb->getAccessToken($code)->throw()->json('access_token');
-
             $fb->setToken($token);
-
-            $page = $fb->getPagesInfo(['name,username,picture,access_token,followers_count,fan_count'])->throw()->json('data');
-
-            $page = Arr::first($page);
+            $page = Arr::first($fb->getPagesInfo([
+                'name,username,picture,access_token,followers_count,fan_count',
+            ])->throw()->json('data'));
 
             if (! $page) {
-                return redirect()->route($this->getBackCacheRoute())
-                    ->with([
-                        'type'    => 'error',
-                        'message' => 'Something went wrong, please try again.',
-                    ]);
+                return $this->failure();
             }
-
-        } catch (Exception $exception) {
-            return redirect()->route($this->getBackCacheRoute())
-                ->with([
-                    'type'    => 'error',
-                    'message' => 'Something went wrong, please try again.',
-                ]);
+        } catch (Exception) {
+            return $this->failure();
         }
 
-        $platformId = Cache::get($this->cacheKey());
-        $followersCount = (int) (
-            data_get($page, 'followers_count')
-            ?? data_get($page, 'fan_count')
-            ?? 0
-        );
+        $pageAccessToken = (string) data_get($page, 'access_token', '');
+        $pageId = (string) data_get($page, 'id', '');
+        $followersCount = (int) (data_get($page, 'followers_count') ?? data_get($page, 'fan_count') ?? 0);
+        $credentials = [
+            'type' => 'user',
+            'platform_id' => $pageId,
+            'name' => data_get($page, 'name'),
+            'username' => data_get($page, 'username'),
+            'picture' => self::downloadImageToStorage(data_get($page, 'picture.data.url')),
+            'access_token' => $pageAccessToken,
+            'access_token_expire_at' => config('social-media.facebook.access_token_expire_at', now()->addDay()),
+            'refresh_token' => $pageAccessToken,
+            'refresh_token_expire_at' => config('social-media.facebook.access_token_expire_at', now()->addDay()),
+        ];
 
-        if ($platformId && is_numeric($platformId)) {
-            $platform = SocialMediaPlatform::query()
+        $platformId = Cache::get($this->cacheKey());
+        $platform = $platformId && is_numeric($platformId)
+            ? SocialMediaPlatform::query()
                 ->where('id', $platformId)
                 ->where('user_id', Auth::id())
                 ->where('platform', PlatformEnum::facebook->value)
-                ->first();
+                ->first()
+            : null;
 
-            if ($platform) {
-                $pageAccessToken = data_get($page, 'access_token');
-                $pageId = data_get($page, 'id');
+        $values = [
+            'credentials' => $credentials,
+            'connected_at' => now(),
+            'expires_at' => config('social-media.facebook.access_token_expire_at', now()->addDay()),
+            'followers_count' => $followersCount,
+        ];
 
-                $platform->update([
-                    'credentials' => [
-                        'type'                    => 'user',
-                        'platform_id'             => $pageId,
-                        'name'                    => data_get($page, 'name'),
-                        'username'                => data_get($page, 'username'),
-                        'picture'                 => self::downloadImageToStorage(data_get($page, 'picture.data.url')),
-
-                        'access_token'           => $pageAccessToken,
-                        'access_token_expire_at' => config('social-media.facebook.access_token_expire_at', now()->addDay()),
-
-                        'refresh_token'           => $pageAccessToken,
-                        'refresh_token_expire_at' => config('social-media.facebook.access_token_expire_at', now()->addDay()),
-                    ],
-                    'connected_at'     => now(),
-                    'expires_at'       => config('social-media.facebook.access_token_expire_at', now()->addDay()),
-                    'followers_count'  => $followersCount,
-                ]);
-
-                $this->subscribePageToWebhook($pageId, $pageAccessToken);
-            }
-
+        if ($platform) {
+            $platform->update($values);
             Cache::forget($this->cacheKey());
-
         } else {
-            $pageAccessToken = data_get($page, 'access_token');
-            $pageId = data_get($page, 'id');
-
-            SocialMediaPlatform::query()->create([
-                'user_id'     => Auth::id(),
-                'platform'    => PlatformEnum::facebook->value,
-                'credentials' => [
-                    'type'                    => 'user',
-                    'platform_id'             => $pageId,
-                    'name'                    => data_get($page, 'name'),
-                    'username'                => data_get($page, 'username'),
-                    'picture'                 => self::downloadImageToStorage(data_get($page, 'picture.data.url')),
-
-                    'access_token'           => $pageAccessToken,
-                    'access_token_expire_at' => config('social-media.facebook.access_token_expire_at', now()->addDay()),
-
-                    'refresh_token'           => $pageAccessToken,
-                    'refresh_token_expire_at' => config('social-media.facebook.access_token_expire_at', now()->addDay()),
-                ],
-                'connected_at'    => now(),
-                'expires_at'      => config('social-media.facebook.access_token_expire_at', now()->addDay()),
-                'followers_count' => $followersCount,
+            $platform = SocialMediaPlatform::query()->create([
+                'user_id' => Auth::id(),
+                'platform' => PlatformEnum::facebook->value,
+                ...$values,
             ]);
+        }
 
+        if ($pageId !== '' && $pageAccessToken !== '') {
             $this->subscribePageToWebhook($pageId, $pageAccessToken);
         }
 
-        return redirect()->route($this->getBackCacheRoute())
-            ->with([
-                'type'    => 'success',
-                'message' => trans('Facebook account connected successfully.'),
-            ]);
+        return redirect()->route($this->getBackCacheRoute())->with([
+            'type' => 'success',
+            'message' => trans('Facebook account connected successfully.'),
+        ]);
     }
 
     public function webhook(Request $request)
     {
-        // GET: Verification handshake
         if ($request->isMethod('GET')) {
-            $verify_token = setting('FACEBOOK_WEBHOOK_SECRET', 'default-password');
+            $verifyToken = setting('FACEBOOK_WEBHOOK_SECRET', 'default-password');
 
             Log::info('Facebook webhook verification attempt', [
-                'hub_mode'         => $request->get('hub_mode'),
-                'hub_verify_token' => $request->get('hub_verify_token'),
-                'expected_token'   => $verify_token,
-                'match'            => $request->get('hub_verify_token') === $verify_token,
+                'mode' => $request->get('hub_mode'),
+                'matched' => hash_equals((string) $verifyToken, (string) $request->get('hub_verify_token')),
             ]);
 
-            if ($request->get('hub_mode') === 'subscribe' && $request->get('hub_verify_token') === $verify_token) {
+            if ($request->get('hub_mode') === 'subscribe'
+                && hash_equals((string) $verifyToken, (string) $request->get('hub_verify_token'))) {
                 return response($request->get('hub_challenge'), 200)
                     ->header('Content-Type', 'text/plain');
             }
@@ -204,34 +157,29 @@ class FacebookController extends Controller
             return response('Token invalid', 403);
         }
 
-        // POST: Process incoming webhook events
         if ($request->isMethod('POST')) {
             Log::info('Facebook webhook POST received', [
-                'payload' => $request->json()->all(),
+                'entry_count' => count((array) $request->json('entry', [])),
             ]);
 
             try {
                 if (class_exists(WebhookProcessor::class)) {
                     $processor = app(WebhookProcessor::class);
-
                     $appSecret = setting('FACEBOOK_APP_SECRET');
 
                     if ($appSecret && ! $processor->verifySignature($request, $appSecret)) {
-                        Log::warning('Facebook webhook signature verification failed', [
-                            'signature_header' => $request->header('X-Hub-Signature-256'),
-                        ]);
+                        Log::warning('Facebook webhook signature verification failed');
 
                         return response('Invalid signature', 403);
                     }
 
                     $processor->processFacebookPayload($request->json()->all());
                 } else {
-                    Log::warning('Facebook webhook: SocialMediaAutomation extension not found');
+                    Log::warning('Facebook webhook automation processor is unavailable');
                 }
-            } catch (Throwable $e) {
+            } catch (Throwable $exception) {
                 Log::error('Facebook webhook processing failed', [
-                    'error' => $e->getMessage(),
-                    'trace' => $e->getTraceAsString(),
+                    'exception' => $exception::class,
                 ]);
             }
 
@@ -244,26 +192,24 @@ class FacebookController extends Controller
     private function subscribePageToWebhook(string $pageId, string $pageAccessToken): void
     {
         try {
-            $fb = new Facebook(null, $pageAccessToken);
-            $response = $fb->subscribePageToWebhook($pageId);
-
-            if ($response->failed()) {
-                Log::warning('Facebook page webhook subscription failed', [
-                    'page_id' => $pageId,
-                    'status'  => $response->status(),
-                    'body'    => $response->body(),
-                ]);
-            } else {
-                Log::info('Facebook page subscribed to webhook', [
-                    'page_id'  => $pageId,
-                    'response' => $response->json(),
-                ]);
-            }
-        } catch (Throwable $e) {
+            $response = (new Facebook(null, $pageAccessToken))->subscribePageToWebhook($pageId);
+            Log::log($response->successful() ? 'info' : 'warning', 'Facebook page webhook subscription completed', [
+                'page_id_hash' => hash('sha256', $pageId),
+                'status' => $response->status(),
+            ]);
+        } catch (Throwable $exception) {
             Log::error('Facebook page webhook subscription exception', [
-                'page_id' => $pageId,
-                'error'   => $e->getMessage(),
+                'page_id_hash' => hash('sha256', $pageId),
+                'exception' => $exception::class,
             ]);
         }
+    }
+
+    private function failure(): RedirectResponse
+    {
+        return redirect()->route($this->getBackCacheRoute())->with([
+            'type' => 'error',
+            'message' => 'Something went wrong, please try again.',
+        ]);
     }
 }

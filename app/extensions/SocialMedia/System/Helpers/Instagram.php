@@ -17,15 +17,12 @@ class Instagram extends BaseMetaHelper
     public function __construct(?array $config = null, protected ?string $accessToken = null)
     {
         $instagramConfig = config('social-media.instagram');
-
         $instagramConfig = array_merge($instagramConfig, [
             'app_id'     => setting('INSTAGRAM_APP_ID'),
             'app_secret' => setting('INSTAGRAM_APP_SECRET'),
         ]);
-
         $this->config = $config ?? $instagramConfig;
         $this->config['redirect_uri'] = secure_url(config('social-media.instagram.redirect_uri'));
-
     }
 
     private function apiClient(): PendingRequest
@@ -87,35 +84,27 @@ class Instagram extends BaseMetaHelper
     public function publishSingleMediaPost(string $igId, array $postData): Response
     {
         $apiUrl = $this->apiUrl("$igId/media");
-
         $uploadMediaRes = Http::withToken($this->accessToken)
             ->retry(3, 3000)
             ->post($apiUrl, $postData)->throw();
-
         $mediaId = $uploadMediaRes->json('id');
-
         $uploadStatus = $this->checkUploadStatus($mediaId);
-
         throw_if(! $uploadStatus['is_ready'], new Exception($uploadStatus['status']));
 
-        return $this->publishContainer($igId, $uploadMediaRes->json('id'));
+        return $this->publishContainer($igId, $mediaId);
     }
 
     public function publishStory(string $igId, string $imageUrl): Response
     {
         $apiUrl = $this->apiUrl("$igId/media");
-
         $uploadMediaRes = Http::withToken($this->accessToken)
             ->retry(3, 3000)
             ->post($apiUrl, [
                 'image_url'  => $imageUrl,
                 'media_type' => 'STORIES',
             ])->throw();
-
         $mediaId = $uploadMediaRes->json('id');
-
         $uploadStatus = $this->checkUploadStatus($mediaId);
-
         throw_if(! $uploadStatus['is_ready'], new Exception($uploadStatus['status']));
 
         return $this->publishContainer($igId, $mediaId);
@@ -125,9 +114,7 @@ class Instagram extends BaseMetaHelper
     {
         $containerIds = [];
         foreach ($files as $fileUrl) {
-            $containerData = [
-                'is_carousel_item' => true,
-            ];
+            $containerData = ['is_carousel_item' => true];
 
             if ($mediaType == 'image') {
                 $containerData['media_type'] = 'IMAGE';
@@ -137,21 +124,17 @@ class Instagram extends BaseMetaHelper
                 $containerData['video_url'] = $fileUrl;
             }
 
-            $apiUrl = $this->apiUrl($igId . '/media');
             $containerRes = Http::withToken($this->accessToken)
                 ->asForm()
                 ->acceptJson()
-                ->post($apiUrl, $containerData)
+                ->post($this->apiUrl($igId . '/media'), $containerData)
                 ->throw();
-
             $containerIds[] = $containerRes->json('id');
         }
 
-        $carouselApiUrl = $this->apiUrl($igId . '/media');
-
         $publishCarouselContainerRes = Http::withToken($this->accessToken)
             ->retry(3, 3000)
-            ->post($carouselApiUrl, [
+            ->post($this->apiUrl($igId . '/media'), [
                 'media_type' => 'CAROUSEL',
                 'children'   => $containerIds,
                 'caption'    => $caption,
@@ -162,11 +145,9 @@ class Instagram extends BaseMetaHelper
 
     protected function publishContainer(string $igId, string $creation_id)
     {
-        $apiUrl = $this->apiUrl($igId . '/media_publish');
-
         return Http::retry(3, 3000)
             ->withToken($this->accessToken)
-            ->post($apiUrl, [
+            ->post($this->apiUrl($igId . '/media_publish'), [
                 'creation_id' => (int) $creation_id,
             ]);
     }
@@ -181,20 +162,16 @@ class Instagram extends BaseMetaHelper
             Log::info("Checking upload for: $mediaId");
             $videoStatus = $this->apiClient()->get($this->apiUrl($mediaId, ['fields' => 'status_code,status']))->throw();
             Log::info("Got upload status is: $status. on $attempted/$maxAttempts attempts");
-
             $status = $videoStatus->json('status_code');
             $isFinished = in_array(strtolower($status), ['finished', 'ok', 'completed', 'ready']);
 
             if ($isFinished) {
                 Log::info("Upload finished with status: $status");
-
                 break;
             }
 
-            $isError = in_array(strtolower($status), ['error', 'failed']);
-            if ($isError) {
+            if (in_array(strtolower($status), ['error', 'failed'])) {
                 Log::info("Upload error with status: $status");
-
                 break;
             }
 
@@ -211,11 +188,9 @@ class Instagram extends BaseMetaHelper
 
     private function getMediaStatus(string $mediaId): Response
     {
-        $apiUrl = $this->apiUrl($mediaId, [
+        return Http::withToken($this->accessToken)->get($this->apiUrl($mediaId, [
             'fields' => 'status',
-        ]);
-
-        return Http::withToken($this->accessToken)->get($apiUrl)->throw();
+        ]))->throw();
     }
 
     public function getMedia(string $igId, int $limit = 50, ?array $fields = null): Response
@@ -229,7 +204,36 @@ class Instagram extends BaseMetaHelper
             ]));
     }
 
-    // analytics
+    public function comments(string $mediaId, int $limit = 50, ?string $after = null): Response
+    {
+        return Http::withToken($this->accessToken)
+            ->acceptJson()
+            ->get($this->apiUrl(rawurlencode(trim($mediaId)) . '/comments'), array_filter([
+                'fields' => 'id,text,username,timestamp,from,parent_id,replies{id,text,username,timestamp}',
+                'limit' => max(1, min(100, $limit)),
+                'after' => $after,
+            ], static fn ($value) => $value !== null && $value !== ''));
+    }
+
+    public function replyToComment(string $commentId, string $message): Response
+    {
+        return Http::withToken($this->accessToken)
+            ->acceptJson()
+            ->post($this->apiUrl(rawurlencode(trim($commentId)) . '/replies'), [
+                'message' => $message,
+            ]);
+    }
+
+    public function privateReply(string $igUserId, string $commentId, string $message): Response
+    {
+        return Http::withToken($this->accessToken)
+            ->acceptJson()
+            ->post($this->apiUrl(rawurlencode(trim($igUserId)) . '/messages'), [
+                'recipient' => ['comment_id' => trim($commentId)],
+                'message' => ['text' => $message],
+            ]);
+    }
+
     public function getPostAnalytics(string $postId, array $fields = []): Response
     {
         return Http::withToken($this->accessToken)

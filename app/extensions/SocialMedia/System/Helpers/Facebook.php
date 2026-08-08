@@ -86,12 +86,7 @@ class Facebook extends BaseMetaHelper
     {
         return Http::withToken($this->accessToken)
             ->acceptJson()
-            ->post(
-                $this->apiUrl($pageId . '/feed'),
-                [
-                    'message' => $text,
-                ]
-            );
+            ->post($this->apiUrl($pageId . '/feed'), ['message' => $text]);
     }
 
     public function publishPhotoOnPage(int $pageId, string $text, array $photos): Response
@@ -117,7 +112,6 @@ class Facebook extends BaseMetaHelper
 
     public function publishPhotoStory(int $pageId, string $photoUrl): Response
     {
-        // Step 1: Upload photo unpublished to get photo_id
         $uploadResponse = Http::retry(3, 3000)
             ->withToken($this->accessToken)
             ->post($this->apiUrl($pageId . '/photos'), [
@@ -129,25 +123,20 @@ class Facebook extends BaseMetaHelper
             return $uploadResponse;
         }
 
-        $photoId = $uploadResponse->json('id');
-
-        // Step 2: Publish story using the photo_id
         return Http::retry(3, 3000)
             ->withToken($this->accessToken)
             ->post($this->apiUrl($pageId . '/photo_stories'), [
-                'photo_id' => $photoId,
+                'photo_id' => $uploadResponse->json('id'),
             ]);
     }
 
     public function publishVideoOnPage(string $pageId, string $fileUrl): Response
     {
-        $postData = [
+        return Http::post($this->apiUrl("$pageId/videos"), [
             'file_url'     => $fileUrl,
             'description'  => 'example caption',
             'access_token' => $this->accessToken,
-        ];
-
-        return Http::post($this->apiUrl("$pageId/videos"), $postData);
+        ]);
     }
 
     public function getPageFeed(string $pageId, int $limit = 50, ?array $fields = null): Response
@@ -161,6 +150,36 @@ class Facebook extends BaseMetaHelper
             ]));
     }
 
+    public function comments(string $postId, int $limit = 50, ?string $after = null): Response
+    {
+        return Http::withToken($this->accessToken)
+            ->acceptJson()
+            ->get($this->apiUrl(rawurlencode(trim($postId)) . '/comments'), array_filter([
+                'fields' => 'id,message,from,created_time,parent,can_reply_privately',
+                'limit' => max(1, min(100, $limit)),
+                'after' => $after,
+            ], static fn ($value) => $value !== null && $value !== ''));
+    }
+
+    public function replyToComment(string $commentId, string $message): Response
+    {
+        return Http::withToken($this->accessToken)
+            ->acceptJson()
+            ->post($this->apiUrl(rawurlencode(trim($commentId)) . '/comments'), [
+                'message' => $message,
+            ]);
+    }
+
+    public function privateReply(string $pageId, string $commentId, string $message): Response
+    {
+        return Http::withToken($this->accessToken)
+            ->acceptJson()
+            ->post($this->apiUrl(rawurlencode(trim($pageId)) . '/messages'), [
+                'recipient' => ['comment_id' => trim($commentId)],
+                'message' => ['text' => $message],
+            ]);
+    }
+
     public function getPostAnalytics(string $postId, array $fields = []): Response
     {
         return Http::withToken($this->accessToken)
@@ -169,13 +188,6 @@ class Facebook extends BaseMetaHelper
             ]));
     }
 
-    /**
-     * Subscribe a Facebook Page to receive webhook feed events.
-     *
-     * Requires the page access token (not user token).
-     * Must be called after connecting a Facebook page so that Facebook
-     * sends comment/feed webhook events to the registered callback URL.
-     */
     public function subscribePageToWebhook(string $pageId, array $subscribedFields = ['feed']): Response
     {
         return Http::withToken($this->accessToken)
