@@ -80,8 +80,8 @@ foreach (['engagement/{account}/capabilities', 'engagement/{account}/inbox', 'en
 
 $assertContains('stageGovernedProposal', $automation, 'Automation must stage governed proposals instead of auto-sending replies.');
 $assertNotContains('https://open.tiktokapis.com/v2/comment/reply/create/', $automation, 'Bogus TikTok commercial reply endpoint must be removed.');
-$assertNotContains("'payload' => $request->json()->all()", $facebookOauth, 'Facebook webhook must not log raw payloads.');
-$assertNotContains("'text'       => $payload['text']", $automation, 'Automation debug logs must not write raw engagement text.');
+$assertNotContains("'payload' => \$request->json()->all()", $facebookOauth, 'Facebook webhook must not log raw payloads.');
+$assertNotContains("'text'       => \$payload['text']", $automation, 'Automation debug logs must not write raw engagement text.');
 $assertNotContains("'comment_text'", $webhook, 'Webhook processor must not log/store raw comment text outside governed records.');
 
 if ($failures !== []) {
