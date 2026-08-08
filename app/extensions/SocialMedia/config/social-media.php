@@ -107,7 +107,7 @@ return [
         'api_url'      => 'https://api.x.com',
         'redirect_uri' => '/social-media/oauth/callback/x',
         'api_version'  => '2',
-        'scope' => ['tweet.read', 'tweet.write', 'users.read', 'offline.access', 'dm.read', 'dm.write'],
+        'scope' => ['tweet.read', 'tweet.write', 'users.read', 'offline.access'],
         'options'      => [],
         'requirements' => [
             'text' => ['limit' => 280],
