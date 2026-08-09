@@ -10,9 +10,14 @@ use App\Extensions\Migration\System\Connectors\Legacy\LegacyDavinciConnector;
 use App\Extensions\Migration\System\Drivers\DavinciDriver;
 use App\Extensions\Migration\System\Enums\MigrationDriverEnum;
 use App\Extensions\Migration\System\Http\Controllers\MigrationController;
+use App\Extensions\Migration\System\Models\MigrationProject;
+use App\Extensions\Migration\System\Policies\MigrationProjectPolicy;
 use App\Extensions\Migration\System\Services\MigrationService;
+use App\Extensions\Migration\System\Tenancy\MigrationTenantContext;
+use App\Extensions\Migration\System\Tenancy\MigrationTenantResolver;
 use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Routing\Router;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 
@@ -35,6 +40,8 @@ class MigrationServiceProvider extends ServiceProvider implements UninstallExten
 
     public function registerComponents(): static
     {
+        Gate::policy(MigrationProject::class, MigrationProjectPolicy::class);
+
         return $this;
     }
 
@@ -54,6 +61,11 @@ class MigrationServiceProvider extends ServiceProvider implements UninstallExten
 
     public function registerServices(): static
     {
+        $this->app->singleton(MigrationTenantContext::class, static fn () => new MigrationTenantContext());
+        $this->app->singleton(MigrationTenantResolver::class, static function ($app) {
+            return new MigrationTenantResolver($app->make(MigrationTenantContext::class));
+        });
+
         $this->app->singleton(ConnectorRegistry::class, function ($app) {
             $registry = new ConnectorRegistry();
             $registry->register(new LegacyDavinciConnector($app->make(DavinciDriver::class)));
