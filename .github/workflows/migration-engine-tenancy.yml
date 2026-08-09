@@ -1,0 +1,26 @@
+name: Migration Engine Tenancy
+
+on:
+  pull_request:
+    paths:
+      - 'app/extensions/Migration/**'
+      - 'docs/superpowers/plans/2026-08-09-migration-engine-tenancy-model.md'
+      - '.github/workflows/migration-engine-tenancy.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run issue 378 tenancy contract
+        run: php app/extensions/Migration/tests/MigrationTenancyContractTest.php
+      - name: Lint Migration extension PHP
+        shell: bash
+        run: |
+          set -euo pipefail
+          while IFS= read -r -d '' file; do
+            php -l "$file"
+          done < <(find app/extensions/Migration -type f -name '*.php' -print0)
