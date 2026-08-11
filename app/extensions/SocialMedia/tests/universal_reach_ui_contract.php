@@ -64,6 +64,12 @@ foreach (['resolveVerticalProfile', 'suitabilityFor', 'generic-business', 'Distr
 $contains("content_type === DistributionItem::TYPE_SOCIAL_POST", $controller, 'Universal draft creation must refuse canonical social posts.');
 $notContains('->publish(', $controller, 'Workspace controller must not publish directly.');
 $notContains('ads_management', $controller, 'Workspace controller must not self-authorise ad spend.');
+$notContains("'source_type' => ['", $controller, 'Workspace clients must not be able to claim canonical source provenance.');
+$notContains("'source_id' => ['", $controller, 'Workspace clients must not be able to claim canonical source IDs.');
+$contains("'source_type' => 'manual'", $controller, 'Manual workspace drafts must be stamped as manual provenance.');
+$contains("'source_id' => null", $controller, 'Manual workspace drafts must not claim a canonical source ID.');
+$contains("'payload.*' => ['nullable', 'string', 'max:2000']", $controller, 'Workspace draft payload values must be bounded.');
+$contains("'content', 'description'", $controller, 'Description requirements must resolve through canonical content.');
 
 $contains('workspace/{section}', $provider, 'Missing universal workspace route.');
 $contains('workspace/create/draft', $provider, 'Missing universal draft route.');
