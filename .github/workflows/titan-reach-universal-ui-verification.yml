@@ -16,5 +16,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Run issue 274 universal UI contract
         run: php app/extensions/SocialMedia/tests/universal_reach_ui_contract.php
-      - name: Lint issue 274 contract
-        run: php -l app/extensions/SocialMedia/tests/universal_reach_ui_contract.php
+      - name: Lint issue 274 PHP files
+        run: |
+          php -l app/extensions/SocialMedia/tests/universal_reach_ui_contract.php
+          php -l app/extensions/SocialMedia/System/Http/Controllers/ReachWorkspaceController.php
+          php -l app/extensions/SocialMedia/System/SocialMediaServiceProvider.php
