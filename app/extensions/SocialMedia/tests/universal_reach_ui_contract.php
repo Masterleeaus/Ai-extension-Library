@@ -33,7 +33,7 @@ $navigation = $source('resources/views/components/reach-navigation.blade.php');
 $overview = $source('resources/views/index.blade.php');
 $organic = $source('resources/views/post/index.blade.php');
 $connections = $source('resources/views/platforms.blade.php');
-$settings = $source('resources/views/setting/index.blade.php');
+$adminSettings = $source('resources/views/setting/index.blade.php');
 $fileMap = $source('docs/TITAN-REACH-UNIVERSAL-UI-FILE-MAP.md');
 
 $canonical = [
@@ -58,7 +58,7 @@ $contains('class ReachWorkspaceController', $controller, 'Missing ReachWorkspace
 foreach (['function show', 'function storeDraft'] as $method) {
     $contains($method, $controller, "ReachWorkspaceController missing {$method}.");
 }
-foreach (['resolveVerticalProfile', 'suitabilityFor', 'generic-business', 'DistributionItem', "where('user_id', Auth::id())"] as $needle) {
+foreach (['resolveVerticalProfile', 'suitabilityFor', 'generic-business', 'DistributionItem', "where('user_id', Auth::id())", "'settings'"] as $needle) {
     $contains($needle, $controller, "Workspace controller missing required boundary {$needle}.");
 }
 $contains("content_type === DistributionItem::TYPE_SOCIAL_POST", $controller, 'Universal draft creation must refuse canonical social posts.');
@@ -81,9 +81,11 @@ foreach ($labels as $label) {
     $contains($label, $navigation, "Reach navigation missing {$label}.");
 }
 
-foreach ([$workspace, $overview, $organic, $connections, $settings] as $view) {
+foreach ([$workspace, $overview, $organic, $connections] as $view) {
     $contains('social-media::components.reach-navigation', $view, 'A native Reach surface is missing shared navigation.');
 }
+$notContains('social-media::components.reach-navigation', $adminSettings, 'Admin credential settings must not be exposed as the customer workspace Settings surface.');
+$contains("'section' => 'settings'", $navigation, 'Customer Settings must route through the authenticated Reach workspace.');
 
 foreach (['direct', 'partner', 'assisted', 'export_only'] as $mode) {
     $contains($mode, $workspace, "Workspace does not visibly represent {$mode} destination mode.");
@@ -99,6 +101,7 @@ $contains('resources/views/index.blade.php', $fileMap, 'Workspace native parent 
 $contains('resources/views/components/home/tools.blade.php', $fileMap, 'Navigation native parent provenance missing.');
 $contains('workspace.blade.php', $fileMap, 'Workspace Blade provenance missing.');
 $contains('reach-navigation.blade.php', $fileMap, 'Navigation Blade provenance missing.');
+$contains('admin-only', mb_strtolower($fileMap), 'File map must document the admin-only settings boundary.');
 
 if ($failures !== []) {
     fwrite(STDERR, "Issue #274 contract failed:\n - " . implode("\n - ", $failures) . "\n");
