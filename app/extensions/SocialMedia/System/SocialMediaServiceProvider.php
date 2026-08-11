@@ -23,6 +23,7 @@ use App\Extensions\SocialMedia\System\Http\Controllers\Oauth\TiktokController;
 use App\Extensions\SocialMedia\System\Http\Controllers\Oauth\XController;
 use App\Extensions\SocialMedia\System\Http\Controllers\Oauth\YoutubeController;
 use App\Extensions\SocialMedia\System\Http\Controllers\PinterestController;
+use App\Extensions\SocialMedia\System\Http\Controllers\ReachWorkspaceController;
 use App\Extensions\SocialMedia\System\Http\Controllers\SocialMediaCalendarController;
 use App\Extensions\SocialMedia\System\Http\Controllers\SocialMediaCampaignController;
 use App\Extensions\SocialMedia\System\Http\Controllers\SocialMediaController;
@@ -164,31 +165,22 @@ class SocialMediaServiceProvider extends ServiceProvider implements UninstallExt
                 ], function (Router $router) {
                     $router->get('redirect/tiktok', [TiktokController::class, 'redirect'])->name('social-media.oauth.connect.tiktok');
                     $router->get('callback/tiktok', [TiktokController::class, 'callback'])->name('social-media.oauth.callback.tiktok');
-
                     $router->get('redirect/instagram', [InstagramController::class, 'redirect'])->name('social-media.oauth.connect.instagram');
                     $router->get('callback/instagram', [InstagramController::class, 'callback'])->name('social-media.oauth.callback.instagram');
-
                     $router->get('redirect/x', [XController::class, 'redirect'])->name('social-media.oauth.connect.x');
                     $router->get('callback/x', [XController::class, 'callback'])->name('social-media.oauth.callback.x');
-
                     $router->get('redirect/facebook', [FacebookController::class, 'redirect'])->name('social-media.oauth.connect.facebook');
                     $router->get('callback/facebook', [FacebookController::class, 'callback'])->name('social-media.oauth.callback.facebook');
-
                     $router->get('redirect/linkedin', [LinkedinController::class, 'redirect'])->name('social-media.oauth.connect.linkedin');
                     $router->get('callback/linkedin', [LinkedinController::class, 'callback'])->name('social-media.oauth.callback.linkedin');
-
                     $router->get('redirect/youtube', [YoutubeController::class, 'redirectYoutube'])->name('social-media.oauth.connect.youtube');
                     $router->get('callback/youtube', [YoutubeController::class, 'callbackYoutube'])->name('social-media.oauth.callback.youtube');
-
                     $router->get('redirect/youtube-shorts', [YoutubeController::class, 'redirectYoutubeShorts'])->name('social-media.oauth.connect.youtube-shorts');
                     $router->get('callback/youtube-shorts', [YoutubeController::class, 'callbackYoutubeShorts'])->name('social-media.oauth.callback.youtube-shorts');
-
                     $router->get('redirect/ebay', [EbayController::class, 'redirect'])->name('social-media.oauth.connect.ebay');
                     $router->get('callback/ebay', [EbayController::class, 'callback'])->name('social-media.oauth.callback.ebay');
-
                     $router->get('redirect/google-business-profile', [GoogleBusinessProfileOauthController::class, 'redirect'])->name('social-media.oauth.connect.google-business-profile');
                     $router->get('callback/google-business-profile', [GoogleBusinessProfileOauthController::class, 'callback'])->name('social-media.oauth.callback.google-business-profile');
-
                     $router->get('redirect/pinterest', [PinterestOauthController::class, 'redirect'])->name('social-media.oauth.connect.pinterest');
                     $router->get('callback/pinterest', [PinterestOauthController::class, 'callback'])->name('social-media.oauth.callback.pinterest');
                 });
@@ -209,6 +201,8 @@ class SocialMediaServiceProvider extends ServiceProvider implements UninstallExt
                         $router->post('upload/video', [SocialMediaUploadController::class, 'video'])->name('upload.video');
 
                         $router->get('', SocialMediaController::class)->name('index');
+                        $router->get('workspace/{section}', [ReachWorkspaceController::class, 'show'])->name('workspace');
+                        $router->post('workspace/create/draft', [ReachWorkspaceController::class, 'storeDraft'])->name('workspace.draft.store');
                         $router->get('platforms', SocialMediaPlatformController::class)->name('platforms');
                         $router->get('platforms/{platform}/disconnect', [SocialMediaPlatformController::class, 'disconnect'])->name('platforms.disconnect');
                         $router->post('campaign/generate', [SocialMediaCampaignController::class, 'generate'])->name('campaign.generate');
