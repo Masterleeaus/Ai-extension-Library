@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Extensions\Migration\System\Discovery;
 
-use App\Extensions\Migration\System\Utils\SqlValueParser;
 use RuntimeException;
 
 final class SqlDumpScanner
@@ -83,10 +82,7 @@ final class SqlDumpScanner
 
                     $active = true;
                     if (isset($match[2]) && trim((string) $match[2]) !== '') {
-                        $columns = array_values(array_map(
-                            static fn (string $column): string => trim($column, " \t\n\r\0\x0B`\""),
-                            str_getcsv((string) $match[2], ',', '`', '\\'),
-                        ));
+                        $columns = $this->identifierList((string) $match[2]);
                     }
                     $fragment = (string) ($match[3] ?? '');
                 }
@@ -133,7 +129,7 @@ final class SqlDumpScanner
                     if ($char === ')' && $depth > 0) {
                         $depth--;
                         if ($depth === 0) {
-                            $values = SqlValueParser::parseRow($tuple);
+                            $values = $this->parseRow($tuple);
                             $tuple = '';
                             yield $this->combine($columns, $values);
                         } else {
@@ -210,6 +206,102 @@ final class SqlDumpScanner
             'keys' => $keys,
             'relationships' => $relationships,
         ];
+    }
+
+    /** @return array<int, mixed> */
+    private function parseRow(string $row): array
+    {
+        $values = [];
+        $current = '';
+        $inString = false;
+        $escaped = false;
+        $depth = 0;
+        $length = strlen($row);
+
+        for ($i = 0; $i < $length; $i++) {
+            $char = $row[$i];
+
+            if ($inString) {
+                $current .= $char;
+                if ($escaped) {
+                    $escaped = false;
+                    continue;
+                }
+                if ($char === '\\') {
+                    $escaped = true;
+                    continue;
+                }
+                if ($char === "'") {
+                    if ($i + 1 < $length && $row[$i + 1] === "'") {
+                        $current .= "'";
+                        $i++;
+                        continue;
+                    }
+                    $inString = false;
+                }
+                continue;
+            }
+
+            if ($char === "'") {
+                $inString = true;
+                $current .= $char;
+                continue;
+            }
+
+            if ($char === '(' || $char === '[' || $char === '{') {
+                $depth++;
+                $current .= $char;
+                continue;
+            }
+            if (($char === ')' || $char === ']' || $char === '}') && $depth > 0) {
+                $depth--;
+                $current .= $char;
+                continue;
+            }
+
+            if ($char === ',' && $depth === 0) {
+                $values[] = $this->cleanValue($current);
+                $current = '';
+                continue;
+            }
+
+            $current .= $char;
+        }
+
+        if (trim($current) !== '' || $row !== '') {
+            $values[] = $this->cleanValue($current);
+        }
+
+        return $values;
+    }
+
+    private function cleanValue(string $value): mixed
+    {
+        $value = trim($value);
+        if (strcasecmp($value, 'NULL') === 0) {
+            return null;
+        }
+        if (strcasecmp($value, 'TRUE') === 0) {
+            return true;
+        }
+        if (strcasecmp($value, 'FALSE') === 0) {
+            return false;
+        }
+        if (strlen($value) >= 2 && $value[0] === "'" && $value[strlen($value) - 1] === "'") {
+            $inner = substr($value, 1, -1);
+            $inner = str_replace("''", "'", $inner);
+            $inner = str_replace(["\\'", '\\\\'], ["'", '\\'], $inner);
+
+            return $inner;
+        }
+        if (preg_match('/^-?\d+$/', $value) === 1) {
+            return (int) $value;
+        }
+        if (is_numeric($value)) {
+            return (float) $value;
+        }
+
+        return $value;
     }
 
     /** @param array<int, string> $columns
