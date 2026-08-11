@@ -28,6 +28,7 @@ class ReachWorkspaceController extends Controller
         'catalogues',
         'inbox',
         'analytics',
+        'settings',
     ];
 
     private const LISTING_TYPES = [
