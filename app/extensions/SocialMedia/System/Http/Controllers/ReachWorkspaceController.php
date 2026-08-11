@@ -127,9 +127,15 @@ class ReachWorkspaceController extends Controller
         $payload = array_slice((array) ($validated['payload'] ?? []), 0, 80, true);
         $missing = [];
         foreach ((array) ($profile['required_fields'] ?? []) as $field) {
-            $value = $validated[$field] ?? Arr::get($payload, (string) $field);
+            $field = (string) $field;
+            $value = match ($field) {
+                'title' => $validated['title'] ?? null,
+                'content', 'description' => $validated['content'] ?? null,
+                default => Arr::get($payload, $field),
+            };
+
             if ($value === null || $value === '' || $value === []) {
-                $missing[] = (string) $field;
+                $missing[] = $field;
             }
         }
 
