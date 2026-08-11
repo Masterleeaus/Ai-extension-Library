@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\Extensions\Migration\System;
 
 use App\Domains\Marketplace\Contracts\UninstallExtensionServiceProviderInterface;
+use App\Extensions\Migration\System\Connectors\BuiltinConnectorCatalog;
 use App\Extensions\Migration\System\Connectors\ConnectorRegistry;
+use App\Extensions\Migration\System\Connectors\File\SqlDumpConnector;
 use App\Extensions\Migration\System\Connectors\Legacy\LegacyDavinciConnector;
 use App\Extensions\Migration\System\Drivers\DavinciDriver;
 use App\Extensions\Migration\System\Enums\MigrationDriverEnum;
@@ -65,10 +67,20 @@ class MigrationServiceProvider extends ServiceProvider implements UninstallExten
         $this->app->singleton(MigrationTenantResolver::class, static function ($app) {
             return new MigrationTenantResolver($app->make(MigrationTenantContext::class));
         });
+        $this->app->singleton(BuiltinConnectorCatalog::class, static fn () => new BuiltinConnectorCatalog());
 
         $this->app->singleton(ConnectorRegistry::class, function ($app) {
             $registry = new ConnectorRegistry();
-            $registry->register(new LegacyDavinciConnector($app->make(DavinciDriver::class)));
+            $catalog = $app->make(BuiltinConnectorCatalog::class);
+
+            foreach ($catalog->classes() as $connectorClass) {
+                $registry->register($app->make($connectorClass));
+            }
+
+            $registry->register(new LegacyDavinciConnector(
+                $app->make(DavinciDriver::class),
+                $app->make(SqlDumpConnector::class),
+            ));
 
             return $registry;
         });
