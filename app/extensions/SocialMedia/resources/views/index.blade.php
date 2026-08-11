@@ -19,6 +19,8 @@
 
 @section('content')
     <div class="py-10">
+        @include('social-media::components.reach-navigation')
+
         <div class="space-y-12">
             @include('social-media::components.home.banner')
 
