@@ -99,9 +99,8 @@ class ReachWorkspaceController extends Controller
             'content' => ['nullable', 'string', 'max:10000'],
             'vertical' => ['nullable', 'string', 'max:100'],
             'subtype' => ['nullable', 'string', 'max:120'],
-            'source_type' => ['nullable', 'string', 'max:120'],
-            'source_id' => ['nullable', 'string', 'max:255'],
-            'payload' => ['nullable', 'array'],
+            'payload' => ['nullable', 'array', 'max:80'],
+            'payload.*' => ['nullable', 'string', 'max:2000'],
         ]);
 
         $content_type = (string) $validated['content_type'];
@@ -153,8 +152,8 @@ class ReachWorkspaceController extends Controller
             'approval_status' => 'pending',
             'title' => $validated['title'] ?? null,
             'content' => $validated['content'] ?? null,
-            'source_type' => $validated['source_type'] ?? 'manual',
-            'source_id' => $validated['source_id'] ?? null,
+            'source_type' => 'manual',
+            'source_id' => null,
             'payload' => [
                 ...$payload,
                 'vertical' => (string) ($profile['slug'] ?? 'generic-business'),
