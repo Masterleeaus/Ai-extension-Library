@@ -1,0 +1,23 @@
+name: Titan Reach Universal UI Verification
+
+on:
+  pull_request:
+    paths:
+      - 'app/extensions/SocialMedia/**'
+      - '.github/workflows/titan-reach-universal-ui-verification.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run issue 274 universal UI contract
+        run: php app/extensions/SocialMedia/tests/universal_reach_ui_contract.php
+      - name: Lint issue 274 PHP files
+        run: |
+          php -l app/extensions/SocialMedia/tests/universal_reach_ui_contract.php
+          php -l app/extensions/SocialMedia/System/Http/Controllers/ReachWorkspaceController.php
+          php -l app/extensions/SocialMedia/System/SocialMediaServiceProvider.php
