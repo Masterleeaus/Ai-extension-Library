@@ -23,6 +23,8 @@ final readonly class ConnectorDefinition
         public bool $supportsDiscovery = false,
         public bool $supportsIncrementalSync = false,
         public bool $supportsAttachments = false,
+        public bool $readOnly = true,
+        public string $streamingMode = 'generator',
     ) {
         if (! preg_match('/^[a-z0-9][a-z0-9._-]*$/', $this->key)) {
             throw new InvalidArgumentException('Connector keys must contain only lowercase letters, numbers, dots, underscores and hyphens.');
@@ -38,6 +40,10 @@ final readonly class ConnectorDefinition
 
         if (trim($this->category) === '') {
             throw new InvalidArgumentException('Connector category cannot be empty.');
+        }
+
+        if (! in_array($this->streamingMode, ['generator', 'chunked', 'cursor', 'paged', 'bundle'], true)) {
+            throw new InvalidArgumentException('Connector streaming mode must be generator, chunked, cursor, paged or bundle.');
         }
     }
 
@@ -57,6 +63,8 @@ final readonly class ConnectorDefinition
             'supports_discovery' => $this->supportsDiscovery,
             'supports_incremental_sync' => $this->supportsIncrementalSync,
             'supports_attachments' => $this->supportsAttachments,
+            'read_only' => $this->readOnly,
+            'streaming_mode' => $this->streamingMode,
         ];
     }
 }
