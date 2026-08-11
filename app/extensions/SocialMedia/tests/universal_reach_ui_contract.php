@@ -108,7 +108,7 @@ $contains('resources/views/components/home/tools.blade.php', $fileMap, 'Navigati
 $contains('workspace.blade.php', $fileMap, 'Workspace Blade provenance missing.');
 $contains('reach-navigation.blade.php', $fileMap, 'Navigation Blade provenance missing.');
 $contains('admin-only', mb_strtolower($fileMap), 'File map must document the admin-only settings boundary.');
-$assert(substr_count($fileMap, '| `resources/views/') === 2, 'Exactly two new Blade files must be declared in the provenance table.');
+$assert(substr_count($fileMap, "\n| `resources/views/") === 2, 'Exactly two new Blade files must be declared in the provenance table.');
 
 if ($failures !== []) {
     fwrite(STDERR, "Issue #274 contract failed:\n - " . implode("\n - ", $failures) . "\n");
