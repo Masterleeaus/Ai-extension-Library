@@ -71,6 +71,7 @@ class AdvancedImageServiceProvider extends ServiceProvider
 
                         $router
                             ->controller(NovitaSettingController::class)
+                            ->middleware('admin')
                             ->prefix('admin/settings')
                             ->name('admin.settings.')
                             ->group(function (Router $router) {
@@ -80,6 +81,7 @@ class AdvancedImageServiceProvider extends ServiceProvider
 
                         $router
                             ->controller(FreepikSettingController::class)
+                            ->middleware('admin')
                             ->prefix('admin/settings')
                             ->name('admin.settings.')
                             ->group(function (Router $router) {
@@ -89,6 +91,7 @@ class AdvancedImageServiceProvider extends ServiceProvider
 
                         $router
                             ->controller(ClipdropSettingController::class)
+                            ->middleware('admin')
                             ->prefix('admin/settings')
                             ->name('admin.settings.')
                             ->group(function (Router $router) {
@@ -98,6 +101,7 @@ class AdvancedImageServiceProvider extends ServiceProvider
 
                         $router
                             ->controller(AdvancedImageSettingController::class)
+                            ->middleware('admin')
                             ->prefix('admin/settings/advanced-image')
                             ->name('admin.settings.advanced-image.')
                             ->group(function (Router $router) {
