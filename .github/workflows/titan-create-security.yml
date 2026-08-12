@@ -34,6 +34,8 @@ on:
       - app/extensions/SeeDreamV4/System/SeeDreamV4ServiceProvider.php
       - app/extensions/SeeDreamV4/System/Http/Controllers/FalAIWebhookController.php
       - app/extensions/BlogPilot/System/BlogPilotServiceProvider.php
+      - app/extensions/BlogPilot/System/Http/Controllers/BlogPilotPostsController.php
+      - app/extensions/BlogPilot/System/Http/Middleware/BlogPilotPostOwnershipMiddleware.php
       - app/extensions/BlogPilot/System/Services/ImageGenerationService.php
       - app/extensions/Canvas/System/Http/Controllers/CanvasController.php
       - tests/contracts/creative_suite_document_ownership.php
@@ -109,6 +111,8 @@ jobs:
           php -l app/extensions/SeeDreamV4/System/SeeDreamV4ServiceProvider.php
           php -l app/extensions/SeeDreamV4/System/Http/Controllers/FalAIWebhookController.php
           php -l app/extensions/BlogPilot/System/BlogPilotServiceProvider.php
+          php -l app/extensions/BlogPilot/System/Http/Controllers/BlogPilotPostsController.php
+          php -l app/extensions/BlogPilot/System/Http/Middleware/BlogPilotPostOwnershipMiddleware.php
           php -l app/extensions/BlogPilot/System/Services/ImageGenerationService.php
           php -l app/extensions/Canvas/System/Http/Controllers/CanvasController.php
           php -l tests/contracts/creative_suite_document_ownership.php
