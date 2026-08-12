@@ -133,14 +133,6 @@ class BlogPilotServiceProvider extends ServiceProvider implements ExtensionRegis
                     });
             });
 
-        // Fal.ai webhook (no auth required)
-        $this->router()
-            ->group([
-                'middleware' => ['api'],
-            ], function (Router $router) {
-                Route::post('blogpilot/fal-webhook', [BlogPilotController::class, 'falWebhook'])->name('dashboard.user.blogpilot.agent.fal-webhook');
-            });
-
         return $this;
     }
 
