@@ -9,6 +9,8 @@ on:
       - .github/workflows/titan-create-security.yml
       - app/Services/Security/RemoteImageFetcher.php
       - app/Services/Security/SvgSanitizer.php
+      - app/Services/Security/FalWebhookVerifier.php
+      - app/Services/Ai/FalImageWebhookProcessor.php
       - app/extensions/CreativeSuite/System/CreativeSuiteServiceProvider.php
       - app/extensions/CreativeSuite/System/Http/Controllers/CreativeSuiteDocumentController.php
       - app/extensions/CreativeSuite/System/Http/Controllers/CreativeSuiteAIController.php
@@ -25,7 +27,12 @@ on:
       - app/extensions/ProductPhotography/System/ProductPhotographyServiceProvider.php
       - app/extensions/AIRealtimeImage/System/AIRealtimeImageServiceProvider.php
       - app/extensions/AIRealtimeImage/System/Http/Controllers/AIRealtimeImageController.php
+      - app/extensions/FluxPro/System/FluxProServiceProvider.php
+      - app/extensions/FluxPro/System/Http/Controllers/FalAIWebhookController.php
       - app/extensions/NanoBanana/System/NanoBananaServiceProvider.php
+      - app/extensions/NanoBanana/System/Http/Controllers/FalAIWebhookController.php
+      - app/extensions/SeeDreamV4/System/SeeDreamV4ServiceProvider.php
+      - app/extensions/SeeDreamV4/System/Http/Controllers/FalAIWebhookController.php
       - app/extensions/Canvas/System/Http/Controllers/CanvasController.php
       - tests/contracts/creative_suite_document_ownership.php
       - tests/contracts/creative_suite_ai_task_ownership.php
@@ -37,6 +44,7 @@ on:
       - tests/contracts/titan_create_admin_settings_authorization.php
       - tests/contracts/ai_realtime_image_gallery_ownership.php
       - tests/contracts/nano_banana_provider_integrity.php
+      - tests/contracts/fal_webhook_security.php
       - tests/contracts/canvas_message_ownership.php
       - tests/Feature/Extensions/CreativeSuite/CreativeSuiteDocumentOwnershipTest.php
       - tests/Feature/Extensions/CreativeSuite/CreativeSuiteAITaskOwnershipTest.php
@@ -72,6 +80,8 @@ jobs:
         run: |
           php -l app/Services/Security/RemoteImageFetcher.php
           php -l app/Services/Security/SvgSanitizer.php
+          php -l app/Services/Security/FalWebhookVerifier.php
+          php -l app/Services/Ai/FalImageWebhookProcessor.php
           php -l app/extensions/CreativeSuite/System/CreativeSuiteServiceProvider.php
           php -l app/extensions/CreativeSuite/System/Http/Controllers/CreativeSuiteDocumentController.php
           php -l app/extensions/CreativeSuite/System/Http/Controllers/CreativeSuiteAIController.php
@@ -88,7 +98,12 @@ jobs:
           php -l app/extensions/ProductPhotography/System/ProductPhotographyServiceProvider.php
           php -l app/extensions/AIRealtimeImage/System/AIRealtimeImageServiceProvider.php
           php -l app/extensions/AIRealtimeImage/System/Http/Controllers/AIRealtimeImageController.php
+          php -l app/extensions/FluxPro/System/FluxProServiceProvider.php
+          php -l app/extensions/FluxPro/System/Http/Controllers/FalAIWebhookController.php
           php -l app/extensions/NanoBanana/System/NanoBananaServiceProvider.php
+          php -l app/extensions/NanoBanana/System/Http/Controllers/FalAIWebhookController.php
+          php -l app/extensions/SeeDreamV4/System/SeeDreamV4ServiceProvider.php
+          php -l app/extensions/SeeDreamV4/System/Http/Controllers/FalAIWebhookController.php
           php -l app/extensions/Canvas/System/Http/Controllers/CanvasController.php
           php -l tests/contracts/creative_suite_document_ownership.php
           php -l tests/contracts/creative_suite_ai_task_ownership.php
@@ -100,6 +115,7 @@ jobs:
           php -l tests/contracts/titan_create_admin_settings_authorization.php
           php -l tests/contracts/ai_realtime_image_gallery_ownership.php
           php -l tests/contracts/nano_banana_provider_integrity.php
+          php -l tests/contracts/fal_webhook_security.php
           php -l tests/contracts/canvas_message_ownership.php
           php -l tests/Feature/Extensions/CreativeSuite/CreativeSuiteDocumentOwnershipTest.php
           php -l tests/Feature/Extensions/CreativeSuite/CreativeSuiteAITaskOwnershipTest.php
@@ -121,4 +137,5 @@ jobs:
           php tests/contracts/titan_create_admin_settings_authorization.php
           php tests/contracts/ai_realtime_image_gallery_ownership.php
           php tests/contracts/nano_banana_provider_integrity.php
+          php tests/contracts/fal_webhook_security.php
           php tests/contracts/canvas_message_ownership.php
