@@ -483,7 +483,7 @@ class CanonicalCatalogueService
 
     private function validateEnvelope(User $user, string $sourceKey, string $recordType, array $envelope): array
     {
-        foreach (['source_system', 'source_type', 'source_id', 'tenant_id', 'canonical_fields', 'provenance', 'authority'] as $required) {
+        foreach (['source_system', 'source_type', 'source_id', 'tenant_id', 'source_version', 'source_updated_at', 'canonical_fields', 'provenance', 'authority'] as $required) {
             if (! array_key_exists($required, $envelope)) {
                 throw new InvalidArgumentException('source_envelope_invalid');
             }
@@ -492,8 +492,9 @@ class CanonicalCatalogueService
         $envelopeSource = trim((string) $envelope['source_system']);
         $envelopeType = trim((string) $envelope['source_type']);
         $sourceId = trim((string) $envelope['source_id']);
+        $sourceVersion = trim((string) $envelope['source_version']);
 
-        if ($envelopeSource === '' || $sourceId === '' || $envelopeType === '') {
+        if ($envelopeSource === '' || $sourceId === '' || $envelopeType === '' || $sourceVersion === '') {
             throw new InvalidArgumentException('source_envelope_invalid');
         }
 
@@ -513,19 +514,26 @@ class CanonicalCatalogueService
             throw new InvalidArgumentException('source_envelope_invalid');
         }
 
+        $provenance = $this->boundedStringList($envelope['provenance']);
+        $authority = is_array($envelope['authority'])
+            ? $this->boundedStringList($envelope['authority'])
+            : mb_substr(trim((string) $envelope['authority']), 0, 200);
+
+        if ($provenance === [] || $authority === '' || $authority === []) {
+            throw new InvalidArgumentException('source_envelope_invalid');
+        }
+
         return [
             'source_system' => $envelopeSource,
             'source_type' => $envelopeType,
             'source_id' => $sourceId,
             'tenant_id' => (string) $envelope['tenant_id'],
             'company_id' => $envelope['company_id'] ?? null,
-            'source_version' => isset($envelope['source_version']) ? (string) $envelope['source_version'] : null,
-            'source_updated_at' => $envelope['source_updated_at'] ?? null,
-            'canonical_fields' => $envelope['canonical_fields'],
-            'provenance' => array_values(array_filter(array_map('strval', $envelope['provenance']))),
-            'authority' => is_array($envelope['authority'])
-                ? array_values(array_filter(array_map('strval', $envelope['authority'])))
-                : (string) $envelope['authority'],
+            'source_version' => $sourceVersion,
+            'source_updated_at' => $envelope['source_updated_at'],
+            'canonical_fields' => $this->boundedCanonicalFields($envelope['canonical_fields']),
+            'provenance' => $provenance,
+            'authority' => $authority,
             'attribution_confidence' => $envelope['attribution_confidence'] ?? null,
         ];
     }
@@ -575,7 +583,52 @@ class CanonicalCatalogueService
         $base = require dirname(__DIR__, 2) . '/config/catalogues.php';
         $configured = (array) config('social-media.catalogues', []);
 
-        return array_replace_recursive($base, $configured);
+        foreach (['sources', 'verticals', 'destination_fields'] as $section) {
+            $baseSection = (array) ($base[$section] ?? []);
+            $configuredSection = (array) ($configured[$section] ?? []);
+            $base[$section] = array_replace_recursive(
+                $baseSection,
+                array_intersect_key($configuredSection, $baseSection)
+            );
+        }
+
+        return $base;
+    }
+
+    private function boundedStringList(array $values): array
+    {
+        return array_values(array_filter(array_map(
+            static fn (mixed $value): string => mb_substr(trim((string) $value), 0, 200),
+            array_slice($values, 0, 20)
+        )));
+    }
+
+    private function boundedCanonicalFields(array $fields, int $depth = 0): array
+    {
+        if ($depth >= 4) {
+            return [];
+        }
+
+        $bounded = [];
+        foreach (array_slice($fields, 0, 100, true) as $key => $value) {
+            $key = mb_substr((string) $key, 0, 150);
+
+            if (is_array($value)) {
+                $bounded[$key] = $this->boundedCanonicalFields($value, $depth + 1);
+                continue;
+            }
+
+            if (is_string($value)) {
+                $bounded[$key] = mb_substr($value, 0, 5000);
+                continue;
+            }
+
+            if (is_scalar($value) || $value === null) {
+                $bounded[$key] = $value;
+            }
+        }
+
+        return $bounded;
     }
 
     private function flattenHandoffTargets(array $targets): array
