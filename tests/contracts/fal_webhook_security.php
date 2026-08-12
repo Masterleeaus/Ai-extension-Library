@@ -77,7 +77,7 @@ foreach ([
     "'ERROR'" => 'processor does not handle FAL error callbacks',
     "'FAILED'" => 'processor does not mark FAL error callbacks failed',
     "'OK'" => 'processor does not require FAL success status',
-    "data_get($payload, 'images')" => 'processor does not read FAL image payload',
+    'data_get($payload, \'images\')' => 'processor does not read FAL image payload',
     'is_array($images)' => 'processor does not validate image collection type',
     'empty($images)' => 'processor does not reject empty image collections',
     'RemoteImageFetcher' => 'processor does not use the SSRF-safe remote image fetcher',
