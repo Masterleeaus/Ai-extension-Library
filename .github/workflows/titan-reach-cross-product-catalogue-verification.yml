@@ -1,0 +1,21 @@
+name: Titan Reach Cross-Product Catalogue Verification
+
+on:
+  pull_request:
+    paths:
+      - 'app/extensions/SocialMedia/**'
+      - '.github/workflows/titan-reach-cross-product-catalogue-verification.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run issue 275 catalogue contract
+        run: php app/extensions/SocialMedia/tests/cross_product_catalogue_contract.php
+      - name: Lint issue 275 PHP files
+        run: |
+          php -l app/extensions/SocialMedia/tests/cross_product_catalogue_contract.php
