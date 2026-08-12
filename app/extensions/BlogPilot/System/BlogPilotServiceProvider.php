@@ -15,6 +15,8 @@ use App\Extensions\BlogPilot\System\Http\Controllers\BlogPilotPostsController;
 use App\Extensions\BlogPilot\System\Http\Middleware\BlogPilotPostOwnershipMiddleware;
 use App\Extensions\BlogPilot\System\Models\BlogPilot;
 use App\Extensions\BlogPilot\System\Policies\BlogPilotPolicy;
+use App\Extensions\BlogPilot\System\Services\PostGenerationService;
+use App\Extensions\BlogPilot\System\Services\SecurePostGenerationService;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Routing\Router;
@@ -24,7 +26,10 @@ use Illuminate\Support\ServiceProvider;
 
 class BlogPilotServiceProvider extends ServiceProvider implements ExtensionRegisterKeyProviderInterface, UninstallExtensionServiceProviderInterface
 {
-    public function register(): void {}
+    public function register(): void
+    {
+        $this->app->bind(PostGenerationService::class, SecurePostGenerationService::class);
+    }
 
     public function boot(Kernel $kernel): void
     {
