@@ -38,6 +38,8 @@ on:
       - app/extensions/BlogPilot/System/Http/Controllers/BlogPilotPostsController.php
       - app/extensions/BlogPilot/System/Http/Middleware/BlogPilotPostOwnershipMiddleware.php
       - app/extensions/BlogPilot/System/Services/ImageGenerationService.php
+      - app/extensions/BlogPilot/System/Services/PostGenerationService.php
+      - app/extensions/BlogPilot/System/Console/Commands/GenerateAgentPostsCommand.php
       - app/extensions/Canvas/System/Http/Controllers/CanvasController.php
       - tests/contracts/creative_suite_document_ownership.php
       - tests/contracts/creative_suite_ai_task_ownership.php
@@ -53,6 +55,7 @@ on:
       - tests/contracts/blogpilot_fal_image_security.php
       - tests/contracts/blogpilot_post_ownership.php
       - tests/contracts/blogpilot_analytics_ownership.php
+      - tests/contracts/blogpilot_generated_post_schema.php
       - tests/contracts/canvas_message_ownership.php
       - tests/Feature/Extensions/CreativeSuite/CreativeSuiteDocumentOwnershipTest.php
       - tests/Feature/Extensions/CreativeSuite/CreativeSuiteAITaskOwnershipTest.php
@@ -117,6 +120,8 @@ jobs:
           php -l app/extensions/BlogPilot/System/Http/Controllers/BlogPilotPostsController.php
           php -l app/extensions/BlogPilot/System/Http/Middleware/BlogPilotPostOwnershipMiddleware.php
           php -l app/extensions/BlogPilot/System/Services/ImageGenerationService.php
+          php -l app/extensions/BlogPilot/System/Services/PostGenerationService.php
+          php -l app/extensions/BlogPilot/System/Console/Commands/GenerateAgentPostsCommand.php
           php -l app/extensions/Canvas/System/Http/Controllers/CanvasController.php
           php -l tests/contracts/creative_suite_document_ownership.php
           php -l tests/contracts/creative_suite_ai_task_ownership.php
@@ -132,6 +137,7 @@ jobs:
           php -l tests/contracts/blogpilot_fal_image_security.php
           php -l tests/contracts/blogpilot_post_ownership.php
           php -l tests/contracts/blogpilot_analytics_ownership.php
+          php -l tests/contracts/blogpilot_generated_post_schema.php
           php -l tests/contracts/canvas_message_ownership.php
           php -l tests/Feature/Extensions/CreativeSuite/CreativeSuiteDocumentOwnershipTest.php
           php -l tests/Feature/Extensions/CreativeSuite/CreativeSuiteAITaskOwnershipTest.php
@@ -157,4 +163,5 @@ jobs:
           php tests/contracts/blogpilot_fal_image_security.php
           php tests/contracts/blogpilot_post_ownership.php
           php tests/contracts/blogpilot_analytics_ownership.php
+          php tests/contracts/blogpilot_generated_post_schema.php
           php tests/contracts/canvas_message_ownership.php
