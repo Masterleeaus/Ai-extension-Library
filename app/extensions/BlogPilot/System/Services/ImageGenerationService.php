@@ -4,10 +4,10 @@ namespace App\Extensions\BlogPilot\System\Services;
 
 use App\Domains\Entity\Enums\EntityEnum;
 use App\Helpers\Classes\ApiHelper;
+use App\Services\Security\RemoteImageFetcher;
 use Exception;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
 
 class ImageGenerationService
 {
@@ -18,37 +18,35 @@ class ImageGenerationService
     public function __construct() {}
 
     /**
-     * Generate an image using Flux Pro (async with webhook)
-     * Returns request_id for tracking
+     * Generate an image using the existing synchronous FAL path.
      */
     public function generateImageForPost(string $postContent, array $options = []): array
     {
         $this->falApiKey = ApiHelper::setFalAIKey();
 
         try {
-            // Create image prompt from post content
             $imagePrompt = $this->createImagePrompt($postContent, $options);
-
-            // Submit to Fal.ai (async)
             $result = $this->submitToFalAi($imagePrompt, $options);
 
             if (! $result['success']) {
                 return [
                     'success' => false,
-                    'error'   => $result['error'] ?? 'Failed to submit image generation',
+                    'error'   => $result['error'] ?? 'Failed to generate image',
                 ];
             }
 
             return [
                 'success'      => true,
-                'request_id'   => $result['request_id'],
+                'request_id'   => $result['request_id'] ?? null,
                 'prompt'       => $imagePrompt,
-                'status'       => $result['status'] ?? 'pending', // Image is being generated
+                'status'       => $result['status'] ?? 'completed',
                 'image_url'    => $result['image_url'] ?? null,
                 'submitted_at' => now()->toIso8601String(),
             ];
         } catch (Exception $e) {
-            Log::error('ImageGenerationService Error: ' . $e->getMessage());
+            Log::error('ImageGenerationService error', [
+                'error' => $e->getMessage(),
+            ]);
 
             return [
                 'success' => false,
@@ -58,19 +56,17 @@ class ImageGenerationService
     }
 
     /**
-     * Submit image generation request to Fal.ai
+     * Submit a direct synchronous image generation request to FAL.
      */
     protected function submitToFalAi(string $prompt, array $options = []): array
     {
         $this->falApiKey = ApiHelper::setFalAIKey();
 
         try {
-            $webhookUrl = route('dashboard.user.blogpilot.agent.fal-webhook');
-
             $response = Http::withHeaders([
                 'Authorization' => 'Key ' . $this->falApiKey,
                 'Content-Type'  => 'application/json',
-            ])->timeout(30)->post('https://fal.run/fal-ai/flux-pro', [
+            ])->timeout(120)->post('https://fal.run/fal-ai/flux-pro', [
                 'prompt'                => $prompt,
                 'image_size'            => $options['image_size'] ?? 'landscape_4_3',
                 'num_inference_steps'   => 28,
@@ -78,11 +74,12 @@ class ImageGenerationService
                 'num_images'            => 1,
                 'enable_safety_checker' => true,
                 'output_format'         => 'jpeg',
-                'webhook_url'           => $webhookUrl,
             ]);
 
             if ($response->failed()) {
-                Log::error('Fal.ai API Error: ' . $response->body());
+                Log::error('Fal.ai image generation failed', [
+                    'status' => $response->status(),
+                ]);
 
                 return [
                     'success' => false,
@@ -90,28 +87,33 @@ class ImageGenerationService
                 ];
             }
 
-            Log::info('Fal.ai API Response: ' . $response->body());
-
             $data = $response->json();
-
             $imageUrl = $data['images'][0]['url'] ?? null;
-            $status = strtolower($data['status'] ?? ($imageUrl ? 'completed' : 'pending'));
+
+            if (! is_string($imageUrl) || trim($imageUrl) === '') {
+                Log::warning('Fal.ai image generation returned no image', [
+                    'request_id' => $response->header('x-fal-request-id'),
+                ]);
+
+                return [
+                    'success' => false,
+                    'error'   => 'Fal.ai returned no image',
+                ];
+            }
 
             $result = [
                 'success'    => true,
-                'request_id' => $data['request_id'] ?? uniqid('fal_', true),
-                'status'     => $status,
+                'request_id' => $response->header('x-fal-request-id'),
+                'status'     => 'completed',
             ];
 
-            if ($imageUrl) {
-                $result['image_url'] = $this->downloadAndStoreImage($imageUrl);
-            }
-
-            Log::info('result: ', $result);
+            $result['image_url'] = $this->downloadAndStoreImage($imageUrl);
 
             return $result;
         } catch (Exception $e) {
-            Log::error('Fal.ai submission error: ' . $e->getMessage());
+            Log::error('Fal.ai submission error', [
+                'error' => $e->getMessage(),
+            ]);
 
             return [
                 'success' => false,
@@ -121,7 +123,7 @@ class ImageGenerationService
     }
 
     /**
-     * Poll Fal.ai for image generation status (alternative to webhook)
+     * Poll FAL queue status when a queue request ID is supplied externally.
      */
     public function checkStatus(string $requestId): array
     {
@@ -131,7 +133,7 @@ class ImageGenerationService
             $response = Http::withHeaders([
                 'Authorization' => 'Key ' . $this->falApiKey,
                 'Content-Type'  => 'application/json',
-            ])->timeout(10)->get("https://fal.run/fal-ai/flux-pro/requests/{$requestId}/status");
+            ])->timeout(10)->get("https://queue.fal.run/fal-ai/flux-pro/requests/{$requestId}/status");
 
             if ($response->failed()) {
                 return [
@@ -142,10 +144,10 @@ class ImageGenerationService
 
             $data = $response->json();
 
-            if ($data['status'] === 'COMPLETED') {
+            if (($data['status'] ?? null) === 'COMPLETED') {
                 $imageUrl = $data['images'][0]['url'] ?? null;
 
-                if ($imageUrl) {
+                if (is_string($imageUrl) && $imageUrl !== '') {
                     $storedPath = $this->downloadAndStoreImage($imageUrl);
 
                     return [
@@ -158,10 +160,12 @@ class ImageGenerationService
 
             return [
                 'success' => true,
-                'status'  => strtolower($data['status']), // pending, processing, completed, failed
+                'status'  => strtolower((string) ($data['status'] ?? 'pending')),
             ];
         } catch (Exception $e) {
-            Log::error('Fal.ai status check error: ' . $e->getMessage());
+            Log::error('Fal.ai status check error', [
+                'error' => $e->getMessage(),
+            ]);
 
             return [
                 'success' => false,
@@ -219,21 +223,25 @@ PROMPT;
             ]);
 
             if ($response->failed()) {
-                Log::error('Failed to create image prompt: ' . $response->body());
+                Log::error('Failed to create image prompt', [
+                    'status' => $response->status(),
+                ]);
 
                 return 'Professional image, modern design, clean composition, vibrant colors';
             }
 
-            return trim($response->json('choices.0.message.content'));
+            return trim((string) $response->json('choices.0.message.content'));
         } catch (Exception $e) {
-            Log::warning('Error creating image prompt: ' . $e->getMessage());
+            Log::warning('Error creating image prompt', [
+                'error' => $e->getMessage(),
+            ]);
 
             return 'Professional image, modern design, clean composition, vibrant colors';
         }
     }
 
     /**
-     * Generate image using Flux Pro API
+     * Generate image using OpenAI image API fallback.
      */
     protected function generateWithFluxPro(string $prompt): ?string
     {
@@ -250,38 +258,37 @@ PROMPT;
             ]);
 
             if ($response->failed()) {
-                Log::error('Flux Pro API Error: ' . $response->body());
+                Log::error('OpenAI image generation failed', [
+                    'status' => $response->status(),
+                ]);
 
                 return null;
             }
 
             $imageUrl = $response->json('data.0.url');
 
-            return $imageUrl;
+            return is_string($imageUrl) ? $imageUrl : null;
         } catch (Exception $e) {
-            Log::error('Flux Pro generation error: ' . $e->getMessage());
+            Log::error('OpenAI image generation error', [
+                'error' => $e->getMessage(),
+            ]);
 
             return null;
         }
     }
 
     /**
-     * Download and store the generated image
+     * Download and store a generated image through the shared SSRF-safe fetcher.
      */
     protected function downloadAndStoreImage(string $url): string
     {
-        try {
-            $imageContents = file_get_contents($url);
-            $filename = 'blogpilot/' . uniqid('post_', true) . '.png';
+        $relativePath = app(RemoteImageFetcher::class)->store(
+            $url,
+            'public',
+            'blogpilot'
+        );
 
-            Storage::disk('public')->put($filename, $imageContents);
-
-            return '/uploads/' . $filename;
-        } catch (Exception $e) {
-            Log::error('Failed to download/store image: ' . $e->getMessage());
-
-            throw $e;
-        }
+        return '/uploads/' . $relativePath;
     }
 
     /**

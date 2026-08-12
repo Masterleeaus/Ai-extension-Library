@@ -33,6 +33,8 @@ on:
       - app/extensions/NanoBanana/System/Http/Controllers/FalAIWebhookController.php
       - app/extensions/SeeDreamV4/System/SeeDreamV4ServiceProvider.php
       - app/extensions/SeeDreamV4/System/Http/Controllers/FalAIWebhookController.php
+      - app/extensions/BlogPilot/System/BlogPilotServiceProvider.php
+      - app/extensions/BlogPilot/System/Services/ImageGenerationService.php
       - app/extensions/Canvas/System/Http/Controllers/CanvasController.php
       - tests/contracts/creative_suite_document_ownership.php
       - tests/contracts/creative_suite_ai_task_ownership.php
@@ -45,6 +47,7 @@ on:
       - tests/contracts/ai_realtime_image_gallery_ownership.php
       - tests/contracts/nano_banana_provider_integrity.php
       - tests/contracts/fal_webhook_security.php
+      - tests/contracts/blogpilot_fal_image_security.php
       - tests/contracts/canvas_message_ownership.php
       - tests/Feature/Extensions/CreativeSuite/CreativeSuiteDocumentOwnershipTest.php
       - tests/Feature/Extensions/CreativeSuite/CreativeSuiteAITaskOwnershipTest.php
@@ -104,6 +107,8 @@ jobs:
           php -l app/extensions/NanoBanana/System/Http/Controllers/FalAIWebhookController.php
           php -l app/extensions/SeeDreamV4/System/SeeDreamV4ServiceProvider.php
           php -l app/extensions/SeeDreamV4/System/Http/Controllers/FalAIWebhookController.php
+          php -l app/extensions/BlogPilot/System/BlogPilotServiceProvider.php
+          php -l app/extensions/BlogPilot/System/Services/ImageGenerationService.php
           php -l app/extensions/Canvas/System/Http/Controllers/CanvasController.php
           php -l tests/contracts/creative_suite_document_ownership.php
           php -l tests/contracts/creative_suite_ai_task_ownership.php
@@ -116,6 +121,7 @@ jobs:
           php -l tests/contracts/ai_realtime_image_gallery_ownership.php
           php -l tests/contracts/nano_banana_provider_integrity.php
           php -l tests/contracts/fal_webhook_security.php
+          php -l tests/contracts/blogpilot_fal_image_security.php
           php -l tests/contracts/canvas_message_ownership.php
           php -l tests/Feature/Extensions/CreativeSuite/CreativeSuiteDocumentOwnershipTest.php
           php -l tests/Feature/Extensions/CreativeSuite/CreativeSuiteAITaskOwnershipTest.php
@@ -138,4 +144,5 @@ jobs:
           php tests/contracts/ai_realtime_image_gallery_ownership.php
           php tests/contracts/nano_banana_provider_integrity.php
           php tests/contracts/fal_webhook_security.php
+          php tests/contracts/blogpilot_fal_image_security.php
           php tests/contracts/canvas_message_ownership.php
