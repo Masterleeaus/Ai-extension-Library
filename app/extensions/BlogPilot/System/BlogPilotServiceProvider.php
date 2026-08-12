@@ -9,6 +9,7 @@ use App\Domains\Marketplace\Contracts\UninstallExtensionServiceProviderInterface
 use App\Extensions\BlogPilot\System\Console\Commands\GenerateAgentPostsCommand;
 use App\Extensions\BlogPilot\System\Console\Commands\PublishAgentPostsCommand;
 use App\Extensions\BlogPilot\System\Console\Commands\SeedDemoDataCommand;
+use App\Extensions\BlogPilot\System\Http\Controllers\BlogPilotAnalyticsController;
 use App\Extensions\BlogPilot\System\Http\Controllers\BlogPilotController;
 use App\Extensions\BlogPilot\System\Http\Controllers\BlogPilotPostsController;
 use App\Extensions\BlogPilot\System\Http\Middleware\BlogPilotPostOwnershipMiddleware;
@@ -111,7 +112,7 @@ class BlogPilotServiceProvider extends ServiceProvider implements ExtensionRegis
                         Route::get('agents', [BlogPilotController::class, 'agents'])->name('agents');
                         Route::get('calendar', [BlogPilotController::class, 'calendar'])->name('calendar');
                         Route::get('posts', BlogPilotPostsController::class)->name('posts');
-                        Route::get('analytics', [BlogPilotController::class, 'analytics'])->name('analytics');
+                        Route::get('analytics', BlogPilotAnalyticsController::class)->name('analytics');
                         Route::post('', [BlogPilotController::class, 'store'])->name('store');
                         Route::get('{agent}/edit', [BlogPilotController::class, 'edit'])->name('edit');
                         Route::put('{agent}', [BlogPilotController::class, 'update'])->name('update');
