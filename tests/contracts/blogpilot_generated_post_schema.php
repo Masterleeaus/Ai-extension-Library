@@ -35,7 +35,7 @@ foreach ([
     "'post_categories'" => 'post_categories is not part of the validated schema',
     'count($tags) !== 3' => 'exactly three tags are not required',
     'count($categories) !== 1' => 'exactly one category is not required',
-    "'success' => true" => 'validated result does not explicitly mark success',
+    '$post[\'success\'] = true;' => 'validated result does not explicitly mark success',
     "setSafeMode(true)" => 'markdown safe mode is not enabled when supported',
 ] as $fragment => $failure) {
     if (! str_contains($service, $fragment)) {
