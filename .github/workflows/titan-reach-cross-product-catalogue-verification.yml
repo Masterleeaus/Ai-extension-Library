@@ -19,3 +19,8 @@ jobs:
       - name: Lint issue 275 PHP files
         run: |
           php -l app/extensions/SocialMedia/tests/cross_product_catalogue_contract.php
+          php -l app/extensions/SocialMedia/System/Contracts/CanonicalSourceAdapterContract.php
+          php -l app/extensions/SocialMedia/System/Services/CanonicalSourceRegistry.php
+          php -l app/extensions/SocialMedia/System/Services/CanonicalCatalogueService.php
+          php -l app/extensions/SocialMedia/System/Models/DistributionItem.php
+          php -l app/extensions/SocialMedia/config/catalogues.php
