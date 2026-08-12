@@ -13,6 +13,7 @@ final class MigrationExternalId extends TenantMigrationModel
     protected $casts = [
         'company_id' => 'integer',
         'project_id' => 'integer',
+        'connection_id' => 'integer',
         'entity_plan_id' => 'integer',
         'migrated_at' => 'datetime',
     ];
@@ -20,6 +21,11 @@ final class MigrationExternalId extends TenantMigrationModel
     public function project(): BelongsTo
     {
         return $this->belongsTo(MigrationProject::class, 'project_id');
+    }
+
+    public function connection(): BelongsTo
+    {
+        return $this->belongsTo(MigrationConnection::class, 'connection_id');
     }
 
     public function entityPlan(): BelongsTo
