@@ -65,6 +65,9 @@ foreach (['resolve', 'search', 'transform', 'health', 'handoff'] as $method) {
 foreach (['resolveVerticalProfile', 'canonical_source', 'source_system', 'source_type', 'source_id', 'source_version', 'source_updated_at', 'provenance', 'authority', 'attribution_confidence', 'missing_canonical_fields', 'tenant_mismatch', 'handoff_unavailable', 'ext_social_media_distribution_audits'] as $needle) {
     $assertContains($needle, $service, "Canonical catalogue service missing {$needle} contract.");
 }
+foreach (['boundedCanonicalFields', 'boundedStringList', "array_intersect_key(\$configuredSection, \$baseSection)", "'source_version', 'source_updated_at'"] as $needle) {
+    $assertContains($needle, $service, "Canonical catalogue service missing hardening boundary {$needle}.");
+}
 $assertNotContains('::query()', $service, 'Canonical catalogue service must not directly query source-product Eloquent models.');
 
 $assertContains('function fromCanonicalSource', $model, 'DistributionItem missing canonical source factory.');
