@@ -48,6 +48,7 @@ on:
       - tests/contracts/nano_banana_provider_integrity.php
       - tests/contracts/fal_webhook_security.php
       - tests/contracts/blogpilot_fal_image_security.php
+      - tests/contracts/blogpilot_post_ownership.php
       - tests/contracts/canvas_message_ownership.php
       - tests/Feature/Extensions/CreativeSuite/CreativeSuiteDocumentOwnershipTest.php
       - tests/Feature/Extensions/CreativeSuite/CreativeSuiteAITaskOwnershipTest.php
@@ -122,6 +123,7 @@ jobs:
           php -l tests/contracts/nano_banana_provider_integrity.php
           php -l tests/contracts/fal_webhook_security.php
           php -l tests/contracts/blogpilot_fal_image_security.php
+          php -l tests/contracts/blogpilot_post_ownership.php
           php -l tests/contracts/canvas_message_ownership.php
           php -l tests/Feature/Extensions/CreativeSuite/CreativeSuiteDocumentOwnershipTest.php
           php -l tests/Feature/Extensions/CreativeSuite/CreativeSuiteAITaskOwnershipTest.php
@@ -145,4 +147,5 @@ jobs:
           php tests/contracts/nano_banana_provider_integrity.php
           php tests/contracts/fal_webhook_security.php
           php tests/contracts/blogpilot_fal_image_security.php
+          php tests/contracts/blogpilot_post_ownership.php
           php tests/contracts/canvas_message_ownership.php
