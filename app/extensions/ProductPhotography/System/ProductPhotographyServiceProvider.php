@@ -77,6 +77,7 @@ class ProductPhotographyServiceProvider extends ServiceProvider
 
                         $router
                             ->controller(PebblelySettingController::class)
+                            ->middleware('admin')
                             ->prefix('admin/settings')
                             ->name('admin.settings.')
                             ->group(function (Router $router) {
