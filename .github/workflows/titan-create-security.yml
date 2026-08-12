@@ -9,6 +9,7 @@ on:
       - .github/workflows/titan-create-security.yml
       - app/Services/Security/RemoteImageFetcher.php
       - app/Services/Security/SvgSanitizer.php
+      - app/extensions/CreativeSuite/System/CreativeSuiteServiceProvider.php
       - app/extensions/CreativeSuite/System/Http/Controllers/CreativeSuiteDocumentController.php
       - app/extensions/CreativeSuite/System/Http/Controllers/CreativeSuiteAIController.php
       - app/extensions/CreativeSuite/System/Http/Controllers/ImageUploadController.php
@@ -16,10 +17,13 @@ on:
       - app/extensions/CreativeSuiteAnnotations/System/Http/Controllers/CreativeSuiteAnnotationsAIController.php
       - app/extensions/CreativeSuiteAnnotations/System/Http/Controllers/CreativeSuiteAnnotationsSecureAIController.php
       - app/extensions/CreativeSuiteAnnotations/System/Jobs/ProcessAnnotationEditJob.php
+      - app/extensions/AdvancedImage/System/AdvancedImageServiceProvider.php
       - app/extensions/AdvancedImage/System/Http/Controllers/AdvancedImageStatusController.php
       - app/extensions/AdvancedImage/System/Http/Controllers/AdvancedImageWebhookController.php
       - app/extensions/AdvancedImage/System/Services/AdvancedFreepikService.php
       - app/extensions/AdvancedImage/System/Services/Traits/HasDownloadImage.php
+      - app/extensions/ProductPhotography/System/ProductPhotographyServiceProvider.php
+      - app/extensions/AIRealtimeImage/System/AIRealtimeImageServiceProvider.php
       - app/extensions/Canvas/System/Http/Controllers/CanvasController.php
       - tests/contracts/creative_suite_document_ownership.php
       - tests/contracts/creative_suite_ai_task_ownership.php
@@ -28,6 +32,7 @@ on:
       - tests/contracts/advanced_image_task_ownership.php
       - tests/contracts/advanced_image_webhook_signature.php
       - tests/contracts/remote_image_fetcher_security.php
+      - tests/contracts/titan_create_admin_settings_authorization.php
       - tests/contracts/canvas_message_ownership.php
       - tests/Feature/Extensions/CreativeSuite/CreativeSuiteDocumentOwnershipTest.php
       - tests/Feature/Extensions/CreativeSuite/CreativeSuiteAITaskOwnershipTest.php
@@ -63,6 +68,7 @@ jobs:
         run: |
           php -l app/Services/Security/RemoteImageFetcher.php
           php -l app/Services/Security/SvgSanitizer.php
+          php -l app/extensions/CreativeSuite/System/CreativeSuiteServiceProvider.php
           php -l app/extensions/CreativeSuite/System/Http/Controllers/CreativeSuiteDocumentController.php
           php -l app/extensions/CreativeSuite/System/Http/Controllers/CreativeSuiteAIController.php
           php -l app/extensions/CreativeSuite/System/Http/Controllers/ImageUploadController.php
@@ -70,10 +76,13 @@ jobs:
           php -l app/extensions/CreativeSuiteAnnotations/System/Http/Controllers/CreativeSuiteAnnotationsAIController.php
           php -l app/extensions/CreativeSuiteAnnotations/System/Http/Controllers/CreativeSuiteAnnotationsSecureAIController.php
           php -l app/extensions/CreativeSuiteAnnotations/System/Jobs/ProcessAnnotationEditJob.php
+          php -l app/extensions/AdvancedImage/System/AdvancedImageServiceProvider.php
           php -l app/extensions/AdvancedImage/System/Http/Controllers/AdvancedImageStatusController.php
           php -l app/extensions/AdvancedImage/System/Http/Controllers/AdvancedImageWebhookController.php
           php -l app/extensions/AdvancedImage/System/Services/AdvancedFreepikService.php
           php -l app/extensions/AdvancedImage/System/Services/Traits/HasDownloadImage.php
+          php -l app/extensions/ProductPhotography/System/ProductPhotographyServiceProvider.php
+          php -l app/extensions/AIRealtimeImage/System/AIRealtimeImageServiceProvider.php
           php -l app/extensions/Canvas/System/Http/Controllers/CanvasController.php
           php -l tests/contracts/creative_suite_document_ownership.php
           php -l tests/contracts/creative_suite_ai_task_ownership.php
@@ -82,6 +91,7 @@ jobs:
           php -l tests/contracts/advanced_image_task_ownership.php
           php -l tests/contracts/advanced_image_webhook_signature.php
           php -l tests/contracts/remote_image_fetcher_security.php
+          php -l tests/contracts/titan_create_admin_settings_authorization.php
           php -l tests/contracts/canvas_message_ownership.php
           php -l tests/Feature/Extensions/CreativeSuite/CreativeSuiteDocumentOwnershipTest.php
           php -l tests/Feature/Extensions/CreativeSuite/CreativeSuiteAITaskOwnershipTest.php
@@ -100,4 +110,5 @@ jobs:
           php tests/contracts/advanced_image_task_ownership.php
           php tests/contracts/advanced_image_webhook_signature.php
           php tests/contracts/remote_image_fetcher_security.php
+          php tests/contracts/titan_create_admin_settings_authorization.php
           php tests/contracts/canvas_message_ownership.php
