@@ -30,7 +30,6 @@ $registry = $source('System/Services/CanonicalSourceRegistry.php');
 $service = $source('System/Services/CanonicalCatalogueService.php');
 $catalogues = $source('config/catalogues.php');
 $model = $source('System/Models/DistributionItem.php');
-$provider = $source('System/SocialMediaServiceProvider.php');
 $verticals = $source('config/vertical-distribution.php');
 
 $assert($contract !== '', 'Missing CanonicalSourceAdapterContract.');
@@ -55,7 +54,7 @@ $assert($registry !== '', 'Missing CanonicalSourceRegistry.');
 foreach (['adapter', 'capabilities', 'health'] as $method) {
     $assertContains("function {$method}", $registry, "CanonicalSourceRegistry missing {$method}().");
 }
-foreach (['CanonicalSourceAdapterContract', 'app()->bound', 'class_exists', 'misconfigured', 'unavailable'] as $needle) {
+foreach (['CanonicalSourceAdapterContract', 'app()->bound', 'class_exists', 'misconfigured', 'unavailable', "require dirname(__DIR__, 2) . '/config/catalogues.php'", 'array_intersect_key'] as $needle) {
     $assertContains($needle, $registry, "Canonical source registry missing {$needle} fail-closed boundary.");
 }
 
@@ -72,7 +71,7 @@ $assertContains('function fromCanonicalSource', $model, 'DistributionItem missin
 $assertContains("'canonical_source'", $model, 'DistributionItem canonical source factory must persist provenance in payload.');
 $assertContains("'source_type'", $model, 'DistributionItem must retain source type identity.');
 $assertContains("'source_id'", $model, 'DistributionItem must retain source ID identity.');
-$assertContains("mergeConfigFrom(__DIR__ . '/../config/catalogues.php', 'social-media.catalogues')", $provider, 'SocialMedia provider must register catalogue config.');
+$assertContains('createForUser($user, $attributes)', $model, 'Canonical source factory must reuse the existing tenant-owned DistributionItem factory.');
 
 if ($failures !== []) {
     fwrite(STDERR, "Issue #275 contract failed:\n - " . implode("\n - ", $failures) . "\n");
