@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Extensions\Migration\System\Canonical;
 
+use Closure;
 use InvalidArgumentException;
 
 final class ModuleAvailabilityResolver
@@ -12,8 +13,10 @@ final class ModuleAvailabilityResolver
     private array $modules = [];
 
     /** @param array<string, bool> $modules */
-    public function __construct(array $modules = [])
-    {
+    public function __construct(
+        array $modules = [],
+        private readonly ?Closure $detector = null,
+    ) {
         foreach ($modules as $module => $available) {
             $this->set((string) $module, (bool) $available);
         }
@@ -31,7 +34,11 @@ final class ModuleAvailabilityResolver
 
     public function isAvailable(string $module): bool
     {
-        return $this->modules[$module] ?? false;
+        if (array_key_exists($module, $this->modules)) {
+            return $this->modules[$module];
+        }
+
+        return $this->detector === null ? false : (bool) ($this->detector)($module);
     }
 
     /** @return array<string, bool> */
