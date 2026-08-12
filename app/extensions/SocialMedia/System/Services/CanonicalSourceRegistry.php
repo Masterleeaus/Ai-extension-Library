@@ -12,6 +12,8 @@ class CanonicalSourceRegistry
 {
     private const HEALTH_STATUSES = ['healthy', 'degraded', 'unavailable', 'misconfigured'];
 
+    private ?array $definitionsCache = null;
+
     public function adapter(string $sourceKey): ?CanonicalSourceAdapterContract
     {
         $definition = $this->definition($sourceKey);
@@ -149,11 +151,20 @@ class CanonicalSourceRegistry
 
     public function definition(string $sourceKey): array
     {
-        return (array) data_get($this->definitions(), $sourceKey, []);
+        return (array) ($this->definitions()[$sourceKey] ?? []);
     }
 
     public function definitions(): array
     {
-        return (array) config('social-media.catalogues.sources', []);
+        if ($this->definitionsCache !== null) {
+            return $this->definitionsCache;
+        }
+
+        $catalogue = require dirname(__DIR__, 2) . '/config/catalogues.php';
+        $base = (array) ($catalogue['sources'] ?? []);
+        $configured = (array) config('social-media.catalogues.sources', []);
+        $overrides = array_intersect_key($configured, $base);
+
+        return $this->definitionsCache = array_replace_recursive($base, $overrides);
     }
 }
