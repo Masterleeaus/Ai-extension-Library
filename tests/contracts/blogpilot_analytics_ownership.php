@@ -27,9 +27,9 @@ $provider = readBlogPilotAnalyticsFile('BlogPilotServiceProvider.php', $provider
 $controller = readBlogPilotAnalyticsFile('BlogPilotAnalyticsController.php', $controllerPath);
 
 foreach ([
-    "BlogPilotPost::query()" => 'analytics controller does not load posts',
-    "->where('user_id', $userId)" => 'analytics post data is not scoped to the authenticated owner',
-    "BlogPilot::query()->where('user_id', $userId)->get()" => 'analytics agents are not scoped to the authenticated owner',
+    'BlogPilotPost::query()' => 'analytics controller does not load posts',
+    '->where(\'user_id\', $userId)' => 'analytics post data is not scoped to the authenticated owner',
+    'BlogPilot::query()->where(\'user_id\', $userId)->get()' => 'analytics agents are not scoped to the authenticated owner',
     "view('blogpilot::analytics.index'" => 'analytics view contract changed unexpectedly',
     'buildMonthRange(12)' => 'analytics 12-month range changed unexpectedly',
     'buildPublishedPostsChartData($userId, $agents, $monthRange)' => 'analytics chart no longer uses the owner-scoped agent collection',
