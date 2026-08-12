@@ -112,6 +112,7 @@ class AIRealtimeImageController extends Controller
 
         return view('ai-realtime-image::gallery.gallery', [
             'images' => RealtimeImage::query()
+                ->where('user_id', auth()->id())
                 ->where('status', Status::success->value)
                 ->orderBy('created_at', 'desc')
                 ->paginate(15),
