@@ -89,7 +89,7 @@ class NanoBananaServiceProvider extends ServiceProvider implements ExtensionRegi
             ->group([
                 'middleware' => ['web', 'auth'],
             ], function (Router $router) {
-                $router->any('generator/webhook/fal-ai', FalAIWebhookController::class)
+                $router->post('generator/webhook/fal-ai', FalAIWebhookController::class)
                     ->name('generator.webhook.fal-ai')
                     ->withoutMiddleware(['web', 'auth']);
 
