@@ -113,6 +113,7 @@ jobs:
           php -l app/extensions/SeeDreamV4/System/SeeDreamV4ServiceProvider.php
           php -l app/extensions/SeeDreamV4/System/Http/Controllers/FalAIWebhookController.php
           php -l app/extensions/BlogPilot/System/BlogPilotServiceProvider.php
+          php -l app/extensions/BlogPilot/System/Http/Controllers/BlogPilotAnalyticsController.php
           php -l app/extensions/BlogPilot/System/Http/Controllers/BlogPilotPostsController.php
           php -l app/extensions/BlogPilot/System/Http/Middleware/BlogPilotPostOwnershipMiddleware.php
           php -l app/extensions/BlogPilot/System/Services/ImageGenerationService.php
