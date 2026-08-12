@@ -39,6 +39,7 @@ on:
       - app/extensions/BlogPilot/System/Http/Middleware/BlogPilotPostOwnershipMiddleware.php
       - app/extensions/BlogPilot/System/Services/ImageGenerationService.php
       - app/extensions/BlogPilot/System/Services/PostGenerationService.php
+      - app/extensions/BlogPilot/System/Services/SecurePostGenerationService.php
       - app/extensions/BlogPilot/System/Console/Commands/GenerateAgentPostsCommand.php
       - app/extensions/Canvas/System/Http/Controllers/CanvasController.php
       - tests/contracts/creative_suite_document_ownership.php
@@ -121,6 +122,7 @@ jobs:
           php -l app/extensions/BlogPilot/System/Http/Middleware/BlogPilotPostOwnershipMiddleware.php
           php -l app/extensions/BlogPilot/System/Services/ImageGenerationService.php
           php -l app/extensions/BlogPilot/System/Services/PostGenerationService.php
+          php -l app/extensions/BlogPilot/System/Services/SecurePostGenerationService.php
           php -l app/extensions/BlogPilot/System/Console/Commands/GenerateAgentPostsCommand.php
           php -l app/extensions/Canvas/System/Http/Controllers/CanvasController.php
           php -l tests/contracts/creative_suite_document_ownership.php
