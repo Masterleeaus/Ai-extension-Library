@@ -17,7 +17,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          OUT="Titan-Reach-Main-e70861c5"
+          SOURCE_SHA="58c05d767f443dcf878d4d744400efbfc272bce5"
+          OUT="Titan-Reach-Main-58c05d76"
           mkdir -p "$OUT/app/extensions"
           cp -a app/extensions/SocialMedia "$OUT/app/extensions/"
           cp -a app/extensions/SocialMediaAutomation "$OUT/app/extensions/"
@@ -25,24 +26,31 @@ jobs:
           # Titan Reach Cumulative Package
 
           Source repository: Masterleeaus/Ai-extensions
-          Source branch: main
-          Source merge commit: e70861c5179a9eeb5904d6d065252e6d398dcc30
+          Source branch snapshot: main
+          Source commit: 58c05d767f443dcf878d4d744400efbfc272bce5
+          Includes Titan Reach engagement work merged by PR #485 / issue #273.
+
           Included extensions:
           - app/extensions/SocialMedia — Titan Reach core runtime (internal extension identity retained)
           - app/extensions/SocialMediaAutomation — governed engagement automation companion
 
-          Packaging only: source code is copied from the merged repository state without implementation edits.
+          Packaging only: source code is copied from the source snapshot without implementation edits.
           EOF
-          find "$OUT" -type f -print0 | sort -z | xargs -0 sha256sum > "$OUT/SHA256SUMS.txt"
+          find "$OUT" -type f -print0 | sort -z | xargs -0 sha256sum > /tmp/titan-reach-file-hashes.txt
+          cp /tmp/titan-reach-file-hashes.txt "$OUT/SHA256SUMS.txt"
           zip -qr "${OUT}.zip" "$OUT"
           sha256sum "${OUT}.zip" > "${OUT}.zip.sha256"
           unzip -t "${OUT}.zip"
+          rm -rf /tmp/titan-reach-verify
+          mkdir -p /tmp/titan-reach-verify
+          unzip -q "${OUT}.zip" -d /tmp/titan-reach-verify
+          (cd /tmp/titan-reach-verify && sha256sum -c "$GITHUB_WORKSPACE/$OUT/SHA256SUMS.txt")
       - name: Upload Titan Reach package
         uses: actions/upload-artifact@v4
         with:
-          name: titan-reach-main-e70861c5
+          name: titan-reach-main-58c05d76
           path: |
-            Titan-Reach-Main-e70861c5.zip
-            Titan-Reach-Main-e70861c5.zip.sha256
+            Titan-Reach-Main-58c05d76.zip
+            Titan-Reach-Main-58c05d76.zip.sha256
           if-no-files-found: error
           retention-days: 7
