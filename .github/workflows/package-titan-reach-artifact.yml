@@ -1,0 +1,48 @@
+name: Package Titan Reach Artifact
+
+on:
+  push:
+    branches:
+      - artifact/titan-reach-package-20260817
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build cumulative Titan Reach ZIP
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUT="Titan-Reach-Main-e70861c5"
+          mkdir -p "$OUT/app/extensions"
+          cp -a app/extensions/SocialMedia "$OUT/app/extensions/"
+          cp -a app/extensions/SocialMediaAutomation "$OUT/app/extensions/"
+          cat > "$OUT/BUILD-MANIFEST.md" <<'EOF'
+          # Titan Reach Cumulative Package
+
+          Source repository: Masterleeaus/Ai-extensions
+          Source branch: main
+          Source merge commit: e70861c5179a9eeb5904d6d065252e6d398dcc30
+          Included extensions:
+          - app/extensions/SocialMedia — Titan Reach core runtime (internal extension identity retained)
+          - app/extensions/SocialMediaAutomation — governed engagement automation companion
+
+          Packaging only: source code is copied from the merged repository state without implementation edits.
+          EOF
+          find "$OUT" -type f -print0 | sort -z | xargs -0 sha256sum > "$OUT/SHA256SUMS.txt"
+          zip -qr "${OUT}.zip" "$OUT"
+          sha256sum "${OUT}.zip" > "${OUT}.zip.sha256"
+          unzip -t "${OUT}.zip"
+      - name: Upload Titan Reach package
+        uses: actions/upload-artifact@v4
+        with:
+          name: titan-reach-main-e70861c5
+          path: |
+            Titan-Reach-Main-e70861c5.zip
+            Titan-Reach-Main-e70861c5.zip.sha256
+          if-no-files-found: error
+          retention-days: 7
