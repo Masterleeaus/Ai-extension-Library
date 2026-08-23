@@ -159,12 +159,16 @@ class MetaAdsService
             'name' => $campaign->name,
             'objective' => $campaign->objective,
             'status' => 'PAUSED',
+            'spend_cap' => $campaign->spend_cap_minor,
             'special_ad_categories' => json_encode(
                 array_values((array) data_get($campaign->campaign_payload, 'special_ad_categories', [])),
                 JSON_THROW_ON_ERROR
             ),
         ];
-        $campaignResponse = $facebook->createCampaign($campaign->ad_account_id, $campaignPayload);
+        $campaignResponse = $facebook->createCampaign($campaign->ad_account_id, array_filter(
+            $campaignPayload,
+            static fn ($value) => $value !== null && $value !== ''
+        ));
         $metaCampaignId = $this->providerId($campaignResponse, 'Meta campaign creation failed.');
 
         $adSetPayload = [
