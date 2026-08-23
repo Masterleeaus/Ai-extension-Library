@@ -584,8 +584,10 @@ class MetaAdsService
     ): void {
         $ability = (string) config('social-media.meta_ads.' . $configKey);
 
-        if ($ability !== '' && Gate::has($ability) && ! Gate::allows($ability, $campaign)) {
-            throw new RuntimeException('The current user does not hold the required paid-media authority.');
+        if ($ability !== '') {
+            if (! Gate::has($ability) || ! Gate::allows($ability, $campaign)) {
+                throw new RuntimeException('The current user does not hold the required paid-media authority.');
+            }
         }
 
         if ((int) $actor->getKey() !== (int) $campaign->user_id) {
