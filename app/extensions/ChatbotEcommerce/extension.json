@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 ﻿{
     "name":  "Ecommerce for External Chatbot",
     "type":  "extension",
@@ -6,12 +5,3 @@
     "description":  "Chatbot ecommerce extension for magicai — TG: @heew_support",
     "support_telegram":  "heew_support"
 }
-=======
-{
-  "name": "Ecommerce for External Chatbot",
-  "type": "extension",
-  "version": "4.9.0",
-  "description": "Three-role conversational commerce extension with unified native and external order workbench, settlement reconciliation, exception management, encrypted credentials, strict tenant isolation, marketplace operations, customer communications, BNPL, orders and returns.",
-  "support_telegram": "heew_support"
-}
->>>>>>> update-extensions-review-upgrade-nvbncq

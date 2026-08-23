@@ -6,6 +6,7 @@ namespace Foundation\Implementations;
 
 use Foundation\Contracts\BookingMigrationContract;
 use PDO;
+use Foundation\Support\JsonHelper;
 
 class BookingMigration implements BookingMigrationContract
 {
@@ -108,7 +109,7 @@ class BookingMigration implements BookingMigrationContract
         $record = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($record) {
-            $record['mapped_data'] = json_decode($record['mapped_data'], true);
+            $record['mapped_data'] = JsonHelper::decode($record['mapped_data']);
         }
 
         return $record ?: null;

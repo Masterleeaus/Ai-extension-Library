@@ -42,6 +42,16 @@ class DistributionItem extends Model
 
     public const TYPE_JOB_LISTING = 'job_listing';
 
+    public const TYPE_ROOM_STAY_OFFER = 'room_stay_offer';
+
+    public const TYPE_MEMBERSHIP_OFFER = 'membership_offer';
+
+    public const TYPE_CLASS_SESSION_OFFER = 'class_session_offer';
+
+    public const TYPE_BOOKING_OFFER = 'booking_offer';
+
+    public const TYPE_HIRE_RENTAL_LISTING = 'hire_rental_listing';
+
     protected $table = 'ext_social_media_distribution_items';
 
     protected $fillable = [
@@ -77,6 +87,11 @@ class DistributionItem extends Model
             self::TYPE_PROPERTY_LISTING,
             self::TYPE_VEHICLE_LISTING,
             self::TYPE_JOB_LISTING,
+            self::TYPE_ROOM_STAY_OFFER,
+            self::TYPE_MEMBERSHIP_OFFER,
+            self::TYPE_CLASS_SESSION_OFFER,
+            self::TYPE_BOOKING_OFFER,
+            self::TYPE_HIRE_RENTAL_LISTING,
         ];
     }
 
@@ -106,6 +121,64 @@ class DistributionItem extends Model
         $attributes['user_id'] = $user->getKey();
 
         return self::query()->create($attributes);
+    }
+
+    public static function fromCanonicalSource(User $user, array $transformation, array $attributes = []): self
+    {
+        if (($transformation['status'] ?? null) !== 'ready') {
+            throw new InvalidArgumentException('A ready canonical source transformation is required.');
+        }
+
+        $contentType = trim((string) ($transformation['content_type'] ?? ''));
+        if (! in_array($contentType, self::contentTypes(), true)) {
+            throw new InvalidArgumentException('Unsupported Titan Reach distribution content type.');
+        }
+
+        if ($contentType === self::TYPE_SOCIAL_POST) {
+            throw new InvalidArgumentException('Use fromSocialMediaPost() for canonical social post mappings.');
+        }
+
+        $canonicalSource = (array) ($transformation['canonical_source'] ?? []);
+        $sourceSystem = trim((string) ($canonicalSource['source_system'] ?? ''));
+        $sourceType = trim((string) ($canonicalSource['source_type'] ?? ''));
+        $sourceId = trim((string) ($canonicalSource['source_id'] ?? ''));
+
+        if ($sourceSystem === '' || $sourceType === '' || $sourceId === '') {
+            throw new InvalidArgumentException('Canonical source system, type and ID are required.');
+        }
+
+        if (! array_key_exists('provenance', $canonicalSource)
+            || ! array_key_exists('authority', $canonicalSource)) {
+            throw new InvalidArgumentException('Canonical source provenance and authority are required.');
+        }
+
+        $fields = (array) ($transformation['fields'] ?? []);
+        $payload = array_replace_recursive(
+            (array) ($attributes['payload'] ?? []),
+            [
+                'canonical_source' => $canonicalSource,
+                'vertical' => $transformation['vertical'] ?? 'generic-business',
+                'business_subtype' => $transformation['business_subtype'] ?? null,
+                'profile_version' => $transformation['profile_version'] ?? null,
+                'profile_provenance' => array_values((array) ($transformation['profile_provenance'] ?? [])),
+                'attribution_confidence' => $transformation['attribution_confidence'] ?? 1.0,
+                'destination' => $transformation['destination'] ?? null,
+                'destination_fields' => array_values((array) ($transformation['destination_fields'] ?? [])),
+                'fields' => $fields,
+            ]
+        );
+
+        $attributes['content_type'] = $contentType;
+        $attributes['status'] = $attributes['status'] ?? 'draft';
+        $attributes['approval_status'] = $attributes['approval_status'] ?? 'pending';
+        $attributes['title'] = $attributes['title'] ?? ($fields['title'] ?? null);
+        $attributes['content'] = $attributes['content'] ?? ($fields['content'] ?? $fields['description'] ?? null);
+        $attributes['company_id'] = $attributes['company_id'] ?? ($canonicalSource['company_id'] ?? null);
+        $attributes['source_type'] = $sourceSystem . ':' . $sourceType;
+        $attributes['source_id'] = $sourceId;
+        $attributes['payload'] = $payload;
+
+        return self::createForUser($user, $attributes);
     }
 
     public static function fromSocialMediaPost(SocialMediaPost $post): self

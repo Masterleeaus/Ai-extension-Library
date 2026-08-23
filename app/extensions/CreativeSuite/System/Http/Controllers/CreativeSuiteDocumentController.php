@@ -25,7 +25,7 @@ class CreativeSuiteDocumentController extends Controller
         $id = $request->input('id');
 
         if ($id) {
-            $document = CreativeSuiteDocument::findOrFail($id);
+            $document = $this->ownedDocument($id);
 
             $document->update([
                 'name'    => $request->name,
@@ -55,9 +55,9 @@ class CreativeSuiteDocumentController extends Controller
         ]);
     }
 
-    public function show(CreativeSuiteDocument $document): CreativeSuiteDocumentResource
+    public function show(string $document): CreativeSuiteDocumentResource
     {
-        return CreativeSuiteDocumentResource::make($document)->additional([
+        return CreativeSuiteDocumentResource::make($this->ownedDocument($document))->additional([
             'status' => 'success',
         ]);
     }
@@ -73,9 +73,10 @@ class CreativeSuiteDocumentController extends Controller
 
         $request->validate(['id' => 'required']);
 
-        $document = CreativeSuiteDocument::findOrFail($request->id);
+        $document = $this->ownedDocument($request->id);
 
         $newDocument = $document->replicate();
+        $newDocument->user_id = auth()->id();
         $newDocument->uuid = (string) Str::uuid();
         $newDocument->name = $document->name . ' (Copy)';
         $newDocument->save();
@@ -99,7 +100,7 @@ class CreativeSuiteDocumentController extends Controller
             'name' => 'required|string|max:255',
         ]);
 
-        $document = CreativeSuiteDocument::findOrFail($request->id);
+        $document = $this->ownedDocument($request->id);
 
         $document->update(['name' => $request->name]);
 
@@ -119,7 +120,7 @@ class CreativeSuiteDocumentController extends Controller
 
         $request->validate(['id' => 'required']);
 
-        $document = CreativeSuiteDocument::findOrFail($request->id);
+        $document = $this->ownedDocument($request->id);
 
         $document->delete();
 
@@ -127,5 +128,12 @@ class CreativeSuiteDocumentController extends Controller
             'status'  => 'success',
             'message' => 'Document deleted successfully.',
         ]);
+    }
+
+    private function ownedDocument(int|string $id): CreativeSuiteDocument
+    {
+        return CreativeSuiteDocument::query()
+            ->where('user_id', auth()->id())
+            ->findOrFail($id);
     }
 }

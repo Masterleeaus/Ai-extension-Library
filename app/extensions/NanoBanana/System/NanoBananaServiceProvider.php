@@ -89,7 +89,7 @@ class NanoBananaServiceProvider extends ServiceProvider implements ExtensionRegi
             ->group([
                 'middleware' => ['web', 'auth'],
             ], function (Router $router) {
-                $router->any('generator/webhook/fal-ai', FalAIWebhookController::class)
+                $router->post('generator/webhook/fal-ai', FalAIWebhookController::class)
                     ->name('generator.webhook.fal-ai')
                     ->withoutMiddleware(['web', 'auth']);
 
@@ -105,17 +105,7 @@ class NanoBananaServiceProvider extends ServiceProvider implements ExtensionRegi
 
     public static function uninstall(): void
     {
-<<<<<<< HEAD
-<<<<<<< HEAD
         $path = public_path("vendor/nanobanana");
-=======
-        $path = public_path("vendor/chatbot");
-=======
-        $path = public_path("vendor/chatbot");
-=======
-        $path = public_path("vendor/nanobanana");
->>>>>>> update-extensions-review-upgrade-nvbncq
->>>>>>> update-ai-suite-extensions-issues-cvrb3y
         if (is_dir($path)) {
             array_map(static fn ($f) => @unlink($f), glob("$path/*.*"));
             @rmdir($path);

@@ -11,6 +11,8 @@ use App\Extensions\SocialMediaAutomation\System\Console\Commands\ProcessPendingA
 use App\Extensions\SocialMediaAutomation\System\Http\Controllers\AutomationBuilderController;
 use App\Extensions\SocialMediaAutomation\System\Http\Controllers\AutomationController;
 use App\Extensions\SocialMediaAutomation\System\Http\Controllers\WebhookController;
+use App\Extensions\SocialMediaAutomation\System\Services\AutomationExecutionService;
+use App\Extensions\SocialMediaAutomation\System\Services\GovernedAutomationExecutionService;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Route;
@@ -18,7 +20,10 @@ use Illuminate\Support\ServiceProvider;
 
 class SocialMediaAutomationServiceProvider extends ServiceProvider implements ExtensionRegisterKeyProviderInterface, UninstallExtensionServiceProviderInterface
 {
-    public function register(): void {}
+    public function register(): void
+    {
+        $this->app->bind(AutomationExecutionService::class, GovernedAutomationExecutionService::class);
+    }
 
     public function boot(): void
     {
@@ -67,13 +72,10 @@ class SocialMediaAutomationServiceProvider extends ServiceProvider implements Ex
                         Route::put('{automation}', [AutomationController::class, 'update'])->name('update');
                         Route::patch('{automation}/status', [AutomationController::class, 'toggleStatus'])->name('toggle-status');
                         Route::delete('{automation}', [AutomationController::class, 'destroy'])->name('destroy');
-
-                        // Builder AJAX endpoints
                         Route::get('posts', [AutomationBuilderController::class, 'fetchPosts'])->name('posts');
                         Route::post('upload-image', [AutomationBuilderController::class, 'uploadImage'])->name('upload-image');
                     });
 
-                // Webhook routes (no auth required)
                 $router
                     ->name('social-media.automation.webhook.')
                     ->prefix('social-media/automation/webhook')

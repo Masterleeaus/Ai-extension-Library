@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Extensions\CreativeSuiteAnnotations\System;
 
 use App\Extensions\CreativeSuiteAnnotations\System\Http\Controllers\Admin\CreativeSuiteAnnotationsSettingsController;
-use App\Extensions\CreativeSuiteAnnotations\System\Http\Controllers\CreativeSuiteAnnotationsAIController;
+use App\Extensions\CreativeSuiteAnnotations\System\Http\Controllers\CreativeSuiteAnnotationsSecureAIController;
 use App\Http\Middleware\CheckTemplateTypeAndPlan;
 use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Routing\Router;
@@ -79,9 +79,9 @@ class CreativeSuiteAnnotationsServiceProvider extends ServiceProvider
                     ->name('dashboard.user.creative-suite-annotations.')
                     ->middleware(CheckTemplateTypeAndPlan::class)
                     ->group(function (Router $router) {
-                        $router->post('edit', [CreativeSuiteAnnotationsAIController::class, 'edit'])->name('edit');
-                        $router->get('edit/{task}/status', [CreativeSuiteAnnotationsAIController::class, 'status'])->name('edit.status');
-                        $router->post('analyze', [CreativeSuiteAnnotationsAIController::class, 'analyze'])->name('analyze');
+                        $router->post('edit', [CreativeSuiteAnnotationsSecureAIController::class, 'edit'])->name('edit');
+                        $router->get('edit/{task}/status', [CreativeSuiteAnnotationsSecureAIController::class, 'status'])->name('edit.status');
+                        $router->post('analyze', [CreativeSuiteAnnotationsSecureAIController::class, 'analyze'])->name('analyze');
                     });
 
                 $router

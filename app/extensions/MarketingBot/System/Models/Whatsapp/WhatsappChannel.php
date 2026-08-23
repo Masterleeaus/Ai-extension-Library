@@ -22,6 +22,13 @@ class WhatsappChannel extends Model
         'meta_waba_id',
     ];
 
+    protected $casts = [
+        'whatsapp_sid' => 'encrypted',
+        'whatsapp_token' => 'encrypted',
+        'meta_access_token' => 'encrypted',
+        'meta_verify_token' => 'encrypted',
+    ];
+
     public function isSandbox(): bool
     {
         return $this->whatsapp_environment === 'sandbox';

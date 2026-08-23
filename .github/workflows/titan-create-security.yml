@@ -1,0 +1,169 @@
+name: Titan Create security contracts
+
+on:
+  pull_request:
+    branches:
+      - main
+    types: [opened, synchronize, reopened]
+    paths:
+      - .github/workflows/titan-create-security.yml
+      - app/Services/Security/RemoteImageFetcher.php
+      - app/Services/Security/SvgSanitizer.php
+      - app/Services/Security/FalWebhookVerifier.php
+      - app/Services/Ai/FalImageWebhookProcessor.php
+      - app/extensions/CreativeSuite/System/CreativeSuiteServiceProvider.php
+      - app/extensions/CreativeSuite/System/Http/Controllers/CreativeSuiteDocumentController.php
+      - app/extensions/CreativeSuite/System/Http/Controllers/CreativeSuiteAIController.php
+      - app/extensions/CreativeSuite/System/Http/Controllers/ImageUploadController.php
+      - app/extensions/CreativeSuiteAnnotations/System/CreativeSuiteAnnotationsServiceProvider.php
+      - app/extensions/CreativeSuiteAnnotations/System/Http/Controllers/CreativeSuiteAnnotationsAIController.php
+      - app/extensions/CreativeSuiteAnnotations/System/Http/Controllers/CreativeSuiteAnnotationsSecureAIController.php
+      - app/extensions/CreativeSuiteAnnotations/System/Jobs/ProcessAnnotationEditJob.php
+      - app/extensions/AdvancedImage/System/AdvancedImageServiceProvider.php
+      - app/extensions/AdvancedImage/System/Http/Controllers/AdvancedImageStatusController.php
+      - app/extensions/AdvancedImage/System/Http/Controllers/AdvancedImageWebhookController.php
+      - app/extensions/AdvancedImage/System/Services/AdvancedFreepikService.php
+      - app/extensions/AdvancedImage/System/Services/Traits/HasDownloadImage.php
+      - app/extensions/ProductPhotography/System/ProductPhotographyServiceProvider.php
+      - app/extensions/AIRealtimeImage/System/AIRealtimeImageServiceProvider.php
+      - app/extensions/AIRealtimeImage/System/Http/Controllers/AIRealtimeImageController.php
+      - app/extensions/FluxPro/System/FluxProServiceProvider.php
+      - app/extensions/FluxPro/System/Http/Controllers/FalAIWebhookController.php
+      - app/extensions/NanoBanana/System/NanoBananaServiceProvider.php
+      - app/extensions/NanoBanana/System/Http/Controllers/FalAIWebhookController.php
+      - app/extensions/SeeDreamV4/System/SeeDreamV4ServiceProvider.php
+      - app/extensions/SeeDreamV4/System/Http/Controllers/FalAIWebhookController.php
+      - app/extensions/BlogPilot/System/BlogPilotServiceProvider.php
+      - app/extensions/BlogPilot/System/Http/Controllers/BlogPilotAnalyticsController.php
+      - app/extensions/BlogPilot/System/Http/Controllers/BlogPilotPostsController.php
+      - app/extensions/BlogPilot/System/Http/Middleware/BlogPilotPostOwnershipMiddleware.php
+      - app/extensions/BlogPilot/System/Services/ImageGenerationService.php
+      - app/extensions/BlogPilot/System/Services/PostGenerationService.php
+      - app/extensions/BlogPilot/System/Services/SecurePostGenerationService.php
+      - app/extensions/BlogPilot/System/Console/Commands/GenerateAgentPostsCommand.php
+      - app/extensions/Canvas/System/Http/Controllers/CanvasController.php
+      - tests/contracts/creative_suite_document_ownership.php
+      - tests/contracts/creative_suite_ai_task_ownership.php
+      - tests/contracts/creative_suite_annotations_finalization_security.php
+      - tests/contracts/creative_suite_svg_sanitization.php
+      - tests/contracts/advanced_image_task_ownership.php
+      - tests/contracts/advanced_image_webhook_signature.php
+      - tests/contracts/remote_image_fetcher_security.php
+      - tests/contracts/titan_create_admin_settings_authorization.php
+      - tests/contracts/ai_realtime_image_gallery_ownership.php
+      - tests/contracts/nano_banana_provider_integrity.php
+      - tests/contracts/fal_webhook_security.php
+      - tests/contracts/blogpilot_fal_image_security.php
+      - tests/contracts/blogpilot_post_ownership.php
+      - tests/contracts/blogpilot_analytics_ownership.php
+      - tests/contracts/blogpilot_generated_post_schema.php
+      - tests/contracts/canvas_message_ownership.php
+      - tests/Feature/Extensions/CreativeSuite/CreativeSuiteDocumentOwnershipTest.php
+      - tests/Feature/Extensions/CreativeSuite/CreativeSuiteAITaskOwnershipTest.php
+      - tests/Feature/Extensions/CreativeSuite/CreativeSuiteSvgUploadSecurityTest.php
+      - tests/Feature/Extensions/CreativeSuiteAnnotations/CreativeSuiteAnnotationsFinalizationSecurityTest.php
+      - tests/Feature/Extensions/AdvancedImage/AdvancedImageTaskOwnershipTest.php
+      - tests/Feature/Extensions/AdvancedImage/AdvancedImageWebhookSignatureTest.php
+      - tests/Feature/Extensions/Canvas/CanvasMessageOwnershipTest.php
+      - tests/Unit/Security/RemoteImageFetcherTest.php
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: titan-create-security-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  titan-create-ownership-contracts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          ref: ${{ github.head_ref || github.ref_name }}
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: none
+      - name: Validate Titan Create security PHP syntax
+        run: |
+          php -l app/Services/Security/RemoteImageFetcher.php
+          php -l app/Services/Security/SvgSanitizer.php
+          php -l app/Services/Security/FalWebhookVerifier.php
+          php -l app/Services/Ai/FalImageWebhookProcessor.php
+          php -l app/extensions/CreativeSuite/System/CreativeSuiteServiceProvider.php
+          php -l app/extensions/CreativeSuite/System/Http/Controllers/CreativeSuiteDocumentController.php
+          php -l app/extensions/CreativeSuite/System/Http/Controllers/CreativeSuiteAIController.php
+          php -l app/extensions/CreativeSuite/System/Http/Controllers/ImageUploadController.php
+          php -l app/extensions/CreativeSuiteAnnotations/System/CreativeSuiteAnnotationsServiceProvider.php
+          php -l app/extensions/CreativeSuiteAnnotations/System/Http/Controllers/CreativeSuiteAnnotationsAIController.php
+          php -l app/extensions/CreativeSuiteAnnotations/System/Http/Controllers/CreativeSuiteAnnotationsSecureAIController.php
+          php -l app/extensions/CreativeSuiteAnnotations/System/Jobs/ProcessAnnotationEditJob.php
+          php -l app/extensions/AdvancedImage/System/AdvancedImageServiceProvider.php
+          php -l app/extensions/AdvancedImage/System/Http/Controllers/AdvancedImageStatusController.php
+          php -l app/extensions/AdvancedImage/System/Http/Controllers/AdvancedImageWebhookController.php
+          php -l app/extensions/AdvancedImage/System/Services/AdvancedFreepikService.php
+          php -l app/extensions/AdvancedImage/System/Services/Traits/HasDownloadImage.php
+          php -l app/extensions/ProductPhotography/System/ProductPhotographyServiceProvider.php
+          php -l app/extensions/AIRealtimeImage/System/AIRealtimeImageServiceProvider.php
+          php -l app/extensions/AIRealtimeImage/System/Http/Controllers/AIRealtimeImageController.php
+          php -l app/extensions/FluxPro/System/FluxProServiceProvider.php
+          php -l app/extensions/FluxPro/System/Http/Controllers/FalAIWebhookController.php
+          php -l app/extensions/NanoBanana/System/NanoBananaServiceProvider.php
+          php -l app/extensions/NanoBanana/System/Http/Controllers/FalAIWebhookController.php
+          php -l app/extensions/SeeDreamV4/System/SeeDreamV4ServiceProvider.php
+          php -l app/extensions/SeeDreamV4/System/Http/Controllers/FalAIWebhookController.php
+          php -l app/extensions/BlogPilot/System/BlogPilotServiceProvider.php
+          php -l app/extensions/BlogPilot/System/Http/Controllers/BlogPilotAnalyticsController.php
+          php -l app/extensions/BlogPilot/System/Http/Controllers/BlogPilotPostsController.php
+          php -l app/extensions/BlogPilot/System/Http/Middleware/BlogPilotPostOwnershipMiddleware.php
+          php -l app/extensions/BlogPilot/System/Services/ImageGenerationService.php
+          php -l app/extensions/BlogPilot/System/Services/PostGenerationService.php
+          php -l app/extensions/BlogPilot/System/Services/SecurePostGenerationService.php
+          php -l app/extensions/BlogPilot/System/Console/Commands/GenerateAgentPostsCommand.php
+          php -l app/extensions/Canvas/System/Http/Controllers/CanvasController.php
+          php -l tests/contracts/creative_suite_document_ownership.php
+          php -l tests/contracts/creative_suite_ai_task_ownership.php
+          php -l tests/contracts/creative_suite_annotations_finalization_security.php
+          php -l tests/contracts/creative_suite_svg_sanitization.php
+          php -l tests/contracts/advanced_image_task_ownership.php
+          php -l tests/contracts/advanced_image_webhook_signature.php
+          php -l tests/contracts/remote_image_fetcher_security.php
+          php -l tests/contracts/titan_create_admin_settings_authorization.php
+          php -l tests/contracts/ai_realtime_image_gallery_ownership.php
+          php -l tests/contracts/nano_banana_provider_integrity.php
+          php -l tests/contracts/fal_webhook_security.php
+          php -l tests/contracts/blogpilot_fal_image_security.php
+          php -l tests/contracts/blogpilot_post_ownership.php
+          php -l tests/contracts/blogpilot_analytics_ownership.php
+          php -l tests/contracts/blogpilot_generated_post_schema.php
+          php -l tests/contracts/canvas_message_ownership.php
+          php -l tests/Feature/Extensions/CreativeSuite/CreativeSuiteDocumentOwnershipTest.php
+          php -l tests/Feature/Extensions/CreativeSuite/CreativeSuiteAITaskOwnershipTest.php
+          php -l tests/Feature/Extensions/CreativeSuite/CreativeSuiteSvgUploadSecurityTest.php
+          php -l tests/Feature/Extensions/CreativeSuiteAnnotations/CreativeSuiteAnnotationsFinalizationSecurityTest.php
+          php -l tests/Feature/Extensions/AdvancedImage/AdvancedImageTaskOwnershipTest.php
+          php -l tests/Feature/Extensions/AdvancedImage/AdvancedImageWebhookSignatureTest.php
+          php -l tests/Feature/Extensions/Canvas/CanvasMessageOwnershipTest.php
+          php -l tests/Unit/Security/RemoteImageFetcherTest.php
+      - name: Run Titan Create ownership contracts
+        run: |
+          php tests/contracts/creative_suite_document_ownership.php
+          php tests/contracts/creative_suite_ai_task_ownership.php
+          php tests/contracts/creative_suite_annotations_finalization_security.php
+          php tests/contracts/creative_suite_svg_sanitization.php
+          php tests/contracts/advanced_image_task_ownership.php
+          php tests/contracts/advanced_image_webhook_signature.php
+          php tests/contracts/remote_image_fetcher_security.php
+          php tests/contracts/titan_create_admin_settings_authorization.php
+          php tests/contracts/ai_realtime_image_gallery_ownership.php
+          php tests/contracts/nano_banana_provider_integrity.php
+          php tests/contracts/fal_webhook_security.php
+          php tests/contracts/blogpilot_fal_image_security.php
+          php tests/contracts/blogpilot_post_ownership.php
+          php tests/contracts/blogpilot_analytics_ownership.php
+          php tests/contracts/blogpilot_generated_post_schema.php
+          php tests/contracts/canvas_message_ownership.php

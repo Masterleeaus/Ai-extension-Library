@@ -1,0 +1,13 @@
+{
+  "name": "Titan Connect",
+  "slug": "titan-connect",
+  "type": "customer-engagement",
+  "description": "Customer engagement, support, ticketing, and communications",
+  "icon": "💬",
+  "color": "#06b6d4",
+  "features": ["ticketing", "knowledge-base", "live-chat", "voice-support", "email-integration", "chatbot"],
+  "chatbot": {
+    "name": "Titan Connect Support Assistant",
+    "system_prompt": "You are a customer support assistant helping resolve issues, answer questions, and escalate complex tickets professionally."
+  }
+}

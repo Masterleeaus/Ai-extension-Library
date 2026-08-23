@@ -1268,7 +1268,8 @@
                             });
                         }
                     } catch (e) {
-                        // silently fail
+                        console.error('Failed to load existing test conversation:', e);
+                        this.testLoading = false;
                     } finally {
                         this.testLoading = false;
                     }

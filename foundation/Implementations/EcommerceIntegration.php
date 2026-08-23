@@ -6,6 +6,7 @@ namespace Foundation\Implementations;
 
 use Foundation\Contracts\EcommerceIntegrationContract;
 use PDO;
+use Foundation\Support\JsonHelper;
 
 class EcommerceIntegration implements EcommerceIntegrationContract
 {
@@ -51,7 +52,7 @@ class EcommerceIntegration implements EcommerceIntegrationContract
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($result) {
-            $result['config'] = json_decode($result['config'], true);
+            $result['config'] = JsonHelper::decode($result['config']);
         }
 
         return $result ?: null;
@@ -119,7 +120,7 @@ class EcommerceIntegration implements EcommerceIntegrationContract
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($result) {
-            $result['data'] = json_decode($result['data'], true);
+            $result['data'] = JsonHelper::decode($result['data']);
         }
 
         return $result ?: null;

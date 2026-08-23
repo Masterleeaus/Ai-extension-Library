@@ -1,0 +1,31 @@
+name: Migration Engine Connectors
+
+on:
+  pull_request:
+    paths:
+      - 'app/extensions/Migration/**'
+      - '.github/workflows/migration-engine-connectors.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up PHP 8.3
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, xml, zip, pdo_sqlite
+          coverage: none
+      - name: Run issue 379 generic connector contract
+        run: php app/extensions/Migration/tests/MigrationGenericConnectorContractTest.php
+      - name: Lint Migration extension PHP
+        shell: bash
+        run: |
+          set -euo pipefail
+          while IFS= read -r -d '' file; do
+            php -l "$file"
+          done < <(find app/extensions/Migration -type f -name '*.php' -print0)

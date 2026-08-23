@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules\Password;
 
 class SettingsController extends Controller
 {
@@ -54,7 +56,7 @@ class SettingsController extends Controller
 
         // Update password
         auth()->user()->update([
-            'password' => bcrypt($validated['new_password'])
+            'password' => Hash::make($validated['new_password'])
         ]);
 
         return back()->with('success', 'Password changed successfully!');

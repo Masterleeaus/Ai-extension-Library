@@ -159,6 +159,9 @@ class Facebook extends BaseMetaHelper
         return $this->post('/' . $pageId . '/feed', [
             'message' => $text,
         ]);
+        return Http::withToken($this->accessToken)
+            ->acceptJson()
+            ->post($this->apiUrl($pageId . '/feed'), ['message' => $text]);
     }
 
     public function publishPhotoOnPage(int $pageId, string $text, array $photos): Response
@@ -190,6 +193,12 @@ class Facebook extends BaseMetaHelper
             'url'       => $photoUrl,
             'published' => false,
         ]);
+        $uploadResponse = Http::retry(3, 3000)
+            ->withToken($this->accessToken)
+            ->post($this->apiUrl($pageId . '/photos'), [
+                'url'       => $photoUrl,
+                'published' => false,
+            ]);
 
         if ($uploadResponse->failed()) {
             return $uploadResponse;
@@ -198,6 +207,11 @@ class Facebook extends BaseMetaHelper
         return $this->post('/' . $pageId . '/photo_stories', [
             'photo_id' => $uploadResponse->json('id'),
         ]);
+        return Http::retry(3, 3000)
+            ->withToken($this->accessToken)
+            ->post($this->apiUrl($pageId . '/photo_stories'), [
+                'photo_id' => $uploadResponse->json('id'),
+            ]);
     }
 
     public function publishVideoOnPage(string $pageId, string $fileUrl): Response
@@ -205,6 +219,10 @@ class Facebook extends BaseMetaHelper
         return $this->post('/' . $pageId . '/videos', [
             'file_url'    => $fileUrl,
             'description' => 'example caption',
+        return Http::post($this->apiUrl("$pageId/videos"), [
+            'file_url'     => $fileUrl,
+            'description'  => 'example caption',
+            'access_token' => $this->accessToken,
         ]);
     }
 
@@ -216,6 +234,36 @@ class Facebook extends BaseMetaHelper
             'fields' => collect($fields ?? $defaultFields)->join(','),
             'limit'  => $limit,
         ]);
+    }
+
+    public function comments(string $postId, int $limit = 50, ?string $after = null): Response
+    {
+        return Http::withToken($this->accessToken)
+            ->acceptJson()
+            ->get($this->apiUrl(rawurlencode(trim($postId)) . '/comments'), array_filter([
+                'fields' => 'id,message,from,created_time,parent,can_reply_privately',
+                'limit' => max(1, min(100, $limit)),
+                'after' => $after,
+            ], static fn ($value) => $value !== null && $value !== ''));
+    }
+
+    public function replyToComment(string $commentId, string $message): Response
+    {
+        return Http::withToken($this->accessToken)
+            ->acceptJson()
+            ->post($this->apiUrl(rawurlencode(trim($commentId)) . '/comments'), [
+                'message' => $message,
+            ]);
+    }
+
+    public function privateReply(string $pageId, string $commentId, string $message): Response
+    {
+        return Http::withToken($this->accessToken)
+            ->acceptJson()
+            ->post($this->apiUrl(rawurlencode(trim($pageId)) . '/messages'), [
+                'recipient' => ['comment_id' => trim($commentId)],
+                'message' => ['text' => $message],
+            ]);
     }
 
     public function getPostAnalytics(string $postId, array $fields = []): Response

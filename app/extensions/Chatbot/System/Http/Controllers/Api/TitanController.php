@@ -6,11 +6,8 @@ namespace App\Extensions\Chatbot\System\Http\Controllers\Api;
 
 use App\Extensions\Chatbot\System\Titan\TitanRegistry;
 use App\Extensions\Chatbot\System\TitanAI\WorkCoreApps\WorkCoreAppBridge;
-<<<<<<< HEAD
-=======
 use App\Extensions\Chatbot\System\TitanShell\PlatformApplicationRegistry;
 use App\Extensions\Chatbot\System\TitanShell\TemplateSchema;
->>>>>>> update-extensions-review-upgrade-nvbncq
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -19,55 +16,50 @@ class TitanController extends Controller
 {
     public function index(WorkCoreAppBridge $workcore): JsonResponse
     {
-<<<<<<< HEAD
-        return response()->json(['templates' => TitanRegistry::toArray(), 'workcore_apps' => $workcore->apps(), 'workcore_runtime_available' => $workcore->runtimeAvailable()]);
-=======
         $applications = $this->applications($workcore);
 
         return response()->json([
+            'catalogue_version' => TitanRegistry::VERSION,
             'applications' => $applications,
-            // Compatibility alias for clients that used the old `templates` key
-            // as the top-level app list.
+            // Compatibility alias retained for clients that used `templates`
+            // as the top-level application list.
             'templates' => $applications,
-            'vertical_templates' => TitanRegistry::toArray(),
+            'vertical_templates' => TitanRegistry::verticals(),
+            'workspace_templates' => TitanRegistry::workspaces(),
+            'legacy_templates' => TitanRegistry::legacy(),
             'legacy_slug_map' => PlatformApplicationRegistry::legacyMap(),
             'workcore_apps' => $this->workCoreApplications($applications),
             'legacy_workcore_apps' => $workcore->apps(),
             'workcore_runtime_available' => $workcore->runtimeAvailable(),
         ]);
->>>>>>> update-extensions-review-upgrade-nvbncq
     }
 
     public function show(string $app, WorkCoreAppBridge $workcore): JsonResponse
     {
-<<<<<<< HEAD
-        $template = TitanRegistry::get($app);
-
-        return $template
-            ? response()->json([...$template, 'workcore' => $workcore->app($app)])
-            : response()->json(['message' => 'Titan app template not found.'], 404);
-=======
         $canonical = PlatformApplicationRegistry::canonicalSlug($app);
+
         if ($canonical !== null) {
             return response()->json($this->application($canonical, $workcore, $app));
         }
 
         $template = TitanRegistry::get($app);
 
-        return $template
-            ? response()->json(['kind' => 'vertical-template', ...$template])
-            : response()->json(['message' => 'Titan application or vertical template not found.'], 404);
->>>>>>> update-extensions-review-upgrade-nvbncq
+        if (! $template) {
+            return response()->json(['message' => 'Titan application or template not found.'], 404);
+        }
+
+        return response()->json([
+            'kind' => $template['category'].'-template',
+            ...$template,
+            'schema' => TemplateSchema::resolve($app),
+            'workcore_runtime_available' => $workcore->runtimeAvailable(),
+        ]);
     }
 
     public function install(Request $request, string $app): JsonResponse
     {
-<<<<<<< HEAD
-        $template = TitanRegistry::get($app);
-        if (! $template) {
-            return response()->json(['message' => 'Titan app template not found.'], 404);
-=======
         $canonical = PlatformApplicationRegistry::canonicalSlug($app);
+
         if ($canonical !== null) {
             $application = PlatformApplicationRegistry::get($canonical);
 
@@ -84,33 +76,27 @@ class TitanController extends Controller
 
         $template = TitanRegistry::get($app);
         if (! $template) {
-            return response()->json(['message' => 'Titan application or vertical template not found.'], 404);
->>>>>>> update-extensions-review-upgrade-nvbncq
+            return response()->json(['message' => 'Titan application or template not found.'], 404);
         }
 
         return response()->json([
             'installed' => true,
-<<<<<<< HEAD
-=======
-            'kind' => 'vertical-template',
->>>>>>> update-extensions-review-upgrade-nvbncq
+            'kind' => $template['category'].'-template',
             'template' => $app,
             'name' => $request->string('name')->toString() ?: $template['name'],
+            'platform_app' => $template['platform_app'] ?? 'titan-zero',
+            'workspaces' => $template['workspaces'] ?? [],
+            'roles' => $template['roles'] ?? [],
             'chatbot' => $template['chatbot'] ?? [],
+            'schema' => TemplateSchema::resolve($app),
             'config' => $request->input('config', []),
         ]);
     }
 
     public function manifest(string $app): JsonResponse
     {
-<<<<<<< HEAD
-        $titanApp = TitanRegistry::create($app);
-
-        return $titanApp
-            ? response()->json($titanApp->manifest())
-            : response()->json(['message' => 'Titan app template not found.'], 404);
-=======
         $canonical = PlatformApplicationRegistry::canonicalSlug($app);
+
         if ($canonical !== null) {
             $application = PlatformApplicationRegistry::get($canonical);
 
@@ -119,26 +105,26 @@ class TitanController extends Controller
                 'short_name' => str_replace('Titan ', '', $application['name']),
                 'description' => $application['purpose'],
                 'start_url' => route('api.v2.titan.install', ['app' => $canonical]),
-                'scope' => '/titan/' . $canonical,
+                'scope' => '/titan/'.$canonical,
                 'display' => 'standalone',
                 'orientation' => 'portrait-primary',
                 'background_color' => '#ffffff',
                 'theme_color' => '#00d4ff',
                 'icons' => [
-                    ['src' => '/images/' . $canonical . '-192.png', 'sizes' => '192x192', 'type' => 'image/png', 'purpose' => 'any'],
-                    ['src' => '/images/' . $canonical . '-512.png', 'sizes' => '512x512', 'type' => 'image/png', 'purpose' => 'any'],
+                    ['src' => '/images/'.$canonical.'-192.png', 'sizes' => '192x192', 'type' => 'image/png', 'purpose' => 'any'],
+                    ['src' => '/images/'.$canonical.'-512.png', 'sizes' => '512x512', 'type' => 'image/png', 'purpose' => 'any'],
                 ],
             ]);
         }
 
-        $titanTemplate = TitanRegistry::create($app);
+        $template = TitanRegistry::create($app);
 
-        return $titanTemplate
-            ? response()->json($titanTemplate->manifest())
-            : response()->json(['message' => 'Titan application or vertical template not found.'], 404);
+        return $template
+            ? response()->json($template->manifest())
+            : response()->json(['message' => 'Titan application or template not found.'], 404);
     }
 
-    /** @return list<array<string, mixed>> */
+    /** @return list<array<string,mixed>> */
     private function applications(WorkCoreAppBridge $workcore): array
     {
         return array_map(
@@ -147,7 +133,7 @@ class TitanController extends Controller
         );
     }
 
-    /** @return array<string, mixed> */
+    /** @return array<string,mixed> */
     private function application(string $slug, WorkCoreAppBridge $workcore, ?string $requestedSlug = null): array
     {
         $definition = PlatformApplicationRegistry::get($slug);
@@ -161,7 +147,9 @@ class TitanController extends Controller
         ];
     }
 
-    /** @param list<array<string, mixed>> $applications */
+    /** @param list<array<string,mixed>> $applications
+     *  @return array<string,mixed>
+     */
     private function workCoreApplications(array $applications): array
     {
         $mapped = [];
@@ -171,6 +159,5 @@ class TitanController extends Controller
         }
 
         return $mapped;
->>>>>>> update-extensions-review-upgrade-nvbncq
     }
 }

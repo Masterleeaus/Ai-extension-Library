@@ -1,0 +1,53 @@
+<?php
+
+declare(strict_types=1);
+
+return [
+    'name' => 'Booking, Reservation & Capacity',
+    'slug' => 'booking',
+    'icon' => '📅',
+    'color' => '#9B59B6',
+    'sub_verticals' => [
+        'restaurants',
+        'escape_rooms',
+        'tour_operators',
+        'adventure_activities',
+        'car_rental',
+        'medical_appointments',
+        'salon_appointments',
+        'event_venues',
+        'campgrounds',
+        'activity_bookings',
+        'table_reservations',
+        'cinema',
+        'theater',
+        'museum',
+        'attractions',
+        'conference_rooms',
+        'banquet_halls',
+        'golf_tee_times',
+        'spa_appointments',
+        'haircut_appointments',
+        'coaching_sessions',
+        'fitness_classes',
+        'sports_facilities',
+        'meeting_rooms',
+        'guided_tours',
+        'travel_bookings',
+    ],
+    'features' => [
+        'capacity_management',
+        'waitlist_management',
+        'automated_reminders',
+        'no_show_tracking',
+        'availability_rules',
+        'overbooking_prevention',
+        'cancellation_policies',
+    ],
+    'customizations' => [
+        'schedule' => 'BookingScheduleCustomization',
+        'omni' => 'BookingOmniCustomization',
+        'answer' => 'BookingAnswerCustomization',
+        'customer' => 'BookingCustomerCustomization',
+    ],
+];

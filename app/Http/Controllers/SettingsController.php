@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules\Password;
 
 class SettingsController extends Controller
 {
@@ -44,17 +46,17 @@ class SettingsController extends Controller
     {
         $validated = $request->validate([
             'current_password' => 'required',
-            'new_password' => 'required|min:6|confirmed',
+            'new_password' => ['required', 'confirmed', Password::min(12)->mixedCase()->numbers()->symbols()],
         ]);
 
         // Check if current password is correct
-        if (!password_verify($validated['current_password'], auth()->user()->password)) {
+        if (!Hash::check($validated['current_password'], auth()->user()->password)) {
             return back()->withErrors(['current_password' => 'Current password is incorrect']);
         }
 
         // Update password
         auth()->user()->update([
-            'password' => bcrypt($validated['new_password'])
+            'password' => Hash::make($validated['new_password'])
         ]);
 
         return back()->with('success', 'Password changed successfully!');

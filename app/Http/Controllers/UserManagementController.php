@@ -6,6 +6,8 @@ use App\Http\Requests\ImportUsersRequest;
 use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules\Password;
 
 class UserManagementController extends Controller
 {
@@ -21,13 +23,13 @@ class UserManagementController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|min:6|confirmed',
+            'password' => ['required', 'confirmed', Password::min(12)->mixedCase()->numbers()->symbols()],
         ]);
 
         User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
-            'password' => bcrypt($validated['password']),
+            'password' => Hash::make($validated['password']),
         ]);
 
         return redirect()->route('users.index')->with('success', 'User created successfully!');
@@ -48,7 +50,7 @@ class UserManagementController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $user->id,
-            'password' => 'nullable|min:6|confirmed',
+            'password' => ['nullable', 'confirmed', Password::min(12)->mixedCase()->numbers()->symbols()],
         ]);
 
         $data = [
@@ -58,7 +60,7 @@ class UserManagementController extends Controller
 
         // Only update password if provided
         if (!empty($validated['password'])) {
-            $data['password'] = bcrypt($validated['password']);
+            $data['password'] = Hash::make($validated['password']);
         }
 
         $user->update($data);
@@ -139,9 +141,9 @@ class UserManagementController extends Controller
                 continue;
             }
 
-            // Validate password length
-            if (strlen($password) < 6) {
-                $errors[] = "Line {$lineNumber}: Password must be at least 6 characters";
+            // Validate password complexity (minimum 12 chars, upper, lower, number, symbol)
+            if (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[a-zA-Z\d!@#$%^&*]{12,}$/', $password)) {
+                $errors[] = "Line {$lineNumber}: Password must be at least 12 characters with uppercase, lowercase, number, and symbol";
                 $failedCount++;
 
                 continue;
@@ -151,7 +153,7 @@ class UserManagementController extends Controller
                 User::create([
                     'name' => trim($name),
                     'email' => trim($email),
-                    'password' => bcrypt($password),
+                    'password' => Hash::make($password),
                 ]);
                 $successCount++;
             } catch (Exception $e) {

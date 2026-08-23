@@ -175,6 +175,8 @@
 
 @section('content')
     <div class="py-10">
+        @include('social-media::components.reach-navigation')
+
         @include('social-media::components.post.posts-container', ['posts' => $posts, 'filter' => $filter])
     </div>
 @endsection

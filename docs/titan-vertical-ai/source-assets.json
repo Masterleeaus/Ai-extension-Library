@@ -1,0 +1,101 @@
+{
+  "project": "Titan Vertical AI Context Engine",
+  "published_at": "2026-08-05T13:52:00+10:00",
+  "transport": {
+    "provider": "MiniUp",
+    "workflow": "project upload",
+    "max_upload_bytes": 10485760,
+    "max_project_file_bytes": 5242880,
+    "visibility": "unlisted"
+  },
+  "source_bundle": {
+    "site_id": "crooked-juice",
+    "site_url": "https://crooked-juice.miniup.app",
+    "file_path": "downloads/Titan-Vertical-AI-Source-Inputs.zip",
+    "bytes": 242694,
+    "sha256": "5ebe36bef29d939a7f41a7d37320df2a60fe6e2055d6770f743eeb48ebd9eda8",
+    "documentation_files": [
+      "docs/titan-vertical-ai/FOUNDATION.md",
+      "docs/superpowers/plans/2026-08-05-titan-vertical-ai-context-engine.md"
+    ]
+  },
+  "integrated_archive": {
+    "original_name": "MagicAI-v10.91-WorkCore-CLEANING-ONBOARDING-INTEGRATED(1).zip",
+    "bytes": 31878490,
+    "sha256": "19f467c118870f9a436ed087da79e34d06e959e23ecc62a0c340025fe992cb4c",
+    "parts": [
+      {
+        "order": 1,
+        "site_id": "abiding-accountant",
+        "site_url": "https://abiding-accountant.miniup.app",
+        "file_path": "downloads/MagicAI-Onboarding-Integrated-part01.zip",
+        "payload_name": "MagicAI-Onboarding-Integrated.part01",
+        "payload_bytes": 4000000,
+        "payload_sha256": "04a14bbd803b84300bb5c954d18adc3e5c5c260bb5e3b7107c745d6e83689233"
+      },
+      {
+        "order": 2,
+        "site_id": "abiding-accountant",
+        "site_url": "https://abiding-accountant.miniup.app",
+        "file_path": "downloads/MagicAI-Onboarding-Integrated-part02.zip",
+        "payload_name": "MagicAI-Onboarding-Integrated.part02",
+        "payload_bytes": 4000000,
+        "payload_sha256": "e235b651a0ba79a5144a3e40b1a78a393185db014d9c9fe75f31e0f4b1d5b9d6"
+      },
+      {
+        "order": 3,
+        "site_id": "acoustic-london",
+        "site_url": "https://acoustic-london.miniup.app",
+        "file_path": "downloads/MagicAI-Onboarding-Integrated-part03.zip",
+        "payload_name": "MagicAI-Onboarding-Integrated.part03",
+        "payload_bytes": 4000000,
+        "payload_sha256": "c03babfbd79957878e5a560710e26e8beefa39ba8d5791661453123d2ffe5856"
+      },
+      {
+        "order": 4,
+        "site_id": "acoustic-london",
+        "site_url": "https://acoustic-london.miniup.app",
+        "file_path": "downloads/MagicAI-Onboarding-Integrated-part04.zip",
+        "payload_name": "MagicAI-Onboarding-Integrated.part04",
+        "payload_bytes": 4000000,
+        "payload_sha256": "59be839cec7fabd6d1ca7813806ec7ced24a07be2dc27e3f075b7d224e1f661e"
+      },
+      {
+        "order": 5,
+        "site_id": "busy-toothbrush",
+        "site_url": "https://busy-toothbrush.miniup.app",
+        "file_path": "downloads/MagicAI-Onboarding-Integrated-part05.zip",
+        "payload_name": "MagicAI-Onboarding-Integrated.part05",
+        "payload_bytes": 4000000,
+        "payload_sha256": "97340ddc3ba75b6a4f1924033e8b80316c2d7492d5db3782cb18d16e4a457be1"
+      },
+      {
+        "order": 6,
+        "site_id": "busy-toothbrush",
+        "site_url": "https://busy-toothbrush.miniup.app",
+        "file_path": "downloads/MagicAI-Onboarding-Integrated-part06.zip",
+        "payload_name": "MagicAI-Onboarding-Integrated.part06",
+        "payload_bytes": 4000000,
+        "payload_sha256": "36103bec148c45bf8281ed68b6bb86bfd28e6d45934f4d1a814f189deb1edeff"
+      },
+      {
+        "order": 7,
+        "site_id": "billions-sweden",
+        "site_url": "https://billions-sweden.miniup.app",
+        "file_path": "downloads/MagicAI-Onboarding-Integrated-part07.zip",
+        "payload_name": "MagicAI-Onboarding-Integrated.part07",
+        "payload_bytes": 4000000,
+        "payload_sha256": "bf433f1f4e3f340e6e9e176463b9b91b7796b898ea5096ab57cf0c5f286e0236"
+      },
+      {
+        "order": 8,
+        "site_id": "billions-sweden",
+        "site_url": "https://billions-sweden.miniup.app",
+        "file_path": "downloads/MagicAI-Onboarding-Integrated-part08.zip",
+        "payload_name": "MagicAI-Onboarding-Integrated.part08",
+        "payload_bytes": 3878490,
+        "payload_sha256": "69fd148b6fa4fb03ca04851117a20fcb4f26d8c73e96b6f04010bf8902cf6e51"
+      }
+    ]
+  }
+}

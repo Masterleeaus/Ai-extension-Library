@@ -68,7 +68,7 @@ class WorkCoreWorkspaceCatalogueTests(unittest.TestCase):
             config,
             re.S,
         )
-        self.assertEqual(42, len(definitions))
+        self.assertEqual(43, len(definitions))
         menu_keys = [definition[0] for definition in definitions]
         route_names = [definition[1] for definition in definitions]
         paths = [definition[2] for definition in definitions]
@@ -174,6 +174,8 @@ class WorkCoreWorkspaceWebShellTests(unittest.TestCase):
         self.assertIn("$this->manifest->forActiveCompany()", content)
         self.assertIn("abort(404", content)
         self.assertIn("return view('workcore::workspace'", content)
+        self.assertIn("workcore-pricing::dashboard", content)
+        self.assertIn("workcore.pricing.analytics", content)
         self.assertNotIn("view($workspace", content)
         self.assertNotIn("view($section", content)
 
@@ -255,6 +257,11 @@ class WorkCoreWorkspaceLaravelFixtureTests(unittest.TestCase):
         self.assertIn("$tenant->set($companyId, $userId)", content)
         self.assertIn("$menus->sync()", content)
         self.assertIn("$manifest->forActiveCompany()", content)
+        self.assertIn("WorkCoreWorkspaceCatalogue::class", content)
+        self.assertIn("$currentMenuKeys", content)
+        self.assertIn("whereIn('key', $currentMenuKeys)", content)
+        self.assertIn("count($currentMenuKeys)", content)
+        self.assertNotIn("where('extension', 'workcore')->count() === 43", content)
         self.assertIn("RuntimeException", content)
 
 

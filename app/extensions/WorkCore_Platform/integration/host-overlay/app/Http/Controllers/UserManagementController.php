@@ -6,6 +6,8 @@ use App\Http\Requests\ImportUsersRequest;
 use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules\Password;
 
 class UserManagementController extends Controller
 {
@@ -27,7 +29,7 @@ class UserManagementController extends Controller
         User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
-            'password' => bcrypt($validated['password']),
+            'password' => Hash::make($validated['password']),
         ]);
 
         return redirect()->route('users.index')->with('success', 'User created successfully!');
@@ -58,7 +60,7 @@ class UserManagementController extends Controller
 
         // Only update password if provided
         if (!empty($validated['password'])) {
-            $data['password'] = bcrypt($validated['password']);
+            $data['password'] = Hash::make($validated['password']);
         }
 
         $user->update($data);
@@ -151,7 +153,7 @@ class UserManagementController extends Controller
                 User::create([
                     'name' => trim($name),
                     'email' => trim($email),
-                    'password' => bcrypt($password),
+                    'password' => Hash::make($password),
                 ]);
                 $successCount++;
             } catch (Exception $e) {

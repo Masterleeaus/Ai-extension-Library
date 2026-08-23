@@ -14,6 +14,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Throwable;
@@ -29,6 +30,8 @@ class ProcessAnnotationEditJob implements ShouldQueue
 
     public int $tries = 1;
 
+    public int $userId;
+
     public function __construct(
         public int $userOpenaiId,
         public string $prompt,
@@ -36,11 +39,16 @@ class ProcessAnnotationEditJob implements ShouldQueue
         public string $imageDiskPath,
         public ?string $maskDiskPath = null,
         public int $creditCost = 0,
-    ) {}
+        ?int $ownerId = null,
+    ) {
+        $this->userId = $ownerId ?? (int) Auth::id();
+    }
 
     public function handle(): void
     {
-        $userOpenai = UserOpenai::query()->find($this->userOpenaiId);
+        $userOpenai = UserOpenai::query()
+            ->where('user_id', $this->userId)
+            ->find($this->userOpenaiId);
 
         if (! $userOpenai) {
             $this->cleanupInputs();
@@ -107,11 +115,14 @@ class ProcessAnnotationEditJob implements ShouldQueue
     {
         Log::error('Creative Suite Annotation edit job failed', [
             'user_openai_id' => $this->userOpenaiId,
+            'user_id'        => $this->userId,
             'model'          => $this->modelSlug,
             'error'          => $exception?->getMessage(),
         ]);
 
-        $userOpenai = UserOpenai::query()->find($this->userOpenaiId);
+        $userOpenai = UserOpenai::query()
+            ->where('user_id', $this->userId)
+            ->find($this->userOpenaiId);
 
         if ($userOpenai) {
             $userOpenai->update([
@@ -131,6 +142,7 @@ class ProcessAnnotationEditJob implements ShouldQueue
             } catch (Throwable $e) {
                 Log::error('Creative Suite Annotation refund failed', [
                     'user_openai_id' => $this->userOpenaiId,
+                    'user_id'        => $this->userId,
                     'error'          => $e->getMessage(),
                 ]);
             }

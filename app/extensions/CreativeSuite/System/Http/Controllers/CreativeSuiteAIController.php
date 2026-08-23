@@ -12,13 +12,13 @@ use App\Http\Controllers\Controller;
 use App\Models\OpenAIGenerator;
 use App\Models\Usage;
 use App\Models\UserOpenai;
+use App\Services\Security\RemoteImageFetcher;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Throwable;
 
 class CreativeSuiteAIController extends Controller
 {
@@ -88,7 +88,9 @@ class CreativeSuiteAIController extends Controller
 
     public function status(int $id): JsonResponse
     {
-        $task = UserOpenai::findOrFail($id);
+        $task = UserOpenai::query()
+            ->where('user_id', Auth::id())
+            ->findOrFail($id);
 
         if (in_array($task->status, self::PENDING_STATUSES, true)) {
             $entity = EntityEnum::fromSlug(data_get($task->payload, 'model')) ?? $this->getEntity();
@@ -172,19 +174,17 @@ class CreativeSuiteAIController extends Controller
 
     private function downloadAndStore(string $url): ?string
     {
-        $response = Http::get($url);
+        try {
+            $path = app(RemoteImageFetcher::class)->store(
+                $url,
+                'uploads',
+                'creative-suite'
+            );
 
-        if (! $response->successful()) {
+            return '/uploads/' . $path;
+        } catch (Throwable) {
             return null;
         }
-
-        $extension = pathinfo(parse_url($url, PHP_URL_PATH), PATHINFO_EXTENSION) ?: 'png';
-        $fileName = Str::uuid() . '.' . $extension;
-        $path = 'creative-suite/' . $fileName;
-
-        Storage::disk('uploads')->put($path, $response->body());
-
-        return '/uploads/' . $path;
     }
 
     private function errorResponse(string $message): JsonResponse

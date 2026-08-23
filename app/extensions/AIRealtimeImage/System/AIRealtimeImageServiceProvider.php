@@ -95,6 +95,7 @@ class AIRealtimeImageServiceProvider extends ServiceProvider implements Uninstal
 
                         $router
                             ->controller(TogetherSettingController::class)
+                            ->middleware('admin')
                             ->prefix('admin/settings')
                             ->name('admin.settings.')
                             ->group(function (Router $router) {

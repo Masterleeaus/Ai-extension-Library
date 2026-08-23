@@ -28,7 +28,7 @@ class XController extends Controller
     {
         if (Helper::appIsDemo()) {
             return back()->with([
-                'type'    => 'error',
+                'type' => 'error',
                 'message' => trans('This feature is disabled in demo mode.'),
             ]);
         }
@@ -36,17 +36,15 @@ class XController extends Controller
         $this->setBackCacheRoute();
 
         if (setting('X_CLIENT_ID') && setting('X_CLIENT_SECRET')) {
-            if ($request->has('platform_id') && $request->get('platform_id')) {
-                Cache::remember($this->cacheKey(), 60, function () use ($request) {
-                    return $request->get('platform_id');
-                });
+            if ($request->filled('platform_id')) {
+                Cache::remember($this->cacheKey(), 60, fn () => $request->get('platform_id'));
             }
 
             return $this->x->authRedirect();
         }
 
         return back()->with([
-            'type'    => 'error',
+            'type' => 'error',
             'message' => 'X app id and secret not set. Please contact the administrator.',
         ]);
     }
@@ -56,83 +54,88 @@ class XController extends Controller
         $code = $request->get('code');
 
         if (! $code) {
-            return to_route($this->getBackCacheRoute())->with([
-                'type'    => 'error',
-                'message' => 'Something went wrong, please try again.',
-            ]);
+            return $this->failure();
         }
 
         $response = $this->x->getAccessToken($code)->throw();
-
-        $this->setPlatformInfo($response->json());
+        $this->setPlatformInfo((array) $response->json());
 
         return to_route($this->getBackCacheRoute())->with([
-            'type'    => 'success',
+            'type' => 'success',
             'message' => 'X account connected successfully.',
         ]);
     }
 
-    protected function setPlatformInfo($tokenData): void
+    protected function setPlatformInfo(array $tokenData): void
     {
-        $accessToken = $tokenData['access_token'];
+        $accessToken = (string) ($tokenData['access_token'] ?? '');
 
-        $platformId = Cache::get($this->cacheKey());
+        if ($accessToken === '') {
+            return;
+        }
 
         $this->x->setToken($accessToken);
-
-        $response = $this->x->getUserInfo()->throw();
-
-        $userData = $response->json('data');
+        $userData = (array) $this->x->getUserInfo()->throw()->json('data', []);
         $followersCount = (int) data_get($userData, 'public_metrics.followers_count', 0);
+        $expiresAt = now()->addSeconds((int) ($tokenData['expires_in'] ?? 7200));
+        $credentials = [
+            'platform_id' => $userData['id'] ?? null,
+            'name' => $userData['name'] ?? '',
+            'picture' => $userData['profile_image_url'] ?? '',
+            'username' => $userData['username'] ?? '',
+            'access_token' => $accessToken,
+            'access_token_expire_at' => $expiresAt,
+            'authorized_scopes' => $this->normaliseScopes($tokenData['scope'] ?? []),
+            'type' => 'user',
+        ];
 
-        if ($platformId && is_numeric($platformId)) {
+        if (! empty($tokenData['refresh_token'])) {
+            $credentials['refresh_token'] = $tokenData['refresh_token'];
+            $credentials['refresh_token_expire_at'] = now()->addMonths(6);
+        }
 
-            $platform = SocialMediaPlatform::query()
+        $platformId = Cache::pull($this->cacheKey());
+        $platform = $platformId && is_numeric($platformId)
+            ? SocialMediaPlatform::query()
                 ->where('id', $platformId)
                 ->where('user_id', Auth::id())
                 ->where('platform', PlatformEnum::x->value)
-                ->first();
+                ->first()
+            : null;
 
-            if ($platform) {
-                $platform->update([
-                    'credentials' => [
-                        'platform_id'             => $userData['id'],
-                        'name'                    => $userData['name'] ?? '',
-                        'picture'                 => $userData['profile_image_url'] ?? '',
-                        'username'                => $userData['username'] ?? '',
-                        'access_token'            => $tokenData['access_token'] ?? '',
-                        'access_token_expire_at'  => now()->addHours(2),
-                        'refresh_token'           => $tokenData['refresh_token'] ?? '',
-                        'refresh_token_expire_at' => now()->addHours(2),
-                        'type'                    => 'user',
-                    ],
-                    'connected_at'    => now(),
-                    'expires_at'      => now()->addHours(2),
-                    'followers_count' => $followersCount,
-                ]);
-            }
-
-            Cache::forget($this->cacheKey());
-
+        if ($platform) {
+            $platform->update([
+                'credentials' => array_merge((array) $platform->credentials, $credentials),
+                'connected_at' => now(),
+                'expires_at' => $expiresAt,
+                'followers_count' => $followersCount,
+            ]);
         } else {
             SocialMediaPlatform::query()->create([
-                'user_id'     => Auth::id(),
-                'platform'    => PlatformEnum::x->value,
-                'credentials' => [
-                    'platform_id'             => $userData['id'],
-                    'name'                    => $userData['name'] ?? '',
-                    'picture'                 => $userData['profile_image_url'] ?? '',
-                    'username'                => $userData['username'] ?? '',
-                    'access_token'            => $tokenData['access_token'] ?? '',
-                    'access_token_expire_at'  => now()->addHours(2),
-                    'refresh_token'           => $tokenData['refresh_token'] ?? '',
-                    'refresh_token_expire_at' => now()->addHours(2),
-                    'type'                    => 'user',
-                ],
-                'connected_at'    => now(),
-                'expires_at'      => now()->addHours(2),
+                'user_id' => Auth::id(),
+                'platform' => PlatformEnum::x->value,
+                'credentials' => $credentials,
+                'connected_at' => now(),
+                'expires_at' => $expiresAt,
                 'followers_count' => $followersCount,
             ]);
         }
+    }
+
+    private function normaliseScopes(array|string $scopes): array
+    {
+        if (is_string($scopes)) {
+            $scopes = preg_split('/[\s,]+/', trim($scopes)) ?: [];
+        }
+
+        return array_values(array_unique(array_filter(array_map('trim', $scopes))));
+    }
+
+    private function failure(): RedirectResponse
+    {
+        return to_route($this->getBackCacheRoute())->with([
+            'type' => 'error',
+            'message' => 'Something went wrong, please try again.',
+        ]);
     }
 }

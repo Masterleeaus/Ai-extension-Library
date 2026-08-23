@@ -1,0 +1,67 @@
+# Permanent verification for the Titan Hub Flutter application.
+name: Titan Hub Flutter
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'mobile apps/titan-hub/**'
+      - '.github/workflows/titan-hub-flutter.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'mobile apps/titan-hub/**'
+      - '.github/workflows/titan-hub-flutter.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: titan-hub-flutter-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: mobile apps/titan-hub
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.27.0'
+          channel: stable
+          cache: true
+
+      - name: Install locked dependencies
+        run: |
+          flutter pub get
+          git diff --exit-code -- pubspec.lock
+
+      - name: Verify Titan-owned Dart formatting
+        run: |
+          dart format --output=none --set-exit-if-changed \
+            lib/app \
+            lib/core \
+            lib/features \
+            lib/shared \
+            lib/main.dart \
+            lib/backend/local_storage/local_storage.dart \
+            lib/backend/utils/logger.dart \
+            lib/views/navbar/bottom_navbar_screen.dart \
+            test/core \
+            test/features \
+            test/widget_test.dart
+
+      - name: Analyze
+        run: flutter analyze
+
+      - name: Test
+        run: flutter test

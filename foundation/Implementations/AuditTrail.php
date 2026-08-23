@@ -6,6 +6,7 @@ namespace Foundation\Implementations;
 
 use Foundation\Contracts\AuditTrailContract;
 use PDO;
+use Foundation\Support\JsonHelper;
 
 class AuditTrail implements AuditTrailContract
 {
@@ -60,8 +61,8 @@ class AuditTrail implements AuditTrailContract
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($result) {
-            $result['changes'] = json_decode($result['changes'], true);
-            $result['metadata'] = json_decode($result['metadata'], true);
+            $result['changes'] = JsonHelper::decode($result['changes']);
+            $result['metadata'] = JsonHelper::decode($result['metadata']);
         }
 
         return $result ?: null;

@@ -101,7 +101,7 @@ class CreativeSuiteServiceProvider extends ServiceProvider implements UninstallE
 
         $this->router()
             ->group([
-                'middleware' => ['web', 'auth'],
+                'middleware' => ['web', 'auth', 'admin'],
                 'prefix'     => 'dashboard/admin/creative-suite',
                 'as'         => 'dashboard.admin.creative-suite.',
             ], function (Router $router) {

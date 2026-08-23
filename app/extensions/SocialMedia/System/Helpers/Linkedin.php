@@ -17,14 +17,11 @@ class Linkedin
     public function __construct(?array $config = null, protected ?string $accessToken = null)
     {
         $this->config = $config ?? config('social-media.linkedin');
-
         $this->config = array_merge($this->config, [
             'app_id'     => setting('LINKEDIN_APP_ID'),
             'app_secret' => setting('LINKEDIN_APP_SECRET'),
         ]);
-
         $this->config['redirect_uri'] = url($this->config['redirect_uri']);
-
     }
 
     private function apiUrl(string $endpoint, array $params = [], bool $isBaseUrl = false)
@@ -39,7 +36,7 @@ class Linkedin
         $versionedUrlWithEndpoint = $apiUrl . '/' . (! $isBaseUrl && $v ? ($v . '/') : '') . $endpoint;
 
         if (count($params)) {
-            $versionedUrlWithEndpoint .= '?' . http_build_query($params);
+            $versionedUrlWithEndpoint .= '?' . http_build_query($params, '', '&', PHP_QUERY_RFC3986);
         }
 
         return $versionedUrlWithEndpoint;
@@ -55,49 +52,40 @@ class Linkedin
     public static function authRedirect(array $scopes = []): RedirectResponse
     {
         $linkedin = new static;
-        $linkedin->config['scopes'] = $scopes ?? config('platform.linkedin.scopes', []);
+        $linkedin->config['scopes'] = $scopes ?: config('social-media.linkedin.scopes', []);
 
-        $apiUrl = $linkedin->apiUrl('oauth/v2/authorization', [
+        return redirect($linkedin->apiUrl('oauth/v2/authorization', [
             'response_type' => 'code',
             'client_id'     => $linkedin->config['app_id'],
             'redirect_uri'  => $linkedin->config['redirect_uri'],
-            // 'state' => '',
-            'scope' => collect($linkedin->config['scopes'])->join(' '),
-        ], true);
-
-        return redirect($apiUrl);
+            'scope'         => collect($linkedin->config['scopes'])->join(' '),
+        ], true));
     }
 
     public function getAccessToken(string $code): Response
     {
-        $apiUrl = $this->apiUrl('oauth/v2/accessToken', [
+        return Http::post($this->apiUrl('oauth/v2/accessToken', [
             'code'          => $code,
             'grant_type'    => 'authorization_code',
             'client_id'     => $this->config['app_id'],
             'client_secret' => $this->config['app_secret'],
             'redirect_uri'  => $this->config['redirect_uri'],
-        ], true);
-
-        return Http::post($apiUrl);
+        ], true));
     }
 
     public function refreshAccessToken($refreshToken = null): Response
     {
-        $apiUrl = $this->apiUrl('oauth/v2/accessToken', [
+        return Http::post($this->apiUrl('oauth/v2/accessToken', [
             'refresh_token' => $refreshToken,
             'grant_type'    => 'refresh_token',
             'client_id'     => $this->config['app_id'],
             'client_secret' => $this->config['app_secret'],
-        ], true);
-
-        return Http::post($apiUrl);
+        ], true));
     }
 
     public function getAccountInfo()
     {
-        $apiUrl = $this->apiUrl('v2/userinfo');
-
-        return Http::withToken($this->accessToken)->get($apiUrl);
+        return Http::withToken($this->accessToken)->get($this->apiUrl('v2/userinfo'));
     }
 
     public function publishText(string $userId, string $text): Response
@@ -120,13 +108,10 @@ class Linkedin
 
     public function publishImage(string $userId, array $images, string $text): Response
     {
-
         $uploadedMedia = collect([]);
         foreach ($images as $imagePath) {
             $imageContainer = $this->apiClient()
-                ->post($this->apiUrl('rest/images', [
-                    'action' => 'initializeUpload',
-                ]), [
+                ->post($this->apiUrl('rest/images', ['action' => 'initializeUpload']), [
                     'initializeUploadRequest' => ['owner' => "urn:li:person:{$userId}"],
                 ])
                 ->json('value');
@@ -140,22 +125,11 @@ class Linkedin
             }
         }
 
-        $postImages = $uploadedMedia->map(function ($item) {
-            return ['id' => $item['image']];
-        });
-
+        $postImages = $uploadedMedia->map(fn ($item) => ['id' => $item['image']]);
         $attachMediaObj = ($postImages->count() > 1) ? [
-            'content' => [
-                'multiImage' => [
-                    'images' => $postImages->toArray(),
-                ],
-            ],
+            'content' => ['multiImage' => ['images' => $postImages->toArray()]],
         ] : [
-            'content' => [
-                'media' => [
-                    'id' => $postImages->value('id'),
-                ],
-            ],
+            'content' => ['media' => ['id' => $postImages->value('id')]],
         ];
 
         $post = [
@@ -172,29 +146,14 @@ class Linkedin
             ...$attachMediaObj,
         ];
 
-        $response = $this->apiClient()->post($this->apiUrl('rest/posts'), $post);
-
-        return $response;
+        return $this->apiClient()->post($this->apiUrl('rest/posts'), $post);
     }
 
-    /**
-     * Publish a video on LinkedIn.
-     *
-     * @param  string  $userId  the id of the user who will publish the post
-     * @param  string  $videoPath  the path to the video file that will be uploaded
-     * @param  string  $text  the text that will be used as the caption for the post
-     *
-     * @throws Exception
-     */
     public function publishVideo(string $userId, string $videoPath, string $text): Response
     {
-        // First, we need to check if the file exists.
         throw_unless(Storage::exists($videoPath), "File not found: $videoPath");
-
-        // Get the size of the video.
         $mediaFileSize = Storage::size($videoPath);
         $mediaName = basename($videoPath);
-
         $mediaContainerData = [
             'mediaLibraryMetadata' => [
                 'owner'     => "urn:li:person:{$userId}",
@@ -208,85 +167,60 @@ class Linkedin
             ],
         ];
 
-        // Initialize the video upload.
         $mediaContainerRes = $this->apiClient()
             ->asJson()
             ->post($this->apiUrl('rest/videos', ['action' => 'initializeUpload']), $mediaContainerData);
 
-        // Check if the initialization was successful.
         if ($mediaContainerRes->failed()) {
             return $mediaContainerRes;
         }
 
-        // Get the video container.
         $mediaContainer = $mediaContainerRes->json('value');
-
         $videoSplitService = new FileSplitService($videoPath, 4);
-
-        // break the video into its max size 4mb then upload each chunks
         $videoChunks = $videoSplitService->splitAndUpload();
-
         $uploadedParts = [];
+
         foreach ($videoChunks as $key => $chunk) {
-
-            // 1. Get the upload url.
             $uploadUrl = $mediaContainer['uploadInstructions'][$key]['uploadUrl'];
-
-            // 2. option for uploading the video with the chunks
             $fileContent = file_get_contents($chunk);
-            $uploadMediaRes = Http::withHeaders([
-                'Content-Type' => 'application/octet-stream',
-            ])
+            $uploadMediaRes = Http::withHeaders(['Content-Type' => 'application/octet-stream'])
                 ->withBody($fileContent, 'application/octet-stream')
                 ->put($uploadUrl);
-
-            // Get the video id and the ETag.
             $videoId = $mediaContainer['video'];
             $eTag = $uploadMediaRes->headers()['ETag'] ?? [];
             array_push($uploadedParts, ...$eTag);
         }
 
-        $finalizeMediaData = [
-            'finalizeUploadRequest' => [
-                'video'           => $videoId,
-                'uploadToken'     => '',
-                'uploadedPartIds' => $uploadedParts,
-            ],
-        ];
-
-        // Finalize the video upload.
         $this->apiClient()->asJson()
-            ->post($this->apiUrl('rest/videos', ['action' => 'finalizeUpload']), $finalizeMediaData)
+            ->post($this->apiUrl('rest/videos', ['action' => 'finalizeUpload']), [
+                'finalizeUploadRequest' => [
+                    'video'           => $videoId,
+                    'uploadToken'     => '',
+                    'uploadedPartIds' => $uploadedParts,
+                ],
+            ])
             ->throw();
 
-        // Get the status of the video.
         $videoStatus = $this->apiClient()->get($this->apiUrl('rest/videos/' . urlencode($videoId)))->throw();
-
-        // throw and exception if the video status is processing failed
         throw_if(
             $videoStatus->json('status') == 'PROCESSING_FAILED ',
             new Exception('Video processing failed. Reason: ' . $videoStatus->json('processingFailureReason' ?? 'unknown'))
         );
 
-        // check if video status is processed for 10 times
         $isVideoAllowed = false;
-        $maxAttempts = 10;
         $attempt = 0;
-        $delay = 2;
-        while (! $isVideoAllowed && $attempt < $maxAttempts) {
+        while (! $isVideoAllowed && $attempt < 10) {
             $videoStatus = $this->apiClient()->get($this->apiUrl('rest/videos/' . urlencode($videoId)))->throw();
 
             if ($videoStatus->json('status') == 'AVAILABLE') {
                 $isVideoAllowed = true;
-
                 break;
             }
 
             $attempt++;
-            sleep($delay);
+            sleep(2);
         }
 
-        // Create the post.
         $post = [
             'author'       => "urn:li:person:{$userId}",
             'commentary'   => $text,
@@ -298,26 +232,84 @@ class Linkedin
             ],
             'lifecycleState'            => 'PUBLISHED',
             'isReshareDisabledByAuthor' => false,
-            'content'                   => [
-                'media' => [
-                    'id' => $videoId,
-                ],
-            ],
+            'content'                   => ['media' => ['id' => $videoId]],
         ];
 
         $videoSplitService->cleanup();
 
         return $this->apiClient()->post($this->apiUrl('rest/posts'), $post)->throw();
-
     }
 
-    // analytics
+    public function organizationAcls(?string $role = null): Response
+    {
+        return $this->apiClient()->get($this->apiUrl('rest/organizationAcls', array_filter([
+            'q' => 'roleAssignee',
+            'role' => $role,
+        ], static fn ($value) => $value !== null && $value !== '')));
+    }
+
+    public function comments(string $targetUrn, int $start = 0, int $count = 50): Response
+    {
+        return $this->apiClient()->get($this->apiUrl(
+            'rest/socialActions/' . rawurlencode(trim($targetUrn)) . '/comments',
+            ['start' => max(0, $start), 'count' => max(1, min(100, $count))]
+        ));
+    }
+
+    public function replyToComment(
+        string $targetUrn,
+        string $actorUrn,
+        string $objectUrn,
+        string $text,
+        ?string $parentCommentUrn = null
+    ): Response {
+        $payload = [
+            'actor' => trim($actorUrn),
+            'object' => trim($objectUrn),
+            'message' => ['text' => $text],
+        ];
+
+        if ($parentCommentUrn) {
+            $payload['parentComment'] = trim($parentCommentUrn);
+        }
+
+        return $this->apiClient()->post(
+            $this->apiUrl('rest/socialActions/' . rawurlencode(trim($targetUrn)) . '/comments'),
+            $payload
+        );
+    }
+
+    public function updateComment(
+        string $objectUrn,
+        string $commentId,
+        string $actorUrn,
+        string $text
+    ): Response {
+        return $this->apiClient()
+            ->withHeader('X-RestLi-Method', 'PARTIAL_UPDATE')
+            ->post($this->apiUrl(
+                'rest/socialActions/' . rawurlencode(trim($objectUrn)) . '/comments/' . rawurlencode(trim($commentId)),
+                ['actor' => trim($actorUrn)]
+            ), [
+                'patch' => [
+                    'message' => [
+                        '$set' => ['text' => $text],
+                    ],
+                ],
+            ]);
+    }
+
+    public function deleteComment(string $objectUrn, string $commentId, string $actorUrn): Response
+    {
+        return $this->apiClient()->delete($this->apiUrl(
+            'rest/socialActions/' . rawurlencode(trim($objectUrn)) . '/comments/' . rawurlencode(trim($commentId)),
+            ['actor' => trim($actorUrn)]
+        ));
+    }
+
     public function getPostAnalytics(string $urn): Response
     {
-        $urn = urlencode($urn);
-        $apiUrl = $this->apiUrl("rest/socialMetadata/{$urn}");
-
-        return $this->apiClient()->get($apiUrl);
+        return $this->apiClient()->get($this->apiUrl('rest/socialMetadata/' . urlencode($urn)));
     }
 
     public function getVideo(string $urn): Response
@@ -328,12 +320,10 @@ class Linkedin
     public function getNetworkSize(string $memberId, string $edgeType = 'Connections'): Response
     {
         $urn = str_starts_with($memberId, 'urn:') ? $memberId : "urn:li:person:{$memberId}";
-        $encodedUrn = urlencode($urn);
-        $apiUrl = $this->apiUrl("rest/networkSizes/{$encodedUrn}", [
-            'edgeType' => $edgeType,
-        ]);
 
-        return $this->apiClient()->get($apiUrl);
+        return $this->apiClient()->get($this->apiUrl('rest/networkSizes/' . urlencode($urn), [
+            'edgeType' => $edgeType,
+        ]));
     }
 
     private function apiClient(): PendingRequest

@@ -1,0 +1,51 @@
+<?php
+
+declare(strict_types=1);
+
+return [
+    'name' => 'E-Commerce & Retail',
+    'slug' => 'ecommerce',
+    'icon' => '🛒',
+    'color' => '#E74C3C',
+    'sub_verticals' => [
+        'online_stores',
+        'fashion_retailers',
+        'food_retailers',
+        'electronics_retailers',
+        'book_retailers',
+        'home_goods',
+        'beauty_products',
+        'sports_equipment',
+        'furniture_retailers',
+        'jewelry_retailers',
+        'toy_retailers',
+        'pet_supplies',
+        'garden_supplies',
+        'automotive_parts',
+        'office_supplies',
+        'craft_supplies',
+        'digital_products',
+        'subscription_boxes',
+        'marketplace',
+        'dropshipping',
+        'print_on_demand',
+        'flash_sales',
+        'group_buying',
+    ],
+    'features' => [
+        'product_reviews',
+        'return_management',
+        'recommendation_engine',
+        'wish_lists',
+        'abandoned_cart_recovery',
+        'review_moderation',
+        'product_recommendations',
+        'inventory_management',
+    ],
+    'customizations' => [
+        'shop' => 'ECommerceShopCustomization',
+        'omni' => 'ECommerceOmniCustomization',
+        'customer' => 'ECommerceCustomerCustomization',
+        'reach' => 'ECommerceReachCustomization',
+    ],
+];
