@@ -22,7 +22,7 @@ class Facebook extends BaseMetaHelper
         ]);
     }
 
-    public static function authRedirect(array $scopes = []): RedirectResponse
+    public static function authRedirect(array $scopes = [], ?string $state = null): RedirectResponse
     {
         $fb = new self;
 
@@ -30,14 +30,18 @@ class Facebook extends BaseMetaHelper
             $fb->config['scopes'] = $scopes;
         }
 
-        $authUri = $fb->apiUrl('dialog/oauth', [
+        $params = [
             'response_type' => 'code',
             'client_id'     => $fb->config['app_id'],
             'redirect_uri'  => $fb->config['redirect_uri'],
             'scope'         => collect($fb->config['scopes'])->join(','),
-        ], true);
+        ];
 
-        return redirect($authUri);
+        if ($state) {
+            $params['state'] = $state;
+        }
+
+        return redirect($fb->apiUrl('dialog/oauth', $params, true));
     }
 
     public function refreshAccessToken(): Response
@@ -54,36 +58,107 @@ class Facebook extends BaseMetaHelper
 
     public function getAccountInfo(array $fields = []): Response
     {
-        $apiUrl = $this->apiUrl('/me', [
-            'access_token' => $this->accessToken,
-            'fields'       => collect($fields)->join(','),
+        return $this->get('/me', [
+            'fields' => collect($fields)->join(','),
         ]);
-
-        return Http::get($apiUrl);
     }
 
     public function getPagesInfo(array $fields = []): Response
     {
-        $apiUrl = $this->apiUrl('/me/accounts', [
-            'access_token' => $this->accessToken,
-            'fields'       => collect($fields)->join(','),
+        return $this->get('/me/accounts', [
+            'fields' => collect($fields)->join(','),
         ]);
-
-        return Http::get($apiUrl);
     }
 
     public function getPageProfile(string $pageId, array $fields = []): Response
     {
-        $apiUrl = $this->apiUrl($pageId, [
-            'access_token' => $this->accessToken,
-            'fields'       => collect($fields)->join(','),
+        return $this->get('/' . $pageId, [
+            'fields' => collect($fields)->join(','),
         ]);
+    }
 
-        return Http::get($apiUrl);
+    public function getAdAccounts(array $fields = []): Response
+    {
+        $fields = $fields ?: [
+            'id',
+            'account_id',
+            'name',
+            'account_status',
+            'currency',
+            'timezone_name',
+            'amount_spent',
+            'spend_cap',
+        ];
+
+        return $this->get('/me/adaccounts', [
+            'fields' => implode(',', $fields),
+            'limit'  => 200,
+        ]);
+    }
+
+    public function getAdAccount(string $adAccountId, array $fields = []): Response
+    {
+        $fields = $fields ?: [
+            'id',
+            'account_id',
+            'name',
+            'account_status',
+            'currency',
+            'timezone_name',
+            'amount_spent',
+            'spend_cap',
+        ];
+
+        return $this->get('/' . $this->normalizeAdAccountId($adAccountId), [
+            'fields' => implode(',', $fields),
+        ]);
+    }
+
+    public function createCampaign(string $adAccountId, array $payload): Response
+    {
+        return $this->post('/' . $this->normalizeAdAccountId($adAccountId) . '/campaigns', $payload);
+    }
+
+    public function createAdSet(string $adAccountId, array $payload): Response
+    {
+        return $this->post('/' . $this->normalizeAdAccountId($adAccountId) . '/adsets', $payload);
+    }
+
+    public function createAdCreative(string $adAccountId, array $payload): Response
+    {
+        return $this->post('/' . $this->normalizeAdAccountId($adAccountId) . '/adcreatives', $payload);
+    }
+
+    public function createAd(string $adAccountId, array $payload): Response
+    {
+        return $this->post('/' . $this->normalizeAdAccountId($adAccountId) . '/ads', $payload);
+    }
+
+    public function updateMarketingObject(string $objectId, array $payload): Response
+    {
+        return $this->post('/' . $objectId, $payload);
+    }
+
+    public function getInsights(string $objectId, array $fields, array $params = []): Response
+    {
+        return $this->get('/' . $objectId . '/insights', [
+            ...$params,
+            'fields' => implode(',', $fields),
+        ]);
+    }
+
+    public function getAdPreviews(string $creativeId, string $adFormat): Response
+    {
+        return $this->get('/' . $creativeId . '/previews', [
+            'ad_format' => $adFormat,
+        ]);
     }
 
     public function publishTextOnPage(int $pageId, string $text): Response
     {
+        return $this->post('/' . $pageId . '/feed', [
+            'message' => $text,
+        ]);
         return Http::withToken($this->accessToken)
             ->acceptJson()
             ->post($this->apiUrl($pageId . '/feed'), ['message' => $text]);
@@ -91,27 +166,33 @@ class Facebook extends BaseMetaHelper
 
     public function publishPhotoOnPage(int $pageId, string $text, array $photos): Response
     {
-        $attached_media = [];
+        $attachedMedia = [];
+
         foreach ($photos as $url) {
-            $res = Http::retry(3, 3000)
-                ->withToken($this->accessToken)
-                ->post($this->apiUrl($pageId . '/photos'), [
-                    'url'       => url($url),
-                    'published' => false,
-                ]);
-            $attached_media[] = ['media_fbid' => $res->json('id')];
+            $response = $this->post('/' . $pageId . '/photos', [
+                'url'       => url($url),
+                'published' => false,
+            ]);
+
+            if ($response->failed()) {
+                return $response;
+            }
+
+            $attachedMedia[] = ['media_fbid' => $response->json('id')];
         }
 
-        return Http::retry(3, 3000)
-            ->withToken($this->accessToken)
-            ->post($this->apiUrl($pageId . '/feed'), [
-                'message'        => $text,
-                'attached_media' => $attached_media,
-            ]);
+        return $this->post('/' . $pageId . '/feed', [
+            'message'        => $text,
+            'attached_media' => $attachedMedia,
+        ]);
     }
 
     public function publishPhotoStory(int $pageId, string $photoUrl): Response
     {
+        $uploadResponse = $this->post('/' . $pageId . '/photos', [
+            'url'       => $photoUrl,
+            'published' => false,
+        ]);
         $uploadResponse = Http::retry(3, 3000)
             ->withToken($this->accessToken)
             ->post($this->apiUrl($pageId . '/photos'), [
@@ -123,6 +204,9 @@ class Facebook extends BaseMetaHelper
             return $uploadResponse;
         }
 
+        return $this->post('/' . $pageId . '/photo_stories', [
+            'photo_id' => $uploadResponse->json('id'),
+        ]);
         return Http::retry(3, 3000)
             ->withToken($this->accessToken)
             ->post($this->apiUrl($pageId . '/photo_stories'), [
@@ -132,6 +216,9 @@ class Facebook extends BaseMetaHelper
 
     public function publishVideoOnPage(string $pageId, string $fileUrl): Response
     {
+        return $this->post('/' . $pageId . '/videos', [
+            'file_url'    => $fileUrl,
+            'description' => 'example caption',
         return Http::post($this->apiUrl("$pageId/videos"), [
             'file_url'     => $fileUrl,
             'description'  => 'example caption',
@@ -143,11 +230,10 @@ class Facebook extends BaseMetaHelper
     {
         $defaultFields = ['id', 'message', 'created_time', 'full_picture'];
 
-        return Http::withToken($this->accessToken)
-            ->get($this->apiUrl("$pageId/feed", [
-                'fields' => collect($fields ?? $defaultFields)->join(','),
-                'limit'  => $limit,
-            ]));
+        return $this->get('/' . $pageId . '/feed', [
+            'fields' => collect($fields ?? $defaultFields)->join(','),
+            'limit'  => $limit,
+        ]);
     }
 
     public function comments(string $postId, int $limit = 50, ?string $after = null): Response
@@ -182,17 +268,39 @@ class Facebook extends BaseMetaHelper
 
     public function getPostAnalytics(string $postId, array $fields = []): Response
     {
-        return Http::withToken($this->accessToken)
-            ->get($this->apiUrl($postId, [
-                'fields' => collect($fields)->join(','),
-            ]));
+        return $this->get('/' . $postId, [
+            'fields' => collect($fields)->join(','),
+        ]);
     }
 
     public function subscribePageToWebhook(string $pageId, array $subscribedFields = ['feed']): Response
     {
-        return Http::withToken($this->accessToken)
-            ->post($this->apiUrl("{$pageId}/subscribed_apps"), [
-                'subscribed_fields' => implode(',', $subscribedFields),
-            ]);
+        return $this->post('/' . $pageId . '/subscribed_apps', [
+            'subscribed_fields' => implode(',', $subscribedFields),
+        ]);
+    }
+
+    private function get(string $endpoint, array $query = []): Response
+    {
+        return Http::retry(2, 500, throw: false)
+            ->withToken((string) $this->accessToken)
+            ->acceptJson()
+            ->get($this->apiUrl($endpoint), $query);
+    }
+
+    private function post(string $endpoint, array $payload = []): Response
+    {
+        return Http::retry(2, 500, throw: false)
+            ->asForm()
+            ->withToken((string) $this->accessToken)
+            ->acceptJson()
+            ->post($this->apiUrl($endpoint), $payload);
+    }
+
+    private function normalizeAdAccountId(string $adAccountId): string
+    {
+        return str_starts_with($adAccountId, 'act_')
+            ? $adAccountId
+            : 'act_' . $adAccountId;
     }
 }
