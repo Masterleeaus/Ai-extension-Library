@@ -242,7 +242,8 @@ class Facebook extends BaseMetaHelper
 
     private function post(string $endpoint, array $payload = []): Response
     {
-        return Http::asForm()
+        return Http::retry(2, 500, throw: false)
+            ->asForm()
             ->withToken((string) $this->accessToken)
             ->acceptJson()
             ->post($this->apiUrl($endpoint), $payload);
