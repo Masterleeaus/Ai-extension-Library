@@ -71,12 +71,13 @@ final class RequireCommerceSessionAuthority
         $name = strtolower((string) $request->route()?->getName());
         $method = strtoupper($request->method());
         if (str_contains($name, 'support.')) return $method === 'GET' ? 'support:read' : 'support:write';
+        if (str_contains($name, 'commerce.roles') || str_contains($name, 'commerce.tools') || str_contains($name, 'session-authority')) return 'catalogue:read';
+        if (str_contains($name, 'marketplace.')) return 'marketplace:read';
         if (str_contains($name, 'orders.materialize')) return 'order:materialize';
         if (str_contains($name, 'orders.returns')) return 'returns:prepare';
         if (str_contains($name, 'orders.')) return 'orders:read';
         if (str_contains($name, 'payments.') || str_contains($name, 'bnpl.')) return $method === 'GET' ? 'payment:read' : 'payment:prepare';
         if (str_contains($name, 'checkout.')) return $method === 'GET' ? 'checkout:read' : 'checkout:prepare';
-        if (str_contains($name, 'marketplaces.')) return 'marketplace:read';
         if (str_contains($name, 'inventory.')) return $method === 'GET' ? 'inventory:read' : 'inventory:reserve';
         if (str_contains($name, 'shipping.')) return 'shipping:read';
         if (str_contains($name, 'conversation.')) return $method === 'GET' ? 'context:read' : 'context:write';
