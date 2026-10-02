@@ -1,5 +1,5 @@
 {
-  "$schema": "./schemas/extension-manifest.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "schema_version": "1.0",
   "key": "chatbot-ecommerce",
   "name": "Titan Commerce",
@@ -7,7 +7,7 @@
   "folder": "ChatbotEcommerce",
   "namespace": "App\\Extensions\\ChatbotEcommerce",
   "provider": "App\\Extensions\\ChatbotEcommerce\\System\\ChatbotEcommerceServiceProvider",
-  "family": "billing",
+  "family": "commerce",
   "compatibility": {
     "magicai": ">=10.91",
     "php": "^8.2",
