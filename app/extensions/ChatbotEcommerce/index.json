@@ -5,5 +5,6 @@
   "version": "4.9.0",
   "provider": "App\\Extensions\\ChatbotEcommerce\\System\\ChatbotEcommerceServiceProvider",
   "preserve_existing_data": true,
-  "migrations": "database/migrations"
+  "migrations": "database/migrations",
+  "description": "Seller-owned AI commerce system for catalogue sales, marketplace operations, customer shopping and support, hire and capacity-managed bookings."
 }
