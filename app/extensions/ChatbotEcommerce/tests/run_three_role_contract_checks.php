@@ -106,6 +106,8 @@ $assert(str_contains($toolService, 'CustomerCommunicationRuntime'), 'tool servic
 $assert(str_contains($toolService, 'CUSTOMER_COMMUNICATIONS'), 'tool service must scope communications tools by role');
 
 $providerWiring = file_get_contents($root . '/System/ChatbotEcommerceServiceProvider.php');
+$assert(str_contains($providerWiring, 'RequireCommerceSessionAuthority::class'), 'public shopper routes require signed authority');
+$assert(str_contains($providerWiring, "\x27api\x27, \x27auth\x27"), 'seller operations use authenticated routes');
 foreach (['CommerceRoleApiController', 'CustomerCommunicationApiController', 'CustomerCommunicationAdminApiController', 'commerce/roles', 'support/messages', 'support/threads'] as $routeWiring) {
     $assert(str_contains($providerWiring, $routeWiring), "service provider must register {$routeWiring}");
 }
