@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Extensions\ChatbotEcommerce\System\Http\Controllers\Api;
 
+use App\Extensions\Chatbot\System\Models\Chatbot;
 use App\Extensions\ChatbotEcommerce\System\Services\CommerceRoleRuntime;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
@@ -16,17 +17,23 @@ final class CommerceRoleApiController extends Controller
         return response()->json(['data' => $roles->definitions()]);
     }
 
-    public function resolve(Request $request, CommerceRoleRuntime $roles): JsonResponse
+    public function resolve(Chatbot $chatbot, Request $request, CommerceRoleRuntime $roles): JsonResponse
     {
         $validated = $request->validate([
-            'actor_type' => ['required', 'in:customer,seller,unknown'],
-            'requested_role' => ['sometimes', 'nullable', 'in:shopping_assistant,seller_steward,customer_communications'],
-            'authenticated' => ['sometimes', 'boolean'],
             'channel' => ['sometimes', 'string', 'max:60'],
             'intent' => ['sometimes', 'nullable', 'string', 'max:100'],
             'inbound_support' => ['sometimes', 'boolean'],
         ]);
 
-        return response()->json(['data' => ['role' => $roles->resolve($validated)]]);
+        $user = $request->user();
+        $isSeller = $user !== null
+            && (int) $user->getAuthIdentifier() === (int) $chatbot->getAttribute('user_id');
+
+        $context = array_merge($validated, [
+            'actor_type' => $isSeller ? 'seller' : 'customer',
+            'authenticated' => $isSeller,
+        ]);
+
+        return response()->json(['data' => ['role' => $roles->resolve($context)]]);
     }
 }
