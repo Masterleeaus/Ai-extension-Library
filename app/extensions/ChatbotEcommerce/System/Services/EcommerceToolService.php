@@ -469,7 +469,7 @@ class EcommerceToolService
             }
             if ($chatbot->shop_source === 'internal') {
                 foreach (app(ConversationalCommerceRuntime::class)->toolDefinitions() as $definition) {
-                    if (str_starts_with((string) ($definition['description'] ?? ''), '[inform]')) {
+                    if (str_starts_with((string) ($definition['description'] ?? ''), '[inform]') || str_starts_with((string) ($definition['name'] ?? ''), 'native_prepare_booking_')) {
                         $tools[] = ['type' => 'function', 'function' => $definition];
                     }
                 }
@@ -532,7 +532,7 @@ class EcommerceToolService
             }
             if ($chatbot->shop_source === 'internal') {
                 foreach (app(ConversationalCommerceRuntime::class)->toolDefinitions() as $definition) {
-                    if (str_starts_with((string) ($definition['description'] ?? ''), '[inform]')) {
+                    if (str_starts_with((string) ($definition['description'] ?? ''), '[inform]') || str_starts_with((string) ($definition['name'] ?? ''), 'native_prepare_booking_')) {
                         $tools[] = $this->toAnthropicFormat($definition);
                     }
                 }
@@ -583,7 +583,7 @@ class EcommerceToolService
             $declarations = array_merge($declarations, app(CustomerCommunicationRuntime::class)->toolDefinitions());
             if ($chatbot->shop_source === 'internal') {
                 foreach (app(ConversationalCommerceRuntime::class)->toolDefinitions() as $definition) {
-                    if (str_starts_with((string) ($definition['description'] ?? ''), '[inform]')) {
+                    if (str_starts_with((string) ($definition['description'] ?? ''), '[inform]') || str_starts_with((string) ($definition['name'] ?? ''), 'native_prepare_booking_')) {
                         $declarations[] = $definition;
                     }
                 }
