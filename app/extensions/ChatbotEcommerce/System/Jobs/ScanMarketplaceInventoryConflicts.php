@@ -22,7 +22,7 @@ final class ScanMarketplaceInventoryConflicts implements ShouldQueue, ShouldBeUn
     public int $tries = 3;
     public int $timeout = 300;
     public int $uniqueFor = 300;
-    public function __construct(public readonly int $connectionId) { $this->onQueue('chatbot-ecommerce-inventory-reconciliation'); }
+    public function __construct(public readonly int $connectionId) { $this->onQueue((string) config('chatbot-ecommerce.queues.inventory_reconciliation', 'chatbot-ecommerce-inventory-reconciliation')); }
     public function uniqueId(): string { return 'marketplace-inventory-scan:' . $this->connectionId; }
     /** @return list<int> */ public function backoff(): array { return RetryBackoff::schedule($this->tries, 15, 300); }
     /** @return list<object> */ public function middleware(): array { return [app(RestoreCommerceTenantContext::class)]; }
