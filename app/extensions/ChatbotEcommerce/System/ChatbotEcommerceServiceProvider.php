@@ -45,6 +45,14 @@ use Illuminate\Support\ServiceProvider;
 
 final class ChatbotEcommerceServiceProvider extends ServiceProvider implements UninstallExtensionServiceProviderInterface
 {
+    public function register(): void
+    {
+        $this->mergeConfigFrom(__DIR__ . '/../config/chatbot-ecommerce.php', 'chatbot-ecommerce');
+
+        $this->app->singleton(MarketplaceTransport::class, GatewayMarketplaceTransport::class);
+        $this->app->singleton(MarketplaceWriteTransport::class, GatewayMarketplaceWriteTransport::class);
+    }
+
     public function boot(Kernel $kernel): void
     {
         $this->registerTranslations()
