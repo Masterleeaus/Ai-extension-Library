@@ -415,6 +415,7 @@ if (empty($products)) {
 
         return match ($function) {
             'support_get_customer_context' => ['data' => $runtime->threadContext($chatbot, $thread)],
+            'support_draft_feedback_request' => $runtime->draftFeedbackRequest($chatbot, $thread),
             'support_draft_reply' => (function () use ($runtime, $chatbot, $thread, $arguments): array {
                 $message = ! empty($arguments['message_uuid'])
                     ? CommerceCommunicationMessage::query()->where('thread_id', $thread->id)->where('uuid', (string) $arguments['message_uuid'])->firstOrFail()
