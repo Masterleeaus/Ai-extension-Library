@@ -98,7 +98,7 @@ final class CommerceCredentialRuntime
                 throw ValidationException::withMessages(['domain' => 'A store domain is required.']);
             }
             if ($provider === 'shopify') {
-                $handler = new ShopifyToolHandler($domain, (string) $credentials['access_token']);
+                $handler = new ShopifyToolHandler($domain, (string) $credentials['access_token'], (string) config('chatbot-ecommerce.shopify.storefront_api_version', '2026-07'));
                 $result = $handler->handleToolCall('getProducts', ['query' => '', 'orderby' => 'best_selling', 'order' => 'desc']);
                 $success = ! isset($result['error']);
             } else {
