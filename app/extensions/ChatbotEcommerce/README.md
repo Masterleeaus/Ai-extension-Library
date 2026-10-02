@@ -30,7 +30,7 @@ The commerce model can cover:
 - Inventory by location, reservations, channel allocation and conflict reconciliation.
 - Unified orders, fulfilment, returns, refunds and settlement reconciliation.
 - Shipping, tax, payment and BNPL provider contracts.
-- Customer communications across native and marketplace orders, feedback-request drafts, governed support actions and human handoff.
+- Customer communications across native and marketplace orders, persisted unsent reply and feedback drafts, governed support actions and human handoff.
 - Rental and hire accounts, agreements, charges, payments and receipts.
 - Seller-managed appointment and event slots exposed through the same booking assistant for native, Shopify and WooCommerce storefronts, with session-scoped availability, customer approval before capacity is reserved, idempotency and cancellation.
 
