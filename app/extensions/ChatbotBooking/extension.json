@@ -1,7 +1,7 @@
-﻿{
-    "name":  "Booking for External Chatbot",
-    "type":  "extension",
-    "version":  "1.0.0",
-    "description":  "Chatbot booking extension for magicai — TG: @heew_support",
-    "support_telegram":  "heew_support"
+{
+  "name": "Titan Commerce Booking Compatibility",
+  "type": "extension",
+  "version": "1.0.0",
+  "description": "Legacy booking extension metadata retained for existing installations. New seller catalogue, availability and booking workflows belong to Titan Commerce.",
+  "support_telegram": "heew_support"
 }
