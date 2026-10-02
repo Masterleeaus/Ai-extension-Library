@@ -61,7 +61,9 @@ final class CustomerCommunicationContextRuntime
                 ->all();
         }
 
-        $orders = ($sessionId === null && $customerIdentityId === null)\n            ? collect()\n            : CommerceOrder::query()
+        $orders = ($sessionId === null && $customerIdentityId === null)
+            ? collect()
+            : CommerceOrder::query()
             ->with(['items', 'events', 'returns.items', 'paymentIntent'])
             ->where('chatbot_id', $chatbotId)
             ->where(function ($query) use ($sessionId, $customerIdentityId): void {
@@ -164,7 +166,8 @@ final class CustomerCommunicationContextRuntime
             ],
             'customer_identity_id' => $customerIdentityId,
             'active_cart' => $cart,
-            'orders' => $orders,\n            'marketplace_orders' => $marketplaceOrders,
+            'orders' => $orders,
+            'marketplace_orders' => $marketplaceOrders,
             'payments' => $payments,
             'fulfillments' => $fulfillments,
             'returns' => $returns,
