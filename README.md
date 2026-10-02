@@ -1,4 +1,4 @@
-![Titan Commerce — one catalogue, three seller-side AI roles, every sales channel](docs/images/portfolio-banner.svg)
+![Titan Commerce — one catalogue, three seller-side AI roles, every sales channel](docs/images/titan-commerce-banner.svg)
 
 # Titan Commerce
 
