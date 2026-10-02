@@ -21,7 +21,7 @@ final class ImportMarketplaceOrders implements ShouldQueue, ShouldBeUnique
     public int $tries = 3;
     public int $timeout = 180;
     public int $uniqueFor = 300;
-    public function __construct(public readonly int $connectionId) { $this->onQueue('chatbot-ecommerce-marketplace-read'); }
+    public function __construct(public readonly int $connectionId) { $this->onQueue((string) config('chatbot-ecommerce.queues.marketplace_read', 'chatbot-ecommerce-marketplace-read')); }
     public function uniqueId(): string { return 'marketplace-orders-' . $this->connectionId; }
     /** @return list<int> */ public function backoff(): array { return RetryBackoff::schedule($this->tries, 10, 300); }
     /** @return list<object> */ public function middleware(): array { return [app(RestoreCommerceTenantContext::class)]; }
