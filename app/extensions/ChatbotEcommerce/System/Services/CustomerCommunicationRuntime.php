@@ -165,10 +165,12 @@ final class CustomerCommunicationRuntime
             'intent' => $intent,
             'confidence' => $confidence,
             'authority' => $decision,
-            'can_auto_send' => (bool) $policy->auto_reply_enabled
+            'policy_eligible_for_auto_send' => (bool) $policy->auto_reply_enabled
                 && $decision['level'] === 'answer_automatically'
                 && $decision['allowed']
                 && $confidence >= (float) $policy->auto_reply_confidence,
+            'can_auto_send' => false,
+            'delivery_status' => 'draft_only',
             'facts' => $context,
             'actions' => $this->suggestedActions($intent, $context),
             'constraints' => [
