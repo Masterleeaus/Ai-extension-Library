@@ -78,6 +78,21 @@ Customer support automation is disabled by default. The default confidence thres
 
 Per-store policies can further limit automatic replies and actions. Marketplace writes, bulk changes and support actions retain approval, idempotency and action-history controls.
 
+
+## Commerce setup by capability
+
+- **Catalogue and pricing:** Create products and variants under the selected seller storefront. Tax inclusion and default tax rates are deployment defaults; seller tax zones, rates, exemptions and pricing rules remain seller-managed records.
+- **Checkout and delivery:** Checkout sessions use the configured lifetime and approval windows. The default delivery option list is empty; configure the seller’s shipping zones, methods and provider before offering delivery.
+- **Payments:** The internal payment adapter exposes bank transfer, PayID, cash and externally fulfilled methods by default. Add seller-specific payment instructions through the payment configuration. Card, direct debit and BNPL intents require a hosted payment URL from a connected licensed provider.
+- **Payment webhooks:** Configure `CHATBOT_ECOMMERCE_PAYMENT_WEBHOOK_SECRET` and keep the webhook worker enabled. Webhook signatures are time-bounded by `CHATBOT_ECOMMERCE_PAYMENT_WEBHOOK_TOLERANCE`.
+- **Returns and support:** The default return window is 30 days. Automatic replies are off by default, monetary support limits default to zero, and sensitive cases route to human handoff.
+- **Hire and rental:** The default payment methods are bank transfer, PayID, cash and external payment. Set seller payment instructions and hire agreements, rates and billing cycles before collecting rental payments.
+- **Marketplace writes:** Set `CHATBOT_ECOMMERCE_MARKETPLACE_APPROVAL_SECRET` before preparing governed writes. Writes default to approval-only; bulk writing and inventory oversell remain disabled. Approval and action limits can be tuned through deployment configuration and seller policy.
+- **Signed customer sessions:** Set `CHATBOT_ECOMMERCE_SESSION_AUTHORITY_SECRET` to enable signed shopper sessions. Keep it separate from marketplace, payment and BNPL secrets.
+- **BNPL:** Licensed-provider enforcement is enabled by default. Configure an approved provider profile and `CHATBOT_ECOMMERCE_BNPL_STATE_SECRET` before enabling buy-now-pay-later offers.
+
+The most important deployment-only secrets are `CHATBOT_ECOMMERCE_MARKETPLACE_APPROVAL_SECRET`, `CHATBOT_ECOMMERCE_SESSION_AUTHORITY_SECRET`, `CHATBOT_ECOMMERCE_PAYMENT_WEBHOOK_SECRET`, `CHATBOT_ECOMMERCE_BNPL_STATE_SECRET`, and the marketplace gateway signing secret. Use separate random values for each purpose.
+
 ## Runtime configuration
 
 The extension merges `config/chatbot-ecommerce.php` through its service provider. Use environment configuration in each installation. Do not commit secrets to this repository. Ensure Laravel’s application encryption key is stable and backed up because encrypted credentials and configuration depend on it.
