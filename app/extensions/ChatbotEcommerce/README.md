@@ -1,8 +1,10 @@
-# Titan Commerce
+# Smart Sellers
+
+<p align="center"><img src="docs/assets/smart-sellers-header.svg" alt="Smart Sellers — seller-first AI commerce" width="100%"></p>
 
 **A seller-owned store and AI sales team for products, services, hire and bookings.**
 
-Titan Commerce gives a seller one product line, one commerce system and three coordinated AI roles. The seller can publish its catalogue through a storefront and supported marketplace channels, while customers get a knowledgeable shopping assistant and responsive post-sale support.
+Smart Sellers gives a seller one product line, one commerce system and three coordinated AI roles. The seller can publish its catalogue through a storefront and supported marketplace channels, while customers get a knowledgeable shopping assistant and responsive post-sale support.
 
 ## The three seller-side AI roles
 
@@ -36,11 +38,14 @@ The commerce model can cover:
 
 ## Governed commerce architecture
 
+<p align="center"><img src="docs/assets/smart-sellers-architecture.svg" alt="Smart Sellers architecture: one seller product line, three AI roles, shared commerce core and connected channels" width="100%"></p>
+
+
 The extension separates seller operations from customer shopping and support. Marketplace and payment actions can be prepared, reviewed, executed under authority, journaled and rolled back. Tenant context, scoped credentials, idempotency, asynchronous jobs and audit records support safe operation across connected channels.
 
-The Laravel extension is located at `app/extensions/ChatbotEcommerce/`. Its current extension key and package paths remain compatible with existing installations; **Titan Commerce** is the customer-facing product name.
+The Laravel extension is located at `app/extensions/ChatbotEcommerce/`. Its current extension key and package paths remain compatible with existing installations; **Smart Sellers** is the customer-facing product name.
 
-Seller connection, gateway, queue, payment and security configuration is documented in [Titan Commerce Operations](docs/OPERATIONS.md).
+Seller connection, gateway, queue, payment and security configuration is documented in [Smart Sellers Operations](docs/OPERATIONS.md).
 
 ## Implementation status
 
@@ -50,7 +55,7 @@ Some workflows are still being built. Booking currently provides dated capacity 
 
 ## Scope
 
-Titan Commerce owns the seller’s catalogue experience and commerce workflows across supported channels. Shared identity, tenant, security, integration and operational services remain dependencies where the extension uses them. General-purpose AI extensions and unrelated Titan product suites are outside this product’s feature scope.
+Smart Sellers owns the seller’s catalogue experience and commerce workflows across supported channels. Shared identity, tenant, security, integration and operational services remain dependencies where the extension uses them. General-purpose AI extensions and unrelated Titan product suites are outside this product’s feature scope.
 
 ## Development and release
 
