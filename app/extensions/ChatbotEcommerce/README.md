@@ -32,7 +32,7 @@ The commerce model can cover:
 - Shipping, tax, payment and BNPL provider contracts.
 - Customer communications, feedback follow-up, support actions and human handoff.
 - Rental and hire accounts, agreements, charges, payments and receipts.
-- Booking and availability integration through shared commerce contracts.
+- Capacity-based appointment and event slots with session-scoped reservations, seller-managed availability, idempotency and cancellation.
 
 ## Governed commerce architecture
 
@@ -42,9 +42,9 @@ The Laravel extension is located at `app/extensions/ChatbotEcommerce/`. Its curr
 
 ## Implementation status
 
-The source contains substantial foundations for catalogue and variants, carts and checkout sessions, inventory reservations, orders and returns, marketplace listings and write proposals, customer communication threads and support actions, and a unified order workbench.
+The source contains foundations for catalogue and variants, carts and checkout sessions, inventory reservations, orders and returns, marketplace listings and write proposals, customer communication threads and support actions, a unified order workbench, and capacity-managed booking slots. Sellers can associate slots with catalogue products; customers can discover availability and reserve capacity through signed storefront sessions.
 
-The product description is the target system, not a blanket production-readiness claim. Marketplace coverage, live payment processing, storefront embedding, booking and rental workflows, and the three roles must be verified against complete-host integration tests and provider sandboxes before each is represented as fully available.
+Some workflows are still being built. Booking currently provides dated capacity slots and reservations; recurring schedules, resource assignment, deposits and booking-specific payment flows remain to be completed. Marketplace coverage, live payment processing, storefront embedding, rental lifecycle depth and end-to-end role handoffs also need further implementation before being presented as production-complete.
 
 ## Scope
 
