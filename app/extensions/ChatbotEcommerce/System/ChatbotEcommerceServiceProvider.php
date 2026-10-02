@@ -27,6 +27,7 @@ use App\Extensions\ChatbotEcommerce\System\Http\Controllers\Api\NativeOrderApiCo
 use App\Extensions\ChatbotEcommerce\System\Http\Controllers\Api\PaymentApiController;
 use App\Extensions\ChatbotEcommerce\System\Http\Controllers\Api\PaymentWebhookController;
 use App\Extensions\ChatbotEcommerce\System\Http\Controllers\Api\CommerceCredentialAdminApiController;
+use App\Extensions\ChatbotEcommerce\System\Http\Controllers\Api\CommerceBookingApiController;
 use App\Extensions\ChatbotEcommerce\System\Http\Controllers\Api\BnplAdminApiController;
 use App\Extensions\ChatbotEcommerce\System\Http\Controllers\Api\PaymentAdminApiController;
 use App\Extensions\ChatbotEcommerce\System\Http\Controllers\Api\PricingAdminApiController;
@@ -102,6 +103,10 @@ final class ChatbotEcommerceServiceProvider extends ServiceProvider implements U
             ->group(function (Router $router): void {
                 $session = '{chatbot:uuid}/session/{sessionId}';
 
+                $router->get($session . '/bookings/availability', [CommerceBookingApiController::class, 'availability'])->name('bookings.availability');
+                $router->post($session . '/bookings', [CommerceBookingApiController::class, 'reserve'])->name('bookings.store');
+                $router->post($session . '/bookings/{booking}/cancel', [CommerceBookingApiController::class, 'cancel'])->name('bookings.cancel');
+
                 $router->get($session . '/context', [ConversationalCommerceApiController::class, 'context'])->name('context.show');
                 $router->put($session . '/context', [ConversationalCommerceApiController::class, 'updateContext'])->name('context.update');
                 $router->post($session . '/tools/execute', [ConversationalCommerceApiController::class, 'execute'])->name('tools.execute');
@@ -176,6 +181,10 @@ final class ChatbotEcommerceServiceProvider extends ServiceProvider implements U
         $router->middleware(['api', 'auth'])->prefix('api/v3/chatbot/ecommerce')->name('api.v3.chatbot.ecommerce.admin.')
             ->group(function (Router $router): void {
                 $base = '{chatbot:uuid}';
+                $router->get($base . '/bookings/slots', [CommerceBookingApiController::class, 'sellerSlots'])->name('bookings.slots.index');
+                $router->post($base . '/bookings/slots', [CommerceBookingApiController::class, 'createSlot'])->name('bookings.slots.store');
+                $router->get($base . '/bookings', [CommerceBookingApiController::class, 'sellerBookings'])->name('bookings.index');
+                $router->post($base . '/bookings/{booking}/cancel', [CommerceBookingApiController::class, 'cancelAsSeller'])->name('bookings.cancel');
                 $router->get($base . '/support/threads', [CustomerCommunicationAdminApiController::class, 'threads'])->name('support.threads.index');
                 $router->get($base . '/support/threads/{thread}', [CustomerCommunicationAdminApiController::class, 'show'])->name('support.threads.show');
                 $router->put($base . '/support/threads/{thread}', [CustomerCommunicationAdminApiController::class, 'updateThread'])->name('support.threads.update');
