@@ -59,6 +59,29 @@ final class ChatbotEcommerceServiceProvider extends ServiceProvider implements U
             ->registerViews()
             ->registerRoutes()
             ->registerMigrations();
+
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                \\App\\Extensions\\ChatbotEcommerce\\System\\Console\\Commands\\ExpireBnplOffers::class,
+                \\App\\Extensions\\ChatbotEcommerce\\System\\Console\\Commands\\ExpireCarts::class,
+                \\App\\Extensions\\ChatbotEcommerce\\System\\Console\\Commands\\ExpireCheckoutSessions::class,
+                \\App\\Extensions\\ChatbotEcommerce\\System\\Console\\Commands\\ExpireCommerceContexts::class,
+                \\App\\Extensions\\ChatbotEcommerce\\System\\Console\\Commands\\ExpireCouponUsages::class,
+                \\App\\Extensions\\ChatbotEcommerce\\System\\Console\\Commands\\ExpireInventoryReservations::class,
+                \\App\\Extensions\\ChatbotEcommerce\\System\\Console\\Commands\\ExpirePaymentIntents::class,
+                \\App\\Extensions\\ChatbotEcommerce\\System\\Console\\Commands\\ExpireRentalHirePaymentRequests::class,
+                \\App\\Extensions\\ChatbotEcommerce\\System\\Console\\Commands\\ExpireShippingQuotes::class,
+                \\App\\Extensions\\ChatbotEcommerce\\System\\Console\\Commands\\GenerateRentalHireCharges::class,
+                \\App\\Extensions\\ChatbotEcommerce\\System\\Console\\Commands\\ImportMarketplaceOrdersCommand::class,
+                \\App\\Extensions\\ChatbotEcommerce\\System\\Console\\Commands\\ManageCommerceLifecycle::class,
+                \\App\\Extensions\\ChatbotEcommerce\\System\\Console\\Commands\\RetryPaymentWebhooks::class,
+                \\App\\Extensions\\ChatbotEcommerce\\System\\Console\\Commands\\ScanMarketplaceInventoryConflictsCommand::class,
+            ]);
+
+            $this->callAfterResolving(Schedule::class, function (Schedule $schedule): void {
+                app(\\App\\Extensions\\ChatbotEcommerce\\System\\Services\\CommerceScheduleRegistrar::class)->register($schedule);
+            });
+        }
     }
 
     protected function registerTranslations(): static
