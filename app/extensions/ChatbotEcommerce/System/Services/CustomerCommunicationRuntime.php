@@ -34,6 +34,7 @@ final class CustomerCommunicationRuntime
         return [
             $this->definition('support_get_customer_context', 'inform', 'Retrieve verified cart, order, payment, fulfilment, and return context for a support thread.', ['thread_uuid' => ['type' => 'string']], ['thread_uuid']),
             $this->definition('support_draft_reply', 'inform', 'Prepare a fact-grounded reply for a customer message without sending it.', ['thread_uuid' => ['type' => 'string'], 'message_uuid' => ['type' => 'string']], ['thread_uuid']),
+            $this->definition('support_draft_feedback_request', 'prepare', 'Draft a post-sale feedback request from verified, completed order facts. This does not send the message; seller approval and a connected channel are required.', ['thread_uuid' => ['type' => 'string']], ['thread_uuid']),
             $this->definition('support_prepare_action', 'prepare', 'Prepare a governed support action and evaluate automatic limits or approval requirements.', [
                 'thread_uuid' => ['type' => 'string'], 'action_type' => ['type' => 'string'], 'payload' => ['type' => 'object'], 'idempotency_key' => ['type' => 'string'],
             ], ['thread_uuid', 'action_type', 'payload', 'idempotency_key']),
@@ -174,6 +175,47 @@ final class CustomerCommunicationRuntime
                 'do_not_claim_an_action_completed_without_a_persisted_result' => true,
                 'do_not_reveal_private_order_data_without_verified_identity' => true,
                 'do_not_invent_tracking_payment_or_refund_state' => true,
+            ],
+        ];
+
+        return ['draft' => $draft, 'ui' => $this->cards->reply($thread, $draft)];
+    }
+
+    /** @return array<string,mixed> */
+    public function draftFeedbackRequest(Chatbot $chatbot, CommerceCommunicationThread $thread): array
+    {
+        $this->assertThreadScope($chatbot, $thread);
+        if (! (bool) $thread->identity_verified) {
+            throw ValidationException::withMessages(['identity' => 'Verify the customer identity before preparing a post-sale feedback request.']);
+        }
+
+        $context = $this->threadContext($chatbot, $thread);
+        $order = collect((array) ($context['orders'] ?? []))->first(
+            static fn (array $candidate): bool => (string) ($candidate['status'] ?? '') === 'completed'
+                || (string) ($candidate['fulfillment_status'] ?? '') === 'delivered'
+        );
+        if (! is_array($order)) {
+            throw ValidationException::withMessages(['order' => 'A completed or delivered seller order is required for a feedback request.']);
+        }
+
+        $items = (array) ($order['items'] ?? []);
+        $itemName = trim((string) ($items[0]['name'] ?? 'your recent order'));
+        $sellerName = trim((string) $chatbot->getAttribute('title')) ?: 'our store';
+        $draft = [
+            'text' => sprintf(
+                'Hi! Thank you for choosing %s. We hope you are enjoying %s. If you have a moment, we would appreciate your feedback about your experience. Your comments help us improve.',
+                $sellerName,
+                $itemName
+            ),
+            'type' => 'post_sale_feedback_request',
+            'order_number' => $order['order_number'] ?? null,
+            'channel' => (string) $thread->channel,
+            'requires_seller_approval' => true,
+            'send_status' => 'draft_only',
+            'constraints' => [
+                'based_on_verified_customer_and_completed_order' => true,
+                'do_not_claim_a_review_was_submitted' => true,
+                'send_only_through_a_connected_channel_with_seller_authority' => true,
             ],
         ];
 
