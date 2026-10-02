@@ -1,6 +1,6 @@
 @extends('panel.layout.app', ['disable_tblr' => true, 'disable_mobile_bottom_menu' => true])
 
-@section('title', 'Titan Commerce')
+@section('title', 'Smart Sellers')
 
 @section('titlebar_subtitle')
     {{ __('One seller catalogue. Three coordinated AI roles.') }}
