@@ -23,7 +23,8 @@ final class CommerceCredentialRuntime
         if (CredentialRedactor::containsSecretKey($configuration)) {
             throw ValidationException::withMessages(['configuration' => 'Secret values belong in the encrypted credentials payload, not configuration.']);
         }
-        $configuration = $this->normaliseStoreConfiguration($provider, $configuration);\n        $credentials = $this->normaliseCredentials($provider, $credentials);
+        $configuration = $this->normaliseStoreConfiguration($provider, $configuration);
+        $credentials = $this->normaliseCredentials($provider, $credentials);
         $existing = CommerceCredential::query()->where('chatbot_id', $chatbot->getKey())->where('provider', $provider)->first();
         $version = ((int) ($existing?->version ?? 0)) + 1;
         $record = CommerceCredential::query()->updateOrCreate(
