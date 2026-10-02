@@ -29,12 +29,15 @@ final class ConversationalCommerceRuntime
         private readonly NativeOrderRuntime $orders,
         private readonly CommerceCardRuntime $cards,
         private readonly FailureTranslationRuntime $failures,
+        private readonly CommerceBookingRuntime $bookings,
     ) {}
 
     /** @return array<int,array<string,mixed>> */
     public function toolDefinitions(): array
     {
         return [
+            $this->definition('native_search_booking_slots', 'inform', 'Find this seller’s available appointment, service or event slots.', ['product_id' => ['type' => 'integer'], 'from' => ['type' => 'string'], 'to' => ['type' => 'string'], 'session_id' => ['type' => 'string']], ['session_id']),
+            $this->definition('native_prepare_booking_reservation', 'prepare', 'Prepare a booking for explicit customer approval. This does not reserve capacity until approved.', ['slot_id' => ['type' => 'integer'], 'quantity' => ['type' => 'integer', 'minimum' => 1], 'customer_details' => ['type' => 'object'], 'session_id' => ['type' => 'string']], ['slot_id', 'session_id']),
             $this->definition('native_search_products', 'inform', 'Search the native catalogue and remember the exact result set.', ['query' => ['type' => 'string'], 'filters' => ['type' => 'object'], 'session_id' => ['type' => 'string']], ['session_id']),
             $this->definition('native_get_product', 'inform', 'Get an exact product. Never guess an ambiguous product reference.', ['product_id' => ['type' => 'integer'], 'session_id' => ['type' => 'string']], ['session_id']),
             $this->definition('native_compare_products', 'inform', 'Compare selected products using factual catalogue data.', ['product_ids' => ['type' => 'array', 'items' => ['type' => 'integer']], 'session_id' => ['type' => 'string']], ['session_id']),
@@ -62,6 +65,8 @@ final class ConversationalCommerceRuntime
 
         try {
             return match ($tool) {
+                'native_search_booking_slots' => $this->bookingAvailability($chatbot, $arguments),
+                'native_prepare_booking_reservation' => $this->prepareBooking($chatbot, $context, $sessionId, $arguments),
                 'native_search_products' => $this->search($chatbot, $context, $arguments),
                 'native_get_product' => $this->product($chatbot, $context, $arguments),
                 'native_compare_products' => $this->compare($chatbot, $context, $arguments),
@@ -84,6 +89,54 @@ final class ConversationalCommerceRuntime
                 'progress' => [['stage' => 'failed', 'message' => 'The commerce action could not be completed.']],
             ];
         }
+    }
+
+    /** @return array<string,mixed> */
+    private function bookingAvailability(Chatbot $chatbot, array $arguments): array
+    {
+        $filters = array_intersect_key($arguments, array_flip(['product_id', 'from', 'to']));
+        $slots = $this->bookings->availability((int) $chatbot->getKey(), $filters);
+        return [
+            'level' => 'inform',
+            'status' => 'completed',
+            'data' => $slots->map(fn ($slot) => $this->bookings->serializeSlot($slot))->values()->all(),
+            'progress' => [['stage' => 'availability', 'message' => 'Showing available times from this seller.']],
+        ];
+    }
+
+    /** @return array<string,mixed> */
+    private function prepareBooking(Chatbot $chatbot, ConversationContext $context, string $sessionId, array $arguments): array
+    {
+        $slotId = (int) ($arguments['slot_id'] ?? 0);
+        $quantity = max(1, min((int) ($arguments['quantity'] ?? 1), 100));
+        $slot = \\App\\Extensions\\ChatbotEcommerce\\System\\Models\\CommerceBookingSlot::query()
+            ->where('chatbot_id', (int) $chatbot->getKey())
+            ->whereKey($slotId)
+            ->where('status', 'open')
+            ->where('starts_at', '>', now())
+            ->firstOrFail();
+        if ($slot->availableCapacity() < $quantity) {
+            throw ValidationException::withMessages(['slot_id' => 'This time no longer has enough availability.']);
+        }
+
+        $prepared = $this->contexts->prepareAction($context, 'reserve_booking', [
+            'slot_id' => $slotId,
+            'quantity' => $quantity,
+            'customer_details' => (array) ($arguments['customer_details'] ?? []),
+            'session_id' => $sessionId,
+        ]);
+        return [
+            'level' => 'prepare',
+            'status' => 'awaiting_approval',
+            'action' => $prepared['action'],
+            'approval_token' => $prepared['approval_token'],
+            'ui' => $this->cards->approval(
+                $prepared['action']['uuid'],
+                'reserve_booking',
+                ['message' => sprintf('Reserve %s at %s', $slot->title, $slot->starts_at->toIso8601String()), 'quantity' => $quantity],
+                $prepared['approval_token'],
+            ),
+        ];
     }
 
     /** @return array<string,mixed> */
@@ -209,6 +262,27 @@ final class ConversationalCommerceRuntime
         $action = $this->contexts->consumeApprovedAction($context, (string) ($arguments['action_uuid'] ?? ''), (string) ($arguments['approval_token'] ?? ''));
         $payload = (array) ($action['payload'] ?? []);
         return match ((string) ($action['type'] ?? '')) {
+            'reserve_booking' => (function () use ($chatbot, $sessionId, $payload, $action, $context): array {
+                $booking = $this->bookings->reserve(
+                    (int) $chatbot->getAttribute('id'),
+                    $sessionId,
+                    'approved:' . $action['uuid'],
+                    (int) $payload['slot_id'],
+                    (int) ($payload['quantity'] ?? 1),
+                    (array) ($payload['customer_details'] ?? []),
+                    $context->customer_identity_id ? (int) $context->customer_identity_id : null,
+                );
+                return [
+                    'level' => 'execute',
+                    'status' => 'completed',
+                    'action_uuid' => $action['uuid'],
+                    'data' => $this->bookings->serializeBooking($booking),
+                    'ui' => [
+                        'schema' => ['type' => 'commerce.booking_confirmation', 'version' => 1, 'booking_uuid' => $booking->uuid, 'status' => $booking->status],
+                        'fallback_text' => sprintf('Your booking for %s is confirmed.', $booking->slot?->title ?? 'the selected time'),
+                    ],
+                ];
+            })(),
             'add_to_cart' => DB::transaction(function () use ($chatbot, $context, $sessionId, $payload, $action): array {
                 $cart = $this->cartFor($chatbot, $context, $sessionId);
                 $cart = $this->carts->addLine($cart, (int) $payload['variant_id'], (int) $payload['quantity'], [], ['approved_action_uuid' => $action['uuid']], 'approved:' . $action['uuid']);
