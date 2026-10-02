@@ -10,7 +10,7 @@ class ChatbotEcommerceController extends Controller
 {
     public function __construct(public ChatbotService $service) {}
 
-    public function index(Request $request)
+    public function index(Request $request, CommerceDashboardRuntime $dashboard)
     {
         $agentOptions = $request->user()
             ->externalChatbots()
@@ -18,6 +18,6 @@ class ChatbotEcommerceController extends Controller
             ->orderBy('title')
             ->get();
 
-        return view('chatbot-ecommerce::index', compact('agentOptions'));
+        $dashboardSummaries = $agentOptions->mapWithKeys(fn ($agent): array => [\n            (string) $agent->uuid => $dashboard->summary($agent),\n        ]);\n\n        return view('chatbot-ecommerce::index', compact('agentOptions', 'dashboardSummaries'));
     }
 }
