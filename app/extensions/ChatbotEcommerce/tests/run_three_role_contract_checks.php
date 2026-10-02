@@ -105,6 +105,8 @@ $toolService = file_get_contents($root . '/System/Services/EcommerceToolService.
 $assert(str_contains($toolService, 'CustomerCommunicationRuntime'), 'tool service must bridge the customer communications tools');
 $assert(str_contains($toolService, 'CUSTOMER_COMMUNICATIONS'), 'tool service must scope communications tools by role');
 
+$assert(str_contains($providerWiring, 'RequireCommerceSessionAuthority::class'), 'public shopper routes require a signed session authority');
+$assert(str_contains($providerWiring, "'api', 'auth'"), 'seller operations use authenticated routes');
 $providerWiring = file_get_contents($root . '/System/ChatbotEcommerceServiceProvider.php');
 foreach (['CommerceRoleApiController', 'CustomerCommunicationApiController', 'CustomerCommunicationAdminApiController', 'commerce/roles', 'support/messages', 'support/threads'] as $routeWiring) {
     $assert(str_contains($providerWiring, $routeWiring), "service provider must register {$routeWiring}");
