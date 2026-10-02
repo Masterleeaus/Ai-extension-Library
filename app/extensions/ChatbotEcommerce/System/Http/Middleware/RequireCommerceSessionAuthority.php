@@ -72,6 +72,7 @@ final class RequireCommerceSessionAuthority
         $method = strtoupper($request->method());
         if (str_contains($name, 'support.')) return $method === 'GET' ? 'support:read' : 'support:write';
         if (str_contains($name, 'context.')) return $method === 'GET' ? 'context:read' : 'context:write';
+        if (str_contains($name, 'bookings.')) return str_contains($name, 'availability') ? 'bookings:read' : 'bookings:reserve';
         if (str_contains($name, 'marketplace.')) return 'marketplace:read';
         if (str_contains($name, 'orders.materialize')) return 'order:materialize';
         if (str_contains($name, 'orders.returns')) return 'returns:prepare';
