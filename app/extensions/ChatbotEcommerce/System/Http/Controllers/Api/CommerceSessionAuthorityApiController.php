@@ -19,7 +19,7 @@ final class CommerceSessionAuthorityApiController extends Controller
         'catalogue:read', 'cart:read', 'cart:write', 'inventory:read', 'inventory:reserve',
         'shipping:read', 'checkout:read', 'checkout:prepare', 'payment:read', 'payment:prepare',
         'orders:read', 'order:materialize', 'returns:prepare', 'context:read', 'context:write', 'support:read',
-        'support:write', 'marketplace:read',
+        'support:write', 'marketplace:read', 'bookings:read', 'bookings:reserve',
     ];
 
     public function issue(Chatbot $chatbot, Request $request): JsonResponse
