@@ -89,7 +89,8 @@ class EcommerceToolService
             $shopifyCredentials = app(CommerceCredentialRuntime::class)->resolve($chatbot, 'shopify');
             $shopifyToolHandler = new ShopifyToolHandler(
                 (string) $chatbot->shopify_domain,
-                (string) $shopifyCredentials['access_token']
+                (string) $shopifyCredentials['access_token'],
+                (string) config('chatbot-ecommerce.shopify.storefront_api_version', '2026-07')
             );
 
             switch ($function) {
