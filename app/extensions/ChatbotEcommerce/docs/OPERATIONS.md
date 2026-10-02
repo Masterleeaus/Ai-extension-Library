@@ -81,7 +81,7 @@ All three roles operate on behalf of the seller:
 
 1. **Customer Shopping Assistant** answers from the seller’s catalogue, guides purchases, finds booking availability and prepares customer-approved reservations.
 2. **Seller Commerce Steward** manages the seller’s connected listings, orders, inventory and sales work through seller-authorized marketplace tools.
-3. **Customer Communications Agent** uses verified native and marketplace order context, drafts responses and feedback requests, prepares governed support actions, and escalates cases for human review. Message and feedback content can be drafted now; outbound delivery through connected email, marketplace or messaging channels still needs a channel transport integration.
+3. **Customer Communications Agent** uses verified native and marketplace order context, drafts responses and feedback requests, prepares governed support actions, and escalates cases for human review. Reply and feedback drafts are stored in the support thread with order provenance and remain unsent. Automatic sending is unavailable until a channel transport integration exists, even when a store policy is configured to permit auto replies.
 
 Customer-facing booking reservations require a signed session authority. Reservation preparation does not consume capacity; capacity is committed only after customer approval. Sellers manage availability and reservations through authenticated booking APIs.
 
