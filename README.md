@@ -1,55 +1,88 @@
-![Titan AI Extension Library — PRIVATE SOURCE LIBRARY · PROVENANCE TRACKED](docs/images/portfolio-banner.svg)
+![Titan AI Extension Library — AI modules, governed by one platform](docs/images/portfolio-banner.svg)
 
 # Titan AI Extension Library
 
-Deep-scanned and losslessly extracted AI extension library from `Extensions(2).zip`, with the verified TitanAI Hybrid Pass 3 core suites applied as a reproducible overlay.
+**A provenance-aware library of AI extensions and shared platform capabilities for the Titan ecosystem.**
 
-## Product architecture and engineering highlights
+Titan AI Extension Library brings together a curated set of AI extensions, shared runtime foundations, integration patterns, and implementation records. It gives developers a traceable source for exploring, validating, and evolving AI capabilities across chat, agents, voice, model providers, creative tools, and business workflows.
 
-A reproducible source library of 78 AI extensions, including the AIChatPro, Chatbot, and AIAgent suites and a shared TitanAI foundation.
+The repository combines a broad extension catalogue with a focused shared foundation. Its extraction and materialisation workflow preserves source paths and file integrity, while verified overlays allow selected core suites to evolve without silently rewriting the remainder of the library.
 
-- **Architecture:** The repository preserves extension paths and bytes in a checksummed transport dataset, then applies verified Hybrid Pass 3 replacements and a Composer core overlay through repeatable materialisation.
-- **Distinctive engineering:** Its differentiator is provenance-aware, lossless extraction at scale: the README inventories 4,213 source/assets and records the canonical chatbot and shared package boundary.
+## At a glance
 
-## Repository scope
+| | |
+|---|---|
+| **Curated extensions** | 78 |
+| **Source and asset files** | 4,213 |
+| **Core suites** | AIChatPro, Chatbot, AIAgent |
+| **Shared foundation** | `packages/titanai-hybrid-core/` |
+| **Primary stack** | Laravel, PHP, JavaScript, Composer |
 
-- **78 selected AI extensions**
-- **4,213 source and asset files** in `extensions/`
-- **81,372,739 raw extension bytes**
-- Core suites: **AIChatPro**, **Chatbot**, and **AIAgent**
-- Canonical chatbot: **Chatbot 7.0.0-five-application-registry**
-- Shared Composer foundation: `packages/titanai-hybrid-core/` (`titanai/hybrid-core:1.0.0`)
+Counts describe the documented source inventory and should be regenerated when the underlying catalogue changes.
 
-## Materialisation
+## What makes it distinctive
 
-The base extraction is stored as a lossless MiniUp Parquet transport dataset. Each row preserves the original path, file bytes compressed with zlib and base64, raw byte count, category and SHA-256 checksum.
+- **Traceable source preservation** — extracted files retain their paths, byte counts, categories, and SHA-256 checksums in the transport dataset.
+- **Controlled core evolution** — verified overlays update AIChatPro, Chatbot, and AIAgent while preserving the other selected extensions.
+- **Shared platform foundation** — common capabilities are organized as a Composer package instead of being duplicated across suites.
+- **Broad integration surface** — the catalogue spans conversational AI, autonomous agents, voice, model providers, creative generation, content, and business workflows.
+- **Reproducible materialisation** — repository automation restores source data, applies the verified overlay, validates package boundaries, and regenerates inventories.
 
-A second verified MiniUp transport dataset contains the TitanAI Hybrid Pass 3 replacements for `AIAgent`, `AIChatPro` and `Chatbot`, plus the original shared foundation source. The GitHub Actions workflow restores that verified source, deterministically converts the foundation into `packages/titanai-hybrid-core`, updates the three shared integrations, validates the package, regenerates inventories and commits the result.
+## Architecture
 
-This two-layer process preserves the other 75 extensions unchanged and prevents future materialisation runs from reverting the upgraded core suites.
+```text
+Lossless extension dataset
+          │
+          ├── Curated extensions ──> extensions/
+          │
+          └── Verified core overlay
+                     │
+                     ├── AIChatPro
+                     ├── Chatbot
+                     ├── AIAgent
+                     └── Shared foundation ──> packages/titanai-hybrid-core/
+```
+
+The extraction dataset is the preserved source record. The verified overlay is the managed change layer for the selected core suites. The shared Composer package defines reusable platform code consumed by those integrations.
+
+## Catalogue
+
+The documented catalogue contains:
+
+- AIChatPro and chat workspace — 16 extensions
+- Chatbot and customer conversation runtime — 9 extensions
+- Autonomous agents and workflow automation — 10 extensions
+- Model providers and model orchestration — 10 extensions
+- Creative, image, audio, and video AI — 26 extensions
+- Content, SEO, social, and growth AI — 6 extensions
+
+Browse the [extension catalogue](docs/EXTENSION-CATALOG.md) and machine-readable [CSV](docs/extension-inventory.csv) or [JSON](docs/extension-inventory.json) inventories for extension-level detail.
 
 ## Documentation
 
-- [`docs/TITANAI-COMPOSER-PACKAGE.md`](docs/TITANAI-COMPOSER-PACKAGE.md) — package layout, WorkCore installation, compatibility and versioning.
-- [`docs/CORE-SUITES-PASS3-REPLACEMENT.md`](docs/CORE-SUITES-PASS3-REPLACEMENT.md) — current replacement scan, measured structure, architecture and verification.
-- [`docs/CORE-SUITES-DEEP-SCAN.md`](docs/CORE-SUITES-DEEP-SCAN.md) — original architecture and capability analysis of AIChatPro, Chatbot and AIAgent.
-- [`docs/EXTENSION-CATALOG.md`](docs/EXTENSION-CATALOG.md) — features, routes, data models, dependencies, external services and public functions for all 78 selected extensions.
-- [`docs/ARCHITECTURE-RISKS-AND-RECOMMENDATIONS.md`](docs/ARCHITECTURE-RISKS-AND-RECOMMENDATIONS.md) — overlap, technical risks, extraction decisions and recommended consolidation.
-- [`docs/extension-inventory.csv`](docs/extension-inventory.csv) — compact machine-readable inventory.
-- [`docs/extension-inventory.json`](docs/extension-inventory.json) — detailed machine-readable inventory.
+- [Start here](docs/00_READ_ME_FIRST.md)
+- [Document index](docs/DOCUMENT-INDEX.md)
+- [Core-suite architecture scan](docs/CORE-SUITES-DEEP-SCAN.md)
+- [Verified core-suite overlay](docs/CORE-SUITES-PASS3-REPLACEMENT.md)
+- [Shared Composer package](docs/TITANAI-COMPOSER-PACKAGE.md)
+- [Architecture risks and recommendations](docs/ARCHITECTURE-RISKS-AND-RECOMMENDATIONS.md)
+- [Historical root documents](docs/legacy-root/README.md)
 
-## Categories
+## Development
 
-- **AIChatPro and chat workspace:** 16 extensions
-- **Chatbot and customer conversation runtime:** 9 extensions
-- **Autonomous agents and workflow automation:** 10 extensions
-- **Model providers and model orchestration:** 10 extensions
-- **Creative, image, audio and video AI:** 26 extensions
-- **Content, SEO, social and growth AI:** 6 extensions
-- **Business discovery and intelligence:** 1 extension
+This is a Laravel application repository with Composer and Node-based frontend tooling. Use the project dependency manifests and existing CI workflows as the source of truth for supported commands.
 
-## Installation model
+```bash
+composer install
+npm install
+```
 
-These are MagicAI/Laravel marketplace extensions. Keep each extension folder name unchanged when copying it into the host extension directory. Install `titanai/hybrid-core:^1.0` in the WorkCore host before enabling the upgraded core suites, then install each core extension before its add-ons and run the host migration and publish process in a controlled environment.
+Before submitting changes, run the relevant project tests and checks for the files changed. For extension or source-dataset changes, also verify the generated inventories and materialisation workflow.
 
-Do not enable every package simultaneously without resolving the duplicated authority boundaries described in the architecture reports.
+## Project status
+
+This repository is an evolving source library and integration foundation. Its inventory and documented capabilities describe repository contents; they do not imply that every extension is production-ready, enabled, or supported as a standalone product.
+
+## License and attribution
+
+Review the applicable license and attribution information for the application, packages, and individual extensions before redistributing or deploying them. Third-party components may carry separate terms.
