@@ -26,7 +26,7 @@ final class ProcessPaymentWebhook implements ShouldQueue, ShouldBeUnique
 
     public function __construct(public readonly int $eventId)
     {
-        $this->onQueue('chatbot-ecommerce-payment-webhooks');
+        $this->onQueue((string) config('chatbot-ecommerce.queues.payment_webhooks', 'chatbot-ecommerce-payment-webhooks'));
     }
 
     public function uniqueId(): string
