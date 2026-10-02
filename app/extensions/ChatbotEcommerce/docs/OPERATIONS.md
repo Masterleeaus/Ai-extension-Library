@@ -1,6 +1,6 @@
-# Titan Commerce Operations
+# Smart Sellers Operations
 
-This guide covers installation configuration for the commerce extension at `app/extensions/ChatbotEcommerce/`. The package keeps its existing extension key and namespace for upgrade compatibility; **Titan Commerce** is its product name.
+This guide covers installation configuration for the commerce extension at `app/extensions/ChatbotEcommerce/`. The package keeps its existing extension key and namespace for upgrade compatibility; **Smart Sellers** is its product name.
 
 ## Store connections
 
