@@ -80,7 +80,7 @@ class ShopifyToolHandler
                             images(first: 5) {
                                 edges {
                                     node {
-                                        originalSrc
+                                        url
                                     }
                                 }
                             }
