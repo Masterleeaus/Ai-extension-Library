@@ -1,7 +1,7 @@
-﻿{
-    "name":  "Ecommerce for External Chatbot",
-    "type":  "extension",
-    "version":  "1.0.0",
-    "description":  "Chatbot ecommerce extension for magicai — TG: @heew_support",
-    "support_telegram":  "heew_support"
+{
+  "name": "Titan Commerce",
+  "type": "extension",
+  "version": "4.9.0",
+  "description": "Seller-owned AI commerce system with a shared catalogue, marketplace sales, customer shopping assistance, support, hire and booking workflows.",
+  "support_telegram": "heew_support"
 }
