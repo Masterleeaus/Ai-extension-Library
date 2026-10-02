@@ -1,3 +1,5 @@
+![Titan AI Extension Library — PRIVATE SOURCE LIBRARY · PROVENANCE TRACKED](docs/images/portfolio-banner.svg)
+
 # AI Extensions
 
 Deep-scanned and losslessly extracted AI extension library from `Extensions(2).zip`, with the verified TitanAI Hybrid Pass 3 core suites applied as a reproducible overlay.
