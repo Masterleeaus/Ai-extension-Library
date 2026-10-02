@@ -33,7 +33,6 @@ final class CommerceBookingApiController extends Controller
         $data = $request->validate([
             'slot_id' => ['required', 'integer', 'min:1'],
             'quantity' => ['sometimes', 'integer', 'min:1', 'max:100'],
-            'customer_identity_id' => ['sometimes', 'nullable', 'integer', 'min:1'],
             'customer_details' => ['sometimes', 'array'],
             'customer_details.name' => ['sometimes', 'string', 'max:191'],
             'customer_details.email' => ['sometimes', 'email', 'max:191'],
@@ -54,6 +53,7 @@ final class CommerceBookingApiController extends Controller
             (int) ($data['quantity'] ?? 1),
             (array) ($data['customer_details'] ?? []),
             $identityId !== null ? (int) $identityId : null,
+            (array) ($data['metadata'] ?? []),
         );
         return response()->json(['data' => $bookings->serializeBooking($booking)], 201);
     }
