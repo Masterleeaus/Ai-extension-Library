@@ -2,7 +2,7 @@
   "$schema": "./schemas/extension-manifest.schema.json",
   "schema_version": "1.0",
   "key": "chatbot-ecommerce",
-  "name": "Ecommerce for External Chatbot",
+  "name": "Titan Commerce",
   "version": "4.9.0",
   "folder": "ChatbotEcommerce",
   "namespace": "App\\Extensions\\ChatbotEcommerce",
