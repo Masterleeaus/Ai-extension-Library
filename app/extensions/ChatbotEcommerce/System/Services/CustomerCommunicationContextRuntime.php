@@ -61,7 +61,7 @@ final class CustomerCommunicationContextRuntime
                 ->all();
         }
 
-        $orders = CommerceOrder::query()
+        $orders = ($sessionId === null && $customerIdentityId === null)\n            ? collect()\n            : CommerceOrder::query()
             ->with(['items', 'events', 'returns.items', 'paymentIntent'])
             ->where('chatbot_id', $chatbotId)
             ->where(function ($query) use ($sessionId, $customerIdentityId): void {
