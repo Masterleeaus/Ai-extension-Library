@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "key": "chatbot-ecommerce",
-  "name": "Titan Commerce",
+  "name": "Smart Sellers",
   "version": "4.9.0",
   "folder": "ChatbotEcommerce",
   "namespace": "App\\Extensions\\ChatbotEcommerce",
