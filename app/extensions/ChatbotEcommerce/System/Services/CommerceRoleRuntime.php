@@ -17,19 +17,19 @@ final class CommerceRoleRuntime
             [
                 'role' => CommerceRole::SHOPPING_ASSISTANT,
                 'audience' => 'customer',
-                'purpose' => 'Conversational storefront, product discovery, cart, checkout, payments, tracking, and returns.',
+                'purpose' => 'Sell and support this seller’s own catalogue across the storefront and customer-facing channels.',
                 'authority' => ['inform', 'prepare', 'execute_after_customer_approval'],
             ],
             [
                 'role' => CommerceRole::SELLER_STEWARD,
                 'audience' => 'authenticated_seller',
-                'purpose' => 'Catalogue, listings, inventory, pricing, orders, fulfilment, analytics, and reversible seller operations.',
+                'purpose' => 'Operate this seller’s catalogue, connected marketplace listings, inventory, orders, fulfilment and sales workflow.',
                 'authority' => ['inform', 'prepare', 'execute_after_seller_approval'],
             ],
             [
                 'role' => CommerceRole::CUSTOMER_COMMUNICATIONS,
                 'audience' => 'customer_and_authenticated_seller_agents',
-                'purpose' => 'Pre-sale, checkout, post-sale, return, delivery, payment, and complaint communications.',
+                'purpose' => 'Follow up on this seller’s enquiries and sales, provide transaction-grounded support, request feedback and escalate sensitive cases.',
                 'authority' => ['answer_automatically', 'prepare_automatically', 'execute_within_limits', 'require_approval', 'human_only'],
             ],
         ];
