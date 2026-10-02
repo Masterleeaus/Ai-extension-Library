@@ -94,7 +94,7 @@ final class ChatbotEcommerceServiceProvider extends ServiceProvider implements U
             ->group(function (Router $router): void {
                 $router->post('{chatbot:uuid}/commerce/session-authority', [CommerceSessionAuthorityApiController::class, 'issue'])->name('commerce.session-authority.issue');
                 $router->get('commerce/roles', [CommerceRoleApiController::class, 'definitions'])->name('commerce.roles');
-                $router->post('commerce/roles/resolve', [CommerceRoleApiController::class, 'resolve'])->name('commerce.roles.resolve');
+                $router->post('{chatbot:uuid}/commerce/roles/resolve', [CommerceRoleApiController::class, 'resolve'])->name('commerce.roles.resolve');
                 $router->get('commerce/tools', [ConversationalCommerceApiController::class, 'definitions'])->name('commerce.tools');
             });
 
