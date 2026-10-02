@@ -109,7 +109,7 @@ final class ConversationalCommerceRuntime
     {
         $slotId = (int) ($arguments['slot_id'] ?? 0);
         $quantity = max(1, min((int) ($arguments['quantity'] ?? 1), 100));
-        $slot = \\App\\Extensions\\ChatbotEcommerce\\System\\Models\\CommerceBookingSlot::query()
+        $slot = \App\Extensions\ChatbotEcommerce\System\Models\CommerceBookingSlot::query()
             ->where('chatbot_id', (int) $chatbot->getKey())
             ->whereKey($slotId)
             ->where('status', 'open')
