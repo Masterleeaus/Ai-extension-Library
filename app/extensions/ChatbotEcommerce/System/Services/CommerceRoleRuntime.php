@@ -17,13 +17,13 @@ final class CommerceRoleRuntime
             [
                 'role' => CommerceRole::SHOPPING_ASSISTANT,
                 'audience' => 'customer',
-                'purpose' => 'Sell and support this seller’s own catalogue across the storefront and customer-facing channels.',
+                'purpose' => 'Sell and support this seller’s own products and bookable offers through the storefront and customer-facing channels.',
                 'authority' => ['inform', 'prepare', 'execute_after_customer_approval'],
             ],
             [
                 'role' => CommerceRole::SELLER_STEWARD,
                 'audience' => 'authenticated_seller',
-                'purpose' => 'Operate this seller’s catalogue, connected marketplace listings, inventory, orders, fulfilment and sales workflow.',
+                'purpose' => 'Operate this seller’s catalogue, connected marketplace listings, inventory, bookings, orders, fulfilment and sales workflow.',
                 'authority' => ['inform', 'prepare', 'execute_after_seller_approval'],
             ],
             [
