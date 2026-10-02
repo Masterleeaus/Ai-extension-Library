@@ -2,7 +2,7 @@
 
 namespace App\Extensions\ChatbotEcommerce\System\Tools;
 
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Http;\nuse Illuminate\Support\Facades\Log;
 
 // This class acts as a helper for an AI chatbot, handling the execution of
 // Shopify-related "tool" functions requested by the OpenAI API.
@@ -26,7 +26,7 @@ class ShopifyToolHandler
     public function __construct(
         string $shopifyDomain,
         string $shopifyStorefrontAccessToken,
-        string $shopifyApiVersion = '2023-07'
+        string $shopifyApiVersion = '2026-07'
     ) {
         // Initialize Shopify client with configuration.
         $this->shopifyApiEndpoint = "https://{$shopifyDomain}/api/{$shopifyApiVersion}/graphql.json";
@@ -385,28 +385,41 @@ class ShopifyToolHandler
      */
     private function sendShopifyGraphQLRequest(string $query, array $variables): array
     {
-        $payload = json_encode(['query' => $query, 'variables' => $variables]);
+        try {
+            $response = Http::connectTimeout(5)
+                ->timeout(20)
+                ->acceptJson()
+                ->withHeaders([
+                    'X-Shopify-Storefront-Access-Token' => $this->shopifyStorefrontAccessToken,
+                ])
+                ->post($this->shopifyApiEndpoint, ['query' => $query, 'variables' => $variables]);
 
-        $ch = curl_init($this->shopifyApiEndpoint);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            'Content-Type: application/json',
-            'X-Shopify-Storefront-Access-Token: ' . $this->shopifyStorefrontAccessToken,
-        ]);
+            $payload = $response->json();
+            if (! $response->successful() || ! is_array($payload)) {
+                Log::warning('Shopify Storefront API request failed.', [
+                    'status' => $response->status(),
+                    'domain' => $this->shopifyDomain,
+                ]);
 
-        $response = curl_exec($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
+                return ['errors' => ['message' => 'The connected Shopify storefront could not complete the request.']];
+            }
 
-        if ($httpCode !== 200) {
-            Log::error("Shopify API Error: HTTP Code {$httpCode}, Response: {$response}");
+            if (! empty($payload['errors'])) {
+                Log::warning('Shopify Storefront API returned GraphQL errors.', [
+                    'domain' => $this->shopifyDomain,
+                    'error_count' => count((array) $payload['errors']),
+                ]);
+            }
 
-            return ['errors' => ['message' => 'Shopify API request failed.']];
+            return $payload;
+        } catch (\\Throwable $exception) {
+            Log::warning('Shopify Storefront API request failed.', [
+                'domain' => $this->shopifyDomain,
+                'exception' => $exception::class,
+            ]);
+
+            return ['errors' => ['message' => 'The connected Shopify storefront is temporarily unavailable.']];
         }
-
-        return json_decode($response, true);
     }
 
     /**
