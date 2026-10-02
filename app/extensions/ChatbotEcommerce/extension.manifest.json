@@ -1,5 +1,4 @@
 {
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "schema_version": "1.0",
   "key": "chatbot-ecommerce",
   "name": "Titan Commerce",
