@@ -15,8 +15,8 @@ use App\Extensions\ChatbotEcommerce\System\Http\Controllers\Api\ConversationalCo
 use App\Extensions\ChatbotEcommerce\System\Http\Controllers\Api\CustomerCommunicationAdminApiController;
 use App\Extensions\ChatbotEcommerce\System\Http\Controllers\Api\CustomerCommunicationApiController;
 use App\Extensions\ChatbotEcommerce\System\Http\Controllers\Api\FulfillmentApiController;
-use App\Extensions\ChatbotEcommerce\System\Http\Controllers\Api\InventoryApiController;
 use App\Extensions\ChatbotEcommerce\System\Http\Controllers\Api\MarketplaceBulkAdminApiController;
+use App\Extensions\ChatbotEcommerce\System\Http\Controllers\Api\InventoryApiController;
 use App\Extensions\ChatbotEcommerce\System\Http\Controllers\Api\MarketplaceAdminApiController;
 use App\Extensions\ChatbotEcommerce\System\Http\Controllers\Api\MarketplaceApiController;
 use App\Extensions\ChatbotEcommerce\System\Http\Controllers\Api\MarketplaceInventoryAdminApiController;
@@ -272,7 +272,6 @@ final class ChatbotEcommerceServiceProvider extends ServiceProvider implements U
                 $router->post($base . '/rentals/accounts/{account}/payments', [RentalHireAdminApiController::class, 'recordPayment'])->name('rentals.payments.store');
                 $router->post($base . '/rentals/payments/{payment}/allocate', [RentalHireAdminApiController::class, 'allocatePayment'])->name('rentals.payments.allocate');
                 $router->post($base . '/rentals/payments/{payment}/confirm', [RentalHireAdminApiController::class, 'confirmPayment'])->name('rentals.payments.confirm');
-                $router->post($base . '/rentals/payments/{payment}/allocate', [RentalHireAdminApiController::class, 'allocatePayment'])->name('rentals.payments.allocate');
                 $router->post($base . '/rentals/payments/{payment}/reverse', [RentalHireAdminApiController::class, 'reversePayment'])->name('rentals.payments.reverse');
                 $router->post($base . '/rentals/charges/{charge}/adjustments', [RentalHireAdminApiController::class, 'adjustment'])->name('rentals.charges.adjust');
                 $router->get($base . '/rentals/receipts/{receipt}', [RentalHireAdminApiController::class, 'receipt'])->name('rentals.receipts.show');
