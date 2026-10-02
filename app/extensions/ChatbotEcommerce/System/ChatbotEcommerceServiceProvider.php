@@ -19,7 +19,6 @@ use App\Extensions\ChatbotEcommerce\System\Http\Controllers\Api\InventoryApiCont
 use App\Extensions\ChatbotEcommerce\System\Http\Controllers\Api\MarketplaceBulkAdminApiController;
 use App\Extensions\ChatbotEcommerce\System\Http\Controllers\Api\MarketplaceAdminApiController;
 use App\Extensions\ChatbotEcommerce\System\Http\Controllers\Api\MarketplaceApiController;
-use App\Extensions\ChatbotEcommerce\System\Http\Controllers\Api\MarketplaceBulkAdminApiController;
 use App\Extensions\ChatbotEcommerce\System\Http\Controllers\Api\MarketplaceInventoryAdminApiController;
 use App\Extensions\ChatbotEcommerce\System\Http\Controllers\Api\MarketplaceWriteAdminApiController;
 use App\Extensions\ChatbotEcommerce\System\Http\Controllers\Api\ListingIntelligenceAdminApiController;
