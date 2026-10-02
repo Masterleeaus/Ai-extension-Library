@@ -23,7 +23,7 @@ final class CommerceCredentialRuntime
         if (CredentialRedactor::containsSecretKey($configuration)) {
             throw ValidationException::withMessages(['configuration' => 'Secret values belong in the encrypted credentials payload, not configuration.']);
         }
-        $credentials = $this->normaliseCredentials($provider, $credentials);
+        $configuration = $this->normaliseStoreConfiguration($provider, $configuration);\n        $credentials = $this->normaliseCredentials($provider, $credentials);
         $existing = CommerceCredential::query()->where('chatbot_id', $chatbot->getKey())->where('provider', $provider)->first();
         $version = ((int) ($existing?->version ?? 0)) + 1;
         $record = CommerceCredential::query()->updateOrCreate(
@@ -171,6 +171,41 @@ final class CommerceCredentialRuntime
         }
 
         return $provider;
+    }
+
+    /** @param array<string,mixed> $configuration @return array<string,mixed> */
+    private function normaliseStoreConfiguration(string $provider, array $configuration): array
+    {
+        if (! array_key_exists('domain', $configuration)) {
+            return $configuration;
+        }
+
+        $input = trim((string) $configuration['domain']);
+        $url = str_contains($input, '://') ? $input : 'https://' . $input;
+        $parts = parse_url($url);
+        $host = strtolower(trim((string) ($parts['host'] ?? '')));
+        $path = trim((string) ($parts['path'] ?? ''), '/');
+
+        if (
+            ($parts['scheme'] ?? null) !== 'https'
+            || $host === ''
+            || isset($parts['user'])
+            || isset($parts['pass'])
+            || isset($parts['port'])
+            || isset($parts['query'])
+            || isset($parts['fragment'])
+            || filter_var($host, FILTER_VALIDATE_IP) !== false
+            || filter_var($host, FILTER_VALIDATE_DOMAIN, FILTER_FLAG_HOSTNAME) === false
+            || ($provider === 'shopify' && $path !== '')
+        ) {
+            throw ValidationException::withMessages(['configuration.domain' => 'Use a public HTTPS store hostname. WooCommerce may include its store path.']);
+        }
+
+        $configuration['domain'] = $provider === 'shopify'
+            ? $host
+            : 'https://' . $host . ($path !== '' ? '/' . $path : '');
+
+        return $configuration;
     }
 
     /** @param array<string,mixed> $credentials @return array<string,string> */
