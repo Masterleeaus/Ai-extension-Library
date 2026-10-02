@@ -34,8 +34,10 @@ use App\Extensions\ChatbotEcommerce\System\Http\Controllers\Api\RentalHireAdminA
 use App\Extensions\ChatbotEcommerce\System\Http\Controllers\Api\RentalHireApiController;
 use App\Extensions\ChatbotEcommerce\System\Http\Controllers\Api\ShippingAdminApiController;
 use App\Extensions\ChatbotEcommerce\System\Http\Controllers\Api\ShippingApiController;
+use App\Extensions\ChatbotEcommerce\System\Http\Controllers\Api\ShippingApiController;
 use App\Extensions\ChatbotEcommerce\System\Http\Controllers\Api\TaxAdminApiController;
 use App\Extensions\ChatbotEcommerce\System\Http\Controllers\Api\UnifiedOrderWorkbenchAdminApiController;
+use App\Extensions\ChatbotEcommerce\System\Http\Middleware\RequireCommerceSessionAuthority;
 use App\Extensions\ChatbotEcommerce\System\Http\Controllers\ChatbotEcommerceController;
 use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Routing\Router;
@@ -89,7 +91,7 @@ final class ChatbotEcommerceServiceProvider extends ServiceProvider implements U
                 $router->post('{chatbot:uuid}/session/{sessionId}/productGetCart', [ChatbotEcommerceApiController::class, 'productGetCart'])->name('product.getCart');
             });
 
-        $router->middleware(['api', LanguageMiddleware::class])->prefix('api/v3/chatbot/ecommerce')->name('api.v3.chatbot.ecommerce.')
+        $router->middleware(['api', LanguageMiddleware::class, RequireCommerceSessionAuthority::class])->prefix('api/v3/chatbot/ecommerce')->name('api.v3.chatbot.ecommerce.')
             ->group(function (Router $router): void {
                 $session = '{chatbot:uuid}/session/{sessionId}';
                 $router->post('{chatbot:uuid}/commerce/session-authority', [CommerceSessionAuthorityApiController::class, 'issue'])->name('commerce.session-authority.issue');
@@ -146,17 +148,17 @@ final class ChatbotEcommerceServiceProvider extends ServiceProvider implements U
                 $router->post($session . '/support/threads/{thread}/actions/{actionUuid}/execute', [CustomerCommunicationApiController::class, 'executeAction'])->name('support.actions.execute');
                 $router->post($session . '/support/threads/{thread}/escalations', [CustomerCommunicationApiController::class, 'escalate'])->name('support.escalations.store');
 
-                $router->get($session . '/shipping/quotes', [ShippingApiController::class, 'quotes'])->name('shipping.quotes');
-                $router->post($session . '/shipping/quotes', [ShippingApiController::class, 'quote'])->name('shipping.quotes.store');
+                $router->get($session . '/shipping/quotes', [ShippingApiController::class, 'options'])->name('shipping.quotes');
+                $router->post($session . '/shipping/quotes', [ShippingApiController::class, 'options'])->name('shipping.quotes.store');
                 $router->post($session . '/shipping/quotes/select', [ShippingApiController::class, 'select'])->name('shipping.quotes.select');
                 $router->get($session . '/inventory/reservations', [InventoryApiController::class, 'reservations'])->name('inventory.reservations');
                 $router->post($session . '/inventory/reservations', [InventoryApiController::class, 'reserve'])->name('inventory.reservations.store');
 
-                $router->post($session . '/payments/intents', [PaymentApiController::class, 'prepare'])->name('payments.intents.store');
-                $router->get($session . '/payments/intents/{intent}', [PaymentApiController::class, 'show'])->name('payments.intents.show');
+                $router->post($session . '/payments/intents', [PaymentApiController::class, 'createCheckout'])->name('payments.intents.store');
+                $router->get($session . '/payments/intents/{intent}', [PaymentApiController::class, 'showCheckout'])->name('payments.intents.show');
                 $router->post($session . '/payments/intents/{intent}/confirm', [PaymentApiController::class, 'confirm'])->name('payments.intents.confirm');
-                $router->post($session . '/bnpl/offers', [BnplApiController::class, 'offers'])->name('bnpl.offers');
-                $router->post($session . '/bnpl/applications', [BnplApiController::class, 'apply'])->name('bnpl.applications');
+                $router->post($session . '/bnpl/offers', [BnplApiController::class, 'checkoutOffers'])->name('bnpl.offers');
+                $router->post($session . '/bnpl/applications', [BnplApiController::class, 'selectCheckout'])->name('bnpl.applications');
 
                 $router->get('{chatbot:uuid}/rentals/accounts/{account}', [RentalHireApiController::class, 'summary'])->name('rentals.accounts.show');
                 $router->get('{chatbot:uuid}/rentals/accounts/{account}/ledger', [RentalHireApiController::class, 'ledger'])->name('rentals.accounts.ledger');
