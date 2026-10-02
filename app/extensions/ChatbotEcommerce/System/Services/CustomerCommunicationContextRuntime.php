@@ -34,8 +34,31 @@ final class CustomerCommunicationContextRuntime
             return $this->payload($thread, null, $cart?->toArray(), [], [], [], []);
         }
 
-        if ($sessionId === null && $customerIdentityId === null) {
+        if ($sessionId === null && $customerIdentityId === null && ! $thread->unified_order_id) {
             return $this->payload($thread, null, null, [], [], [], []);
+        }
+
+        $marketplaceOrders = collect();
+        if ($identityVerified) {
+            $marketplaceOrders = UnifiedCommerceOrder::query()
+                ->with(['sourceSnapshots', 'settlements', 'exceptions'])
+                ->where('chatbot_id', $chatbotId)
+                ->where('source_type', '!=', 'native')
+                ->where(function ($query) use ($thread, $customerIdentityId): void {
+                    if ($customerIdentityId !== null) {
+                        $query->where('customer_identity_id', $customerIdentityId);
+                    }
+                    if ($thread->unified_order_id) {
+                        $customerIdentityId !== null
+                            ? $query->orWhere('id', (int) $thread->unified_order_id)
+                            : $query->where('id', (int) $thread->unified_order_id);
+                    }
+                })
+                ->orderByDesc('placed_at')
+                ->limit(10)
+                ->get()
+                ->map(static fn (UnifiedCommerceOrder $order): array => $order->toArray())
+                ->all();
         }
 
         $orders = CommerceOrder::query()
@@ -123,11 +146,12 @@ final class CustomerCommunicationContextRuntime
             $paymentIntents->map->toArray()->all(),
             $fulfillments->map->toArray()->all(),
             $returns->map->toArray()->all(),
+            $marketplaceOrders,
         );
     }
 
     /** @param array<string,mixed>|null $cart @param array<int,mixed> $orders @param array<int,mixed> $payments @param array<int,mixed> $fulfillments @param array<int,mixed> $returns @return array<string,mixed> */
-    private function payload(CommerceCommunicationThread $thread, ?int $customerIdentityId, ?array $cart, array $orders, array $payments, array $fulfillments, array $returns): array
+    private function payload(CommerceCommunicationThread $thread, ?int $customerIdentityId, ?array $cart, array $orders, array $payments, array $fulfillments, array $returns, array $marketplaceOrders = []): array
     {
         return [
             'role' => 'customer_communications',
@@ -140,7 +164,7 @@ final class CustomerCommunicationContextRuntime
             ],
             'customer_identity_id' => $customerIdentityId,
             'active_cart' => $cart,
-            'orders' => $orders,
+            'orders' => $orders,\n            'marketplace_orders' => $marketplaceOrders,
             'payments' => $payments,
             'fulfillments' => $fulfillments,
             'returns' => $returns,
