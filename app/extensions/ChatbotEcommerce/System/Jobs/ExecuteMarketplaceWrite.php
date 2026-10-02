@@ -23,7 +23,7 @@ final class ExecuteMarketplaceWrite implements ShouldQueue, ShouldBeUnique
     public int $tries = 3;
     public int $timeout = 120;
 
-    public function __construct(public readonly int $proposalId) { $this->onQueue('chatbot-ecommerce-marketplace-write'); }
+    public function __construct(public readonly int $proposalId) { $this->onQueue((string) config('chatbot-ecommerce.queues.marketplace_write', 'chatbot-ecommerce-marketplace-write')); }
     public function uniqueId(): string { return 'marketplace-write:' . $this->proposalId; }
     /** @return list<int> */ public function backoff(): array { return RetryBackoff::schedule($this->tries, 10, 300); }
     /** @return list<object> */ public function middleware(): array { return [app(RestoreCommerceTenantContext::class)]; }
