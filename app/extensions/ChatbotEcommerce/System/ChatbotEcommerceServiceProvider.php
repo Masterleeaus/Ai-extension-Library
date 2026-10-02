@@ -34,7 +34,6 @@ use App\Extensions\ChatbotEcommerce\System\Http\Controllers\Api\RentalHireAdminA
 use App\Extensions\ChatbotEcommerce\System\Http\Controllers\Api\RentalHireApiController;
 use App\Extensions\ChatbotEcommerce\System\Http\Controllers\Api\ShippingAdminApiController;
 use App\Extensions\ChatbotEcommerce\System\Http\Controllers\Api\ShippingApiController;
-use App\Extensions\ChatbotEcommerce\System\Http\Controllers\Api\ShippingApiController;
 use App\Extensions\ChatbotEcommerce\System\Http\Controllers\Api\TaxAdminApiController;
 use App\Extensions\ChatbotEcommerce\System\Http\Controllers\Api\UnifiedOrderWorkbenchAdminApiController;
 use App\Extensions\ChatbotEcommerce\System\Http\Middleware\RequireCommerceSessionAuthority;
