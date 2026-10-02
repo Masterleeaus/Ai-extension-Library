@@ -110,4 +110,9 @@ foreach (['CommerceRoleApiController', 'CustomerCommunicationApiController', 'Cu
     $assert(str_contains($providerWiring, $routeWiring), "service provider must register {$routeWiring}");
 }
 
+$providerWiring = file_get_contents($root . '/System/ChatbotEcommerceServiceProvider.php');
+foreach (['CommerceRoleApiController', 'CustomerCommunicationApiController', 'CustomerCommunicationAdminApiController', 'commerce/roles', 'support/messages', 'support/threads'] as $routeWiring) {
+    $assert(str_contains($providerWiring, $routeWiring), "service provider must register {$routeWiring}");
+}
+
 echo "Three-role contract checks passed: {$checks}\n";
