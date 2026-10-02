@@ -16,6 +16,7 @@ use App\Extensions\ChatbotEcommerce\System\Http\Controllers\Api\CustomerCommunic
 use App\Extensions\ChatbotEcommerce\System\Http\Controllers\Api\CustomerCommunicationApiController;
 use App\Extensions\ChatbotEcommerce\System\Http\Controllers\Api\FulfillmentApiController;
 use App\Extensions\ChatbotEcommerce\System\Http\Controllers\Api\InventoryApiController;
+use App\Extensions\ChatbotEcommerce\System\Http\Controllers\Api\MarketplaceBulkAdminApiController;
 use App\Extensions\ChatbotEcommerce\System\Http\Controllers\Api\MarketplaceAdminApiController;
 use App\Extensions\ChatbotEcommerce\System\Http\Controllers\Api\MarketplaceApiController;
 use App\Extensions\ChatbotEcommerce\System\Http\Controllers\Api\MarketplaceBulkAdminApiController;
@@ -149,7 +150,9 @@ final class ChatbotEcommerceServiceProvider extends ServiceProvider implements U
 
                 $router->get($session . '/shipping/options', [ShippingApiController::class, 'options'])->name('shipping.options');
                 $router->get($session . '/inventory/reservations', [InventoryApiController::class, 'reservations'])->name('inventory.reservations');
+                $router->get($session . '/inventory/{variant}/availability', [InventoryApiController::class, 'show'])->name('inventory.availability');
                 $router->post($session . '/inventory/reservations', [InventoryApiController::class, 'reserve'])->name('inventory.reservations.store');
+                $router->delete($session . '/inventory/reservations/{reservation}', [InventoryApiController::class, 'release'])->name('inventory.reservations.release');
 
                 $router->post($session . '/checkout/payments/intents', [PaymentApiController::class, 'createCheckout'])->name('checkout.payments.intents.store');
                 $router->get($session . '/checkout/payments/intents/{intent}', [PaymentApiController::class, 'showCheckout'])->name('checkout.payments.intents.show');
@@ -208,8 +211,9 @@ final class ChatbotEcommerceServiceProvider extends ServiceProvider implements U
                 $router->post($base . '/marketplace-write-proposals/{proposal}/execute', [MarketplaceWriteAdminApiController::class, 'execute'])->name('marketplace-write-proposals.execute');
                 $router->post($base . '/marketplace-write-proposals/{proposal}/rollback', [MarketplaceWriteAdminApiController::class, 'rollback'])->name('marketplace-write-proposals.rollback');
 
+                $router->get($base . '/marketplace-bulk-batches', [MarketplaceBulkAdminApiController::class, 'index'])->name('marketplace-bulk-batches.index');
                 $router->get($base . '/marketplace-bulk-batches/{batch}', [MarketplaceBulkAdminApiController::class, 'show'])->name('marketplace-bulk-batches.show');
-                $router->post($base . '/marketplace-bulk-batches', [MarketplaceBulkAdminApiController::class, 'prepare'])->name('marketplace-bulk-batches.store');
+                $router->post($base . '/marketplaces/{connection}/bulk-batches/preview', [MarketplaceBulkAdminApiController::class, 'preview'])->name('marketplace-bulk-batches.preview');
                 $router->post($base . '/marketplace-bulk-batches/{batch}/approve', [MarketplaceBulkAdminApiController::class, 'approve'])->name('marketplace-bulk-batches.approve');
                 $router->post($base . '/marketplace-bulk-batches/{batch}/execute', [MarketplaceBulkAdminApiController::class, 'execute'])->name('marketplace-bulk-batches.execute');
                 $router->post($base . '/marketplace-bulk-batches/{batch}/rollback', [MarketplaceBulkAdminApiController::class, 'rollback'])->name('marketplace-bulk-batches.rollback');
@@ -252,16 +256,30 @@ final class ChatbotEcommerceServiceProvider extends ServiceProvider implements U
 
                 $router->post($base . '/orders/{order}/fulfillments', [FulfillmentApiController::class, 'store'])->name('fulfillments.store');
                 $router->get($base . '/orders/{order}/fulfillments', [FulfillmentApiController::class, 'index'])->name('fulfillments.index');
-                $router->put($base . '/orders/{order}/fulfillments/{fulfillment}', [FulfillmentApiController::class, 'update'])->name('fulfillments.update');
-                $router->post($base . '/orders/{order}/fulfillments/{fulfillment}/ship', [FulfillmentApiController::class, 'ship'])->name('fulfillments.ship');
+                $router->post($base . '/fulfillments/{fulfillment}/processing', [FulfillmentApiController::class, 'processing'])->name('fulfillments.processing');
+                $router->post($base . '/fulfillments/{fulfillment}/shipped', [FulfillmentApiController::class, 'shipped'])->name('fulfillments.shipped');
+                $router->post($base . '/fulfillments/{fulfillment}/delivered', [FulfillmentApiController::class, 'delivered'])->name('fulfillments.delivered');
+                $router->post($base . '/fulfillments/{fulfillment}/cancel', [FulfillmentApiController::class, 'cancel'])->name('fulfillments.cancel');
 
-                $router->post($base . '/rentals/accounts', [RentalHireAdminApiController::class, 'openAccount'])->name('rentals.accounts.store');
-                $router->post($base . '/rentals/accounts/{account}/agreements', [RentalHireAdminApiController::class, 'createAgreement'])->name('rentals.agreements.store');
-                $router->post($base . '/rentals/agreements/{agreement}/extend', [RentalHireAdminApiController::class, 'extendAgreement'])->name('rentals.agreements.extend');
-                $router->post($base . '/rentals/agreements/{agreement}/return', [RentalHireAdminApiController::class, 'returnAgreement'])->name('rentals.agreements.return');
+                $router->get($base . '/rentals/accounts', [RentalHireAdminApiController::class, 'accounts'])->name('rentals.accounts.index');
+                $router->post($base . '/rentals/accounts', [RentalHireAdminApiController::class, 'storeAccount'])->name('rentals.accounts.store');
+                $router->get($base . '/rentals/accounts/{account}', [RentalHireAdminApiController::class, 'showAccount'])->name('rentals.accounts.show');
+                $router->post($base . '/rentals/accounts/{account}/tokens/rotate', [RentalHireAdminApiController::class, 'rotateToken'])->name('rentals.accounts.tokens.rotate');
+                $router->get($base . '/rentals/accounts/{account}/agreements', [RentalHireAdminApiController::class, 'agreements'])->name('rentals.agreements.index');
+                $router->post($base . '/rentals/accounts/{account}/agreements', [RentalHireAdminApiController::class, 'storeAgreement'])->name('rentals.agreements.store');
+                $router->put($base . '/rentals/agreements/{agreement}', [RentalHireAdminApiController::class, 'updateAgreement'])->name('rentals.agreements.update');
+                $router->post($base . '/rentals/agreements/{agreement}/rates', [RentalHireAdminApiController::class, 'addRate'])->name('rentals.agreements.rates.store');
+                $router->post($base . '/rentals/agreements/{agreement}/generate-charges', [RentalHireAdminApiController::class, 'generateCharges'])->name('rentals.agreements.charges.generate');
+                $router->get($base . '/rentals/accounts/{account}/summary', [RentalHireAdminApiController::class, 'summary'])->name('rentals.accounts.summary');
+                $router->get($base . '/rentals/accounts/{account}/ledger', [RentalHireAdminApiController::class, 'ledger'])->name('rentals.accounts.ledger');
+                $router->post($base . '/rentals/accounts/{account}/payment-requests', [RentalHireAdminApiController::class, 'paymentRequest'])->name('rentals.payment-requests');
                 $router->post($base . '/rentals/accounts/{account}/payments', [RentalHireAdminApiController::class, 'recordPayment'])->name('rentals.payments.store');
                 $router->post($base . '/rentals/payments/{payment}/allocate', [RentalHireAdminApiController::class, 'allocatePayment'])->name('rentals.payments.allocate');
-                $router->post($base . '/rentals/charges/{charge}/adjustments', [RentalHireAdminApiController::class, 'adjustCharge'])->name('rentals.charges.adjust');
+                $router->post($base . '/rentals/payments/{payment}/confirm', [RentalHireAdminApiController::class, 'confirmPayment'])->name('rentals.payments.confirm');
+                $router->post($base . '/rentals/payments/{payment}/allocate', [RentalHireAdminApiController::class, 'allocatePayment'])->name('rentals.payments.allocate');
+                $router->post($base . '/rentals/payments/{payment}/reverse', [RentalHireAdminApiController::class, 'reversePayment'])->name('rentals.payments.reverse');
+                $router->post($base . '/rentals/charges/{charge}/adjustments', [RentalHireAdminApiController::class, 'adjustment'])->name('rentals.charges.adjust');
+                $router->get($base . '/rentals/receipts/{receipt}', [RentalHireAdminApiController::class, 'receipt'])->name('rentals.receipts.show');
             });
 
         $router->middleware(['api'])->prefix('api/v3/chatbot/ecommerce/payment-webhooks')->name('api.v3.chatbot.ecommerce.payment-webhooks.')
