@@ -21,7 +21,7 @@ final class SearchMarketplaceListings implements ShouldQueue, ShouldBeUnique
     public int $tries = 3;
     public int $timeout = 120;
     public int $uniqueFor = 300;
-    public function __construct(public readonly int $searchId) { $this->onQueue('chatbot-ecommerce-marketplace-read'); }
+    public function __construct(public readonly int $searchId) { $this->onQueue((string) config('chatbot-ecommerce.queues.marketplace_read', 'chatbot-ecommerce-marketplace-read')); }
     public function uniqueId(): string { return 'marketplace-search-' . $this->searchId; }
     /** @return list<int> */ public function backoff(): array { return RetryBackoff::schedule($this->tries, 5, 120); }
     /** @return list<object> */ public function middleware(): array { return [app(RestoreCommerceTenantContext::class)]; }
