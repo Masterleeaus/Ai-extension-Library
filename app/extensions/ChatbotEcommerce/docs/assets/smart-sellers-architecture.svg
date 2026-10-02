@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1420" viewBox="0 0 1440 1420" role="img" aria-labelledby="title desc">
+<title id="title">Smart Sellers architecture</title>
+<desc id="desc">A seller's unified product line powers three AI roles through a governed commerce core and connected sales channels.</desc>
+<defs>
+ <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#07182e"/><stop offset="1" stop-color="#103450"/></linearGradient>
+ <linearGradient id="aqua" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#31d2d0"/><stop offset="1" stop-color="#5fe6c4"/></linearGradient>
+ <linearGradient id="amber" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#f3ae54"/><stop offset="1" stop-color="#ffd58a"/></linearGradient>
+ <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0 0 12 6 0 12z" fill="#55d8d1"/></marker>
+ <filter id="soft"><feGaussianBlur stdDeviation="12"/></filter>
+</defs>
+<rect width="1440" height="1420" rx="32" fill="url(#bg)"/>
+<circle cx="1280" cy="210" r="220" fill="#13aabd" opacity=".07" filter="url(#soft)"/>
+<circle cx="140" cy="1210" r="250" fill="#f1a945" opacity=".05" filter="url(#soft)"/>
+<g font-family="Inter,Segoe UI,Arial,sans-serif">
+ <text x="100" y="98" fill="#62ded7" font-size="16" font-weight="700" letter-spacing="3">SMART SELLERS · PRODUCT ARCHITECTURE</text>
+ <text x="100" y="158" fill="#f4f8fc" font-size="42" font-weight="750">One seller system, from product line to repeat sale</text>
+ <text x="100" y="199" fill="#b4c9d9" font-size="21">AI roles share a governed catalogue, operational record and seller authority.</text>
+ <!-- seller catalogue -->
+ <rect x="100" y="242" width="1240" height="174" rx="24" fill="#102b44" stroke="#4ad7d3" stroke-opacity=".55" stroke-width="2"/>
+ <text x="138" y="285" fill="#68e1da" font-size="15" font-weight="700" letter-spacing="2">SELLER PRODUCT LINE</text>
+ <text x="138" y="323" fill="#f4f8fc" font-size="26" font-weight="700">A single source for what the seller offers</text>
+ <g font-size="17" font-weight="600">
+  <rect x="138" y="350" width="240" height="42" rx="21" fill="#173d56"/><text x="166" y="377" fill="#d4e8f0">Physical &amp; digital goods</text>
+  <rect x="396" y="350" width="220" height="42" rx="21" fill="#173d56"/><text x="430" y="377" fill="#d4e8f0">Services &amp; appointments</text>
+  <rect x="634" y="350" width="206" height="42" rx="21" fill="#173d56"/><text x="674" y="377" fill="#d4e8f0">Hire &amp; rentals</text>
+  <rect x="858" y="350" width="198" height="42" rx="21" fill="#173d56"/><text x="891" y="377" fill="#d4e8f0">Bookings &amp; events</text>
+ </g>
+ <path d="M720 418v42" stroke="#55d8d1" stroke-width="3" marker-end="url(#arrow)"/>
+ <!-- role cards -->
+ <g>
+  <rect x="100" y="478" width="390" height="224" rx="22" fill="#0d263e" stroke="#3cd4d2" stroke-opacity=".75" stroke-width="2"/>
+  <circle cx="146" cy="526" r="17" fill="#31d2d0"/><path d="M137 526h18m-9-9v18" stroke="#073044" stroke-width="3" stroke-linecap="round"/>
+  <text x="178" y="533" fill="#f5f8fb" font-size="22" font-weight="700">Customer Shopping</text>
+  <text x="138" y="582" fill="#b9d0df" font-size="17">Guides discovery, comparison,</text><text x="138" y="609" fill="#b9d0df" font-size="17">availability, cart and checkout.</text>
+  <rect x="138" y="642" width="162" height="34" rx="17" fill="#153a4f"/><text x="157" y="665" fill="#8ce7df" font-size="13" font-weight="700">CUSTOMER-FACING</text>
+ </g>
+ <g>
+  <rect x="525" y="478" width="390" height="224" rx="22" fill="#0d263e" stroke="#f5bd65" stroke-opacity=".75" stroke-width="2"/>
+  <circle cx="571" cy="526" r="17" fill="#f5bd65"/><path d="M562 523h18v14h-18zM566 519v-4h10v4" fill="none" stroke="#513914" stroke-width="2.5" stroke-linejoin="round"/>
+  <text x="603" y="533" fill="#f5f8fb" font-size="22" font-weight="700">Seller Commerce Steward</text>
+  <text x="563" y="582" fill="#b9d0df" font-size="17">Prepares listings, tracks stock and</text><text x="563" y="609" fill="#b9d0df" font-size="17">orders, resolves channel conflicts.</text>
+  <rect x="563" y="642" width="142" height="34" rx="17" fill="#3b3428"/><text x="583" y="665" fill="#ffdda6" font-size="13" font-weight="700">SELLER-OPERATED</text>
+ </g>
+ <g>
+  <rect x="950" y="478" width="390" height="224" rx="22" fill="#0d263e" stroke="#3cd4d2" stroke-opacity=".75" stroke-width="2"/>
+  <circle cx="996" cy="526" r="17" fill="#31d2d0"/><path d="M987 527q9-12 18 0M989 533h14" fill="none" stroke="#073044" stroke-width="2.5" stroke-linecap="round"/>
+  <text x="1028" y="533" fill="#f5f8fb" font-size="22" font-weight="700">Customer Communications</text>
+  <text x="988" y="582" fill="#b9d0df" font-size="17">Uses verified order context, drafts</text><text x="988" y="609" fill="#b9d0df" font-size="17">replies and escalates sensitive cases.</text>
+  <rect x="988" y="642" width="170" height="34" rx="17" fill="#153a4f"/><text x="1008" y="665" fill="#8ce7df" font-size="13" font-weight="700">DRAFTS FOR REVIEW</text>
+ </g>
+ <path d="M295 704v44h425M720 704v44M1145 704v44H720v27" fill="none" stroke="#55d8d1" stroke-width="3" marker-end="url(#arrow)"/>
+ <!-- core -->
+ <rect x="100" y="790" width="1240" height="228" rx="24" fill="#102b44" stroke="#55d8d1" stroke-opacity=".6" stroke-width="2"/>
+ <text x="138" y="835" fill="#68e1da" font-size="15" font-weight="700" letter-spacing="2">SHARED COMMERCE CORE</text>
+ <text x="138" y="873" fill="#f4f8fc" font-size="26" font-weight="700">One operational record across the seller journey</text>
+ <g font-size="16" font-weight="600" text-anchor="middle">
+  <rect x="138" y="903" width="176" height="76" rx="14" fill="#173d56"/><text x="226" y="948" fill="#d9eaf1">Catalogue &amp; pricing</text>
+  <rect x="330" y="903" width="176" height="76" rx="14" fill="#173d56"/><text x="418" y="948" fill="#d9eaf1">Inventory &amp; capacity</text>
+  <rect x="522" y="903" width="176" height="76" rx="14" fill="#173d56"/><text x="610" y="948" fill="#d9eaf1">Cart &amp; checkout</text>
+  <rect x="714" y="903" width="176" height="76" rx="14" fill="#173d56"/><text x="802" y="948" fill="#d9eaf1">Orders &amp; fulfilment</text>
+  <rect x="906" y="903" width="176" height="76" rx="14" fill="#173d56"/><text x="994" y="948" fill="#d9eaf1">Payments &amp; returns</text>
+  <rect x="1098" y="903" width="204" height="76" rx="14" fill="#173d56"/><text x="1200" y="948" fill="#d9eaf1">Bookings &amp; hire</text>
+ </g>
+ <path d="M720 1020v42" stroke="#55d8d1" stroke-width="3" marker-end="url(#arrow)"/>
+ <!-- channels -->
+ <rect x="100" y="1080" width="1240" height="148" rx="24" fill="#0d263e" stroke="#f0b75e" stroke-opacity=".65" stroke-width="2"/>
+ <text x="138" y="1123" fill="#ffd189" font-size="15" font-weight="700" letter-spacing="2">CONNECTED SALES &amp; SERVICE CHANNELS</text>
+ <g font-size="17" font-weight="600" text-anchor="middle">
+  <rect x="138" y="1150" width="258" height="52" rx="16" fill="#173d56"/><text x="267" y="1183" fill="#e1edf4">Native storefront</text>
+  <rect x="420" y="1150" width="258" height="52" rx="16" fill="#173d56"/><text x="549" y="1183" fill="#e1edf4">Shopify · WooCommerce</text>
+  <rect x="702" y="1150" width="330" height="52" rx="16" fill="#173d56"/><text x="867" y="1183" fill="#e1edf4">Amazon · eBay · Etsy gateways</text>
+  <rect x="1056" y="1150" width="246" height="52" rx="16" fill="#173d56"/><text x="1179" y="1183" fill="#e1edf4">Support conversations</text>
+ </g>
+ <!-- governance footer -->
+ <rect x="100" y="1260" width="1240" height="104" rx="20" fill="#081d31" stroke="#294c65"/>
+ <text x="138" y="1300" fill="#75dcd7" font-size="14" font-weight="700" letter-spacing="2">SELLER AUTHORITY RUNS THROUGH EVERY ACTION</text>
+ <text x="138" y="1335" fill="#b9cad8" font-size="16">Scoped credentials  ·  Approval gates  ·  Idempotent actions  ·  Audit history  ·  Human handoff</text>
+ <text x="100" y="1392" fill="#6f8da4" font-size="13">Marketplace writes route through configured gateways. Customer replies and feedback requests are persisted as unsent drafts until channel delivery is connected.</text>
+</g>
+</svg>
