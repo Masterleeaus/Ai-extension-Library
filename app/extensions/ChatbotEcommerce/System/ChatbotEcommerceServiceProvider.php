@@ -148,7 +148,6 @@ final class ChatbotEcommerceServiceProvider extends ServiceProvider implements U
                 $router->post($session . '/support/threads/{thread}/escalations', [CustomerCommunicationApiController::class, 'escalate'])->name('support.escalations.store');
 
                 $router->get($session . '/shipping/options', [ShippingApiController::class, 'options'])->name('shipping.options');
-                $router->get($session . '/inventory/reservations', [InventoryApiController::class, 'reservations'])->name('inventory.reservations');
                 $router->get($session . '/inventory/{variant}/availability', [InventoryApiController::class, 'show'])->name('inventory.availability');
                 $router->post($session . '/inventory/reservations', [InventoryApiController::class, 'reserve'])->name('inventory.reservations.store');
                 $router->delete($session . '/inventory/reservations/{reservation}', [InventoryApiController::class, 'release'])->name('inventory.reservations.release');
@@ -163,8 +162,6 @@ final class ChatbotEcommerceServiceProvider extends ServiceProvider implements U
                 $router->post('{chatbot:uuid}/rentals/accounts/{account}/payments/{payment}/bnpl/select', [BnplApiController::class, 'selectRental'])->name('bnpl.rentals.select');
                 $router->post($session . '/payments/intents', [PaymentApiController::class, 'createCheckout'])->name('payments.intents.store');
                 $router->get($session . '/payments/intents/{intent}', [PaymentApiController::class, 'showCheckout'])->name('payments.intents.show');
-                $router->post($session . '/payments/intents/{intent}/confirm', [PaymentApiController::class, 'confirm'])->name('payments.intents.confirm');
-                $router->post($session . '/bnpl/offers', [BnplApiController::class, 'checkoutOffers'])->name('bnpl.offers');
 
                 $router->get('{chatbot:uuid}/rentals/accounts/{account}', [RentalHireApiController::class, 'summary'])->name('rentals.accounts.show');
                 $router->get('{chatbot:uuid}/rentals/accounts/{account}/ledger', [RentalHireApiController::class, 'ledger'])->name('rentals.accounts.ledger');
