@@ -4,6 +4,13 @@
 
 Deep-scanned and losslessly extracted AI extension library from `Extensions(2).zip`, with the verified TitanAI Hybrid Pass 3 core suites applied as a reproducible overlay.
 
+## Product architecture and engineering highlights
+
+A reproducible source library of 78 AI extensions, including the AIChatPro, Chatbot, and AIAgent suites and a shared TitanAI foundation.
+
+- **Architecture:** The repository preserves extension paths and bytes in a checksummed transport dataset, then applies verified Hybrid Pass 3 replacements and a Composer core overlay through repeatable materialisation.
+- **Distinctive engineering:** Its differentiator is provenance-aware, lossless extraction at scale: the README inventories 4,213 source/assets and records the canonical chatbot and shared package boundary.
+
 ## Repository scope
 
 - **78 selected AI extensions**
