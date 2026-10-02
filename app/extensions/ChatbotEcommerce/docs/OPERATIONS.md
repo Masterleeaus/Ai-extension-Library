@@ -14,7 +14,7 @@ Connect seller storefront credentials through the authenticated credential manag
 
 The storefront connection APIs are under:
 
-`/api/v3/chatbot/ecommerce/{chatbot}/credentials/{provider}`
+`/api/v3/chatbot/ecommerce/{chatbot}/credentials/{provider}` (authenticated seller)
 
 The seller must authenticate as the owner of the selected storefront. The extension never returns credential values in credential summaries.
 
@@ -58,13 +58,30 @@ Marketplace gateway timeouts and retry settings can be configured with:
 
 Configure the signing secret outside source control. Marketplace credentials belong in the connected seller credential vault; use only a non-secret `credential_reference` in the connection record.
 
+## Seller API map
+
+Seller management endpoints use the `/api/v3/chatbot/ecommerce/{chatbot}` prefix and require an authenticated seller who owns the selected chatbot/store. The API currently exposes these primary workflows:
+
+| Workflow | Endpoint | Purpose |
+| --- | --- | --- |
+| Store credentials | `PUT /{chatbot}/credentials/{provider}` | Save or rotate Shopify/WooCommerce credentials; use `POST .../{provider}/test` to verify and `DELETE .../{provider}` to revoke. |
+| Marketplace channels | `GET/POST /{chatbot}/marketplaces`, `PUT /{chatbot}/marketplaces/{connection}` | Connect provider gateway references and manage channel state. |
+| Marketplace orders | `POST /{chatbot}/marketplaces/{connection}/orders/import`, `GET /{chatbot}/marketplaces/orders` | Import external orders and view imported order snapshots. |
+| Listing operations | `POST /{chatbot}/marketplace-write-proposals` and `/marketplace-bulk-batches` | Prepare, approve, execute and roll back governed listing changes. |
+| Unified order desk | `GET /{chatbot}/unified-orders`, `/order-exceptions` | Review cross-channel orders, settlement reconciliation and exceptions. |
+| Booking availability | `GET/POST /{chatbot}/bookings/slots` | Read and create capacity slots linked to the seller’s catalogue. |
+| Booking operations | `GET /{chatbot}/bookings`, `POST /{chatbot}/bookings/{booking}/cancel` | Review and cancel reservations as the seller. |
+| Customer support | `GET /{chatbot}/support/threads`, `GET/PUT /{chatbot}/support/policies` | Review threads, tune policies and resolve escalations. |
+
+Customer-facing commerce APIs use `/api/v3/chatbot/ecommerce/{chatbot}/session/{sessionId}/...`. The host application must issue signed session authority at `POST /api/v3/chatbot/ecommerce/{chatbot}/commerce/session-authority`; session routes reject requests without valid authority. Those APIs cover catalogue, cart, checkout, orders, shipping, inventory, payments, booking availability/reservation/cancellation and customer support. Authenticated seller endpoints and customer session endpoints are separate trust boundaries.
+
 ## Seller AI roles
 
 All three roles operate on behalf of the seller:
 
 1. **Customer Shopping Assistant** answers from the seller’s catalogue, guides purchases, finds booking availability and prepares customer-approved reservations.
 2. **Seller Commerce Steward** manages the seller’s connected listings, orders, inventory and sales work through seller-authorized marketplace tools.
-3. **Customer Communications Agent** uses verified native and marketplace order context, drafts responses and feedback requests, prepares governed customer actions, and escalates cases for human review. Outbound follow-ups remain drafts until a seller approves sending through a connected channel.
+3. **Customer Communications Agent** uses verified native and marketplace order context, drafts responses and feedback requests, prepares governed support actions, and escalates cases for human review. Message and feedback content can be drafted now; outbound delivery through connected email, marketplace or messaging channels still needs a channel transport integration.
 
 Customer-facing booking reservations require a signed session authority. Reservation preparation does not consume capacity; capacity is committed only after customer approval. Sellers manage availability and reservations through authenticated booking APIs.
 
