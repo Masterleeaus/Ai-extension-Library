@@ -147,9 +147,7 @@ final class ChatbotEcommerceServiceProvider extends ServiceProvider implements U
                 $router->post($session . '/support/threads/{thread}/actions/{actionUuid}/execute', [CustomerCommunicationApiController::class, 'executeAction'])->name('support.actions.execute');
                 $router->post($session . '/support/threads/{thread}/escalations', [CustomerCommunicationApiController::class, 'escalate'])->name('support.escalations.store');
 
-                $router->get($session . '/shipping/quotes', [ShippingApiController::class, 'options'])->name('shipping.quotes');
-                $router->post($session . '/shipping/quotes', [ShippingApiController::class, 'options'])->name('shipping.quotes.store');
-                $router->post($session . '/shipping/quotes/select', [ShippingApiController::class, 'select'])->name('shipping.quotes.select');
+                $router->get($session . '/shipping/options', [ShippingApiController::class, 'options'])->name('shipping.options');
                 $router->get($session . '/inventory/reservations', [InventoryApiController::class, 'reservations'])->name('inventory.reservations');
                 $router->post($session . '/inventory/reservations', [InventoryApiController::class, 'reserve'])->name('inventory.reservations.store');
 
