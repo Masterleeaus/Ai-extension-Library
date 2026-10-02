@@ -153,11 +153,18 @@ final class ChatbotEcommerceServiceProvider extends ServiceProvider implements U
                 $router->get($session . '/inventory/reservations', [InventoryApiController::class, 'reservations'])->name('inventory.reservations');
                 $router->post($session . '/inventory/reservations', [InventoryApiController::class, 'reserve'])->name('inventory.reservations.store');
 
+                $router->post($session . '/checkout/payments/intents', [PaymentApiController::class, 'createCheckout'])->name('checkout.payments.intents.store');
+                $router->get($session . '/checkout/payments/intents/{intent}', [PaymentApiController::class, 'showCheckout'])->name('checkout.payments.intents.show');
+                $router->post('{chatbot:uuid}/rentals/accounts/{account}/payments/{payment}/intents', [PaymentApiController::class, 'createRental'])->name('rentals.payments.intents.store');
+                $router->get('{chatbot:uuid}/rentals/accounts/{account}/payments/{payment}/intents/{intent}', [PaymentApiController::class, 'showRental'])->name('rentals.payments.intents.show');
+                $router->post($session . '/bnpl/checkout/offers', [BnplApiController::class, 'checkoutOffers'])->name('bnpl.checkout.offers');
+                $router->post($session . '/bnpl/checkout/select', [BnplApiController::class, 'selectCheckout'])->name('bnpl.checkout.select');
+                $router->post('{chatbot:uuid}/rentals/accounts/{account}/payments/{payment}/bnpl/offers', [BnplApiController::class, 'rentalOffers'])->name('bnpl.rentals.offers');
+                $router->post('{chatbot:uuid}/rentals/accounts/{account}/payments/{payment}/bnpl/select', [BnplApiController::class, 'selectRental'])->name('bnpl.rentals.select');
                 $router->post($session . '/payments/intents', [PaymentApiController::class, 'createCheckout'])->name('payments.intents.store');
                 $router->get($session . '/payments/intents/{intent}', [PaymentApiController::class, 'showCheckout'])->name('payments.intents.show');
                 $router->post($session . '/payments/intents/{intent}/confirm', [PaymentApiController::class, 'confirm'])->name('payments.intents.confirm');
                 $router->post($session . '/bnpl/offers', [BnplApiController::class, 'checkoutOffers'])->name('bnpl.offers');
-                $router->post($session . '/bnpl/applications', [BnplApiController::class, 'selectCheckout'])->name('bnpl.applications');
 
                 $router->get('{chatbot:uuid}/rentals/accounts/{account}', [RentalHireApiController::class, 'summary'])->name('rentals.accounts.show');
                 $router->get('{chatbot:uuid}/rentals/accounts/{account}/ledger', [RentalHireApiController::class, 'ledger'])->name('rentals.accounts.ledger');
