@@ -11,7 +11,6 @@ use App\Extensions\ChatbotEcommerce\System\Models\CommerceCommunicationMessage;
 use App\Extensions\ChatbotEcommerce\System\Models\CommerceCommunicationThread;
 use App\Extensions\ChatbotEcommerce\System\Services\CommerceCredentialRuntime;
 use App\Extensions\ChatbotEcommerce\System\Support\CommerceRole;
-use Illuminate\Support\Facades\Log;
 
 class EcommerceToolService
 {
@@ -146,10 +145,7 @@ class EcommerceToolService
                     }
 
                     $products = $wooToolHandler->getProducts($args);
-
-                    Log::info(print_r($args, true));
-
-                    if (empty($products)) {
+if (empty($products)) {
                         $products = $wooToolHandler->getProducts([
                             'orderby'  => 'popularity',
                             'order'    => 'desc',
