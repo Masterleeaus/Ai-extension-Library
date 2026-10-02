@@ -14,7 +14,7 @@ class ChatbotEcommerceController extends Controller
     {
         $agentOptions = $request->user()
             ->externalChatbots()
-            ->select(['id', 'title'])
+            ->select(['id', 'uuid', 'title'])
             ->orderBy('title')
             ->get();
 
