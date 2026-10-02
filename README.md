@@ -1,10 +1,10 @@
-![Titan Commerce — one catalogue, three seller-side AI roles, every sales channel](docs/images/titan-commerce-banner.svg)
+![Smart Sellers — one catalogue, three seller-side AI roles, every sales channel](app/extensions/ChatbotEcommerce/docs/assets/smart-sellers-header.svg)
 
-# Titan Commerce
+# Smart Sellers
 
 **The AI-powered commerce system that takes a seller’s product line wherever customers discover, compare and buy.**
 
-Titan Commerce gives a seller one source of truth for products, variants, prices, availability, orders and customer policies. Three coordinated AI roles use that shared commerce foundation to sell the catalogue, operate its sales channels and support customers.
+Smart Sellers gives a seller one source of truth for products, variants, prices, availability, orders and customer policies. Three coordinated AI roles use that shared commerce foundation to sell the catalogue, operate its sales channels and support customers.
 
 The product is designed for physical goods, digital products, services, hire and rentals, and bookable offerings. A seller can combine product sales with appointments, reservations, rental periods, deposits and extensions in one commerce operation.
 
@@ -20,7 +20,7 @@ All three roles share the same catalogue, inventory, bookings, orders, customer 
 
 ## One commerce system for varied offerings
 
-Titan Commerce is intended to support more than conventional product checkout:
+Smart Sellers is intended to support more than conventional product checkout:
 
 - **Products:** variants, categories, bundles, content, channel listings and stock.
 - **Services:** service options, availability, appointments, deposits and customer follow-up.
@@ -87,6 +87,8 @@ Payment, shipping, tax and marketplace capabilities depend on configured provide
 
 ## Architecture
 
+<p align="center"><img src="app/extensions/ChatbotEcommerce/docs/assets/smart-sellers-architecture.svg" alt="Smart Sellers architecture infographic: seller catalogue, three AI roles, shared commerce core, connected channels and seller authority controls" width="100%"></p>
+
 ```text
 Seller catalogue and policies
              │
@@ -104,7 +106,7 @@ Seller catalogue and policies
        Seller store and supported channels
 ```
 
-The existing extension is built as a Laravel/PHP module with service providers, APIs, persistence models, jobs, queues, scheduled lifecycle tasks, marketplace and payment provider contracts, and a capability manifest. The extension currently lives at `app/extensions/ChatbotEcommerce/`; **Titan Commerce** is the product name for the seller-owned commerce system.
+The existing extension is built as a Laravel/PHP module with service providers, APIs, persistence models, jobs, queues, scheduled lifecycle tasks, marketplace and payment provider contracts, and a capability manifest. The extension currently lives at `app/extensions/ChatbotEcommerce/`; **Smart Sellers** is the product name for the seller-owned commerce system.
 
 ## Repository implementation
 
@@ -114,7 +116,7 @@ This README describes the intended integrated product. It does not claim that ev
 
 ## Product boundary
 
-Titan Commerce focuses on helping a seller present, sell and support the seller’s own offerings across channels. General-purpose AI provider libraries, unrelated creative-generation tools, unrelated business vertical engines and non-commerce extension suites are outside the product boundary. Shared infrastructure remains in scope when the commerce system depends on it.
+Smart Sellers focuses on helping a seller present, sell and support the seller’s own offerings across channels. General-purpose AI provider libraries, unrelated creative-generation tools, unrelated business vertical engines and non-commerce extension suites are outside the product boundary. Shared infrastructure remains in scope when the commerce system depends on it.
 
 ## Development
 
