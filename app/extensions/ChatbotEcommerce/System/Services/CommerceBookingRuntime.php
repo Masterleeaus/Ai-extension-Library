@@ -54,9 +54,9 @@ final class CommerceBookingRuntime
             ->get();
     }
 
-    public function reserve(int $chatbotId, string $sessionId, string $idempotencyKey, int $slotId, int $quantity, array $customerDetails = [], ?int $customerIdentityId = null): CommerceBooking
+    public function reserve(int $chatbotId, string $sessionId, string $idempotencyKey, int $slotId, int $quantity, array $customerDetails = [], ?int $customerIdentityId = null, array $metadata = []): CommerceBooking
     {
-        return DB::transaction(function () use ($chatbotId, $sessionId, $idempotencyKey, $slotId, $quantity, $customerDetails, $customerIdentityId): CommerceBooking {
+        return DB::transaction(function () use ($chatbotId, $sessionId, $idempotencyKey, $slotId, $quantity, $customerDetails, $customerIdentityId, $metadata): CommerceBooking {
             $existing = CommerceBooking::query()->where('chatbot_id', $chatbotId)->where('idempotency_key', $idempotencyKey)->first();
             if ($existing !== null) {
                 if ((int) $existing->slot_id !== $slotId || (int) $existing->quantity !== $quantity || (string) $existing->session_id !== $sessionId) {
@@ -87,6 +87,7 @@ final class CommerceBookingRuntime
                 'status' => 'confirmed',
                 'idempotency_key' => $idempotencyKey,
                 'customer_details' => $customerDetails,
+                'metadata' => $metadata,
             ])->load('slot');
         }, 3);
     }
