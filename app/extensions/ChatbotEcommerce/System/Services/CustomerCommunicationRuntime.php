@@ -226,7 +226,26 @@ final class CustomerCommunicationRuntime
             ],
         ];
 
-        return ['draft' => $draft, 'ui' => $this->cards->reply($thread, $draft)];
+        $message = CommerceCommunicationMessage::query()->create([
+            'thread_id' => (int) $thread->getKey(),
+            'chatbot_id' => (int) $chatbot->getAttribute('id'),
+            'channel' => (string) $thread->channel,
+            'direction' => 'outbound',
+            'actor_type' => 'assistant',
+            'role' => CommerceRole::CUSTOMER_COMMUNICATIONS,
+            'message_type' => 'text',
+            'body' => $draft['text'],
+            'safe_summary' => 'Post-sale feedback request draft',
+            'intent' => 'post_sale_feedback_request',
+            'metadata' => [
+                'delivery_status' => 'draft_only',
+                'requires_seller_approval' => true,
+                'order_source' => $draft['order_source'],
+                'order_number' => $draft['order_number'],
+            ],
+        ]);
+
+        return ['draft' => $draft, 'message' => $message->toArray(), 'ui' => $this->cards->reply($thread, $draft)];
     }
 
     /** @param array<string,mixed> $payload @return array<string,mixed> */
