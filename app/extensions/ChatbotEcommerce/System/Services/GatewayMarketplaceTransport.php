@@ -21,7 +21,7 @@ final class GatewayMarketplaceTransport implements MarketplaceTransport
         try {
             $config = (array) config("chatbot-ecommerce.marketplaces.providers.{$provider}", []);
             $url = rtrim((string) ($config['gateway_url'] ?? ''), '/');
-            if ($url === '') throw new RuntimeException("Marketplace gateway is not configured for {$provider}.");
+            if ($url === '' || $secret === '') throw new RuntimeException("Marketplace gateway URL and signing secret must be configured for {$provider}.");
             $body = [
                 'operation' => $operation,
                 'credential_reference' => (string) $connection->credential_reference,
@@ -41,7 +41,7 @@ final class GatewayMarketplaceTransport implements MarketplaceTransport
                     'X-Marketplace-Provider' => $provider,
                     'X-Marketplace-Operation' => $operation,
                     'X-Credential-Reference' => (string) $connection->credential_reference,
-                    'X-Payload-Signature' => $secret === '' ? '' : hash_hmac('sha256', $encoded, $secret),
+                    'X-Payload-Signature' => hash_hmac('sha256', $encoded, $secret),
                 ])->post($url . '/v1/marketplace/read', $body);
             if (! $response->successful()) throw new RuntimeException("Marketplace gateway request failed with status {$response->status()}.");
             $result = $response->json();
