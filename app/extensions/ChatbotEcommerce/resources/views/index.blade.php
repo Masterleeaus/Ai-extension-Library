@@ -38,7 +38,7 @@
             <article class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900">
                 <p class="text-xs font-semibold uppercase tracking-wider text-amber-600">03 · RETAIN</p>
                 <h2 class="mt-3 text-lg font-semibold">Customer Communications Agent</h2>
-                <p class="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300">Follows up on sales, answers from transaction facts, requests feedback and escalates sensitive issues.</p>
+                <p class="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300">Drafts transaction-grounded order follow-ups and feedback requests, answers from seller records, and escalates sensitive issues.</p>
             </article>
         </section>
 
