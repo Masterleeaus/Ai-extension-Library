@@ -40,7 +40,9 @@ The extension separates seller operations from customer shopping and support. Ma
 
 The Laravel extension is located at `app/extensions/ChatbotEcommerce/`. Its current extension key and package paths remain compatible with existing installations; **Titan Commerce** is the customer-facing product name.
 
-Seller connection, gateway, queue, payment and security configuration is documented in [Titan Commerce Operations](docs/OPERATIONS.md).\n\n## Implementation status
+Seller connection, gateway, queue, payment and security configuration is documented in [Titan Commerce Operations](docs/OPERATIONS.md).
+
+## Implementation status
 
 The source contains foundations for catalogue and variants, carts and checkout sessions, inventory reservations, orders and returns, marketplace listings and write proposals, customer communication threads and support actions, a unified order workbench, and capacity-managed booking slots. Sellers can associate slots with catalogue products; the shopping and customer communications roles can discover availability across supported store sources, while customer approval is required before capacity is reserved through a signed storefront session.
 
