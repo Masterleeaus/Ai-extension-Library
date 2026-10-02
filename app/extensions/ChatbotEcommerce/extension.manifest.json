@@ -91,7 +91,10 @@
     "commerce.external-order-projections",
     "commerce.settlement-reconciliation",
     "commerce.order-exception-management",
-    "commerce.order-customer-communication-linking"
+    "commerce.order-customer-communication-linking",
+    "commerce.bookings",
+    "commerce.service-appointments",
+    "commerce.capacity-reservations"
   ],
   "contributions": [],
   "permissions": [
@@ -131,7 +134,10 @@
     "chatbot-ecommerce.issue-session-authority",
     "chatbot-ecommerce.manage-order-workbench",
     "chatbot-ecommerce.import-settlements",
-    "chatbot-ecommerce.resolve-order-exceptions"
+    "chatbot-ecommerce.resolve-order-exceptions",
+    "chatbot-ecommerce.manage-bookings",
+    "chatbot-ecommerce.manage-booking-availability",
+    "chatbot-ecommerce.cancel-bookings"
   ],
   "external_hosts": [],
   "routes": [
@@ -251,7 +257,9 @@
       "ext_chatbot_order_reconciliations",
       "ext_chatbot_order_exceptions",
       "ext_chatbot_order_exception_events",
-      "ext_chatbot_order_workbench_actions"
+      "ext_chatbot_order_workbench_actions",
+      "ext_chatbot_booking_slots",
+      "ext_chatbot_bookings"
     ],
     "shared_tables": [
       "ext_chatbots"
