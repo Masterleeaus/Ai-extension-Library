@@ -90,13 +90,17 @@ final class ChatbotEcommerceServiceProvider extends ServiceProvider implements U
                 $router->post('{chatbot:uuid}/session/{sessionId}/productGetCart', [ChatbotEcommerceApiController::class, 'productGetCart'])->name('product.getCart');
             });
 
-        $router->middleware(['api', LanguageMiddleware::class, RequireCommerceSessionAuthority::class])->prefix('api/v3/chatbot/ecommerce')->name('api.v3.chatbot.ecommerce.')
+        $router->middleware(['api', LanguageMiddleware::class])->prefix('api/v3/chatbot/ecommerce')->name('api.v3.chatbot.ecommerce.')
             ->group(function (Router $router): void {
-                $session = '{chatbot:uuid}/session/{sessionId}';
                 $router->post('{chatbot:uuid}/commerce/session-authority', [CommerceSessionAuthorityApiController::class, 'issue'])->name('commerce.session-authority.issue');
                 $router->get('commerce/roles', [CommerceRoleApiController::class, 'definitions'])->name('commerce.roles');
                 $router->post('commerce/roles/resolve', [CommerceRoleApiController::class, 'resolve'])->name('commerce.roles.resolve');
                 $router->get('commerce/tools', [ConversationalCommerceApiController::class, 'definitions'])->name('commerce.tools');
+            });
+
+        $router->middleware(['api', LanguageMiddleware::class, RequireCommerceSessionAuthority::class])->prefix('api/v3/chatbot/ecommerce')->name('api.v3.chatbot.ecommerce.')
+            ->group(function (Router $router): void {
+                $session = '{chatbot:uuid}/session/{sessionId}';
 
                 $router->get($session . '/context', [ConversationalCommerceApiController::class, 'context'])->name('context.show');
                 $router->put($session . '/context', [ConversationalCommerceApiController::class, 'updateContext'])->name('context.update');
