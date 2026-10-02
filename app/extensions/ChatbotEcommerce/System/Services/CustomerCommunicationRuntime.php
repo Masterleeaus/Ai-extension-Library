@@ -190,16 +190,22 @@ final class CustomerCommunicationRuntime
         }
 
         $context = $this->threadContext($chatbot, $thread);
-        $order = collect((array) ($context['orders'] ?? []))->first(
-            static fn (array $candidate): bool => (string) ($candidate['status'] ?? '') === 'completed'
-                || (string) ($candidate['fulfillment_status'] ?? '') === 'delivered'
-        );
+        $candidateOrders = collect((array) ($context['orders'] ?? []))
+            ->merge((array) ($context['marketplace_orders'] ?? []));
+        $order = $candidateOrders->first(static function (array $candidate): bool {
+            $status = strtolower((string) ($candidate['status'] ?? ''));
+            $fulfillment = strtolower((string) ($candidate['fulfillment_status'] ?? ''));
+
+            return in_array($status, ['completed', 'delivered', 'fulfilled'], true)
+                || in_array($fulfillment, ['delivered', 'fulfilled'], true);
+        });
         if (! is_array($order)) {
             throw ValidationException::withMessages(['order' => 'A completed or delivered seller order is required for a feedback request.']);
         }
 
-        $items = (array) ($order['items'] ?? []);
-        $itemName = trim((string) ($items[0]['name'] ?? 'your recent order'));
+        $sourceSnapshot = (array) ($order['source_snapshot'] ?? []);
+        $items = (array) ($order['items'] ?? $sourceSnapshot['items'] ?? $sourceSnapshot['line_items'] ?? []);
+        $itemName = trim((string) ($items[0]['name'] ?? $items[0]['title'] ?? $items[0]['product_name'] ?? 'your recent order'));
         $sellerName = trim((string) $chatbot->getAttribute('title')) ?: 'our store';
         $draft = [
             'text' => sprintf(
@@ -208,7 +214,7 @@ final class CustomerCommunicationRuntime
                 $itemName
             ),
             'type' => 'post_sale_feedback_request',
-            'order_number' => $order['order_number'] ?? null,
+            'order_number' => $order['order_number'] ?? $order['source_order_id'] ?? $sourceSnapshot['order_number'] ?? null,\n            'order_source' => $order['source_type'] ?? 'native',
             'channel' => (string) $thread->channel,
             'requires_seller_approval' => true,
             'send_status' => 'draft_only',
