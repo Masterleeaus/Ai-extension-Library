@@ -214,7 +214,8 @@ final class CustomerCommunicationRuntime
                 $itemName
             ),
             'type' => 'post_sale_feedback_request',
-            'order_number' => $order['order_number'] ?? $order['source_order_id'] ?? $sourceSnapshot['order_number'] ?? null,\n            'order_source' => $order['source_type'] ?? 'native',
+            'order_number' => $order['order_number'] ?? $order['source_order_id'] ?? $sourceSnapshot['order_number'] ?? null,
+            'order_source' => $order['source_type'] ?? 'native',
             'channel' => (string) $thread->channel,
             'requires_seller_approval' => true,
             'send_status' => 'draft_only',
